@@ -21,7 +21,7 @@ const uri: string = process.env.MONGODB_URI || 'mongodb://localhost:27017/your-a
         console.error(error);
     }
 })();
-
+ 
 app.get('/', (_req: Request, res: Response) => {
     res.status(200).send('Server is running');
 });
