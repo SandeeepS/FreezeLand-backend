@@ -1,3 +1,18 @@
 import mongoose from "mongoose";
-import userModel from "../models/userModel";
+import userModel, { UserInterface } from "../models/userModel";
+
+class UserRepository{
+    async saveUser(userData:UserInterface):Promise<UserInterface| null> {
+        try{
+             const newUser = new userModel(userData);
+             await newUser.save();
+             return newUser as UserInterface
+        }catch(error){
+            console.log(error as Error);
+            return null;
+        }
+    }
+}
+
+export default UserRepository
 
