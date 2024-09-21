@@ -6,12 +6,10 @@ import UserRepository from "../repositories/userRepository";
 
 class userService {
     constructor(private userRepository:UserRepository,
-        
     ){}
-
-
     async signupUser(userData:UserInterface):Promise <any>{
         try{
+            console.log("Entered in user Service");
             const user = await this.userRepository.saveUser(userData);
             if(user){
                 console.log("user is registered ");

@@ -5,7 +5,7 @@ export interface UserInterface extends Document{
       name:string;
       password:string;
       email:string;
-      phoneNumber:Number;
+      phone:Number;
       isBlocked:boolean;
       
 }
@@ -22,7 +22,7 @@ const userSchema:Schema<UserInterface> = new Schema({
         type:String,
         required:true
     },
-    phoneNumber:{
+    phone:{
         type:Number,
         required:true,
     },

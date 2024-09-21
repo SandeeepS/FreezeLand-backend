@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors'
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import userRoutes from './routes/userRoutes';
 
 dotenv.config();
 const app: Express = express();
@@ -28,6 +29,8 @@ const uri: string = process.env.MONGODB_URI || 'mongodb://localhost:27017/your-a
 app.get('/', (_req: Request, res: Response) => {
     res.status(200).send('Server is running');
 });
+
+app.use('/api',userRoutes);
 
 
 app.listen(PORT, () => {

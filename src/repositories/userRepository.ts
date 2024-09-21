@@ -8,7 +8,8 @@ class UserRepository{
              await newUser.save();
              return newUser as UserInterface
         }catch(error){
-            console.log(error as Error);
+
+            console.log("Error from userRepository",error as Error);
             return null;
         }
     }
