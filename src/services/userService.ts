@@ -19,6 +19,18 @@ class userService {
 
         }
     }
+
+    async userLogin(email:string,password:string):Promise<any>{
+        try{
+            const user : UserInterface | null = await this.userRepository.findEmail(email);
+            if(user){
+                 return user;
+            }
+        }catch(error){
+            console.log("error occured in the userService while userLogin",error as Error);
+            return null;
+        }
+    }
 }
 
 export default userService

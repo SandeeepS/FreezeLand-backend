@@ -9,5 +9,5 @@ const userServices = new userService(userRepository);
 const controller = new userController(userServices);
 
 userRouter.post('/user/registration',async(req:Request,res:Response) => await controller.userSignup(req,res));
-
+userRouter.post('/user/login',async(req:Request,res:Response) => await controller.userLogin(req,res) )
 export default userRouter;
