@@ -29,6 +29,24 @@ class UserRepository{
             return null;
         }
     }
+
+    async emailExistCheck(email: string): Promise<UserInterface | null> {
+        try {
+            const userFound = await userModel.findOne({ email: email });
+            return userFound as UserInterface;
+        } catch (error) {
+            console.log(error as Error);
+            return null;
+        }
+    }
+    async getUserById(id: string): Promise<UserInterface | null> {
+        try {
+            return await userModel.findById(id);
+        } catch (error) {
+            console.log(error as Error);
+            return null;
+        }
+    }
 }
 
 export default UserRepository

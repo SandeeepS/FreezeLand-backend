@@ -3,6 +3,7 @@ import cors from 'cors'
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes';
+import adminRoutes from './routes/adminRoutes';
 
 dotenv.config();
 const app: Express = express();
@@ -21,7 +22,7 @@ const uri: string = process.env.MONGODB_URI || 'mongodb://localhost:27017/your-a
     try {
         await mongoose.connect(uri);
         console.log('Connected to the database');
-    } catch(error) {
+    }catch(error) {
         console.error(error);
     }
 })();
@@ -31,6 +32,7 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 app.use('/api',userRoutes);
+app.use('/api/admin',adminRoutes);
 
 
 app.listen(PORT, () => {
