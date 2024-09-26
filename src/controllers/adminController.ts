@@ -13,35 +13,33 @@ class adminController {
   async adminLogin(req: Request, res: Response) {
     try {
       console.log("enterd in the backend adminlogin in adminController");
-      const { email, password } = req.body;
+      const { email, password} = req.body;
       const loginStatus = await this.adminService.adminLogin(email, password);
-      if (
-        loginStatus &&
-        !loginStatus.data.success &&
-        loginStatus.data.message === "Incorrect password!"
-      ) {
+ 
         if (!loginStatus.data.success) {
           res
             .status(UNAUTHORIZED)
             .json({ success: false, message: loginStatus.data.message });
           return;
+        }else{
+          const time = this.milliseconds(23, 30, 0);
+          const access_token = loginStatus.data.token;
+          const refresh_token = loginStatus.data.refreshToken;
+          const accessTokenMaxAge = 5 * 60 * 1000;
+          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+          console.log("respose is going to send to the frontend");
+          res
+            .status(loginStatus.status)
+            .cookie("admin_access_token", access_token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("admin_refresh_token", refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(loginStatus);
         }
-        const time = this.milliseconds(23, 30, 0);
-        const access_token = loginStatus.data.token;
-        const refresh_token = loginStatus.data.refreshToken;
-        const accessTokenMaxAge = 5 * 60 * 1000;
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-        console.log("respose is going to send");
-        res
-          .status(loginStatus.status)
-          .cookie("admin_access_token", access_token, {
-            maxAge: accessTokenMaxAge,
-          })
-          .cookie("refresh_token", refresh_token, {
-            maxAge: refreshTokenMaxAge,
-          })
-          .json(loginStatus);
-      }
+      
+      
     } catch (error) {
       console.log(error as Error);
       res

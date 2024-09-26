@@ -18,7 +18,6 @@ class AdminRepository {
     console.log("enterd in the isAdminExist", email);
     const admin = await AdminModel.findOne({ email: email });
     if (admin) {
-      console.log("admin is exist", admin);
       return admin as AdminInterface;
     } else {
       console.log("admin is not exists");
