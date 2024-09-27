@@ -1,9 +1,10 @@
 import { AdminInterface } from "../models/adminModel";
 import AdminModel from "../models/adminModel";
+import { comRepository } from "./comRepository";
 // import { UserInterface } from "../models/userModel";
 // import userModel from "../models/userModel";
 
-class AdminRepository {
+class AdminRepository implements comRepository<AdminInterface> {
   async getAdminById(id: string): Promise<AdminInterface | null> {
     try {
       const admin = await AdminModel.findById(id);

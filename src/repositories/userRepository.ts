@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import userModel, { UserInterface } from "../models/userModel";
+import { comRepository } from "./comRepository";
 
-class UserRepository {
+class UserRepository implements comRepository<UserInterface>{
   async saveUser(userData: UserInterface): Promise<UserInterface | null> {
     try {
       const newUser = new userModel(userData);

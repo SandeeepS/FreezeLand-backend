@@ -1,6 +1,7 @@
 import MechModel,{MechInterface} from "../models/mechModel";
+import { comRepository } from "./comRepository";
 
-class MechRepository{
+class MechRepository implements comRepository<MechInterface>{
     async saveMechanic(mechData:MechInterface):Promise<MechInterface | null>{
         try{
             const newMech = new MechModel(mechData);
