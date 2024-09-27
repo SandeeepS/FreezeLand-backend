@@ -14,6 +14,7 @@ const userRepository = new UserRepository()
 const userServices = new userService(userRepository,createjwt,encrypt);
 const controller = new userController(userServices);
 
+
 userRouter.post('/user/registration',async(req:Request,res:Response) => await controller.userSignup(req,res));
 userRouter.post('/user/login',async(req:Request,res:Response) => await controller.userLogin(req,res) )
 userRouter.get('/user/logout', async (req: Request, res: Response) => await controller.logout(req, res));

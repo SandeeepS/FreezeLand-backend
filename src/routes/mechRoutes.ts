@@ -1,0 +1,20 @@
+import express,{Router,Request,Response} from 'express'
+import Encrypt from '../utils/comparePassword';
+import MechRepository from '../repositories/mechRepository';
+import mechController from '../controllers/mechController';
+import { CreateJWT } from '../utils/generateToken';
+import mechService from '../services/mechServices';
+
+
+const encrypt = new Encrypt();
+const createjwt = new CreateJWT();
+const mechRouter:Router = express.Router();
+const mechRepository = new MechRepository();
+const mechServices = new mechService(mechRepository,createjwt,encrypt);
+const controller = new mechController(mechServices);
+
+mechRouter.post('/mech/login',async(req:Request,res:Response) => await controller.mechLogin(req,res));
+
+
+
+export default mechRouter;

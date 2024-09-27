@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import AdminService from "../services/AdminServices";
+import AdminService from "../services/adminServices";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 
 const { OK, UNAUTHORIZED, BAD_REQUEST, INTERNAL_SERVER_ERROR } = STATUS_CODES;
