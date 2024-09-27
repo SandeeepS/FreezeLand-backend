@@ -2,3 +2,12 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/user/login\",\"status\":\"200\",\"responseTime\":\"62.333\"}","timestamp":"2024-09-27T08:47:36.238Z"}
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/user/logout\",\"status\":\"304\",\"responseTime\":\"6.397\"}","timestamp":"2024-09-27T08:48:16.996Z"}
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/user/login\",\"status\":\"200\",\"responseTime\":\"50.413\"}","timestamp":"2024-09-27T08:48:30.192Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/user/logout\",\"status\":\"304\",\"responseTime\":\"4.951\"}","timestamp":"2024-09-27T09:18:48.672Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/user/login\",\"status\":\"200\",\"responseTime\":\"55.095\"}","timestamp":"2024-09-27T09:18:56.260Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/user/logout\",\"status\":\"304\",\"responseTime\":\"0.501\"}","timestamp":"2024-09-27T09:19:01.053Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/user/login\",\"status\":\"200\",\"responseTime\":\"59.999\"}","timestamp":"2024-09-27T15:14:43.411Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/user/logout\",\"status\":\"304\",\"responseTime\":\"1.610\"}","timestamp":"2024-09-27T15:14:58.639Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/login\",\"status\":\"200\",\"responseTime\":\"45.235\"}","timestamp":"2024-09-27T15:15:28.560Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/mech/logout\",\"status\":\"304\",\"responseTime\":\"1.263\"}","timestamp":"2024-09-27T15:15:33.898Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/admin/login\",\"status\":\"200\",\"responseTime\":\"45.490\"}","timestamp":"2024-09-27T15:15:50.889Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/admin/logout\",\"status\":\"304\",\"responseTime\":\"0.608\"}","timestamp":"2024-09-27T15:15:55.795Z"}

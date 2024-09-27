@@ -7,6 +7,7 @@ export interface comRepository<T> {
     isAdminExist?(email: string): Promise<T | null>;
     saveMechanic?(data: T): Promise<T | null>;
 
-
-    
   }
+
+
+  

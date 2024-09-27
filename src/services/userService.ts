@@ -3,9 +3,10 @@ import { UserInterface } from "../models/userModel";
 import UserRepository from "../repositories/userRepository";
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
+import { comService } from "./comServices";
 
 const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
-class userService {
+class userService implements comService<UserInterface> {
   constructor(
     private userRepository: UserRepository,
     private createjwt: CreateJWT,

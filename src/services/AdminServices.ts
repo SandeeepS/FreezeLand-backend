@@ -1,12 +1,13 @@
-import { Request } from "express";
-import AdminModel, { AdminInterface } from "../models/adminModel";
+import { AdminInterface } from "../models/adminModel";
+import { comService } from "./comServices";
 import AdminRepository from "../repositories/adminRepository";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
 const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
 
-class AdminService {
+
+class AdminService implements comService<AdminInterface> {
   constructor(
     private adminRepository: AdminRepository,
     private encrypt: Encrypt,

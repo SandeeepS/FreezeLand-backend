@@ -3,9 +3,10 @@ import { MechInterface } from "../models/mechModel";
 import MechRepository from "../repositories/mechRepository";
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
+import { comService } from "./comServices";
 
 const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
-class mechService {
+class mechService implements comService<MechInterface> {
   constructor(
     private mechRepository: MechRepository,
     private createjwt: CreateJWT,

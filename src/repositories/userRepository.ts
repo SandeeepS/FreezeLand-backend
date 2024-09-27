@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import userModel, { UserInterface } from "../models/userModel";
 import { comRepository } from "./comRepository";
 
