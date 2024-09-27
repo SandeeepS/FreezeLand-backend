@@ -13,8 +13,9 @@ const mechRepository = new MechRepository();
 const mechServices = new mechService(mechRepository,createjwt,encrypt);
 const controller = new mechController(mechServices);
 
-mechRouter.post('/mech/login',async(req:Request,res:Response) => await controller.mechLogin(req,res));
-
+mechRouter.post('/login',async(req:Request,res:Response) => await controller.mechLogin(req,res));
+mechRouter.post('/signup',async(req:Request,res:Response) => await controller.mechSignup(req,res));
+mechRouter.get('/logout',async(req:Request,res:Response) => await controller.mechLogout(req,res));
 
 
 export default mechRouter;

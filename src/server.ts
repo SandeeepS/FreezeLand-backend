@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import mechRoutes from "./routes/mechRoutes";
 
 dotenv.config();
 const app: Express = express();
@@ -36,6 +37,7 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use("/api", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/mech", mechRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);

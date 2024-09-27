@@ -4,7 +4,7 @@ class MechRepository{
     async saveMechanic(mechData:MechInterface):Promise<MechInterface | null>{
         try{
             const newMech = new MechModel(mechData);
-            await newMech as MechInterface;
+            await newMech.save();
             return newMech as MechInterface;
 
         }catch(error){

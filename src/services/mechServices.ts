@@ -12,6 +12,29 @@ class mechService {
     private encrypt: Encrypt
   ) {}
 
+  async signupMech(mechData: MechInterface): Promise<any> {
+    try {
+      console.log("Entered in mechanic Service");
+      const mechanic = await this.mechRepository.saveMechanic(mechData);
+      if (mechanic) {
+        console.log("mechanic is registered ");
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: "mechanic is successfully registered ",
+            data: mechanic,
+          },
+        };
+      } else {
+        console.log("mechanic is not registered");
+        
+      }
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
   async mechLogin(email: string, password: string): Promise<any> {
     try {
       const mech: MechInterface | null =
@@ -72,6 +95,5 @@ class mechService {
     }
   }
 }
-
 
 export default mechService;
