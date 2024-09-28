@@ -102,12 +102,10 @@ class userController {
           .status(UNAUTHORIZED)
           .json({ success: false, message: "Authentication failed..!" });
       else if (currentUser?.isBlocked)
-        res
-          .status(UNAUTHORIZED)
-          .json({
-            success: false,
-            message: "user has been blocked by the admin!",
-          });
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "user has been blocked by the admin!",
+        });
       else res.status(OK).json(currentUser);
     } catch (error) {
       console.log(error as Error);
