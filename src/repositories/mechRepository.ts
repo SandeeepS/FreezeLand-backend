@@ -2,7 +2,7 @@ import MechModel,{MechInterface} from "../models/mechModel";
 import { comRepository } from "./comRepository";
 
 class MechRepository implements comRepository<MechInterface>{
-    async saveMechanic(mechData:MechInterface):Promise<MechInterface | null>{
+    async saveMechanic(mechData:Partial<MechInterface>):Promise<MechInterface | null>{
         try{
             const newMech = new MechModel(mechData);
             await newMech.save();

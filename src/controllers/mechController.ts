@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import mechService from "../services/mechServices";
+import Cryptr from "cryptr";
 
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
 

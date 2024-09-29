@@ -17,6 +17,7 @@ class Encrypt implements compareInterface {
     if (password === becrypedPassword) {
       return true;
     } else {
+      console.log("Password is note mathched ");
       return false;
     }
   }
