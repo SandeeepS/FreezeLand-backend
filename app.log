@@ -29,3 +29,6 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/signup\",\"status\":\"200\",\"responseTime\":\"154.357\"}","timestamp":"2024-09-29T08:11:26.951Z"}
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/login\",\"status\":\"401\",\"responseTime\":\"41.192\"}","timestamp":"2024-09-29T08:12:51.958Z"}
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/login\",\"status\":\"401\",\"responseTime\":\"40.483\"}","timestamp":"2024-09-29T08:13:04.026Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/login\",\"status\":\"401\",\"responseTime\":\"50.107\"}","timestamp":"2024-09-29T08:15:45.585Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/login\",\"status\":\"200\",\"responseTime\":\"133.627\"}","timestamp":"2024-09-29T08:16:27.688Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/mech/logout\",\"status\":\"304\",\"responseTime\":\"0.917\"}","timestamp":"2024-09-29T08:16:40.473Z"}
