@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import Cryptr = require("cryptr");
 
 interface compareInterface {
   compare(password: string, hashedPassword: string): Promise<boolean>;
@@ -6,7 +6,15 @@ interface compareInterface {
 
 class Encrypt implements compareInterface {
   async compare(password: string, hashedPassword: string): Promise<boolean> {
-    if (password === hashedPassword) {
+    const secret_key:string | undefined= process.env.CRYPTR_SECRET;
+    if(!secret_key){
+      throw new Error("Encrption secret key is not defined in the environment");
+    }
+    const cryptr = new Cryptr(secret_key);
+    const becrypedPassword = cryptr.decrypt(hashedPassword);
+
+    
+    if (password === becrypedPassword) {
       return true;
     } else {
       return false;

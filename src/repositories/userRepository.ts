@@ -2,7 +2,7 @@ import userModel, { UserInterface } from "../models/userModel";
 import { comRepository } from "./comRepository";
 
 class UserRepository implements comRepository<UserInterface>{
-  async saveUser(userData: UserInterface): Promise<UserInterface | null> {
+  async saveUser(userData:Partial< UserInterface>): Promise<UserInterface | null> {
     try {
       const newUser = new userModel(userData);
       await newUser.save();

@@ -4,7 +4,12 @@ import UserRepository from "../repositories/userRepository";
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
+import dotenv from "dotenv";
+import Cryptr = require("cryptr");
 
+
+
+dotenv.config();
 
 const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
 class userService implements comService<UserInterface> {
@@ -15,8 +20,22 @@ class userService implements comService<UserInterface> {
   ) {}
   async signupUser(userData: UserInterface): Promise<any> {
     try {
-      console.log("Entered in user Service");
-      const user = await this.userRepository.saveUser(userData);
+      console.log("Entered in user Service and the userData is ",userData);
+      const {name,email,password,phone} = userData;
+      const secret_key :string | undefined= process.env.CRYPTR_SECRET
+      if(!secret_key){
+        throw new Error("Encrption secret key is not defined in the environment");
+      }
+      const cryptr = new Cryptr(secret_key);
+      const newPassword = cryptr.encrypt(password);
+      const newDetails: Partial<UserInterface> = {
+               name:name,
+               password:newPassword,
+               email:email,
+               phone:phone
+      }
+      console.log("new Encypted password with data is ",newDetails);
+      const user = await this.userRepository.saveUser(newDetails);
       if (user) {
         console.log("user is registered ");
         return {
