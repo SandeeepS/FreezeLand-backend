@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
+import { generateAndSendOTP } from "../utils/generateOtp";
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
+
 
 class userController {
   constructor(private userServices: userService) {}
@@ -10,26 +12,30 @@ class userController {
 
   async userSignup(req: Request, res: Response): Promise<void> {
     try {
-      console.log("req body is ", req.body);
-      req.app.locals.userData = req.body;
-      console.log(
-        "User detials from userController is ",
-        req.app.locals.userData
-      );
-      const newUser = await this.userServices.signupUser(
-        req.app.locals.userData
-      );
-      console.log("enterd into the backend");
-      console.log(newUser);
-      if (newUser) {
-        res
-          .status(OK)
-          .json({ success: true, message: "Registered Successfully" });
-      }
+        req.app.locals.userData = req.body;
+        const newUser = await this.userServices.userSignup(req.app.locals.userData);
+        if (!newUser) {
+            req.app.locals.newUser = true;
+            req.app.locals.userData = req.body;
+            req.app.locals.userEmail = req.body.email;
+            const otp = await generateAndSendOTP(req.body.email);
+            req.app.locals.userOtp = otp;
+
+            const expirationMinutes = 1;
+            setTimeout(() => {
+                delete req.app.locals.userOtp;
+            }, expirationMinutes * 60 * 1000);
+
+            res.status(OK).json({ userId: null, success: true, message: 'OTP sent for verification...' });
+
+        } else {
+            res.status(BAD_REQUEST).json({ success: false, message: 'The email is already in use!' });
+        }
     } catch (error) {
-      console.log(error as Error);
+        console.log(error as Error)
+        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
     }
-  }
+}
 
   async userLogin(req: Request, res: Response): Promise<void> {
     try {
@@ -73,6 +79,48 @@ class userController {
         .json({ success: false, message: "Internal server error" });
     }
   }
+
+
+  async veryfyOtp(req: Request, res: Response): Promise<void> {
+    try {
+        const { otp } = req.body;
+        const isNuewUser = req.app.locals.newUser;
+        const savedUser = req.app.locals.userData;
+
+     
+
+        const accessTokenMaxAge = 5 * 60 * 1000;
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+ 
+
+        if (otp === Number(req.app.locals.userOtp)) {
+          console.log(typeof(otp))
+          console.log(typeof(req.app.locals.userOtp))
+            if (isNuewUser) {
+                const newUser = await this.userServices.saveUser(savedUser);
+                req.app.locals = {};
+                // const time = this.milliseconds(23, 30, 0);
+                res.status(OK).cookie('access_token', newUser?.data.token, {
+                    maxAge: accessTokenMaxAge
+                }).cookie('refresh_token', newUser?.data.refresh_token, {
+                    maxAge: refreshTokenMaxAge
+                }).json(newUser);
+            } else {
+                const time = this.milliseconds(23, 30, 0);
+                res.status(OK).cookie('access_token', isNuewUser.data.token, {
+                    maxAge: accessTokenMaxAge
+                }).cookie('refresh_token', isNuewUser.data.refresh_token, {
+                    maxAge: refreshTokenMaxAge
+                }).json({ success: true, message: 'old user verified' });
+            }
+        } else {
+            res.status(BAD_REQUEST).json({ success: false, message: 'Incorrect otp !' });
+        }
+    } catch (error) {
+        console.log(error as Error);
+        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server Error.' });
+    }
+}
 
   async logout(req: Request, res: Response) {
     try {

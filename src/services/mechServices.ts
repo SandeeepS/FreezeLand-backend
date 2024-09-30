@@ -23,7 +23,7 @@ class mechService implements comService<MechInterface> {
         throw new Error("Encrption secret key is not defined in the environment");
       }
 
-      const cryptr = new Cryptr(secret_key);
+      const cryptr = new Cryptr(secret_key,{ encoding: 'base64', pbkdf2Iterations: 10000, saltLength: 10 });
       const newPassword = cryptr.encrypt(password);
       const newDetails: Partial<MechInterface> = {
                name:name,

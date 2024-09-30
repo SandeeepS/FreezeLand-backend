@@ -1,6 +1,7 @@
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { UserInterface } from "../models/userModel";
 import UserRepository from "../repositories/userRepository";
+import {UserResponseInterface} from "../interfaces/serviceInterfaces/InUserService"
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
@@ -18,15 +19,63 @@ class userService implements comService<UserInterface> {
     private createjwt: CreateJWT,
     private encrypt: Encrypt
   ) {}
-  async signupUser(userData: UserInterface): Promise<any> {
+  // async signupUser(userData: UserInterface): Promise<any> {
+  //   try {
+  //     console.log("Entered in user Service and the userData is ",userData);
+  //     const {name,email,password,phone} = userData;
+  //     const secret_key :string | undefined= process.env.CRYPTR_SECRET
+  //     if(!secret_key){
+  //       throw new Error("Encrption secret key is not defined in the environment");
+  //     }
+  //     const cryptr = new Cryptr(secret_key,{ encoding: 'base64', pbkdf2Iterations: 10000, saltLength: 10 });
+  //     const newPassword = cryptr.encrypt(password);
+  //     const newDetails: Partial<UserInterface> = {
+  //              name:name,
+  //              password:newPassword,
+  //              email:email,
+  //              phone:phone
+  //     }
+  //     console.log("new Encypted password with data is ",newDetails);
+  //     const user = await this.userRepository.saveUser(newDetails);
+  //     if (user) {
+  //       console.log("user is registered ");
+  //       return {
+  //         status: OK,
+  //         data: {
+  //           success: true,
+  //           message: "User is successfully registered ",
+  //           data: user,
+  //         },
+  //       };
+  //     } else {
+  //       console.log("User is not registered");
+  //     }
+  //   } catch (error) {
+  //     console.log(error as Error);
+  //   }
+  // }
+
+
+  async userSignup(userData: UserInterface): Promise<UserInterface | null> {
     try {
-      console.log("Entered in user Service and the userData is ",userData);
+        return await this.userRepository.emailExistCheck(userData.email);
+    } catch (error) {
+        console.log(error as Error);
+        return null;
+    }
+
+}
+
+
+async saveUser(userData: UserInterface): Promise<UserResponseInterface | undefined> {
+  try {
+          console.log("Entered in user Service and the userData is ",userData);
       const {name,email,password,phone} = userData;
       const secret_key :string | undefined= process.env.CRYPTR_SECRET
       if(!secret_key){
         throw new Error("Encrption secret key is not defined in the environment");
       }
-      const cryptr = new Cryptr(secret_key);
+      const cryptr = new Cryptr(secret_key,{ encoding: 'base64', pbkdf2Iterations: 10000, saltLength: 10 });
       const newPassword = cryptr.encrypt(password);
       const newDetails: Partial<UserInterface> = {
                name:name,
@@ -37,22 +86,27 @@ class userService implements comService<UserInterface> {
       console.log("new Encypted password with data is ",newDetails);
       const user = await this.userRepository.saveUser(newDetails);
       if (user) {
-        console.log("user is registered ");
-        return {
-          status: OK,
-          data: {
-            success: true,
-            message: "User is successfully registered ",
-            data: user,
-          },
-        };
-      } else {
-        console.log("User is not registered");
+          const token = this.createjwt.generateToken(user?.id);
+          const  refresh_token = this.createjwt.generateRefreshToken(user?.id);
+          console.log("token is ",token);
+          console.log("refresh",  refresh_token);
+          return {
+              status: OK,
+              data: {
+                  success: true,
+                  message: 'Success',
+                  userId: userData.id,
+                  token: token,
+                  data: user,
+                  refresh_token
+              }
+          }
       }
-    } catch (error) {
+  } catch (error) {
       console.log(error as Error);
-    }
+      return { status: INTERNAL_SERVER_ERROR, data: { success: false, message: 'Internal server error' } };
   }
+}
 
   async userLogin(email: string, password: string): Promise<any> {
     try {

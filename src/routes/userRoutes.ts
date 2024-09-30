@@ -18,6 +18,7 @@ const controller = new userController(userServices);
 userRouter.post('/user/registration',async(req:Request,res:Response) => await controller.userSignup(req,res));
 userRouter.post('/user/login',async(req:Request,res:Response) => await controller.userLogin(req,res) )
 userRouter.get('/user/logout', async (req: Request, res: Response) => await controller.logout(req, res));
+userRouter.post('/user/veryfy-otp',async(req:Request,res:Response) => await controller.veryfyOtp(req,res));
 userRouter.get('/profile', authenticate, async (req: Request, res: Response) => await controller.getProfile(req, res));
 
 
