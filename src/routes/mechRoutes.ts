@@ -15,6 +15,8 @@ const controller = new mechController(mechServices);
 
 mechRouter.post('/login',async(req:Request,res:Response) => await controller.mechLogin(req,res));
 mechRouter.post('/signup',async(req:Request,res:Response) => await controller.mechSignup(req,res));
+mechRouter.post('/veryfy-otp',async(req:Request,res:Response) => await controller.veryfyMechOtp(req,res));
+
 mechRouter.get('/logout',async(req:Request,res:Response) => await controller.mechLogout(req,res));
 
 

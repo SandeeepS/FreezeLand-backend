@@ -1,11 +1,11 @@
-import { UserInterface } from "../../models/userModel";
+import { MechInterface } from "../../models/mechModel";
 
-export interface UserResponseInterface {
+export interface MechResponseInterface {
   status: number;
   data: {
     success: boolean;
     message: string;
-    data?: UserInterface;
+    data?: MechInterface;
     userId?: string;
     token?: string;
     refresh_token?: string;

@@ -16,8 +16,8 @@ class MechRepository implements comRepository<MechInterface>{
 
     async emailExistCheck(email: string): Promise<MechInterface | null> {
         try {
-          const userFound = await MechModel.findOne({ email: email });
-          return userFound as MechInterface;
+          const mechFound = await MechModel.findOne({ email: email });
+          return mechFound as MechInterface;
         } catch (error) {
           console.log(error as Error);
           return null;

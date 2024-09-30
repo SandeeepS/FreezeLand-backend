@@ -153,3 +153,14 @@
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/user/veryfy-otp\",\"status\":\"500\",\"responseTime\":\"77.463\"}","timestamp":"2024-09-30T03:31:34.636Z"}
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/user/registration\",\"status\":\"200\",\"responseTime\":\"3077.113\"}","timestamp":"2024-09-30T03:38:01.283Z"}
 {"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/user/veryfy-otp\",\"status\":\"200\",\"responseTime\":\"73.537\"}","timestamp":"2024-09-30T03:38:15.432Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/user/logout\",\"status\":\"304\",\"responseTime\":\"4.876\"}","timestamp":"2024-09-30T03:39:31.319Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/user/login\",\"status\":\"200\",\"responseTime\":\"64.810\"}","timestamp":"2024-09-30T03:39:49.704Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/user/logout\",\"status\":\"304\",\"responseTime\":\"0.885\"}","timestamp":"2024-09-30T03:39:55.149Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/signup\",\"status\":\"200\",\"responseTime\":\"2639.151\"}","timestamp":"2024-09-30T04:30:51.318Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/veryfy-otp\",\"status\":\"500\",\"responseTime\":\"16.357\"}","timestamp":"2024-09-30T04:31:05.347Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/signup\",\"status\":\"200\",\"responseTime\":\"3581.038\"}","timestamp":"2024-09-30T04:39:23.863Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/veryfy-otp\",\"status\":\"500\",\"responseTime\":\"7.573\"}","timestamp":"2024-09-30T04:39:36.010Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/signup\",\"status\":\"200\",\"responseTime\":\"2407.273\"}","timestamp":"2024-09-30T05:39:48.885Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/veryfy-otp\",\"status\":\"500\",\"responseTime\":\"7.393\"}","timestamp":"2024-09-30T05:40:07.196Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/signup\",\"status\":\"200\",\"responseTime\":\"2366.706\"}","timestamp":"2024-09-30T05:45:45.074Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/mech/veryfy-otp\",\"status\":\"500\",\"responseTime\":\"10.477\"}","timestamp":"2024-09-30T05:46:01.577Z"}
