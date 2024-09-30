@@ -11,7 +11,7 @@ class UserRepository implements comRepository<UserInterface> {
       return newUser as UserInterface;
     } catch (error) {
       console.log("Error from userRepository", error as Error);
-      return null;
+      throw error
     }
   }
 
@@ -29,7 +29,8 @@ class UserRepository implements comRepository<UserInterface> {
         "error found in the userRepository while finding the email ",
         error as Error
       );
-      return null;
+      throw error
+    
     }
   }
 
@@ -39,7 +40,7 @@ class UserRepository implements comRepository<UserInterface> {
       return userFound as UserInterface;
     } catch (error) {
       console.log(error as Error);
-      return null;
+      throw error
     }
   }
 
@@ -51,6 +52,7 @@ class UserRepository implements comRepository<UserInterface> {
       return updatedUser;
     } catch (error) {
       console.log(error as Error);
+      throw error;
     }
   }
 
@@ -59,7 +61,7 @@ class UserRepository implements comRepository<UserInterface> {
       return await userModel.findById(id);
     } catch (error) {
       console.log(error as Error);
-      return null;
+      throw error
     }
   }
 }

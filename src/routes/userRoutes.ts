@@ -15,17 +15,12 @@ const userServices = new userService(userRepository,createjwt,encrypt);
 const controller = new userController(userServices);
 
 
-userRouter.post('/user/registration',async(req:Request,res:Response) => await controller.userSignup(req,res));
-userRouter.post('/user/login',async(req:Request,res:Response) => await controller.userLogin(req,res) )
-userRouter.get('/user/logout', async (req: Request, res: Response) => await controller.logout(req, res));
-userRouter.post('/user/veryfy-otp',async(req:Request,res:Response) => await controller.veryfyOtp(req,res));
-userRouter.post('/user/forgot-password', async (req: Request, res: Response) => await controller.forgotResentOtp(req, res));
-userRouter.post('/user/verify-forgot-otp', async (req: Request, res: Response) => await controller.VerifyForgotOtp(req, res));
-userRouter.put('/user/update-newpassword', async (req: Request, res: Response) => await controller.updateNewPassword(req, res));
-
-
-
-userRouter.get('/profile', authenticate, async (req: Request, res: Response) => await controller.getProfile(req, res));
-
+userRouter.post('/user/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
+userRouter.post('/user/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next) )
+userRouter.get('/user/logout', async (req: Request, res: Response,next:NextFunction) => await controller.logout(req, res,next));
+userRouter.post('/user/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.veryfyOtp(req,res,next));
+userRouter.post('/user/forgot-password', async (req: Request, res: Response,next:NextFunction) => await controller.forgotResentOtp(req, res,next));
+userRouter.post('/user/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await controller.VerifyForgotOtp(req, res,next));
+userRouter.put('/user/update-newpassword', async (req: Request, res: Response,next:NextFunction) => await controller.updateNewPassword(req, res,next));
 
 export default userRouter;

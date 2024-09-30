@@ -1,4 +1,4 @@
-import express,{Router,Request,Response} from 'express'
+import express,{Router,Request,Response,NextFunction} from 'express'
 import Encrypt from '../utils/comparePassword';
 import MechRepository from '../repositories/mechRepository';
 import mechController from '../controllers/mechController';
@@ -13,11 +13,11 @@ const mechRepository = new MechRepository();
 const mechServices = new mechService(mechRepository,createjwt,encrypt);
 const controller = new mechController(mechServices);
 
-mechRouter.post('/login',async(req:Request,res:Response) => await controller.mechLogin(req,res));
-mechRouter.post('/signup',async(req:Request,res:Response) => await controller.mechSignup(req,res));
-mechRouter.post('/veryfy-otp',async(req:Request,res:Response) => await controller.veryfyMechOtp(req,res));
+mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next));
+mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await controller.mechSignup(req,res,next));
+mechRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.veryfyMechOtp(req,res,next));
 
-mechRouter.get('/logout',async(req:Request,res:Response) => await controller.mechLogout(req,res));
+mechRouter.get('/logout',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogout(req,res,next));
 
 
 export default mechRouter;

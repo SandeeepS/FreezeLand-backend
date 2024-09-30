@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from "express";
+import errorHandlerMiddleware from "./middlewares/errorHandler";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -7,6 +8,7 @@ import adminRoutes from "./routes/adminRoutes";
 import mechRoutes from "./routes/mechRoutes";
 import logger from "./utils/logger";
 import morgan from 'morgan';
+
 
 dotenv.config();
 const morganFormat = ":method :url :status :response-time ms";
@@ -37,6 +39,8 @@ app.use(
     },
   })
 );
+
+app.use(errorHandlerMiddleware)
 
 const uri: string =
   process.env.MONGODB_URI || "mongodb://localhost:27017/your-app";

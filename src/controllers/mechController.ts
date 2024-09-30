@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { Request, Response,NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import mechService from "../services/mechServices";
 import { generateAndSendOTP } from "../utils/generateOtp";
+import { error } from "console";
 
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
 
@@ -10,7 +11,7 @@ class mechController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-  async mechSignup(req: Request, res: Response): Promise<void> {
+  async mechSignup(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
       console.log("req body is ", req.body);
       req.app.locals.mechData = req.body;
@@ -43,13 +44,11 @@ class mechController {
       }
     } catch (error) {
       console.log(error as Error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
+      next(error)
     }
   }
 
-  async veryfyMechOtp(req: Request, res: Response): Promise<void> {
+  async veryfyMechOtp(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
       const { otp } = req.body;
       const isNuewMech = req.app.locals.newMechanic;
@@ -95,13 +94,11 @@ class mechController {
       }
     } catch (error) {
       console.log(error as Error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server Error." });
+      next(error);
     }
   }
 
-  async mechLogin(req: Request, res: Response): Promise<void> {
+  async mechLogin(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
       const loginStatus = await this.mechServices.mechLogin(email, password);
@@ -138,13 +135,11 @@ class mechController {
           .json({ success: false, message: "Authentication error" });
       }
     } catch (error) {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
+      next(error)
     }
   }
 
-  async mechLogout(req: Request, res: Response) {
+  async mechLogout(req: Request, res: Response,next:NextFunction) {
     try {
       res
         .cookie("m_access_token", "", {
@@ -158,9 +153,7 @@ class mechController {
         .json({ success: true, message: "user logout - clearing cookie" });
     } catch (err) {
       console.log(err);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
+      next(err)
     }
   }
 }

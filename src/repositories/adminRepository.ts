@@ -11,18 +11,22 @@ class AdminRepository implements comRepository<AdminInterface> {
       return admin;
     } catch (error) {
       console.log(error as Error);
-      return null;
+      throw error;
     }
   }
 
   async isAdminExist(email: string): Promise<AdminInterface | null> {
-    console.log("enterd in the isAdminExist", email);
-    const admin = await AdminModel.findOne({ email: email });
-    if (admin) {
-      return admin as AdminInterface;
-    } else {
-      console.log("admin is not exists");
-      return null;
+    try {
+      console.log("enterd in the isAdminExist", email);
+      const admin = await AdminModel.findOne({ email: email });
+      if (admin) {
+        return admin as AdminInterface;
+      } else {
+        console.log("admin is not exists");
+        return null;
+      }
+    } catch (error) {
+      throw error;
     }
   }
 }

@@ -1,4 +1,4 @@
-import express ,{ Request,Response} from "express";
+import express ,{ Request,Response,NextFunction} from "express";
 import adminController from "../controllers/adminController";
 import AdminService from "../services/adminServices";
 import AdminRepository from "../repositories/adminRepository";
@@ -15,7 +15,7 @@ const adminService: AdminService = new AdminService(adminReopsitory, encrypt, cr
 const controller = new adminController(adminService);
 
 
-adminRouter.post('/login', async (req: Request, res: Response) => controller.adminLogin(req, res));
-adminRouter.get('/logout', async (req: Request, res: Response) => controller.adminLogout(req, res));
+adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => controller.adminLogin(req, res,next));
+adminRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => controller.adminLogout(req, res,next));
 
 export default adminRouter;

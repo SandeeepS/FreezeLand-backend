@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response ,NextFunction} from "express";
 import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
@@ -9,7 +9,7 @@ class userController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-  async userSignup(req: Request, res: Response): Promise<void> {
+  async userSignup(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
       req.app.locals.userData = req.body;
       const newUser = await this.userServices.userSignup(
@@ -41,13 +41,11 @@ class userController {
       }
     } catch (error) {
       console.log(error as Error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
+      next(error);
     }
   }
 
-  async userLogin(req: Request, res: Response): Promise<void> {
+  async userLogin(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
       const loginStatus = await this.userServices.userLogin(email, password);
@@ -84,13 +82,12 @@ class userController {
           .json({ success: false, message: "Authentication error" });
       }
     } catch (error) {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
-    }
+      console.log(error as Error)
+      next();
+    } 
   }
 
-  async veryfyOtp(req: Request, res: Response): Promise<void> {
+  async veryfyOtp(req: Request, res: Response,next:NextFunction): Promise<void> {
     try {
       const { otp } = req.body;
       const isNuewUser = req.app.locals.newUser;
@@ -134,13 +131,11 @@ class userController {
       }
     } catch (error) {
       console.log(error as Error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server Error." });
+      next(error)
     }
   }
 
-  async forgotResentOtp(req: Request, res: Response) {
+  async forgotResentOtp(req: Request, res: Response,next:NextFunction) {
     try {
       const { email } = req.body;
       req.app.locals.userEmail = email;
@@ -171,13 +166,11 @@ class userController {
         });
     } catch (error) {
       console.log(error as Error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error occured!" });
-    }
+     next(error)
   }
+}
 
-  async VerifyForgotOtp(req: Request, res: Response) {
+  async VerifyForgotOtp(req: Request, res: Response,next:NextFunction) {
     try {
       const otp = req.body.otp;
       console.log("otp from the req body is ", otp);
@@ -190,11 +183,11 @@ class userController {
       else res.json({ success: false, message: "Entered otp is not correct!" });
     } catch (error) {
       console.log(error);
-      res.json({ success: false, message: "Internal server Error occured!" });
+      next(error);
     }
   }
 
-  async updateNewPassword(req: Request, res: Response) {
+  async updateNewPassword(req: Request, res: Response,next:NextFunction) {
     try {
       const { password, userId } = req.body;
       const result = await this.userServices.updateNewPassword(
@@ -207,11 +200,11 @@ class userController {
       else res.json({ success: false, message: "somthing went wrong!" });
     } catch (error) {
       console.log(error as Error);
-      res.json({ success: false, message: "Internal server Error occured!" });
+      next(error)
     }
   }
 
-  async logout(req: Request, res: Response) {
+  async logout(req: Request, res: Response,next: NextFunction) {
     try {
       res
         .cookie("access_token", "", {
@@ -225,32 +218,10 @@ class userController {
         .json({ success: true, message: "user logout - clearing cookie" });
     } catch (err) {
       console.log(err);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
-    }
+       next(err);
   }
+}
 
-  async getProfile(req: Request, res: Response) {
-    try {
-      const currentUser = await this.userServices.getProfile(req.userId);
-      if (!currentUser)
-        res
-          .status(UNAUTHORIZED)
-          .json({ success: false, message: "Authentication failed..!" });
-      else if (currentUser?.isBlocked)
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "user has been blocked by the admin!",
-        });
-      else res.status(OK).json(currentUser);
-    } catch (error) {
-      console.log(error as Error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
-    }
-  }
 }
 
 export default userController;

@@ -10,7 +10,7 @@ class MechRepository implements comRepository<MechInterface>{
 
         }catch(error){
             console.log("Error from mechRepsitory",error as Error);
-            return null;
+            throw error
         }
     }
 
@@ -20,7 +20,7 @@ class MechRepository implements comRepository<MechInterface>{
           return mechFound as MechInterface;
         } catch (error) {
           console.log(error as Error);
-          return null;
+          throw error
         }
       }
 }

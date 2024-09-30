@@ -1,25 +1,22 @@
-// import { IsEmail,IsNotEmpty,Min,MinLength } from "class-validator";
 
-// export class signupUserDTO{
-//       @IsNotEmpty()
-//       @IsEmail()
-//       email:string;
-
-      
-//       @IsNotEmpty()
-//       @MinLength(6)
-//       password:string;
-
-//       @IsNotEmpty()
-//       name:string;
-
-// }
-
-// export class loginUserDTO {
-//       @IsNotEmpty()
-//       @IsEmail()
-//       email: string;
-    
-//       @IsNotEmpty()
-//       password: string;
-//     }
+export interface CreateUserDTO {
+    name: string;
+    email: string;
+    password: string;
+    phone: string;
+  }
+  
+  export interface UserLoginDTO {
+    email: string;
+    password: string;
+  }
+  
+  export interface UserResponseDTO {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    token: string;
+    refreshToken: string;
+  }
+  

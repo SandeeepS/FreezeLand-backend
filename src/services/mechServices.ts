@@ -59,7 +59,7 @@ class mechService implements comService<MechInterface> {
         return await this.mechRepository.emailExistCheck(mechData.email);
     } catch (error) {
         console.log(error as Error);
-        return null;
+        throw error
     }
 
 }
@@ -102,7 +102,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
       }
   } catch (error) {
       console.log(error as Error);
-      return { status: INTERNAL_SERVER_ERROR, data: { success: false, message: 'Internal server error' } };
+      throw error
   }
 }
 
@@ -156,13 +156,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
       }
     } catch (error) {
       console.log(error as Error);
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        data: {
-          success: false,
-          message: "Internal server Error!",
-        },
-      } as const;
+      throw error;
     }
   }
 }

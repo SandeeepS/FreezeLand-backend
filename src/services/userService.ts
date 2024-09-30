@@ -5,13 +5,14 @@ import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserSer
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
+import { CreateUserDTO } from "../dto/user.dto.";
 import dotenv from "dotenv";
 import Cryptr = require("cryptr");
 
 dotenv.config();
 
 const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
-class userService implements comService<UserInterface> {
+class userService implements comService<CreateUserDTO> {
   constructor(
     private userRepository: UserRepository,
     private createjwt: CreateJWT,
@@ -58,7 +59,7 @@ class userService implements comService<UserInterface> {
       return await this.userRepository.emailExistCheck(userData.email);
     } catch (error) {
       console.log(error as Error);
-      return null;
+      throw error;
     }
   }
 
@@ -107,10 +108,7 @@ class userService implements comService<UserInterface> {
       }
     } catch (error) {
       console.log(error as Error);
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        data: { success: false, message: "Internal server error" },
-      };
+      throw error;
     }
   }
 
@@ -164,23 +162,20 @@ class userService implements comService<UserInterface> {
       }
     } catch (error) {
       console.log(error as Error);
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        data: {
-          success: false,
-          message: "Internal server Error!",
-        },
-      } as const;
+      throw error;
     }
   }
 
   async getUserByEmail(email: string): Promise<UserInterface | null> {
-    return this.userRepository.emailExistCheck(email);
+    try {
+      return this.userRepository.emailExistCheck(email);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async updateNewPassword(password: string, userId: string) {
     try {
-      
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
       if (!secret_key) {
         throw new Error(
@@ -193,23 +188,11 @@ class userService implements comService<UserInterface> {
         saltLength: 10,
       });
       const newPassword = cryptr.encrypt(password);
- 
+
       return await this.userRepository.updateNewPassword(newPassword, userId);
     } catch (error) {
       console.log(error as Error);
-    }
-  }
-
-
-
-
-  getProfile(id: string | undefined): Promise<UserInterface | null> | null {
-    try {
-      if (!id) return null;
-      return this.userRepository.getUserById(id);
-    } catch (error) {
-      console.log(error as Error);
-      return null;
+      throw error;
     }
   }
 }

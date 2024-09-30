@@ -19,12 +19,8 @@ class AdminService implements comService<AdminInterface> {
       console.log("entered in the admin login");
       const admin = await this.adminRepository.isAdminExist(email);
 
-      if (admin?.password && password) {
-        const passwordMatch = await this.encrypt.compare(
-          password,
-          admin.password as string
-        );
-        if (passwordMatch) {
+      if (admin?.password===password) {
+     
           const token = this.createjwt.generateToken(admin?.id);
           const refreshToken = this.createjwt.generateRefreshToken(admin?.id);
           console.log("admin is exist", admin);
@@ -48,17 +44,11 @@ class AdminService implements comService<AdminInterface> {
             },
           } as const;
         }
-      }
+      
+    
     } catch (error) {
       console.log("error occured while login admin");
-      console.log(error as Error);
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        data: {
-          success: false,
-          message: "Internal server Error!",
-        },
-      } as const;
+      throw error;
     }
   }
 }

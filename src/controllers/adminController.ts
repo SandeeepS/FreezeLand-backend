@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response,NextFunction } from "express";
 import AdminService from "../services/adminServices";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 
@@ -10,7 +10,7 @@ class adminController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-  async adminLogin(req: Request, res: Response) {
+  async adminLogin(req: Request, res: Response,next:NextFunction) {
     try {
       console.log("enterd in the backend adminlogin in adminController");
       const { email, password} = req.body;
@@ -42,13 +42,12 @@ class adminController {
       
     } catch (error) {
       console.log(error as Error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
+      next(error)
+
     }
   }
 
-  async adminLogout(req: Request, res: Response) {
+  async adminLogout(req: Request, res: Response,next:NextFunction) {
     try {
       res.cookie("admin_access_token", "", {
         httpOnly: true,
@@ -57,9 +56,7 @@ class adminController {
       res.status(200).json({ success: true, message: "logout sucessfully" });
     } catch (error) {
       console.log(error as Error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
+      next(error);
     }
   }
 }
