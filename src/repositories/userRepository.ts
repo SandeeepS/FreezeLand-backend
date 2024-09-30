@@ -42,6 +42,18 @@ class UserRepository implements comRepository<UserInterface> {
       return null;
     }
   }
+
+  async updateNewPassword(password: string, userId: string) {
+    try {
+      const user = await userModel.findById(userId);
+      if (user) user.password = password;
+      const updatedUser = await user?.save();
+      return updatedUser;
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
   async getUserById(id: string): Promise<UserInterface | null> {
     try {
       return await userModel.findById(id);
