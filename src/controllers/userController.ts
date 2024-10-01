@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
+import { CreateUserDTO } from "../dto/user.dto.";
 const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
 
 class userController {
@@ -15,9 +16,9 @@ class userController {
     next: NextFunction
   ): Promise<void> {
     try {
-      req.app.locals.userData = req.body;
+      const userData:CreateUserDTO = req.body;
       const newUser = await this.userServices.userSignup(
-        req.app.locals.userData
+        userData
       );
       if (!newUser) {
         req.app.locals.newUser = true;

@@ -5,7 +5,7 @@ import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserSer
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
-import { CreateUserDTO } from "../dto/user.dto.";
+import { CreateUserDTO, UserResponseDTO } from "../dto/user.dto.";
 import dotenv from "dotenv";
 import Cryptr = require("cryptr");
 
@@ -54,7 +54,7 @@ class userService implements comService<CreateUserDTO> {
   //   }
   // }
 
-  async userSignup(userData: UserInterface): Promise<UserInterface | null> {
+  async userSignup(userData: CreateUserDTO): Promise<UserResponseDTO | null> {
     try {
       return await this.userRepository.emailExistCheck(userData.email);
     } catch (error) {

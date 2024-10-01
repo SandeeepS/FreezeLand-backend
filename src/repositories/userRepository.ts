@@ -1,7 +1,8 @@
+import { CreateUserDTO, UserResponseDTO } from "../dto/user.dto.";
 import userModel, { UserInterface } from "../models/userModel";
 import { comRepository } from "./comRepository";
 
-class UserRepository implements comRepository<UserInterface> {
+class UserRepository implements comRepository<CreateUserDTO> {
   async saveUser(
     userData: Partial<UserInterface>
   ): Promise<UserInterface | null> {

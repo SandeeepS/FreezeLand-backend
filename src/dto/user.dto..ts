@@ -14,12 +14,15 @@ export interface CreateUserDTO {
     password: string;
   }
   
-  export interface UserResponseDTO {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    token: string;
-    refreshToken: string;
+  export interface UserResponseDTO{
+    id?: string;
+    name?: string;
+    email?: string;
+    password?:string;
+    phone?: Number;
+    token?: string;
+    refreshToken?: string;
+    isBlocked:boolean;
+    isDeleted:boolean;
   }
   
