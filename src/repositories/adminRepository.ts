@@ -39,9 +39,10 @@ class AdminRepository implements comRepository<AdminInterface> {
         const regex = new RegExp(searchQuery, 'i');
         const result = await userModel.find(
             {
+              isDeleted: false,
                 $or: [
                     { name: { $regex: regex } },
-                    { email: { $regex: regex } }
+                    { email: { $regex: regex } },
                 ]
             })
             .skip((page - 1) * limit)
@@ -90,6 +91,40 @@ async getUserCount(searchQuery: string): Promise<number> {
   } catch (error) {
       console.log(error as Error);
       throw new Error('Error occured');
+  }
+}
+
+async blockUser(userId: string) {
+  try {
+      const user = await userModel.findById(userId);
+      if (user) {
+          user.isBlocked = !user?.isBlocked;
+          await user.save();
+          return user;
+      } else {
+          throw new Error('Somthing went wrong!!!');
+         
+      }
+  } catch (error) {
+      console.log(error as Error);
+      return null;
+  }
+}
+
+async deleteUser(userId: string) {
+  try {
+      const user = await userModel.findById(userId);
+      if (user) {
+          user.isDeleted = !user?.isDeleted;
+          await user.save();
+          return user;
+      } else {
+          throw new Error('Somthing went wrong!!!');
+         
+      }
+  } catch (error) {
+      console.log(error as Error);
+      return null;
   }
 }
 

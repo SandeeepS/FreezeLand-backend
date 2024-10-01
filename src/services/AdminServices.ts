@@ -97,5 +97,22 @@ async getMechList(page: number, limit: number, searchQuery: string | undefined):
       throw new Error('Error occured.');
   }
 }
+
+
+async blockUser(userId: string){
+  try {
+      return await this.adminRepository.blockUser(userId);
+  } catch (error) {
+      console.log(error as Error);
+  }
+}
+
+async deleteUser(userId: string){
+  try {
+      return await this.adminRepository.deleteUser(userId);
+  } catch (error) {
+      console.log(error as Error);
+  }
+}
 }
 export default AdminService;

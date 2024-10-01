@@ -4,7 +4,6 @@ import AdminService from "../services/adminServices";
 import AdminRepository from "../repositories/adminRepository";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
-import adminAuth from "../middlewares/adminAuthMidd";
 
 
 const adminRouter = express.Router();
@@ -20,5 +19,9 @@ adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction)
 adminRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => controller.adminLogout(req, res,next));
 adminRouter.get('/users',  async (req: Request, res: Response,next:NextFunction) => controller.getUserList(req, res,next));
 adminRouter.get('/mechanics',async (req:Request,res:Response,next:NextFunction) => controller.getMechList(req,res,next));
+adminRouter.put('/users/block/:userId', async (req: Request, res: Response,next:NextFunction) => controller.blockUser(req, res,next));
+adminRouter.put('/users/delete/:userId', async (req: Request, res: Response,next:NextFunction) => controller.deleteUser(req, res,next));
+
+
 
 export default adminRouter;

@@ -4,6 +4,6 @@ export interface comService<T>{
     mechLogin?(email:string,password:string):Promise<T | null>;
     singupUser?(userData:string):Promise<T | null>;
     userLogin?(email:string,password:string):Promise<T | null>;
-    getProfile?(id:string):Promise<T | null> | null;
+    getProfile?(id:string | undefined):Promise<T | null> | null;
 }
 

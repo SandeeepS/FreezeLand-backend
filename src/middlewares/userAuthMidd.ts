@@ -21,23 +21,26 @@ declare global {
 }
 
 const userAuth = async (req: Request, res: Response, next: NextFunction) => {
-  let token = req.cookies.access_token;
-  let refresh_token = req.cookies.refresh_token;
-
-  if (!refresh_token)
-    return res.json({
-      success: false,
-      message: "Token expired or not available",
-    });
-
-  if (!token) {
-    console.log("noooooooo");
-    const newAccessToken = await refreshAccessToken(refresh_token);
-    const accessTokenMaxAge = 15 * 60 * 1000;
-    res.cookie("access_token", newAccessToken, { maxAge: accessTokenMaxAge });
-  }
-
   try {
+
+    console.log("enterd in the userAuth")
+    let token = req.cookies.access_token;
+    let refresh_token = req.cookies.refresh_token;
+
+    console.log("accesstoken  and refreshtoken is ",token , refresh_token)
+  
+    if (!refresh_token)
+      return res.json({
+        success: false,
+        message: "Token expired or not available",
+      });
+  
+    if (!token) {
+      console.log("noooooooo");
+      const newAccessToken = await refreshAccessToken(refresh_token);
+      const accessTokenMaxAge = 15 * 60 * 1000;
+      res.cookie("access_token", newAccessToken, { maxAge: accessTokenMaxAge });
+    }
     const decoded = jwt.verifyToken(token);
     // console.log(decoded);
     if (decoded?.success) {

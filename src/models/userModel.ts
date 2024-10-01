@@ -7,6 +7,7 @@ export interface UserInterface extends Document {
   email: string;
   phone: Number;
   isBlocked: boolean;
+  isDeleted:boolean;
 }
 
 const userSchema: Schema<UserInterface> = new Schema({
@@ -29,6 +30,10 @@ const userSchema: Schema<UserInterface> = new Schema({
     type: Boolean,
     default: false,
   },
+  isDeleted:{
+    type:Boolean,
+    default:false
+  }
 });
 
 const userModel: Model<UserInterface> = mongoose.model<UserInterface>(

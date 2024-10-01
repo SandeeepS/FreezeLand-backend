@@ -81,6 +81,28 @@ async getMechList(req: Request, res: Response,next:NextFunction) {
   }
 }
 
+async blockUser(req: Request, res: Response, next:NextFunction) {
+  try {
+      const result = await this.adminService.blockUser(req.params.userId as string);
+      if (result) res.json({ success: true, message: 'block or unblocked the user' })
+      else res.json({ success: false, message: 'Something Went wrong please try again' });
+  } catch (error) {
+      console.log(error as Error);
+      res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+  }
+}
+
+async deleteUser(req: Request, res: Response, next:NextFunction) {
+  try {
+      const result = await this.adminService.deleteUser(req.params.userId as string);
+      if (result) res.json({ success: true, message: 'block or unblocked the user' })
+      else res.json({ success: false, message: 'Something Went wrong please try again' });
+  } catch (error) {
+      console.log(error as Error);
+      res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+  }
+}
+
   async adminLogout(req: Request, res: Response,next:NextFunction) {
     try {
       res.cookie("admin_access_token", "", {

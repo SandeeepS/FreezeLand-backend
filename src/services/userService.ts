@@ -174,6 +174,16 @@ class userService implements comService<CreateUserDTO> {
     }
   }
 
+  getProfile(id: string | undefined): Promise<UserInterface | null> | null {
+    try {
+        if (!id) return null;
+        return this.userRepository.getUserById(id);
+    } catch (error) {
+        console.log(error as Error);
+        return null;
+    }
+}
+
   async updateNewPassword(password: string, userId: string) {
     try {
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
