@@ -18,41 +18,6 @@ class userService implements comService<CreateUserDTO> {
     private createjwt: CreateJWT,
     private encrypt: Encrypt
   ) {}
-  // async signupUser(userData: UserInterface): Promise<any> {
-  //   try {
-  //     console.log("Entered in user Service and the userData is ",userData);
-  //     const {name,email,password,phone} = userData;
-  //     const secret_key :string | undefined= process.env.CRYPTR_SECRET
-  //     if(!secret_key){
-  //       throw new Error("Encrption secret key is not defined in the environment");
-  //     }
-  //     const cryptr = new Cryptr(secret_key,{ encoding: 'base64', pbkdf2Iterations: 10000, saltLength: 10 });
-  //     const newPassword = cryptr.encrypt(password);
-  //     const newDetails: Partial<UserInterface> = {
-  //              name:name,
-  //              password:newPassword,
-  //              email:email,
-  //              phone:phone
-  //     }
-  //     console.log("new Encypted password with data is ",newDetails);
-  //     const user = await this.userRepository.saveUser(newDetails);
-  //     if (user) {
-  //       console.log("user is registered ");
-  //       return {
-  //         status: OK,
-  //         data: {
-  //           success: true,
-  //           message: "User is successfully registered ",
-  //           data: user,
-  //         },
-  //       };
-  //     } else {
-  //       console.log("User is not registered");
-  //     }
-  //   } catch (error) {
-  //     console.log(error as Error);
-  //   }
-  // }
 
   async userSignup(userData: UserInterface): Promise<UserInterface | null> {
     try {
@@ -176,13 +141,13 @@ class userService implements comService<CreateUserDTO> {
 
   getProfile(id: string | undefined): Promise<UserInterface | null> | null {
     try {
-        if (!id) return null;
-        return this.userRepository.getUserById(id);
+      if (!id) return null;
+      return this.userRepository.getUserById(id);
     } catch (error) {
-        console.log(error as Error);
-        return null;
+      console.log(error as Error);
+      return null;
     }
-}
+  }
 
   async updateNewPassword(password: string, userId: string) {
     try {

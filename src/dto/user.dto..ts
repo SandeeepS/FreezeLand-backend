@@ -1,11 +1,11 @@
 
 export interface CreateUserDTO {
-    name: string;
-    email: string;
-    password: string;
-    phone: Number;
-    isBlocked:boolean;
-    isDeleted:boolean;
+    name?: string;
+    email?: string;
+    password?: string;
+    phone?: Number;
+    isBlocked?:boolean;
+    isDeleted?:boolean;
 
   }
   
