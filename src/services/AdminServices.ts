@@ -9,7 +9,6 @@ import { IMechsAndCount } from "../interfaces/serviceInterfaces/InMechService";
 import { IUsersAndCount } from "../interfaces/serviceInterfaces/InaAdminService";
 
 
-const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
 
 
 class AdminService implements comService<AdminInterface> {

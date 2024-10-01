@@ -11,7 +11,7 @@ import Cryptr = require("cryptr");
 
 dotenv.config();
 
-const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
+const { OK, UNAUTHORIZED } = STATUS_CODES;
 class userService implements comService<CreateUserDTO> {
   constructor(
     private userRepository: UserRepository,

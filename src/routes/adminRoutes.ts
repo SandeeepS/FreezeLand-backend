@@ -1,4 +1,4 @@
-import express ,{ Request,Response,NextFunction, response} from "express";
+import express ,{ Request,Response,NextFunction,} from "express";
 import adminController from "../controllers/adminController";
 import AdminService from "../services/adminServices";
 import AdminRepository from "../repositories/adminRepository";

@@ -2,7 +2,7 @@ import { Request, Response,NextFunction } from "express";
 import AdminService from "../services/adminServices";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 
-const { OK, UNAUTHORIZED, BAD_REQUEST, INTERNAL_SERVER_ERROR } = STATUS_CODES;
+const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
 
 class adminController {
   constructor(private adminService: AdminService) {}
@@ -22,7 +22,6 @@ class adminController {
             .json({ success: false, message: loginStatus.data.message });
           return;
         }else{
-          const time = this.milliseconds(23, 30, 0);
           const access_token = loginStatus.data.token;
           const refresh_token = loginStatus.data.refreshToken;
           const accessTokenMaxAge = 5 * 60 * 1000;

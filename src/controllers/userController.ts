@@ -69,7 +69,6 @@ class userController {
             .json({ success: false, message: loginStatus.data.message });
           return;
         }
-        const time = this.milliseconds(23, 30, 0);
         const access_token = loginStatus.data.token;
         const refresh_token = loginStatus.data.refreshToken;
         const accessTokenMaxAge = 5 * 60 * 1000;
@@ -124,7 +123,6 @@ class userController {
             })
             .json(newUser);
         } else {
-          const time = this.milliseconds(23, 30, 0);
           res
             .status(OK)
             .cookie("access_token", isNuewUser.data.token, {

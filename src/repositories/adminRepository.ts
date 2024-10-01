@@ -5,7 +5,6 @@ import { comRepository } from "./comRepository";
 import { UserInterface } from "../models/userModel";
 import userModel from "../models/userModel";
 import MechModel, { MechInterface } from "../models/mechModel";
-import Mech from "../interfaces/entityInterface/Imech";
 
 class AdminRepository implements comRepository<AdminInterface> {
   async getAdminById(id: string): Promise<AdminInterface | null> {
