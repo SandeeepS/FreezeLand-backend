@@ -47,6 +47,40 @@ class adminController {
     }
   }
 
+  async getUserList(req: Request, res: Response,next:NextFunction) {
+    try {
+        const page = parseInt(req.query.page as string);
+        const limit = parseInt(req.query.limit as string);
+        const searchQuery = req.query.searchQuery as string | undefined
+        console.log("page is ",page);
+        console.log("limit is ",limit);
+        const data = await this.adminService.getUserList(page, limit, searchQuery);
+        console.log("usersData from the admin controller is ",data);
+        res.status(OK).json(data);
+    } catch (error) {
+        console.log(error as Error);
+        next(error)
+    }
+}
+
+
+
+async getMechList(req: Request, res: Response,next:NextFunction) {
+  try {
+      const page = parseInt(req.query.page as string);
+      const limit = parseInt(req.query.limit as string);
+      const searchQuery = req.query.searchQuery as string | undefined
+      console.log("page is ",page);
+      console.log("limit is ",limit);
+      const data = await this.adminService.getMechList(page, limit, searchQuery);
+      console.log("mechsData from the admin controller is ",data);
+      res.status(OK).json(data);
+  } catch (error) {
+      console.log(error as Error);
+      next(error)
+  }
+}
+
   async adminLogout(req: Request, res: Response,next:NextFunction) {
     try {
       res.cookie("admin_access_token", "", {

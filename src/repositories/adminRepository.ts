@@ -1,8 +1,11 @@
 import { AdminInterface } from "../models/adminModel";
 import AdminModel from "../models/adminModel";
 import { comRepository } from "./comRepository";
-// import { UserInterface } from "../models/userModel";
-// import userModel from "../models/userModel";
+
+import { UserInterface } from "../models/userModel";
+import userModel from "../models/userModel";
+import MechModel, { MechInterface } from "../models/mechModel";
+import Mech from "../interfaces/entityInterface/Imech";
 
 class AdminRepository implements comRepository<AdminInterface> {
   async getAdminById(id: string): Promise<AdminInterface | null> {
@@ -29,6 +32,85 @@ class AdminRepository implements comRepository<AdminInterface> {
       throw error;
     }
   }
+
+
+  async getUserList(page: number, limit: number, searchQuery: string): Promise<UserInterface[]> {
+    try {
+        const regex = new RegExp(searchQuery, 'i');
+        const result = await userModel.find(
+            {
+                $or: [
+                    { name: { $regex: regex } },
+                    { email: { $regex: regex } }
+                ]
+            })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .select('-password')
+            .exec();
+        return result as UserInterface[];
+    } catch (error) {
+        console.log(error as Error);
+        throw new Error('Error occured');
+    }
+}
+
+async getMechList(page: number, limit: number, searchQuery: string): Promise<MechInterface[]> {
+  try {
+      const regex = new RegExp(searchQuery, 'i');
+      const result = await MechModel.find(
+          {
+              $or: [
+                  { name: { $regex: regex } },
+                  { email: { $regex: regex } }
+              ]
+          })
+          .skip((page - 1) * limit)
+          .limit(limit)
+          .select('-password')
+          .exec();
+      return result as MechInterface[];
+  } catch (error) {
+      console.log(error as Error);
+      throw new Error('Error occured');
+  }
+}
+
+
+async getUserCount(searchQuery: string): Promise<number> {
+  try {
+      const regex = new RegExp(searchQuery, 'i');
+      return await userModel.find(
+          {
+              $or: [
+                  { name: { $regex: regex } },
+                  { email: { $regex: regex } }
+              ]
+          }).countDocuments();
+  } catch (error) {
+      console.log(error as Error);
+      throw new Error('Error occured');
+  }
+}
+
+async getMechCount(searchQuery: string): Promise<number> {
+  try {
+      const regex = new RegExp(searchQuery, 'i');
+      return await MechModel.find(
+          {
+              $or: [
+                  { name: { $regex: regex } },
+                  { email: { $regex: regex } }
+              ]
+          }).countDocuments();
+  } catch (error) {
+      console.log(error as Error);
+      throw new Error('Error occured');
+  }
+}
+
+
+  
 }
 
 export default AdminRepository;

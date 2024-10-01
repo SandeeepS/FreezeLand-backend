@@ -4,6 +4,11 @@ import AdminRepository from "../repositories/adminRepository";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
+import { IApiRes } from "../interfaces/commonInterfaces/getDetailInterface";
+import { IMechsAndCount } from "../interfaces/serviceInterfaces/InMechService";
+import { IUsersAndCount } from "../interfaces/serviceInterfaces/InaAdminService";
+
+
 const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
 
 
@@ -51,5 +56,46 @@ class AdminService implements comService<AdminInterface> {
       throw error;
     }
   }
+
+
+
+  async getUserList(page: number, limit: number, searchQuery: string | undefined): Promise<IApiRes<IUsersAndCount>> {
+    try {
+        if (isNaN(page)) page = 1;
+        if (isNaN(limit)) limit = 10;
+        if (!searchQuery) searchQuery = '';
+        const users = await this.adminRepository.getUserList(page, limit, searchQuery);
+        const usersCount = await this.adminRepository.getUserCount(searchQuery);
+
+        return {
+            status: STATUS_CODES.OK,
+            data: { users, usersCount },
+            message: 'success',
+        }
+    } catch (error) {
+        console.log(error);
+        throw new Error('Error occured.');
+    }
+}
+
+async getMechList(page: number, limit: number, searchQuery: string | undefined): Promise<IApiRes<IMechsAndCount>> {
+  try {
+      if (isNaN(page)) page = 1;
+      if (isNaN(limit)) limit = 10;
+      if (!searchQuery) searchQuery = '';
+      const mechs = await this.adminRepository.getMechList(page, limit, searchQuery);
+      console.log("list of mechanics is ",mechs);
+      const mechsCount = await this.adminRepository.getMechCount(searchQuery);
+
+      return {
+          status: STATUS_CODES.OK,
+          data: { mechs, mechsCount },
+          message: 'success',
+      }
+  } catch (error) {
+      console.log(error);
+      throw new Error('Error occured.');
+  }
+}
 }
 export default AdminService;
