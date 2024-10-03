@@ -1,6 +1,6 @@
 import express ,{ Request,Response,NextFunction,} from "express";
 import adminController from "../controllers/adminController";
-import AdminService from "../services/adminServices";
+import AdminService from "../services/AdminServices";
 import AdminRepository from "../repositories/adminRepository";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
