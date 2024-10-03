@@ -159,6 +159,37 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
       throw error;
     }
   }
+
+
+  async getUserByEmail(email: string): Promise<MechInterface | null> {
+    try {
+      return this.mechRepository.emailExistCheck(email);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateNewPassword(password: string, userId: string) {
+    try {
+      const secret_key: string | undefined = process.env.CRYPTR_SECRET;
+      if (!secret_key) {
+        throw new Error(
+          "Encrption secret key is not defined in the environment"
+        );
+      }
+      const cryptr = new Cryptr(secret_key, {
+        encoding: "base64",
+        pbkdf2Iterations: 10000,
+        saltLength: 10,
+      });
+      const newPassword = cryptr.encrypt(password);
+
+      return await this.mechRepository.updateNewPassword(newPassword, userId);
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
 }
 
 export default mechService;

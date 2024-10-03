@@ -139,6 +139,74 @@ class mechController {
     }
   }
 
+  async forgotResentOtpMech(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      req.app.locals.mechEmail = email;
+      if (!email)
+        return res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "please enter the email" });
+      const mech = await this.mechServices.getUserByEmail(email);
+      if (!mech)
+        return res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "mech with email is not exist!" });
+      const otp = await generateAndSendOTP(email);
+      req.app.locals.resendOtp = otp;
+
+      const expirationMinutes = 1;
+      setTimeout(() => {
+        delete req.app.locals.resendOtp;
+      }, expirationMinutes * 60 * 1000);
+
+      res.status(OK).json({
+        success: true,
+        data: mech,
+        message: "OTP sent for verification...",
+      });
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async VerifyForgotOtpMech(req: Request, res: Response, next: NextFunction) {
+    try {
+      const otp = req.body.otp;
+      console.log("otp from the req body is ", otp);
+      if (!otp)
+        return res.json({ success: false, message: "Please enter the otp!" });
+      if (!req.app.locals.resendOtp)
+        return res.json({ success: false, message: "Otp is expired!" });
+      if (otp === req.app.locals.resendOtp)
+        res.json({ success: true, message: "both otp are same." });
+      else res.json({ success: false, message: "Entered otp is not correct!" });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
+
+  async updateNewPasswordMech(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { password, userId } = req.body;
+      const result = await this.mechServices.updateNewPassword(
+        password,
+        userId
+      );
+      console.log(result);
+      if (result)
+        res.json({ success: true, data: result, message: "successful" });
+      else res.json({ success: false, message: "somthing went wrong!" });
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
   async mechLogout(req: Request, res: Response,next:NextFunction) {
     try {
       res
