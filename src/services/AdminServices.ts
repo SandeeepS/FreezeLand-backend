@@ -11,7 +11,7 @@ import { IUsersAndCount } from "../interfaces/serviceInterfaces/InaAdminService"
 
 
 
-class AdminService implements comService<AdminInterface> {
+class adminService implements comService<AdminInterface> {
   constructor(
     private adminRepository: AdminRepository,
     private encrypt: Encrypt,
@@ -114,4 +114,4 @@ async deleteUser(userId: string){
   }
 }
 }
-export default AdminService;
+export default adminService;

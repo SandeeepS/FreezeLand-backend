@@ -1,11 +1,11 @@
 import { Request, Response,NextFunction } from "express";
-import AdminService from "../services/adminServices";
+import adminService from "../services/AdminServices"
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
 
 class adminController {
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: adminService) {}
 
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
