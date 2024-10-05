@@ -28,6 +28,7 @@ class AdminRepository implements comRepository<AdminInterface> {
         return null;
       }
     } catch (error) {
+      console.log("error occured in the isAmdinExist in the admin repository");
       throw error;
     }
   }
@@ -48,6 +49,7 @@ class AdminRepository implements comRepository<AdminInterface> {
             .limit(limit)
             .select('-password')
             .exec();
+            console.log("users list is ",result);
         return result as UserInterface[];
     } catch (error) {
         console.log(error as Error);
@@ -100,6 +102,23 @@ async blockUser(userId: string) {
           user.isBlocked = !user?.isBlocked;
           await user.save();
           return user;
+      } else {
+          throw new Error('Somthing went wrong!!!');
+         
+      }
+  } catch (error) {
+      console.log(error as Error);
+      return null;
+  }
+}
+
+async blockMech(mechId: string) {
+  try {
+      const mech = await MechModel.findById(mechId);
+      if (mech) {
+          mech.isBlocked = !mech?.isBlocked;
+          await mech.save();
+          return mech;
       } else {
           throw new Error('Somthing went wrong!!!');
          

@@ -5,7 +5,7 @@ export interface MechInterface extends Document {
   name: string;
   email: string;
   password: string;
-  phone: Number;
+  phone: number;
   isBlocked: boolean;
 }
 

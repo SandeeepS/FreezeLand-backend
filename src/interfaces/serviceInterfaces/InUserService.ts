@@ -1,11 +1,11 @@
-import { UserInterface } from "../../models/userModel";
+import User from "../entityInterface/Iuser";
 
 export interface UserResponseInterface {
   status: number;
   data: {
     success: boolean;
     message: string;
-    data?: UserInterface;
+    data?: User;
     userId?: string;
     token?: string;
     refresh_token?: string;

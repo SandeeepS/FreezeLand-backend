@@ -1,4 +1,3 @@
-import { AdminInterface } from "../models/adminModel";
 import { comService } from "./comServices";
 import AdminRepository from "../repositories/adminRepository";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
@@ -6,19 +5,19 @@ import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
 import { IApiRes } from "../interfaces/commonInterfaces/getDetailInterface";
 import { IMechsAndCount } from "../interfaces/serviceInterfaces/InMechService";
-import { IUsersAndCount } from "../interfaces/serviceInterfaces/InaAdminService";
+import { AdminAuthResponse, IUsersAndCount } from "../interfaces/serviceInterfaces/InaAdminService";
 
 
 
 
-class adminService implements comService<AdminInterface> {
+class adminService implements comService<AdminAuthResponse> {
   constructor(
     private adminRepository: AdminRepository,
     private encrypt: Encrypt,
     private createjwt: CreateJWT
   ) {}
 
-  async adminLogin(email: string, password: string): Promise<any> {
+  async adminLogin(email: string, password: string): Promise<AdminAuthResponse> {
     try {
       console.log("entered in the admin login");
       const admin = await this.adminRepository.isAdminExist(email);
@@ -36,7 +35,7 @@ class adminService implements comService<AdminInterface> {
               data: admin,
               adminId: admin.id,
               token: token,
-              refreshToken: refreshToken,
+              refresh_token: refreshToken,
             },
           };
         } else {
@@ -101,6 +100,15 @@ async getMechList(page: number, limit: number, searchQuery: string | undefined):
 async blockUser(userId: string){
   try {
       return await this.adminRepository.blockUser(userId);
+  } catch (error) {
+      console.log(error as Error);
+  }
+}
+
+
+async blockMech(mechId: string){
+  try {
+      return await this.adminRepository.blockMech(mechId);
   } catch (error) {
       console.log(error as Error);
   }

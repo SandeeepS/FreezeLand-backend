@@ -23,7 +23,7 @@ class adminController {
           return;
         }else{
           const access_token = loginStatus.data.token;
-          const refresh_token = loginStatus.data.refreshToken;
+          const refresh_token = loginStatus.data.refresh_token;
           const accessTokenMaxAge = 5 * 60 * 1000;
           const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
           console.log("respose is going to send to the frontend");
@@ -87,6 +87,19 @@ async blockUser(req: Request, res: Response, next:NextFunction) {
       else res.json({ success: false, message: 'Something Went wrong please try again' });
   } catch (error) {
       console.log(error as Error);
+      next(error);
+      res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+  }
+}
+
+async blockMech(req: Request, res: Response, next:NextFunction) {
+  try {
+      const result = await this.adminService.blockMech(req.params.mechId as string);
+      if (result) res.json({ success: true, message: 'block or unblocked the mechanic' })
+      else res.json({ success: false, message: 'Something Went wrong please try again' });
+  } catch (error) {
+      console.log(error as Error);
+      next(error);
       res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
   }
 }
@@ -98,7 +111,7 @@ async deleteUser(req: Request, res: Response, next:NextFunction) {
       else res.json({ success: false, message: 'Something Went wrong please try again' });
   } catch (error) {
       console.log(error as Error);
-      res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+      next(error);
   }
 }
 

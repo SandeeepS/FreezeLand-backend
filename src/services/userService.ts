@@ -5,14 +5,13 @@ import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserSer
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
-import { CreateUserDTO } from "../dto/user.dto.";
 import dotenv from "dotenv";
-import Cryptr = require("cryptr");
+import Cryptr from 'cryptr';
 
 dotenv.config();
 
-const { OK, UNAUTHORIZED } = STATUS_CODES;
-class userService implements comService<CreateUserDTO> {
+const { OK, UNAUTHORIZED,NOT_FOUND,INTERNAL_SERVER_ERROR } = STATUS_CODES;
+class userService implements comService<UserResponseInterface> {
   constructor(
     private userRepository: UserRepository,
     private createjwt: CreateJWT,
@@ -77,7 +76,10 @@ class userService implements comService<CreateUserDTO> {
     }
   }
 
-  async userLogin(email: string, password: string): Promise<any> {
+  async userLogin(
+    email: string,
+    password: string
+  ): Promise<UserResponseInterface> {
     try {
       const user: UserInterface | null =
         await this.userRepository.emailExistCheck(email);
@@ -91,7 +93,7 @@ class userService implements comService<CreateUserDTO> {
             message: "You have been blocked by the admin !",
             token: token,
             data: user,
-            refreshToken: refreshToken,
+            refresh_token: refreshToken,
           },
         } as const;
       }
@@ -112,7 +114,7 @@ class userService implements comService<CreateUserDTO> {
               data: user,
               userId: user.id,
               token: token,
-              refreshToken: refreshToken,
+              refresh_token: refreshToken,
             },
           } as const;
         } else {
@@ -125,6 +127,13 @@ class userService implements comService<CreateUserDTO> {
           } as const;
         }
       }
+      return {
+        status: UNAUTHORIZED,
+        data: {
+          success: false,
+          message: "Invalid email or password.",
+        },
+      } as const;
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -135,17 +144,49 @@ class userService implements comService<CreateUserDTO> {
     try {
       return this.userRepository.emailExistCheck(email);
     } catch (error) {
+      console.log("error occured while getUserEmail in the userService");
       throw error;
     }
   }
 
-  getProfile(id: string | undefined): Promise<UserInterface | null> | null {
+  async getProfile(id: string | undefined): Promise<UserResponseInterface> {
     try {
-      if (!id) return null;
-      return this.userRepository.getUserById(id);
+      if (!id)
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "User ID is missing",
+          },
+        } as const;
+        const user = await this.userRepository.getUserById(id);
+        if (!user) {
+          return {
+            status: NOT_FOUND,
+            data: {
+              success: false,
+              message: "User not found",
+            },
+          } as const;
+        }
+
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: "User profile retrieved successfully",
+            data: user, 
+          },
+        } as const;
     } catch (error) {
       console.log(error as Error);
-      return null;
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+          success: false,
+          message: "An error occurred while retrieving user profile",
+        },
+      } as const;
     }
   }
 

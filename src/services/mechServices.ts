@@ -7,8 +7,8 @@ import { comService } from "./comServices";
 import { MechResponseInterface } from "../interfaces/serviceInterfaces/InMechService";
 import Cryptr from "cryptr";
 
-const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
-class mechService implements comService<MechInterface> {
+const { OK, UNAUTHORIZED } = STATUS_CODES;
+class mechService implements comService<MechResponseInterface> {
   constructor(
     private mechRepository: MechRepository,
     private createjwt: CreateJWT,
@@ -93,7 +93,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
               data: {
                   success: true,
                   message: 'Success',
-                  userId: mechData.id,
+                  mechId: mechData.id,
                   token: token,
                   data: mech,
                   refresh_token
@@ -106,7 +106,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
   }
 }
 
-  async mechLogin(email: string, password: string): Promise<any> {
+  async mechLogin(email: string, password: string): Promise<MechResponseInterface> {
     try {
       const mech: MechInterface | null =
         await this.mechRepository.emailExistCheck(email);
@@ -120,7 +120,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
             message: "You have been blocked by the mech !",
             token: token,
             data: mech,
-            refreshToken: refreshToken,
+            refresh_token: refreshToken,
           },
         } as const;
       }
@@ -141,7 +141,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
               data: mech,
               mechId: mech.id,
               token: token,
-              refreshToken: refreshToken,
+              refresh_token: refreshToken,
             },
           } as const;
         } else {
@@ -154,6 +154,16 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
           } as const;
         }
       }
+      else {
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Authentication failed...",
+          },
+        } as const;
+      }
+      
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -165,6 +175,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
     try {
       return this.mechRepository.emailExistCheck(email);
     } catch (error) {
+      console.log(error as Error)
       throw error;
     }
   }

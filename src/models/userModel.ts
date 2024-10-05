@@ -5,7 +5,7 @@ export interface UserInterface extends Document {
   name: string;
   password: string;
   email: string;
-  phone: Number;
+  phone: number;
   isBlocked: boolean;
   isDeleted:boolean;
 }

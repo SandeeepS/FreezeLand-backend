@@ -9,6 +9,8 @@ const jwt = new CreateJWT();
 const userRepository = new UserRepository();
 dotenv.config();
 
+
+/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace Express {
     interface Request {
@@ -17,14 +19,15 @@ declare global {
     }
   }
 }
+/* eslint-enable @typescript-eslint/no-namespace */
+
 
 const userAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
     console.log("enterd in the userAuth")
-    let token = req.cookies.access_token;
-    let refresh_token = req.cookies.refresh_token;
-
+    const token = req.cookies.access_token;
+    const refresh_token = req.cookies.refresh_token;
     console.log("accesstoken  and refreshtoken is ",token , refresh_token)
   
     if (!refresh_token)
@@ -40,9 +43,8 @@ const userAuth = async (req: Request, res: Response, next: NextFunction) => {
       res.cookie("access_token", newAccessToken, { maxAge: accessTokenMaxAge });
     }
     const decoded = jwt.verifyToken(token);
-    // console.log(decoded);
     if (decoded?.success) {
-      let user = await userRepository.getUserById(
+      const user = await userRepository.getUserById(
         decoded.decoded?.data?.toString()
       );
       if (user?.isBlocked) {
@@ -58,7 +60,7 @@ const userAuth = async (req: Request, res: Response, next: NextFunction) => {
     } else {
       return res.json({ success: false, message: decoded?.message });
     }
-  } catch (err: any) {
+  } catch (err) {
     console.log("the error is here.");
     console.log(err);
     return res.send({ success: false, message: "Authentication failed!" });

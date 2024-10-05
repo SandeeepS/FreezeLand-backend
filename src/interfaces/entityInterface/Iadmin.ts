@@ -4,7 +4,9 @@ interface Admin {
     username?: string;
     password?: string;
     email?: string;
-    phone?:number
+    phone?:number;
+    isDeleted?:boolean;
+    isBlocked?:boolean;
 }
 
 export default Admin;

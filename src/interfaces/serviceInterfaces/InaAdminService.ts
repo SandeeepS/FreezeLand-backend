@@ -5,11 +5,12 @@ import UserInterface from "../entityInterface/Iuser";
 export interface AdminAuthResponse {
     status: number;
     data: {
-        success: boolean;
-        message: string;
+        success?: boolean;
+        message?: string;
         data?: Admin,
         adminId?: string;
         token?: string;
+        refresh_token?: string;
     };
 }
 export interface IUsersAndCount {

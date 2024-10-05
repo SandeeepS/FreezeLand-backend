@@ -1,10 +1,12 @@
-interface UserInterface {
+interface User{
     id?: string | undefined;
     name?: string;
     email?: string;
-    phone?: Number;
+    phone?: number;
     password?: string | Promise<string>;
+    isDeleted?: boolean;
+    isBlocked?: boolean;
 
 }
 
-export default UserInterface;
+export default User;

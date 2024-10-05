@@ -2,9 +2,7 @@ import { Request, Response,NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import mechService from "../services/mechServices";
 import { generateAndSendOTP } from "../utils/generateOtp";
-import { error } from "console";
-
-const { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
+const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
 
 class mechController {
   constructor(private mechServices: mechService) {}
@@ -65,7 +63,6 @@ class mechController {
         if (isNuewMech) {
           const newMech = await this.mechServices.saveMech(savedMech);
           req.app.locals = {};
-          // const time = this.milliseconds(23, 30, 0);
           res
             .status(OK)
             .cookie("access_token", newMech?.data.token, {
@@ -76,7 +73,6 @@ class mechController {
             })
             .json(newMech);
         } else {
-          const time = this.milliseconds(23, 30, 0);
           res
             .status(OK)
             .cookie("access_token", isNuewMech.data.token, {
@@ -98,7 +94,7 @@ class mechController {
     }
   }
 
-  async mechLogin(req: Request, res: Response,next:NextFunction): Promise<void> {
+  async mechLogin(req: Request, res: Response,next:NextFunction){
     try {
       const { email, password }: { email: string; password: string } = req.body;
       const loginStatus = await this.mechServices.mechLogin(email, password);
@@ -113,11 +109,10 @@ class mechController {
           res
             .status(UNAUTHORIZED)
             .json({ success: false, message: loginStatus.data.message });
-          return;
+          return 
         }
-        const time = this.milliseconds(23, 30, 0);
         const access_token = loginStatus.data.token;
-        const refresh_token = loginStatus.data.refreshToken;
+        const refresh_token = loginStatus.data.refresh_token;
         const accessTokenMaxAge = 5 * 60 * 1000;
         const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
         res
