@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
-const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
+import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
+const { BAD_REQUEST, OK, UNAUTHORIZED,INTERNAL_SERVER_ERROR} = STATUS_CODES;
 
 class userController {
   constructor(private userServices: userService) {}
@@ -92,6 +93,63 @@ class userController {
       next();
     }
   }
+
+
+  async googleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { name, email, googlePhotoUrl } = req.body;
+    const accessTokenMaxAge = 5 * 60 * 1000;
+    const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+    try {
+        const user = await this.userServices.getUserByEmail(email);
+        if (user) {
+            if (user.isBlocked) {
+                res.status(UNAUTHORIZED).json({ success: false, message: 'user has been blocked by admin.' });
+                // throw new Error('user has been blocked by admin...');
+            } else {
+                const token = this.userServices.generateToken(user.id);
+                const refreshToken = this.userServices.generateRefreshToken(user.id);
+                const data = {
+                    success: true,
+                    message: 'Success',
+                    userId: user.id,
+                    token: token,
+                    refreshToken,
+                    data: user
+                }
+
+                // const time = this.milliseconds(23, 30, 0);
+                res.status(OK).cookie('access_token', token, {
+                    maxAge: accessTokenMaxAge
+                }).cookie('refresh_token', refreshToken, {
+                    maxAge: refreshTokenMaxAge
+                }).json(data);
+            }
+
+        } else {
+            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const hashedPassword = await this.userServices.hashPassword(generatedPassword);
+
+            const newUser: UserResponseInterface | undefined = await this.userServices.saveUser({
+                name: name,
+                email: email,
+                password: hashedPassword,
+                profile_picture: googlePhotoUrl,
+
+            })
+            if (newUser?.data.data) {
+                // const time = this.milliseconds(23, 30, 0);
+                res.status(OK).cookie('access_token', newUser.data.token, {
+                    maxAge: accessTokenMaxAge
+                }).cookie('refresh_token', newUser.data.refresh_token, {
+                    maxAge: refreshTokenMaxAge,
+                }).json(newUser.data);
+            }
+        }
+    } catch (error) {
+        next(error);
+        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error......' });
+    }
+}
 
   async veryfyOtp(
     req: Request,

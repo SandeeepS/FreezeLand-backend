@@ -3,9 +3,10 @@ interface User{
     name?: string;
     email?: string;
     phone?: number;
-    password?: string | Promise<string>;
+    password?: string ;
     isDeleted?: boolean;
     isBlocked?: boolean;
+    profile_picture?:string;
 
 }
 

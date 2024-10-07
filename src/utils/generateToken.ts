@@ -1,7 +1,7 @@
 import { JwtPayload, Secret } from "jsonwebtoken";
 import dotenv from "dotenv";
 
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 dotenv.config();
 
 export class CreateJWT {
@@ -24,19 +24,27 @@ export class CreateJWT {
   }
   verifyToken(token: string): JwtPayload | null {
     try {
-      let secret = process.env.JWT_SECRET;
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        throw new Error("JWT_SECRET is not defined");
+      }
+
       const decoded = jwt.verify(token, secret) as JwtPayload;
       return { success: true, decoded };
-    } catch (err: any) {
-      console.error("Error while verifying JWT token:", err);
-      if (err?.name === "TokenExpiredError")
+    } catch (error) {
+      console.error("Error while verifying JWT token:", error as Error);
+      if (error === "TokenExpiredError")
         return { success: false, message: "Token Expired!" };
       else return { success: false, message: "Internal server error" };
     }
   }
   verifyRefreshToken(token: string) {
     try {
-      let secret = process.env.JWT_REFRESH_SECRET;
+      const secret = process.env.JWT_REFRESH_SECRET;
+      if (!secret) {
+        throw new Error("JWT_SECRET is not defined");
+      }
+
       const decoded = jwt.verify(token, secret) as JwtPayload;
       return { success: true, decoded };
     } catch (error) {

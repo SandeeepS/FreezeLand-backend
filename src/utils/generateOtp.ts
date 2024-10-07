@@ -15,8 +15,8 @@ export const generateAndSendOTP = async (
   toEmail: string
 ): Promise<string | null> => {
   try {
-    console.log("provider email is ",process.env.TRANSPOTER_EMAIL);
-    console.log("provider password is ", process.env.TRANSPOTER_PASS)
+    console.log("provider email is ", process.env.TRANSPOTER_EMAIL);
+    console.log("provider password is ", process.env.TRANSPOTER_PASS);
     const otp: string | null = generateRandomOTP();
     console.log("the reciver email is ", toEmail);
     const mailOptions = {

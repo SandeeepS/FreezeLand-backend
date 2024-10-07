@@ -7,7 +7,8 @@ export interface UserInterface extends Document {
   email: string;
   phone: number;
   isBlocked: boolean;
-  isDeleted:boolean;
+  isDeleted: boolean;
+  profile_picture: string;
 }
 
 const userSchema: Schema<UserInterface> = new Schema({
@@ -24,16 +25,20 @@ const userSchema: Schema<UserInterface> = new Schema({
   },
   phone: {
     type: Number,
-    required: true,
+  },
+  profile_picture: {
+    type: String,
+    default:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/680px-Default_pfp.svg.png",
   },
   isBlocked: {
     type: Boolean,
     default: false,
   },
-  isDeleted:{
-    type:Boolean,
-    default:false
-  }
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const userModel: Model<UserInterface> = mongoose.model<UserInterface>(

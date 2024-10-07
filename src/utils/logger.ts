@@ -19,11 +19,11 @@ const logger = createLogger({
       format: consoleLogFormat,
     }),
     new DailyRotateFile({
-      filename: 'app.log', // Directory for log files, logs folder should exist
+      filename: 'loggerDetails/app.log', // Directory for log files, logs folder should exist
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
-      maxFiles: '1d', // Keep logs for 14 days
+      maxFiles: '1d', // Keep logs for 1 day
       format: json(),
     }),
   ],

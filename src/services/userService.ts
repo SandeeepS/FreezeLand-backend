@@ -6,11 +6,12 @@ import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
 import dotenv from "dotenv";
-import Cryptr from 'cryptr';
+import Cryptr from "cryptr";
+import User from "../interfaces/entityInterface/Iuser";
 
 dotenv.config();
 
-const { OK, UNAUTHORIZED,NOT_FOUND,INTERNAL_SERVER_ERROR } = STATUS_CODES;
+const { OK, UNAUTHORIZED, NOT_FOUND, INTERNAL_SERVER_ERROR } = STATUS_CODES;
 class userService implements comService<UserResponseInterface> {
   constructor(
     private userRepository: UserRepository,
@@ -27,9 +28,7 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async saveUser(
-    userData: UserInterface
-  ): Promise<UserResponseInterface | undefined> {
+  async saveUser(userData: User): Promise<UserResponseInterface | undefined> {
     try {
       console.log("Entered in user Service and the userData is ", userData);
       const { name, email, password, phone } = userData;
@@ -149,6 +148,18 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
+  generateToken(payload: string | undefined): string | undefined {
+    if (payload) return this.createjwt.generateToken(payload);
+  }
+
+  generateRefreshToken(payload: string | undefined): string | undefined {
+    if (payload) return this.createjwt.generateRefreshToken(payload);
+  }
+
+  async hashPassword(password: string) {
+    return await this.encrypt.hashPassword(password);
+  }
+
   async getProfile(id: string | undefined): Promise<UserResponseInterface> {
     try {
       if (!id)
@@ -159,25 +170,25 @@ class userService implements comService<UserResponseInterface> {
             message: "User ID is missing",
           },
         } as const;
-        const user = await this.userRepository.getUserById(id);
-        if (!user) {
-          return {
-            status: NOT_FOUND,
-            data: {
-              success: false,
-              message: "User not found",
-            },
-          } as const;
-        }
-
+      const user = await this.userRepository.getUserById(id);
+      if (!user) {
         return {
-          status: OK,
+          status: NOT_FOUND,
           data: {
-            success: true,
-            message: "User profile retrieved successfully",
-            data: user, 
+            success: false,
+            message: "User not found",
           },
         } as const;
+      }
+
+      return {
+        status: OK,
+        data: {
+          success: true,
+          message: "User profile retrieved successfully",
+          data: user,
+        },
+      } as const;
     } catch (error) {
       console.log(error as Error);
       return {

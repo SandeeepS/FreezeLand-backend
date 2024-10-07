@@ -6,7 +6,7 @@ export interface AdminInterface extends Document {
   email: string;
   password: string;
   isBlocked: boolean;
-  isDeleted:boolean;
+  isDeleted: boolean;
 }
 
 const adminSchema: Schema<AdminInterface> = new Schema({
