@@ -1,41 +1,55 @@
 import MechModel, { MechInterface } from "../models/mechModel";
-import { comRepository } from "./comRepository";
+import { MechBaseRepository } from "./BaseRepository/MechBaseRepository"; // Import the base repository
+import { Document } from "mongoose";
 
-class MechRepository implements comRepository<MechInterface> {
+class MechRepository extends MechBaseRepository<MechInterface & Document> {
+  constructor() {
+    super(MechModel);
+  }
+
   async saveMechanic(
     mechData: Partial<MechInterface>
   ): Promise<MechInterface | null> {
-    try {
-      const newMech = new MechModel(mechData);
-      await newMech.save();
-      return newMech as MechInterface;
-    } catch (error) {
-      console.log("Error from mechRepsitory", error as Error);
-      throw error;
-    }
+    return this.save(mechData);
   }
 
   async emailExistCheck(email: string): Promise<MechInterface | null> {
     try {
-      const mechFound = await MechModel.findOne({ email: email });
-      console.log("mechFound in the mech repository", mechFound);
-      return mechFound as MechInterface;
+      const mechFound = await this.findOne({ email });
+      console.log("Mechanic found in the MechRepository:", mechFound);
+      return mechFound;
     } catch (error) {
-      console.log(error as Error);
+      console.log(
+        "Error in MechRepository while checking email existence",
+        error as Error
+      );
       throw error;
     }
   }
 
-  async updateNewPassword(password: string, userId: string) {
+  async updateNewPassword(
+    password: string,
+    userId: string
+  ): Promise<MechInterface | null> {
     try {
-      const user = await MechModel.findById(userId);
-      if (user) user.password = password;
-      const updatedUser = await user?.save();
-      return updatedUser;
+      const user = await this.findById(userId);
+      if (user) {
+        user.password = password;
+        return await user.save();
+      }
+      return null;
     } catch (error) {
-      console.log(error as Error);
+      console.log(
+        "Error in MechRepository while updating password",
+        error as Error
+      );
       throw error;
     }
   }
+
+  async getMechById(id: string): Promise<MechInterface | null> {
+    return this.findById(id);
+  }
 }
+
 export default MechRepository;
