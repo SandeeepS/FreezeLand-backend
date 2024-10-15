@@ -33,137 +33,140 @@ class AdminRepository implements comRepository<AdminInterface> {
     }
   }
 
-
-  async getUserList(page: number, limit: number, searchQuery: string): Promise<UserInterface[]> {
+  async getUserList(
+    page: number,
+    limit: number,
+    searchQuery: string
+  ): Promise<UserInterface[]> {
     try {
-        const regex = new RegExp(searchQuery, 'i');
-        const result = await userModel.find(
-            {
-              isDeleted: false,
-                $or: [
-                    { name: { $regex: regex } },
-                    { email: { $regex: regex } },
-                ]
-            })
-            .skip((page - 1) * limit)
-            .limit(limit)
-            .select('-password')
-            .exec();
-            console.log("users list is ",result);
-        return result as UserInterface[];
+      const regex = new RegExp(searchQuery, "i");
+      const result = await userModel
+        .find({
+          isDeleted: false,
+          $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
+      console.log("users list is ", result);
+      return result as UserInterface[];
     } catch (error) {
-        console.log(error as Error);
-        throw new Error('Error occured');
+      console.log(error as Error);
+      throw new Error("Error occured");
     }
-}
+  }
 
-async getMechList(page: number, limit: number, searchQuery: string): Promise<MechInterface[]> {
-  try {
-      const regex = new RegExp(searchQuery, 'i');
-      const result = await MechModel.find(
-          {
-              $or: [
-                  { name: { $regex: regex } },
-                  { email: { $regex: regex } }
-              ]
-          })
-          .skip((page - 1) * limit)
-          .limit(limit)
-          .select('-password')
-          .exec();
+  async getMechList(
+    page: number,
+    limit: number,
+    searchQuery: string
+  ): Promise<MechInterface[]> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      const result = await MechModel.find({
+        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+      })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       return result as MechInterface[];
-  } catch (error) {
+    } catch (error) {
       console.log(error as Error);
-      throw new Error('Error occured');
+      throw new Error("Error occured");
+    }
   }
-}
 
-
-async getUserCount(searchQuery: string): Promise<number> {
-  try {
-      const regex = new RegExp(searchQuery, 'i');
-      return await userModel.find(
-          {
-              $or: [
-                  { name: { $regex: regex } },
-                  { email: { $regex: regex } }
-              ]
-          }).countDocuments();
-  } catch (error) {
+  async getUserCount(searchQuery: string): Promise<number> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      return await userModel
+        .find({
+          $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+        })
+        .countDocuments();
+    } catch (error) {
       console.log(error as Error);
-      throw new Error('Error occured');
+      throw new Error("Error occured");
+    }
   }
-}
 
-async blockUser(userId: string) {
-  try {
+  async blockUser(userId: string) {
+    try {
       const user = await userModel.findById(userId);
       if (user) {
-          user.isBlocked = !user?.isBlocked;
-          await user.save();
-          return user;
+        user.isBlocked = !user?.isBlocked;
+        await user.save();
+        return user;
       } else {
-          throw new Error('Somthing went wrong!!!');
-         
+        throw new Error("Somthing went wrong!!!");
       }
-  } catch (error) {
+    } catch (error) {
       console.log(error as Error);
       return null;
+    }
   }
-}
 
-async blockMech(mechId: string) {
-  try {
+  async blockMech(mechId: string) {
+    try {
       const mech = await MechModel.findById(mechId);
       if (mech) {
-          mech.isBlocked = !mech?.isBlocked;
-          await mech.save();
-          return mech;
+        mech.isBlocked = !mech?.isBlocked;
+        await mech.save();
+        return mech;
       } else {
-          throw new Error('Somthing went wrong!!!');
-         
+        throw new Error("Somthing went wrong!!!");
       }
-  } catch (error) {
+    } catch (error) {
       console.log(error as Error);
       return null;
+    }
   }
-}
 
-async deleteUser(userId: string) {
-  try {
+  async deleteUser(userId: string) {
+    try {
       const user = await userModel.findById(userId);
       if (user) {
-          user.isDeleted = !user?.isDeleted;
-          await user.save();
-          return user;
+        user.isDeleted = !user?.isDeleted;
+        await user.save();
+        return user;
       } else {
-          throw new Error('Somthing went wrong!!!');
-         
+        throw new Error("Somthing went wrong!!!");
       }
-  } catch (error) {
+    } catch (error) {
       console.log(error as Error);
       return null;
+    }
   }
-}
 
-async getMechCount(searchQuery: string): Promise<number> {
-  try {
-      const regex = new RegExp(searchQuery, 'i');
-      return await MechModel.find(
-          {
-              $or: [
-                  { name: { $regex: regex } },
-                  { email: { $regex: regex } }
-              ]
-          }).countDocuments();
-  } catch (error) {
+  async deleteMech(mechId: string) {
+    try {
+      const mech = await MechModel.findById(mechId);
+      if (mech) {
+        mech.isDeleted = !mech?.isDeleted;
+        await mech.save();
+        return mech;
+      } else {
+        throw new Error("Somthing went wrong!!!");
+      }
+    } catch (error) {
       console.log(error as Error);
-      throw new Error('Error occured');
+      return null;
+    }
   }
-}
 
-
-  
+  async getMechCount(searchQuery: string): Promise<number> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      return await MechModel.find({
+        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+      }).countDocuments();
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
+    }
+  }
 }
 
 export default AdminRepository;

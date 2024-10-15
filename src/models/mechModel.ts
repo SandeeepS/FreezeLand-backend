@@ -7,6 +7,7 @@ export interface MechInterface extends Document {
   password: string;
   phone: number;
   isBlocked: boolean;
+  isDeleted:boolean;
 }
 
 const mechSchema: Schema<MechInterface> = new Schema({
@@ -26,6 +27,10 @@ const mechSchema: Schema<MechInterface> = new Schema({
     required: true,
   },
   isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  isDeleted: {
     type: Boolean,
     default: false,
   },

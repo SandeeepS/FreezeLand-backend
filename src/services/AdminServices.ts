@@ -133,5 +133,13 @@ class adminService implements comService<AdminAuthResponse> {
       console.log(error as Error);
     }
   }
+
+  async deleteMech(mechId: string) {
+    try {
+      return await this.adminRepository.deleteMech(mechId);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
 }
 export default adminService;
