@@ -1,8 +1,8 @@
 import userModel, { UserInterface } from "../models/userModel";
-import { UserBaseRepository } from "./BaseRepository/UserBaseRepository";
+import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
 
-class UserRepository extends UserBaseRepository<UserInterface & Document> {
+class UserRepository extends BaseRepository<UserInterface & Document> {
   constructor() {
     super(userModel);
   }

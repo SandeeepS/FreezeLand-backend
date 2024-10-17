@@ -1,8 +1,8 @@
 import MechModel, { MechInterface } from "../models/mechModel";
-import { MechBaseRepository } from "./BaseRepository/MechBaseRepository"; // Import the base repository
+import { BaseRepository } from "./BaseRepository/baseRepository";// Import the base repository
 import { Document } from "mongoose";
 
-class MechRepository extends MechBaseRepository<MechInterface & Document> {
+class MechRepository extends BaseRepository<MechInterface & Document> {
   constructor() {
     super(MechModel);
   }
