@@ -87,4 +87,18 @@ export class BaseRepository<T extends Searchable>
       return null;
     }
   }
+
+  async countDocument(regex: RegExp): Promise<number> {
+    try {
+      return await this.model.countDocuments({
+        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+      });
+    } catch (error) {
+      console.log(
+        "error while getting the count of the document in the baseRepository",
+        error
+      );
+      throw new Error();
+    }
+  }
 }

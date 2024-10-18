@@ -76,6 +76,18 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
       throw new Error("Error occured");
     }
   }
+
+
+  //getting the userCount
+  async getUserCount(regex: RegExp):Promise<number> {
+    try{
+      const result = await this.countDocument(regex);
+      return result as number;
+    }catch(error){
+      console.log("error occured while getting the count in the userRepository",error);
+      throw new Error;
+    }
+  }
 }
 
 export default UserRepository;

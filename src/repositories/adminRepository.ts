@@ -73,7 +73,7 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async getUserCount(searchQuery: string): Promise<number> {
+  async getUserCount(searchQuery: string): Promise<number>{
     try {
       const regex = new RegExp(searchQuery, "i");
       return await userModel
@@ -89,7 +89,7 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
 
   async blockUser(userId: string) {
     try {
-      const user = await userModel.findById(userId);
+      const user = await this.userRepository.findById(userId);
       if (user) {
         user.isBlocked = !user?.isBlocked;
         await user.save();
@@ -105,10 +105,10 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
 
   async blockMech(mechId: string) {
     try {
-      const mech = await MechModel.findById(mechId);
+      const mech = await this.mechRepository.getMechById(mechId);
       if (mech) {
         mech.isBlocked = !mech?.isBlocked;
-        await mech.save();
+        await this.mechRepository.saveMechanic(mech);
         return mech;
       } else {
         throw new Error("Somthing went wrong!!!");
