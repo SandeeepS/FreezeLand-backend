@@ -32,9 +32,9 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
 
   async emailExistCheck(email: string): Promise<UserInterface | null> {
     console.log("email find in userRepsoi", email);
-
     return this.findOne({ email });
   }
+  
 
   async updateNewPassword(
     password: string,
@@ -58,6 +58,23 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
 
   async getUserById(id: string): Promise<UserInterface | null> {
     return this.findById(id);
+  }
+
+  //methods used in the admin side 
+  async getUserList(
+    page: number,
+    limit: number,
+    searchQuery: string
+  ): Promise<UserInterface[]> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      const result = await this.findAll(page,limit,regex)
+      console.log("users list is ", result);
+      return result as UserInterface[];
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
+    }
   }
 }
 

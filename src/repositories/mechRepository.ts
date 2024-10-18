@@ -50,6 +50,24 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
   async getMechById(id: string): Promise<MechInterface | null> {
     return this.findById(id);
   }
+
+  async getMechList(
+    page: number,
+    limit: number,
+    searchQuery: RegExp
+  ): Promise<MechInterface[]> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      const result = await this.findAll(page,limit,regex)
+      console.log("mech list is ", result);
+      return result as MechInterface[];
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
+    }
+  }
+  
+
 }
 
 export default MechRepository;

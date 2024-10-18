@@ -1,15 +1,24 @@
 import { AdminInterface } from "../models/adminModel";
 import AdminModel from "../models/adminModel";
-import { comRepository } from "./comRepository";
-
+import { Document } from "mongoose";
+import { BaseRepository } from "./BaseRepository/baseRepository";
 import { UserInterface } from "../models/userModel";
 import userModel from "../models/userModel";
 import MechModel, { MechInterface } from "../models/mechModel";
+import UserRepository from "./userRepository";
+import MechRepository from "./mechRepository";
 
-class AdminRepository implements comRepository<AdminInterface> {
+class AdminRepository extends BaseRepository<AdminInterface & Document> {
+  private userRepository: UserRepository;
+  private mechRepository: MechRepository;
+  constructor() {
+    super(AdminModel);
+    this.userRepository = new UserRepository();
+    this.mechRepository = new MechRepository();
+  }
   async getAdminById(id: string): Promise<AdminInterface | null> {
     try {
-      const admin = await AdminModel.findById(id);
+      const admin = await this.findById(id);
       return admin;
     } catch (error) {
       console.log(error as Error);
@@ -20,7 +29,7 @@ class AdminRepository implements comRepository<AdminInterface> {
   async isAdminExist(email: string): Promise<AdminInterface | null> {
     try {
       console.log("enterd in the isAdminExist", email);
-      const admin = await AdminModel.findOne({ email: email });
+      const admin = await this.findOne({ email: email });
       if (admin) {
         return admin as AdminInterface;
       } else {
@@ -40,15 +49,7 @@ class AdminRepository implements comRepository<AdminInterface> {
   ): Promise<UserInterface[]> {
     try {
       const regex = new RegExp(searchQuery, "i");
-      const result = await userModel
-        .find({
-          isDeleted: false,
-          $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
-        })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .select("-password")
-        .exec();
+      const result = await this.userRepository.findAll(page, limit, regex);
       console.log("users list is ", result);
       return result as UserInterface[];
     } catch (error) {
@@ -64,13 +65,7 @@ class AdminRepository implements comRepository<AdminInterface> {
   ): Promise<MechInterface[]> {
     try {
       const regex = new RegExp(searchQuery, "i");
-      const result = await MechModel.find({
-        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
-      })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .select("-password")
-        .exec();
+      const result = await this.mechRepository.getMechList(page,limit,regex)
       return result as MechInterface[];
     } catch (error) {
       console.log(error as Error);
