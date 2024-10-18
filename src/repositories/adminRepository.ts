@@ -3,8 +3,7 @@ import AdminModel from "../models/adminModel";
 import { Document } from "mongoose";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import { UserInterface } from "../models/userModel";
-import userModel from "../models/userModel";
-import MechModel, { MechInterface } from "../models/mechModel";
+import { MechInterface } from "../models/mechModel";
 import UserRepository from "./userRepository";
 import MechRepository from "./mechRepository";
 
@@ -65,7 +64,7 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
   ): Promise<MechInterface[]> {
     try {
       const regex = new RegExp(searchQuery, "i");
-      const result = await this.mechRepository.getMechList(page,limit,regex)
+      const result = await this.mechRepository.getMechList(page, limit, regex);
       return result as MechInterface[];
     } catch (error) {
       console.log(error as Error);
@@ -73,14 +72,10 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async getUserCount(searchQuery: string): Promise<number>{
+  async getUserCount(searchQuery: string): Promise<number> {
     try {
       const regex = new RegExp(searchQuery, "i");
-      return await userModel
-        .find({
-          $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
-        })
-        .countDocuments();
+      return await this.userRepository.getUserCount(regex);
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
@@ -121,10 +116,10 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
 
   async deleteUser(userId: string) {
     try {
-      const user = await userModel.findById(userId);
+      const user = await this.userRepository.findById(userId);
       if (user) {
         user.isDeleted = !user?.isDeleted;
-        await user.save();
+        await this.userRepository.saveUser(user);
         return user;
       } else {
         throw new Error("Somthing went wrong!!!");
@@ -137,10 +132,10 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
 
   async deleteMech(mechId: string) {
     try {
-      const mech = await MechModel.findById(mechId);
+      const mech = await this.mechRepository.findById(mechId);
       if (mech) {
         mech.isDeleted = !mech?.isDeleted;
-        await mech.save();
+        await this.mechRepository.saveMechanic(mech);
         return mech;
       } else {
         throw new Error("Somthing went wrong!!!");
@@ -154,9 +149,7 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
   async getMechCount(searchQuery: string): Promise<number> {
     try {
       const regex = new RegExp(searchQuery, "i");
-      return await MechModel.find({
-        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
-      }).countDocuments();
+      return await this.mechRepository.getMechCount(regex);
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");

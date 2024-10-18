@@ -34,7 +34,6 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     console.log("email find in userRepsoi", email);
     return this.findOne({ email });
   }
-  
 
   async updateNewPassword(
     password: string,
@@ -60,7 +59,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     return this.findById(id);
   }
 
-  //methods used in the admin side 
+  //methods used in the admin side
   async getUserList(
     page: number,
     limit: number,
@@ -68,7 +67,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
   ): Promise<UserInterface[]> {
     try {
       const regex = new RegExp(searchQuery, "i");
-      const result = await this.findAll(page,limit,regex)
+      const result = await this.findAll(page, limit, regex);
       console.log("users list is ", result);
       return result as UserInterface[];
     } catch (error) {
@@ -77,15 +76,17 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-
   //getting the userCount
-  async getUserCount(regex: RegExp):Promise<number> {
-    try{
+  async getUserCount(regex: RegExp): Promise<number> {
+    try {
       const result = await this.countDocument(regex);
       return result as number;
-    }catch(error){
-      console.log("error occured while getting the count in the userRepository",error);
-      throw new Error;
+    } catch (error) {
+      console.log(
+        "error occured while getting the count in the userRepository",
+        error
+      );
+      throw new Error();
     }
   }
 }

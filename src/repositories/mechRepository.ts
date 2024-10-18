@@ -1,5 +1,5 @@
 import MechModel, { MechInterface } from "../models/mechModel";
-import { BaseRepository } from "./BaseRepository/baseRepository";// Import the base repository
+import { BaseRepository } from "./BaseRepository/baseRepository"; // Import the base repository
 import { Document } from "mongoose";
 
 class MechRepository extends BaseRepository<MechInterface & Document> {
@@ -58,7 +58,7 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
   ): Promise<MechInterface[]> {
     try {
       const regex = new RegExp(searchQuery, "i");
-      const result = await this.findAll(page,limit,regex)
+      const result = await this.findAll(page, limit, regex);
       console.log("mech list is ", result);
       return result as MechInterface[];
     } catch (error) {
@@ -66,8 +66,20 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
       throw new Error("Error occured");
     }
   }
-  
 
+  //getting the mechCount
+  async getMechCount(regex: RegExp): Promise<number> {
+    try {
+      const result = await this.countDocument(regex);
+      return result as number;
+    } catch (error) {
+      console.log(
+        "error occured while getting the count in the userRepository",
+        error
+      );
+      throw new Error();
+    }
+  }
 }
 
 export default MechRepository;

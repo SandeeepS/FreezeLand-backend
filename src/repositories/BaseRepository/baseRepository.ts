@@ -88,6 +88,7 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
+  //for counting the userData 
   async countDocument(regex: RegExp): Promise<number> {
     try {
       return await this.model.countDocuments({
