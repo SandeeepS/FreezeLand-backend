@@ -285,7 +285,29 @@ class userController {
       else res.status(OK).json(currentUser);
     } catch (error) {
       console.log(error as Error);
-      next(error)
+      next(error);
+    }
+  }
+
+  async editUser (req:Request,res:Response,next:NextFunction){
+    try{
+      console.log("req bidt kdjfsfdsffh",req.body);
+      const {_id,name,phone} = req.body;
+
+      const editedUser = await this.userServices.editUser(_id,name,phone);
+      console.log("fghfgdfggdgnfgngnngjdfgnkj",editedUser);
+      if(editedUser){
+        res
+        .status(OK)
+        .json({ success: true, message: "UserData updated sucessfully" });
+      }else{
+        res
+        .status(BAD_REQUEST)
+        .json({ success: false, message: "UserData updation is not updated !!" });
+      }
+    }catch(error){
+      console.log(error as Error);
+      next(error);
     }
   }
 

@@ -222,6 +222,14 @@ class userService implements comService<UserResponseInterface> {
       throw error;
     }
   }
+
+  async editUser(_id:string,name:string,phone:number){
+    try{
+      return this.userRepository.editUser(_id,name,phone)
+    }catch(error){
+      console.log(error as Error);
+    }
+  }
 }
 
 export default userService;

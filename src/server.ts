@@ -8,7 +8,7 @@ import adminRoutes from "./routes/adminRoutes";
 import mechRoutes from "./routes/mechRoutes";
 import logger from "./utils/logger";
 import morgan from 'morgan';
-
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 const morganFormat = ":method :url :status :response-time ms";
@@ -21,9 +21,10 @@ app.use(
     credentials: true, 
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cookieParser());
 app.use(
   morgan(morganFormat, {
     stream: {

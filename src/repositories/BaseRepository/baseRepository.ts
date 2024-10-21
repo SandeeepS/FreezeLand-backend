@@ -13,7 +13,7 @@ export interface IBaseRepository<T> {
   save(item: Partial<T>): Promise<T | null>;
   findById(id: string): Promise<T | null>;
   findOne(filter: Partial<T>): Promise<T | null>;
-  update(id: string, item: Partial<T>): Promise<T | null>;
+  update(id: string, name:string,phone:number): Promise<T | null>;
 }
 
 export class BaseRepository<T extends Searchable>
@@ -55,9 +55,9 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  async update(id: string, item: Partial<T>): Promise<T | null> {
+  async update(id: string, name:string,phone:number): Promise<T | null> {
     try {
-      return (await this.model.findByIdAndUpdate(id, item, { new: true })) as T;
+      return (await this.model.findByIdAndUpdate(id,   { $set: { name:name,phone:phone} }, { new: true })) as T;
     } catch (error) {
       console.log("Error in BaseRepository update:", error as Error);
       throw error;

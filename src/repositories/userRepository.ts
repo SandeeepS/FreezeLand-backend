@@ -75,9 +75,9 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
       throw new Error("Error occured");
     }
   }
-
+  
   //getting the userCount
-  async getUserCount(regex: RegExp): Promise<number> {
+  async getUserCount(regex: RegExp): Promise<number>{
     try {
       const result = await this.countDocument(regex);
       return result as number;
@@ -87,6 +87,16 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
         error
       );
       throw new Error();
+    }
+  }
+
+  async editUser(id:string,name:string,phone:number):Promise <UserInterface | null > {
+    try{
+       const editedUser = await this.update(id,name,phone)
+       return editedUser;
+    }catch(error){
+      console.log(error as Error);
+      throw error;
     }
   }
 }

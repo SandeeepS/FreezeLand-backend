@@ -25,6 +25,7 @@ userRouter.post('/user/forgot-password', async (req: Request, res: Response,next
 userRouter.post('/user/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await controller.VerifyForgotOtp(req, res,next));
 userRouter.put('/user/update-newpassword', async (req: Request, res: Response,next:NextFunction) => await controller.updateNewPassword(req, res,next));
 userRouter.get('/user/profile', authenticate, async (req: Request, res: Response,next:NextFunction) => await controller.getProfile(req, res,next));
+userRouter.put('/user/editUser',async (req:Request,res:Response,next:NextFunction) => await controller.editUser(req,res,next));
 
 
 export default userRouter;
