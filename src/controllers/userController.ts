@@ -330,16 +330,43 @@ class userController {
       console.log(
         "enterd in the addAddress fucniton in the backend userController"
       );
-      const {values,_id}= req.body;
-      const addedAddress = await this.userServices.AddUserAddress(_id,values);
-      if(addedAddress){
+      const { values, _id } = req.body;
+      const addedAddress = await this.userServices.AddUserAddress(_id, values);
+      if (addedAddress) {
         res
-        .status(OK)
-        .json({success:true,message:"User address added successfully"})
-      }else{
+          .status(OK)
+          .json({ success: true, message: "User address added successfully" });
+      } else {
         res
-        .status(BAD_REQUEST)
-        .json({success:false,message:"User Address addingh failed"});
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "User Address addingh failed" });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async setDefaultAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "Enterd in the address funciton in the backend userController"
+      );
+      const { userId, addressId } = req.body;
+      console.log("userId and addressId is ", userId, addressId);
+      const updatedDefaultAddress =
+        await this.userServices.setUserDefaultAddress(userId, addressId);
+      if (updatedDefaultAddress) {
+        res
+          .status(OK)
+          .json({
+            success: true,
+            message: "Default address updated successfully",
+          });
+      } else {
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Default address updation failed" });
       }
     } catch (error) {
       console.log(error as Error);

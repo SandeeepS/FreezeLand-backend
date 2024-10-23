@@ -115,6 +115,18 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
 
     }
   }
+
+  async setDefaultAddress(userId:string , addressId:string) {
+    try{
+      console.log("enterd in the userRepository for upaidng the default address",userId,addressId);
+      const qr = {defaultAddress:addressId}
+      const updatedUser = await this.update(userId,qr);
+      return updatedUser;
+    }catch(error){
+      console.log(error as Error)
+      throw error;
+    }
+  }
 }
 
 export default UserRepository;

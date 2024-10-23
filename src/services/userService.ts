@@ -224,18 +224,27 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async editUser(_id:string,name:string,phone:number){
-    try{
-      return this.userRepository.editUser(_id,name,phone)
-    }catch(error){
+  async editUser(_id: string, name: string, phone: number) {
+    try {
+      return this.userRepository.editUser(_id, name, phone);
+    } catch (error) {
       console.log(error as Error);
     }
   }
 
-  async AddUserAddress(_id:string,values:AddAddress){
-    try{
-      return await this.userRepository.addAddress(_id,values)
-    }catch(error){
+  async AddUserAddress(_id: string, values: AddAddress) {
+    try {
+      return await this.userRepository.addAddress(_id, values);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+  async setUserDefaultAddress(userId: string, addressId: string) {
+    try {
+      console.log("entered in the userService ");
+      return await this.userRepository.setDefaultAddress(userId, addressId);
+    } catch (error) {
       console.log(error as Error);
     }
   }

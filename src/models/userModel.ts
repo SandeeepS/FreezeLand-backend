@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model} from "mongoose";
 
 const AddressSchema = new Schema({
   name: { type: String, require: true },
@@ -26,6 +26,7 @@ export interface UserInterface extends Document {
     district: string;
     landMark: string;
   }[];
+  defaultAddress:string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -53,6 +54,9 @@ const userSchema: Schema<UserInterface> = new Schema({
   address: {
     type: [AddressSchema],
     required: false,
+  },
+  defaultAddress:{
+    type:String,
   },
   isBlocked: {
     type: Boolean,
