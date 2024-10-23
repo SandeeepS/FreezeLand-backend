@@ -3,7 +3,7 @@ import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
-const { BAD_REQUEST, OK, UNAUTHORIZED,INTERNAL_SERVER_ERROR} = STATUS_CODES;
+const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
 
 class userController {
   constructor(private userServices: userService) {}
@@ -26,7 +26,7 @@ class userController {
         req.app.locals.userEmail = req.body.email;
         const otp = await generateAndSendOTP(req.body.email);
         req.app.locals.userOtp = otp;
-        console.log("otp print ", req.app.locals.userOtp)
+        console.log("otp print ", req.app.locals.userOtp);
 
         const expirationMinutes = 1;
         setTimeout(() => {
@@ -49,11 +49,7 @@ class userController {
     }
   }
 
-  async userLogin(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  async userLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password }: { email: string; password: string } = req.body;
       const loginStatus = await this.userServices.userLogin(email, password);
@@ -94,62 +90,81 @@ class userController {
     }
   }
 
-
-  async googleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async googleLogin(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const { name, email, googlePhotoUrl } = req.body;
     const accessTokenMaxAge = 5 * 60 * 1000;
     const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
     try {
-        const user = await this.userServices.getUserByEmail(email);
-        if (user) {
-            if (user.isBlocked) {
-                res.status(UNAUTHORIZED).json({ success: false, message: 'user has been blocked by admin.' });
-                // throw new Error('user has been blocked by admin...');
-            } else {
-                const token = this.userServices.generateToken(user.id);
-                const refreshToken = this.userServices.generateRefreshToken(user.id);
-                const data = {
-                    success: true,
-                    message: 'Success',
-                    userId: user.id,
-                    token: token,
-                    refreshToken,
-                    data: user
-                }
-
-                // const time = this.milliseconds(23, 30, 0);
-                res.status(OK).cookie('access_token', token, {
-                    maxAge: accessTokenMaxAge
-                }).cookie('refresh_token', refreshToken, {
-                    maxAge: refreshTokenMaxAge
-                }).json(data);
-            }
-
+      const user = await this.userServices.getUserByEmail(email);
+      if (user) {
+        if (user.isBlocked) {
+          res.status(UNAUTHORIZED).json({
+            success: false,
+            message: "user has been blocked by admin.",
+          });
+          // throw new Error('user has been blocked by admin...');
         } else {
-            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
-            const hashedPassword = await this.userServices.hashPassword(generatedPassword);
+          const token = this.userServices.generateToken(user.id);
+          const refreshToken = this.userServices.generateRefreshToken(user.id);
+          const data = {
+            success: true,
+            message: "Success",
+            userId: user.id,
+            token: token,
+            refreshToken,
+            data: user,
+          };
 
-            const newUser: UserResponseInterface | undefined = await this.userServices.saveUser({
-                name: name,
-                email: email,
-                password: hashedPassword,
-                profile_picture: googlePhotoUrl,
-
+          // const time = this.milliseconds(23, 30, 0);
+          res
+            .status(OK)
+            .cookie("access_token", token, {
+              maxAge: accessTokenMaxAge,
             })
-            if (newUser?.data.data) {
-                // const time = this.milliseconds(23, 30, 0);
-                res.status(OK).cookie('access_token', newUser.data.token, {
-                    maxAge: accessTokenMaxAge
-                }).cookie('refresh_token', newUser.data.refresh_token, {
-                    maxAge: refreshTokenMaxAge,
-                }).json(newUser.data);
-            }
+            .cookie("refresh_token", refreshToken, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(data);
         }
+      } else {
+        const generatedPassword =
+          Math.random().toString(36).slice(-8) +
+          Math.random().toString(36).slice(-8);
+        const hashedPassword = await this.userServices.hashPassword(
+          generatedPassword
+        );
+
+        const newUser: UserResponseInterface | undefined =
+          await this.userServices.saveUser({
+            name: name,
+            email: email,
+            password: hashedPassword,
+            profile_picture: googlePhotoUrl,
+          });
+        if (newUser?.data.data) {
+          // const time = this.milliseconds(23, 30, 0);
+          res
+            .status(OK)
+            .cookie("access_token", newUser.data.token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("refresh_token", newUser.data.refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(newUser.data);
+        }
+      }
     } catch (error) {
-        next(error);
-        res.status(INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error......' });
+      next(error);
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: "Internal server error......" });
     }
-}
+  }
 
   async veryfyOtp(
     req: Request,
@@ -276,12 +291,10 @@ class userController {
           .status(UNAUTHORIZED)
           .json({ success: false, message: "Authentication failed..!" });
       else if (currentUser?.data.data?.isBlocked)
-        res
-          .status(UNAUTHORIZED)
-          .json({
-            success: false,
-            message: "user has been blocked by the admin!",
-          });
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "user has been blocked by the admin!",
+        });
       else res.status(OK).json(currentUser);
     } catch (error) {
       console.log(error as Error);
@@ -289,23 +302,46 @@ class userController {
     }
   }
 
-  async editUser (req:Request,res:Response,next:NextFunction){
-    try{
-      console.log("req bidt kdjfsfdsffh",req.body);
-      const {_id,name,phone} = req.body;
+  async editUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("req bidt kdjfsfdsffh", req.body);
+      const { _id, name, phone } = req.body;
 
-      const editedUser = await this.userServices.editUser(_id,name,phone);
-      console.log("fghfgdfggdgnfgngnngjdfgnkj",editedUser);
-      if(editedUser){
+      const editedUser = await this.userServices.editUser(_id, name, phone);
+      console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
+      if (editedUser) {
+        res
+          .status(OK)
+          .json({ success: true, message: "UserData updated sucessfully" });
+      } else {
+        res.status(BAD_REQUEST).json({
+          success: false,
+          message: "UserData updation is not updated !!",
+        });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async addAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "enterd in the addAddress fucniton in the backend userController"
+      );
+      const {values,_id}= req.body;
+      const addedAddress = await this.userServices.AddUserAddress(_id,values);
+      if(addedAddress){
         res
         .status(OK)
-        .json({ success: true, message: "UserData updated sucessfully" });
+        .json({success:true,message:"User address added successfully"})
       }else{
         res
         .status(BAD_REQUEST)
-        .json({ success: false, message: "UserData updation is not updated !!" });
+        .json({success:false,message:"User Address addingh failed"});
       }
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }

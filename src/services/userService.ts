@@ -8,6 +8,7 @@ import { comService } from "./comServices";
 import dotenv from "dotenv";
 import Cryptr from "cryptr";
 import User from "../interfaces/entityInterface/Iuser";
+import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 
 dotenv.config();
 
@@ -226,6 +227,14 @@ class userService implements comService<UserResponseInterface> {
   async editUser(_id:string,name:string,phone:number){
     try{
       return this.userRepository.editUser(_id,name,phone)
+    }catch(error){
+      console.log(error as Error);
+    }
+  }
+
+  async AddUserAddress(_id:string,values:AddAddress){
+    try{
+      return await this.userRepository.addAddress(_id,values)
     }catch(error){
       console.log(error as Error);
     }

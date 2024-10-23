@@ -1,4 +1,6 @@
 import { Model } from "mongoose";
+import { ObjectId } from 'mongodb';
+
 
 interface Deletable {
   isDeleted: boolean;
@@ -13,7 +15,8 @@ export interface IBaseRepository<T> {
   save(item: Partial<T>): Promise<T | null>;
   findById(id: string): Promise<T | null>;
   findOne(filter: Partial<T>): Promise<T | null>;
-  update(id: string, name:string,phone:number): Promise<T | null>;
+  update(id: string, qr: Partial<T>): Promise<T | null>;
+  updateAddress(_id: string, qr: Partial<T>): Promise<T | null>
 }
 
 export class BaseRepository<T extends Searchable>
@@ -55,13 +58,34 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  async update(id: string, name:string,phone:number): Promise<T | null> {
+  async update(id: string, qr: Partial<T>): Promise<T | null> {
     try {
-      return (await this.model.findByIdAndUpdate(id,   { $set: { name:name,phone:phone} }, { new: true })) as T;
+      return (await this.model.findByIdAndUpdate(
+        id,
+        { $set: qr },
+        { new: true }
+      )) as T;
     } catch (error) {
       console.log("Error in BaseRepository update:", error as Error);
       throw error;
     }
+  }
+
+  async updateAddress(id:string,qr:Partial<T>) : Promise<T | null>{
+        try{
+          console.log("id",id);
+          
+          console.log("qr",qr);
+          const objectId = new ObjectId(id);
+          return (await this.model.findByIdAndUpdate(
+            objectId,
+            { $push: qr },
+            { new: true }
+          )) as T;
+        }catch(error){
+          console.log(error as Error);
+          throw error;
+        }
   }
 
   async findAll(
@@ -88,7 +112,7 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  //for counting the userData 
+  //for counting the userData
   async countDocument(regex: RegExp): Promise<number> {
     try {
       return await this.model.countDocuments({

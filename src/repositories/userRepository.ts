@@ -1,6 +1,7 @@
 import userModel, { UserInterface } from "../models/userModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
+import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 
 class UserRepository extends BaseRepository<UserInterface & Document> {
   constructor() {
@@ -92,11 +93,26 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
 
   async editUser(id:string,name:string,phone:number):Promise <UserInterface | null > {
     try{
-       const editedUser = await this.update(id,name,phone)
+      const qr = {name:name,phone:phone}
+       const editedUser = await this.update(id,qr)
        return editedUser;
     }catch(error){
       console.log(error as Error);
       throw error;
+    }
+  }
+
+  async addAddress(_id:string,values:AddAddress) : Promise<UserInterface | null>{
+    try{
+      console.log("new address from the userRepository is ",values);
+      const qr = {address:[values]}
+      const addedAddress  = await this.updateAddress(_id,qr);
+      return addedAddress;
+      
+    }catch(error){
+      console.log(error as Error);
+      throw error;
+
     }
   }
 }

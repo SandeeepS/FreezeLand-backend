@@ -22,7 +22,7 @@ export interface UserInterface extends Document {
     phone: number;
     email: string;
     state: string;
-    pin: string;
+    pin: number;
     district: string;
     landMark: string;
   }[];
