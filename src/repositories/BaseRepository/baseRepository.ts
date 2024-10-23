@@ -1,6 +1,5 @@
 import { Model } from "mongoose";
-import { ObjectId } from 'mongodb';
-
+import { ObjectId } from "mongodb";
 
 interface Deletable {
   isDeleted: boolean;
@@ -16,7 +15,12 @@ export interface IBaseRepository<T> {
   findById(id: string): Promise<T | null>;
   findOne(filter: Partial<T>): Promise<T | null>;
   update(id: string, qr: Partial<T>): Promise<T | null>;
-  updateAddress(_id: string, qr: Partial<T>): Promise<T | null>
+  updateAddress(_id: string, qr: Partial<T>): Promise<T | null>;
+  editExistAddress(
+    _id: string,
+    addressId: string,
+    qr: Partial<T>
+  ): Promise<T | null>;
 }
 
 export class BaseRepository<T extends Searchable>
@@ -71,21 +75,45 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  async updateAddress(id:string,qr:Partial<T>) : Promise<T | null>{
-        try{
-          console.log("id",id);
-          
-          console.log("qr",qr);
-          const objectId = new ObjectId(id);
-          return (await this.model.findByIdAndUpdate(
-            objectId,
-            { $push: qr },
-            { new: true }
-          )) as T;
-        }catch(error){
-          console.log(error as Error);
-          throw error;
-        }
+  async updateAddress(id: string, qr: Partial<T>): Promise<T | null> {
+    try {
+      console.log("id", id);
+
+      console.log("qr", qr);
+      const objectId = new ObjectId(id);
+      return (await this.model.findByIdAndUpdate(
+        objectId,
+        { $push: qr },
+        { new: true }
+      )) as T;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  async editExistAddress(
+    _id: string,
+    addressId: string,
+    values: Partial<T>
+  ): Promise<T | null> {
+    try {
+      const objectId = new ObjectId(_id);
+      const newAddressId = new ObjectId(addressId);
+
+      return await this.model.findOneAndUpdate(
+        { _id: objectId, "address._id": newAddressId },
+        {
+          $set: {
+            "address.$": values,
+          },
+        },
+        { new: true }
+      );
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
   }
 
   async findAll(

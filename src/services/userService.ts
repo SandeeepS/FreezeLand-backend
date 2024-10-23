@@ -240,6 +240,14 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
+  async editAddress(_id: string, addressId :string, values: AddAddress) {
+    try {
+      return await this.userRepository.editAddress(_id,addressId, values);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
   async setUserDefaultAddress(userId: string, addressId: string) {
     try {
       console.log("entered in the userService ");

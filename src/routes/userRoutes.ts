@@ -28,6 +28,7 @@ userRouter.get('/user/profile', authenticate, async (req: Request, res: Response
 userRouter.put('/user/editUser',async (req:Request,res:Response,next:NextFunction) => await controller.editUser(req,res,next));
 userRouter.post('/user/addAddress',async(req:Request,res:Response,next:NextFunction) => await controller.addAddress(req,res,next));
 userRouter.put('/user/setDefaultAddress',async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
+userRouter.put('/user/editAddress', async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 
 
 export default userRouter;

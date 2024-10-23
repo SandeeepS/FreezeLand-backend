@@ -347,6 +347,33 @@ class userController {
     }
   }
 
+  async editAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("entered in teh userController for editing the address");
+      const { values, _id, addressId } = req.body;
+      const editedAddress = await this.userServices.editAddress(
+        _id,
+        addressId,
+        values
+      );
+      if (editedAddress) {
+        res
+          .status(OK)
+          .json({
+            success: true,
+            message: "Address edited  added successfully",
+          });
+      } else {
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Address editing  failed" });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async setDefaultAddress(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
@@ -357,12 +384,10 @@ class userController {
       const updatedDefaultAddress =
         await this.userServices.setUserDefaultAddress(userId, addressId);
       if (updatedDefaultAddress) {
-        res
-          .status(OK)
-          .json({
-            success: true,
-            message: "Default address updated successfully",
-          });
+        res.status(OK).json({
+          success: true,
+          message: "Default address updated successfully",
+        });
       } else {
         res
           .status(BAD_REQUEST)

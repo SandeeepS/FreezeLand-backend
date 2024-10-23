@@ -76,9 +76,9 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
       throw new Error("Error occured");
     }
   }
-  
+
   //getting the userCount
-  async getUserCount(regex: RegExp): Promise<number>{
+  async getUserCount(regex: RegExp): Promise<number> {
     try {
       const result = await this.countDocument(regex);
       return result as number;
@@ -91,39 +91,62 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async editUser(id:string,name:string,phone:number):Promise <UserInterface | null > {
-    try{
-      const qr = {name:name,phone:phone}
-       const editedUser = await this.update(id,qr)
-       return editedUser;
-    }catch(error){
+  async editUser(
+    id: string,
+    name: string,
+    phone: number
+  ): Promise<UserInterface | null> {
+    try {
+      const qr = { name: name, phone: phone };
+      const editedUser = await this.update(id, qr);
+      return editedUser;
+    } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
 
-  async addAddress(_id:string,values:AddAddress) : Promise<UserInterface | null>{
-    try{
-      console.log("new address from the userRepository is ",values);
-      const qr = {address:[values]}
-      const addedAddress  = await this.updateAddress(_id,qr);
+  async addAddress(
+    _id: string,
+    values: AddAddress
+  ): Promise<UserInterface | null> {
+    try {
+      console.log("new address from the userRepository is ", values);
+      const qr = { address: [values] };
+      const addedAddress = await this.updateAddress(_id, qr);
       return addedAddress;
-      
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       throw error;
-
     }
   }
 
-  async setDefaultAddress(userId:string , addressId:string) {
-    try{
-      console.log("enterd in the userRepository for upaidng the default address",userId,addressId);
-      const qr = {defaultAddress:addressId}
-      const updatedUser = await this.update(userId,qr);
+  async editAddress(
+    _id: string,
+    addressId: string,
+    values: AddAddress
+  ): Promise<UserInterface | null> {
+    try {
+      const editedAddress = await this.editExistAddress(_id, addressId, values);
+      return editedAddress;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  async setDefaultAddress(userId: string, addressId: string) {
+    try {
+      console.log(
+        "enterd in the userRepository for upaidng the default address",
+        userId,
+        addressId
+      );
+      const qr = { defaultAddress: addressId };
+      const updatedUser = await this.update(userId, qr);
       return updatedUser;
-    }catch(error){
-      console.log(error as Error)
+    } catch (error) {
+      console.log(error as Error);
       throw error;
     }
   }
