@@ -5,14 +5,15 @@ import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserSer
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
-import { CreateUserDTO } from "../dto/user.dto.";
 import dotenv from "dotenv";
-import Cryptr = require("cryptr");
+import Cryptr from "cryptr";
+import User from "../interfaces/entityInterface/Iuser";
+import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 
 dotenv.config();
 
-const { OK, UNAUTHORIZED } = STATUS_CODES;
-class userService implements comService<CreateUserDTO> {
+const { OK, UNAUTHORIZED, NOT_FOUND, INTERNAL_SERVER_ERROR } = STATUS_CODES;
+class userService implements comService<UserResponseInterface> {
   constructor(
     private userRepository: UserRepository,
     private createjwt: CreateJWT,
@@ -28,9 +29,7 @@ class userService implements comService<CreateUserDTO> {
     }
   }
 
-  async saveUser(
-    userData: UserInterface
-  ): Promise<UserResponseInterface | undefined> {
+  async saveUser(userData: User): Promise<UserResponseInterface | undefined> {
     try {
       console.log("Entered in user Service and the userData is ", userData);
       const { name, email, password, phone } = userData;
@@ -77,7 +76,10 @@ class userService implements comService<CreateUserDTO> {
     }
   }
 
-  async userLogin(email: string, password: string): Promise<any> {
+  async userLogin(
+    email: string,
+    password: string
+  ): Promise<UserResponseInterface> {
     try {
       const user: UserInterface | null =
         await this.userRepository.emailExistCheck(email);
@@ -91,7 +93,7 @@ class userService implements comService<CreateUserDTO> {
             message: "You have been blocked by the admin !",
             token: token,
             data: user,
-            refreshToken: refreshToken,
+            refresh_token: refreshToken,
           },
         } as const;
       }
@@ -112,7 +114,7 @@ class userService implements comService<CreateUserDTO> {
               data: user,
               userId: user.id,
               token: token,
-              refreshToken: refreshToken,
+              refresh_token: refreshToken,
             },
           } as const;
         } else {
@@ -125,6 +127,13 @@ class userService implements comService<CreateUserDTO> {
           } as const;
         }
       }
+      return {
+        status: UNAUTHORIZED,
+        data: {
+          success: false,
+          message: "Invalid email or password.",
+        },
+      } as const;
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -135,17 +144,61 @@ class userService implements comService<CreateUserDTO> {
     try {
       return this.userRepository.emailExistCheck(email);
     } catch (error) {
+      console.log("error occured while getUserEmail in the userService");
       throw error;
     }
   }
 
-  getProfile(id: string | undefined): Promise<UserInterface | null> | null {
+  generateToken(payload: string | undefined): string | undefined {
+    if (payload) return this.createjwt.generateToken(payload);
+  }
+
+  generateRefreshToken(payload: string | undefined): string | undefined {
+    if (payload) return this.createjwt.generateRefreshToken(payload);
+  }
+
+  async hashPassword(password: string) {
+    return await this.encrypt.hashPassword(password);
+  }
+
+  async getProfile(id: string | undefined): Promise<UserResponseInterface> {
     try {
-      if (!id) return null;
-      return this.userRepository.getUserById(id);
+      if (!id)
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "User ID is missing",
+          },
+        } as const;
+      const user = await this.userRepository.getUserById(id);
+      if (!user) {
+        return {
+          status: NOT_FOUND,
+          data: {
+            success: false,
+            message: "User not found",
+          },
+        } as const;
+      }
+
+      return {
+        status: OK,
+        data: {
+          success: true,
+          message: "User profile retrieved successfully",
+          data: user,
+        },
+      } as const;
     } catch (error) {
       console.log(error as Error);
-      return null;
+      return {
+        status: INTERNAL_SERVER_ERROR,
+        data: {
+          success: false,
+          message: "An error occurred while retrieving user profile",
+        },
+      } as const;
     }
   }
 
@@ -168,6 +221,39 @@ class userService implements comService<CreateUserDTO> {
     } catch (error) {
       console.log(error as Error);
       throw error;
+    }
+  }
+
+  async editUser(_id: string, name: string, phone: number) {
+    try {
+      return this.userRepository.editUser(_id, name, phone);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+  async AddUserAddress(_id: string, values: AddAddress) {
+    try {
+      return await this.userRepository.addAddress(_id, values);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+  async editAddress(_id: string, addressId :string, values: AddAddress) {
+    try {
+      return await this.userRepository.editAddress(_id,addressId, values);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+  async setUserDefaultAddress(userId: string, addressId: string) {
+    try {
+      console.log("entered in the userService ");
+      return await this.userRepository.setDefaultAddress(userId, addressId);
+    } catch (error) {
+      console.log(error as Error);
     }
   }
 }

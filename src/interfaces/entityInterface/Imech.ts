@@ -1,10 +1,11 @@
 interface Mech {
     id?: string;
-    username?: string;
-    password?: string;
+    name?: string;
     email?: string;
-    phone?:Number;
-    isBlocked?:boolean;  
+    password?: string ;
+    phone?:number;
+    isBlocked?:boolean; 
+    isDeleted?:boolean; 
 }
 
 export default Mech;

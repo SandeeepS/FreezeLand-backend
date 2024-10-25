@@ -7,8 +7,8 @@ import { comService } from "./comServices";
 import { MechResponseInterface } from "../interfaces/serviceInterfaces/InMechService";
 import Cryptr from "cryptr";
 
-const { OK, INTERNAL_SERVER_ERROR, UNAUTHORIZED } = STATUS_CODES;
-class mechService implements comService<MechInterface> {
+const { OK, UNAUTHORIZED } = STATUS_CODES;
+class mechService implements comService<MechResponseInterface> {
   constructor(
     private mechRepository: MechRepository,
     private createjwt: CreateJWT,
@@ -46,67 +46,75 @@ class mechService implements comService<MechInterface> {
   //       };
   //     } else {
   //       console.log("mechanic is not registered");
-        
+
   //     }
   //   } catch (error) {
   //     console.log(error as Error);
   //   }
   // }
 
-
   async signupMech(mechData: MechInterface): Promise<MechInterface | null> {
     try {
-        return await this.mechRepository.emailExistCheck(mechData.email);
+      return await this.mechRepository.emailExistCheck(mechData.email);
     } catch (error) {
-        console.log(error as Error);
-        throw error
+      console.log(error as Error);
+      throw error;
     }
+  }
 
-}
-
-
-async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefined> {
-  try {
-          console.log("Entered in mech Service and the mechData is ",mechData);
-      const {name,email,password,phone} = mechData;
-      const secret_key :string | undefined= process.env.CRYPTR_SECRET
-      if(!secret_key){
-        throw new Error("Encrption secret key is not defined in the environment");
+  async saveMech(
+    mechData: MechInterface
+  ): Promise<MechResponseInterface | undefined> {
+    try {
+      console.log("Entered in mech Service and the mechData is ", mechData);
+      const { name, email, password, phone } = mechData;
+      const secret_key: string | undefined = process.env.CRYPTR_SECRET;
+      if (!secret_key) {
+        throw new Error(
+          "Encrption secret key is not defined in the environment"
+        );
       }
-      const cryptr = new Cryptr(secret_key,{ encoding: 'base64', pbkdf2Iterations: 10000, saltLength: 10 });
+      const cryptr = new Cryptr(secret_key, {
+        encoding: "base64",
+        pbkdf2Iterations: 10000,
+        saltLength: 10,
+      });
       const newPassword = cryptr.encrypt(password);
       const newDetails: Partial<MechInterface> = {
-               name:name,
-               password:newPassword,
-               email:email,
-               phone:phone
-      }
-      console.log("new Encypted password with data is ",newDetails);
+        name: name,
+        password: newPassword,
+        email: email,
+        phone: phone,
+      };
+      console.log("new Encypted password with data is ", newDetails);
       const mech = await this.mechRepository.saveMechanic(newDetails);
       if (mech) {
-          const token = this.createjwt.generateToken(mech?.id);
-          const  refresh_token = this.createjwt.generateRefreshToken(mech?.id);
-          console.log("token is ",token);
-          console.log("refresh",  refresh_token);
-          return {
-              status: OK,
-              data: {
-                  success: true,
-                  message: 'Success',
-                  userId: mechData.id,
-                  token: token,
-                  data: mech,
-                  refresh_token
-              }
-          }
+        const token = this.createjwt.generateToken(mech?.id);
+        const refresh_token = this.createjwt.generateRefreshToken(mech?.id);
+        console.log("token is ", token);
+        console.log("refresh", refresh_token);
+        return {
+          status: OK,
+          data: {
+            success: true,
+            message: "Success",
+            mechId: mechData.id,
+            token: token,
+            data: mech,
+            refresh_token,
+          },
+        };
       }
-  } catch (error) {
+    } catch (error) {
       console.log(error as Error);
-      throw error
+      throw error;
+    }
   }
-}
 
-  async mechLogin(email: string, password: string): Promise<any> {
+  async mechLogin(
+    email: string,
+    password: string
+  ): Promise<MechResponseInterface> {
     try {
       const mech: MechInterface | null =
         await this.mechRepository.emailExistCheck(email);
@@ -120,7 +128,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
             message: "You have been blocked by the mech !",
             token: token,
             data: mech,
-            refreshToken: refreshToken,
+            refresh_token: refreshToken,
           },
         } as const;
       }
@@ -141,7 +149,7 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
               data: mech,
               mechId: mech.id,
               token: token,
-              refreshToken: refreshToken,
+              refresh_token: refreshToken,
             },
           } as const;
         } else {
@@ -153,7 +161,46 @@ async saveMech(mechData: MechInterface): Promise<MechResponseInterface | undefin
             },
           } as const;
         }
+      } else {
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Authentication failed...",
+          },
+        } as const;
       }
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<MechInterface | null> {
+    try {
+      return this.mechRepository.emailExistCheck(email);
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  async updateNewPassword(password: string, userId: string) {
+    try {
+      const secret_key: string | undefined = process.env.CRYPTR_SECRET;
+      if (!secret_key) {
+        throw new Error(
+          "Encrption secret key is not defined in the environment"
+        );
+      }
+      const cryptr = new Cryptr(secret_key, {
+        encoding: "base64",
+        pbkdf2Iterations: 10000,
+        saltLength: 10,
+      });
+      const newPassword = cryptr.encrypt(password);
+
+      return await this.mechRepository.updateNewPassword(newPassword, userId);
     } catch (error) {
       console.log(error as Error);
       throw error;

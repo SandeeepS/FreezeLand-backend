@@ -1,6 +1,4 @@
 
-import { MechInterface } from "../../models/mechModel";
-import Admin from "../entityInterface/Iadmin";
 import Mech from "../entityInterface/Imech";
 
 export interface MechResponseInterface {
@@ -8,8 +6,8 @@ export interface MechResponseInterface {
   data: {
     success: boolean;
     message: string;
-    data?: Admin | MechInterface;
-    userId?: string;
+    data?: Mech;
+    mechId?: string;
     token?: string;
     refresh_token?: string;
   };

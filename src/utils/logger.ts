@@ -1,10 +1,11 @@
 import { createLogger, format, transports } from "winston";
 const { combine, timestamp, json, colorize } = format;
+import DailyRotateFile from "winston-daily-rotate-file";
 
 // Custom format for console logging with colors
 const consoleLogFormat = format.combine(
   format.colorize(),
-  format.printf(({ level, message, timestamp }) => {
+  format.printf(({ level, message }) => {
     return `${level}: ${message}`;
   })
 );
@@ -17,7 +18,14 @@ const logger = createLogger({
     new transports.Console({
       format: consoleLogFormat,
     }),
-    new transports.File({ filename: "app.log" }),
+    new DailyRotateFile({
+      filename: 'loggerDetails/app.log', // Directory for log files, logs folder should exist
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '1d', // Keep logs for 1 day
+      format: json(),
+    }),
   ],
 });
 

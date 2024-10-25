@@ -17,12 +17,18 @@ const controller = new userController(userServices);
 
 userRouter.post('/user/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
 userRouter.post('/user/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next) )
+userRouter.post('/user/google-login', async (req: Request, res: Response, next: NextFunction) => await controller.googleLogin(req, res, next));
+
 userRouter.get('/user/logout', async (req: Request, res: Response,next:NextFunction) => await controller.logout(req, res,next));
 userRouter.post('/user/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.veryfyOtp(req,res,next));
 userRouter.post('/user/forgot-password', async (req: Request, res: Response,next:NextFunction) => await controller.forgotResentOtp(req, res,next));
 userRouter.post('/user/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await controller.VerifyForgotOtp(req, res,next));
 userRouter.put('/user/update-newpassword', async (req: Request, res: Response,next:NextFunction) => await controller.updateNewPassword(req, res,next));
 userRouter.get('/user/profile', authenticate, async (req: Request, res: Response,next:NextFunction) => await controller.getProfile(req, res,next));
+userRouter.put('/user/editUser',async (req:Request,res:Response,next:NextFunction) => await controller.editUser(req,res,next));
+userRouter.post('/user/addAddress',async(req:Request,res:Response,next:NextFunction) => await controller.addAddress(req,res,next));
+userRouter.put('/user/setDefaultAddress',async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
+userRouter.put('/user/editAddress', async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 
 
 export default userRouter;

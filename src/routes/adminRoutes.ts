@@ -21,6 +21,10 @@ adminRouter.get('/users',  async (req: Request, res: Response,next:NextFunction)
 adminRouter.get('/mechanics',async (req:Request,res:Response,next:NextFunction) => controller.getMechList(req,res,next));
 adminRouter.put('/users/block/:userId', async (req: Request, res: Response,next:NextFunction) => controller.blockUser(req, res,next));
 adminRouter.put('/users/delete/:userId', async (req: Request, res: Response,next:NextFunction) => controller.deleteUser(req, res,next));
+adminRouter.put('/mech/block/:mechId',  async (req: Request, res: Response,next:NextFunction) => controller.blockMech(req, res,next));
+adminRouter.put('/mech/delete/:mechId', async (req: Request, res: Response,next:NextFunction) => controller.deleteMech(req, res,next));
+adminRouter.post('/admin/addNewService',async(req:Request,res:Response,next:NextFunction) => controller.addNewServices(req,res,next));
+
 
 
 
