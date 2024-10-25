@@ -80,6 +80,16 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
       throw new Error();
     }
   }
+
+  async AddService(values: string) {
+    try {
+      const result = await this.addService(values);
+      return result ;
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error();
+    }
+  }
 }
 
 export default MechRepository;

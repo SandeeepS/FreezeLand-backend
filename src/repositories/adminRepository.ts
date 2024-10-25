@@ -28,8 +28,9 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
   async isAdminExist(email: string): Promise<AdminInterface | null> {
     try {
       console.log("enterd in the isAdminExist", email);
-      const admin = await this.findOne({ email: email });
+      const admin = await this.findOne({email: email});
       if (admin) {
+        console.log("admin is exist in the database !dlkghdopgokdgdgj");
         return admin as AdminInterface;
       } else {
         console.log("admin is not exists");
@@ -146,6 +147,18 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
+  async addNewServices(values:string){
+    try{
+      const addedService = await this.mechRepository.AddService(values);
+      if(addedService){
+        return addedService
+      } else{
+        throw new Error("Something went wrong ");
+      }
+    }catch(error){
+      console.log(error as Error);
+    }
+  }
   async getMechCount(searchQuery: string): Promise<number> {
     try {
       const regex = new RegExp(searchQuery, "i");

@@ -160,6 +160,26 @@ class adminController {
     }
   }
 
+  async addNewServices(req:Request,res:Response,next:NextFunction){
+    try{
+      const {values} = req.body;
+      const result = await this.adminService.addService(values);
+      if(result){
+        res.json({ success: true, message: "added the service successfully" });
+        
+      }else{
+        res.json({
+          success: false,
+          message:
+            "Something went wrong while adding the service ",
+        });
+      }
+    }catch(error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
       res.cookie("admin_access_token", "", {

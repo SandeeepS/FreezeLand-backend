@@ -17,7 +17,7 @@ const serviceSchema: Schema<IServices> = new Schema({
   },
   image: {
     type: String,
-    required: true,
+    required: false,
   },
   discription: {
     type: String,

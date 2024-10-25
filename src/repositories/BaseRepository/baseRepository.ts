@@ -154,4 +154,15 @@ export class BaseRepository<T extends Searchable>
       throw new Error();
     }
   }
+
+  async addService(values:string):Promise<T | null>{
+    try{
+      const newSerive = new this.model(values)
+      await newSerive.save();
+      return newSerive as T;
+    }catch(error){
+      console.log(error);
+      throw error;
+    }
+  }
 }

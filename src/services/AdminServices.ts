@@ -26,6 +26,7 @@ class adminService implements comService<AdminAuthResponse> {
       const admin = await this.adminRepository.isAdminExist(email);
 
       if (admin?.password === password) {
+        console.log("passwrod from the admin side is ",admin.password);
         const token = this.createjwt.generateToken(admin?.id);
         const refreshToken = this.createjwt.generateRefreshToken(admin?.id);
         console.log("admin is exist", admin);
@@ -138,6 +139,15 @@ class adminService implements comService<AdminAuthResponse> {
     try {
       return await this.adminRepository.deleteMech(mechId);
     } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+  async addService (values:string){
+    try{
+      return await this.adminRepository.addNewServices(values);
+
+    }catch(error){
       console.log(error as Error);
     }
   }

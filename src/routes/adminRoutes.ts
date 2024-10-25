@@ -23,6 +23,7 @@ adminRouter.put('/users/block/:userId', async (req: Request, res: Response,next:
 adminRouter.put('/users/delete/:userId', async (req: Request, res: Response,next:NextFunction) => controller.deleteUser(req, res,next));
 adminRouter.put('/mech/block/:mechId',  async (req: Request, res: Response,next:NextFunction) => controller.blockMech(req, res,next));
 adminRouter.put('/mech/delete/:mechId', async (req: Request, res: Response,next:NextFunction) => controller.deleteMech(req, res,next));
+adminRouter.post('/admin/addNewService',async(req:Request,res:Response,next:NextFunction) => controller.addNewServices(req,res,next));
 
 
 
