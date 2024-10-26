@@ -4,6 +4,7 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
+import LoginValidation from "../utils/validator";
 
 class userController {
   constructor(private userServices: userService) {}
@@ -52,37 +53,62 @@ class userController {
   async userLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password }: { email: string; password: string } = req.body;
-      const loginStatus = await this.userServices.userLogin(email, password);
-      console.log(loginStatus);
-      if (
-        loginStatus &&
-        loginStatus.data &&
-        typeof loginStatus.data == "object" &&
-        "token" in loginStatus.data
-      ) {
-        if (!loginStatus.data.success) {
-          res
-            .status(UNAUTHORIZED)
-            .json({ success: false, message: loginStatus.data.message });
-          return;
-        }
-        const access_token = loginStatus.data.token;
-        const refresh_token = loginStatus.data.refresh_token;
-        const accessTokenMaxAge = 5 * 60 * 1000;
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-        res
-          .status(loginStatus.status)
-          .cookie("access_token", access_token, {
-            maxAge: accessTokenMaxAge,
-          })
-          .cookie("refresh_token", refresh_token, {
-            maxAge: refreshTokenMaxAge,
-          })
-          .json(loginStatus);
-      } else {
+      console.log(
+        "email and password is from the controllers for login ",
+        email,
+        password
+      );
+      if (email === null || email === undefined) {
         res
           .status(UNAUTHORIZED)
-          .json({ success: false, message: "Authentication error" });
+          .json({ success: false, message: "Please check the  email !!" });
+      }
+
+      if (password === null || password === undefined) {
+        res
+          .status(UNAUTHORIZED)
+          .json({ success: false, message: "Please check the  password !!" });
+      }
+
+      const check = LoginValidation(email, password);
+      if (check) {
+        const loginStatus = await this.userServices.userLogin(email, password);
+        console.log(loginStatus);
+        if (
+          loginStatus &&
+          loginStatus.data &&
+          typeof loginStatus.data == "object" &&
+          "token" in loginStatus.data
+        ) {
+          if (!loginStatus.data.success) {
+            res
+              .status(UNAUTHORIZED)
+              .json({ success: false, message: loginStatus.data.message });
+            return;
+          }
+          const access_token = loginStatus.data.token;
+          const refresh_token = loginStatus.data.refresh_token;
+          const accessTokenMaxAge = 5 * 60 * 1000;
+          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+          res
+            .status(loginStatus.status)
+            .cookie("access_token", access_token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("refresh_token", refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(loginStatus);
+        } else {
+          res
+            .status(UNAUTHORIZED)
+            .json({ success: false, message: "Authentication error" });
+        }
+      } else {
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Please check the email and password",
+        });
       }
     } catch (error) {
       console.log(error as Error);
@@ -357,12 +383,10 @@ class userController {
         values
       );
       if (editedAddress) {
-        res
-          .status(OK)
-          .json({
-            success: true,
-            message: "Address edited  added successfully",
-          });
+        res.status(OK).json({
+          success: true,
+          message: "Address edited  added successfully",
+        });
       } else {
         res
           .status(BAD_REQUEST)
