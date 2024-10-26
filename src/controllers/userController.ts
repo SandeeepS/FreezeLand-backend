@@ -58,17 +58,6 @@ class userController {
         email,
         password
       );
-      if (email === null || email === undefined) {
-        res
-          .status(UNAUTHORIZED)
-          .json({ success: false, message: "Please check the  email !!" });
-      }
-
-      if (password === null || password === undefined) {
-        res
-          .status(UNAUTHORIZED)
-          .json({ success: false, message: "Please check the  password !!" });
-      }
 
       const check = LoginValidation(email, password);
       if (check) {
