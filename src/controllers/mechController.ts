@@ -1,15 +1,20 @@
-import { Request, Response,NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import mechService from "../services/mechServices";
 import { generateAndSendOTP } from "../utils/generateOtp";
 const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
+import LoginValidation from "../utils/validator";
 
 class mechController {
   constructor(private mechServices: mechService) {}
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-  async mechSignup(req: Request, res: Response,next:NextFunction): Promise<void> {
+  async mechSignup(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       console.log("req body is ", req.body);
       req.app.locals.mechData = req.body;
@@ -42,22 +47,26 @@ class mechController {
       }
     } catch (error) {
       console.log(error as Error);
-      next(error)
+      next(error);
     }
   }
 
-  async veryfyMechOtp(req: Request, res: Response,next:NextFunction): Promise<void> {
+  async veryfyMechOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const { otp } = req.body;
       const isNuewMech = req.app.locals.newMechanic;
-      console.log("new Mechanic is ",isNuewMech);
+      console.log("new Mechanic is ", isNuewMech);
       const savedMech = req.app.locals.mechData;
 
       const accessTokenMaxAge = 5 * 60 * 1000;
       const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
 
       if (otp === Number(req.app.locals.mechOtp)) {
-        console.log("cehcking the type ",typeof otp);
+        console.log("cehcking the type ", typeof otp);
         console.log(typeof req.app.locals.mechOtp);
 
         if (isNuewMech) {
@@ -94,43 +103,50 @@ class mechController {
     }
   }
 
-  async mechLogin(req: Request, res: Response,next:NextFunction){
+  async mechLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password }: { email: string; password: string } = req.body;
-      const loginStatus = await this.mechServices.mechLogin(email, password);
-      console.log(loginStatus);
-      if (
-        loginStatus &&
-        loginStatus.data &&
-        typeof loginStatus.data == "object" &&
-        "token" in loginStatus.data
-      ) {
-        if (!loginStatus.data.success) {
+      const check = LoginValidation(email, password);
+      if (check) {
+        const loginStatus = await this.mechServices.mechLogin(email, password);
+        console.log(loginStatus);
+        if (
+          loginStatus &&
+          loginStatus.data &&
+          typeof loginStatus.data == "object" &&
+          "token" in loginStatus.data
+        ) {
+          if (!loginStatus.data.success) {
+            res
+              .status(UNAUTHORIZED)
+              .json({ success: false, message: loginStatus.data.message });
+            return;
+          }
+          const access_token = loginStatus.data.token;
+          const refresh_token = loginStatus.data.refresh_token;
+          const accessTokenMaxAge = 5 * 60 * 1000;
+          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+          res
+            .status(loginStatus.status)
+            .cookie("m_access_token", access_token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("m_refresh_token", refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(loginStatus);
+        } else {
           res
             .status(UNAUTHORIZED)
-            .json({ success: false, message: loginStatus.data.message });
-          return 
+            .json({ success: false, message: "Authentication error" });
         }
-        const access_token = loginStatus.data.token;
-        const refresh_token = loginStatus.data.refresh_token;
-        const accessTokenMaxAge = 5 * 60 * 1000;
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-        res
-          .status(loginStatus.status)
-          .cookie("m_access_token", access_token, {
-            maxAge: accessTokenMaxAge,
-          })
-          .cookie("m_refresh_token", refresh_token, {
-            maxAge: refreshTokenMaxAge,
-          })
-          .json(loginStatus);
       } else {
         res
           .status(UNAUTHORIZED)
-          .json({ success: false, message: "Authentication error" });
+          .json({ success: false, message: "Check the email and password" });
       }
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -183,7 +199,6 @@ class mechController {
     }
   }
 
-
   async updateNewPasswordMech(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, userId } = req.body;
@@ -201,8 +216,7 @@ class mechController {
     }
   }
 
-
-  async mechLogout(req: Request, res: Response,next:NextFunction) {
+  async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
       res
         .cookie("m_access_token", "", {
@@ -216,7 +230,7 @@ class mechController {
         .json({ success: true, message: "user logout - clearing cookie" });
     } catch (err) {
       console.log(err);
-      next(err)
+      next(err);
     }
   }
 }
