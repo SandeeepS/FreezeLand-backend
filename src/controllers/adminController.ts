@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
-
+import LoginValidation from "../utils/validator";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
 
 class adminController {
@@ -14,29 +14,37 @@ class adminController {
     try {
       console.log("enterd in the backend adminlogin in adminController");
       const { email, password } = req.body;
-      const loginStatus = await this.adminService.adminLogin(email, password);
+      const check = LoginValidation(email,password);
+      if(check){
+        const loginStatus = await this.adminService.adminLogin(email, password);
 
-      if (!loginStatus.data.success) {
+        if (!loginStatus.data.success) {
+          res
+            .status(UNAUTHORIZED)
+            .json({ success: false, message: loginStatus.data.message });
+          return;
+        } else {
+          const access_token = loginStatus.data.token;
+          const refresh_token = loginStatus.data.refresh_token;
+          const accessTokenMaxAge = 5 * 60 * 1000;
+          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+          console.log("respose is going to send to the frontend");
+          res
+            .status(loginStatus.status)
+            .cookie("admin_access_token", access_token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("admin_refresh_token", refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(loginStatus);
+        }
+      }else{
         res
-          .status(UNAUTHORIZED)
-          .json({ success: false, message: loginStatus.data.message });
-        return;
-      } else {
-        const access_token = loginStatus.data.token;
-        const refresh_token = loginStatus.data.refresh_token;
-        const accessTokenMaxAge = 5 * 60 * 1000;
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-        console.log("respose is going to send to the frontend");
-        res
-          .status(loginStatus.status)
-          .cookie("admin_access_token", access_token, {
-            maxAge: accessTokenMaxAge,
-          })
-          .cookie("admin_refresh_token", refresh_token, {
-            maxAge: refreshTokenMaxAge,
-          })
-          .json(loginStatus);
+        .status(UNAUTHORIZED)
+        .json({ success: false, message:"Please check the email and password"});
       }
+     
     } catch (error) {
       console.log(error as Error);
       next(error);
