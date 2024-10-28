@@ -8,7 +8,9 @@ function checkWhiteSpace(s: string) {
   return s.trim() === "";
 }
 
-const LoginValidation = (email: string, password: string) => {
+const Phoneregx = /(\+91[\s]?)?[0]?(91)?[789]\d{9}$/;
+
+export const  LoginValidation = (email: string, password: string) : boolean  => {
   console.log(
     "email and password for validating in the validator funciton",
     email,
@@ -39,4 +41,30 @@ const LoginValidation = (email: string, password: string) => {
   return true;
 };
 
-export default LoginValidation;
+export const  EditUserDetailsValidator = (name:string,phone:number) : boolean => {
+  console.log("entered name and phone are ", name , phone);
+  if(name == null || name == undefined){
+    return false ;
+  }
+
+  if(phone == null || phone == undefined){
+    console.log("phone number is null or undefined ")
+    return false ;
+  }
+
+  if(checkWhiteSpace(name)){
+    console.log("name contin white space ")
+    return false ;
+  }
+
+  if(!(Phoneregx.test(phone.toString()))){
+    console.log("phone number is nor valid");
+    return false ;
+  }
+
+  return true;
+}
+
+
+
+

@@ -3,7 +3,7 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import mechService from "../services/mechServices";
 import { generateAndSendOTP } from "../utils/generateOtp";
 const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
-import LoginValidation from "../utils/validator";
+import {LoginValidation} from "../utils/validator";
 
 class mechController {
   constructor(private mechServices: mechService) {}

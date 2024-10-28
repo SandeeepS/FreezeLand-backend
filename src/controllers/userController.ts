@@ -4,7 +4,8 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
-import LoginValidation from "../utils/validator";
+import {LoginValidation} from "../utils/validator";
+import { EditUserDetailsValidator } from "../utils/validator";
 
 class userController {
   constructor(private userServices: userService) {}
@@ -321,19 +322,27 @@ class userController {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
       const { _id, name, phone } = req.body;
-
-      const editedUser = await this.userServices.editUser(_id, name, phone);
-      console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
-      if (editedUser) {
-        res
-          .status(OK)
-          .json({ success: true, message: "UserData updated sucessfully" });
-      } else {
-        res.status(BAD_REQUEST).json({
+      const check = EditUserDetailsValidator(name,phone);
+      if(check){
+        const editedUser = await this.userServices.editUser(_id, name, phone);
+        console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
+        if (editedUser) {
+          res
+            .status(OK)
+            .json({ success: true, message: "UserData updated sucessfully" });
+        } else {
+          res.status(BAD_REQUEST).json({
+            success: false,
+            message: "UserData updation is not updated !!",
+          });
+        }
+      }else{
+        res.status(UNAUTHORIZED).json({
           success: false,
-          message: "UserData updation is not updated !!",
+          message: "Please check the name and phone number  !!",
         });
       }
+     
     } catch (error) {
       console.log(error as Error);
       next(error);
