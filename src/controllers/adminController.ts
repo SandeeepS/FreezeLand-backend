@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
 import { LoginValidation } from "../utils/validator";
-const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR ,BAD_REQUEST } = STATUS_CODES;
+const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
 class adminController {
   constructor(private adminService: AdminService) {}
@@ -40,12 +40,10 @@ class adminController {
             .json(loginStatus);
         }
       } else {
-        res
-          .status(UNAUTHORIZED)
-          .json({
-            success: false,
-            message: "Please check the email and password",
-          });
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Please check the email and password",
+        });
       }
     } catch (error) {
       console.log(error as Error);
@@ -232,11 +230,31 @@ class adminController {
     }
   }
 
+  async listUnlistServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("reached the listUnlistServices at adminController");
+      const _id = req.params.serviceId;
+      console.log("id reached from the front is ",_id);
+      const result = await this.adminService.blockService(_id);
+      if(result){
+        res.json({success:true,message:"blocked/unblocked the service "});
+      }else{
+        res.json({
+          success:false,
+          message:"Something went wrong please try again",
+        })
+      }
+
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
 
   async deleteService(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("entered in the admin controller for deleting the service ");
-      console.log(req.params.serviceId)
+      console.log(req.params.serviceId);
       const result = await this.adminService.deleteService(
         req.params.serviceId as string
       );
@@ -247,35 +265,38 @@ class adminController {
           message:
             "Something Went wrong while deleting the service please try again",
         });
-    } catch (error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
   }
- 
 
-  async editExistingService (req:Request,res:Response,next:NextFunction){
-    try{
-      const {_id,values} = req.body;
-      console.log("the id from the fronedn is ",_id);
-      const editedSevice = await this.adminService.editExistingService(_id,values);
-      if(editedSevice){
+  async editExistingService(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { _id, values } = req.body;
+      console.log("the id from the fronedn is ", _id);
+      const editedSevice = await this.adminService.editExistingService(
+        _id,
+        values
+      );
+      if (editedSevice) {
         res
-        .status(OK)
-        .json({success:true,message:"Existing service  updated successfully"});
-      }else{
+          .status(OK)
+          .json({
+            success: true,
+            message: "Existing service  updated successfully",
+          });
+      } else {
         res.status(BAD_REQUEST).json({
-          success:false,
-          message:"service updation failed"
-        })
+          success: false,
+          message: "service updation failed",
+        });
       }
-
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
   }
-
 
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {

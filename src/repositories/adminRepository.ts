@@ -156,6 +156,19 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
+   async BlockService(_id:string){
+    try{
+      const service = await this.serviceRepository.findById(_id);
+      if(service){
+        service.isBlocked = !service?.isBlocked;
+        await this.serviceRepository.save(service);
+        return service;
+      }
+    }catch(error){
+      console.log(error as Error);
+
+    }
+   }
   async deleteUser(userId: string) {
     try {
       const user = await this.userRepository.findById(userId);

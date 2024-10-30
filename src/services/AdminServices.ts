@@ -171,6 +171,15 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
+  async blockService(_id:string){
+    try{
+      return await this.adminRepository.BlockService(_id);
+    }catch(error){
+      console.log(error as Error);
+
+    }
+  }
+
   async deleteUser(userId: string) {
     try {
       return await this.adminRepository.deleteUser(userId);
