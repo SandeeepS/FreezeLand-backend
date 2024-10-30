@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
-import {LoginValidation} from "../utils/validator";
+import { LoginValidation } from "../utils/validator";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
 
 class adminController {
@@ -14,8 +14,8 @@ class adminController {
     try {
       console.log("enterd in the backend adminlogin in adminController");
       const { email, password } = req.body;
-      const check = LoginValidation(email,password);
-      if(check){
+      const check = LoginValidation(email, password);
+      if (check) {
         const loginStatus = await this.adminService.adminLogin(email, password);
 
         if (!loginStatus.data.success) {
@@ -39,12 +39,14 @@ class adminController {
             })
             .json(loginStatus);
         }
-      }else{
+      } else {
         res
-        .status(UNAUTHORIZED)
-        .json({ success: false, message:"Please check the email and password"});
+          .status(UNAUTHORIZED)
+          .json({
+            success: false,
+            message: "Please check the email and password",
+          });
       }
-     
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -168,25 +170,76 @@ class adminController {
     }
   }
 
-  async addNewServices(req:Request,res:Response,next:NextFunction){
-    try{
-      const {values} = req.body;
+  async addNewServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "entered in the backend for adding new Service in the admin Controller"
+      );
+      const { values } = req.body;
+      console.log("values from the frontend is ", values);
       const result = await this.adminService.addService(values);
-      if(result){
+      if (result) {
         res.json({ success: true, message: "added the service successfully" });
-        
-      }else{
+      } else {
         res.json({
           success: false,
-          message:
-            "Something went wrong while adding the service ",
+          message: "Something went wrong while adding the service ",
         });
       }
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
   }
+
+  async getAllServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllServices funciton in the admin controller"
+      );
+      const page = parseInt(req.query.page as string);
+      const limit = parseInt(req.query.limit as string);
+      const searchQuery = req.query.searchQuery as string | undefined;
+      console.log(" page is ", page);
+      console.log("limit is ", limit);
+      const data = await this.adminService.getServices(
+        page,
+        limit,
+        searchQuery
+      );
+      console.log(
+        "listed services from the database is in the admin controller is",
+        data
+      );
+      res.status(OK).json(data);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
+  async deleteService(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("entered in the admin controller for deleting the service ");
+      console.log(req.params.serviceId)
+      const result = await this.adminService.deleteService(
+        req.params.serviceId as string
+      );
+      if (result) res.json({ success: true, message: "Service deleted" });
+      else
+        res.json({
+          success: false,
+          message:
+            "Something Went wrong while deleting the service please try again",
+        });
+    } catch (error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
 
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {

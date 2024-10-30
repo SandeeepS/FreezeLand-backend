@@ -6,7 +6,7 @@ export interface IServices extends Document {
   image: string;
   discription: string;
   createdAt: Date;
-  status: boolean;
+  isBlocked: boolean;
   isDeleted: boolean;
 }
 
@@ -23,9 +23,9 @@ const serviceSchema: Schema<IServices> = new Schema({
     type: String,
     required: true,
   },
-  status: {
+  isBlocked: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   isDeleted: {
     type: Boolean,

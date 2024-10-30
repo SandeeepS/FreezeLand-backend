@@ -3,11 +3,14 @@ import Mech from "../entityInterface/Imech"
 import UserInterface from "../entityInterface/Iuser"
 import { IMechsAndCount } from "../serviceInterfaces/InMechService"
 import { IUsersAndCount } from "../serviceInterfaces/InaAdminService"
+import { IUserServiceAndCount } from "../serviceInterfaces/userServiceInterfaces"
 import MechInterface from "../entityInterface/Imech"
+import Iservices from '../entityInterface/Iservices'
 
 
 
-export type AllResTypes = Admin | Mech | UserInterface | UserInterface[] | null | IUsersAndCount |IMechsAndCount | MechInterface[]
+
+export type AllResTypes = Admin | Mech | UserInterface | Iservices | UserInterface[] | null | IUsersAndCount |IMechsAndCount | MechInterface[] | IUserServiceAndCount
 
 export interface IApiRes<T extends AllResTypes> {
     status: number,

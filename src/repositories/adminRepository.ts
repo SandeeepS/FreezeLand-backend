@@ -2,6 +2,7 @@ import { AdminInterface } from "../models/adminModel";
 import AdminModel from "../models/adminModel";
 import { Document } from "mongoose";
 import { BaseRepository } from "./BaseRepository/baseRepository";
+import serviceModel, { IServices } from "../models/serviceModel";
 import { UserInterface } from "../models/userModel";
 import { MechInterface } from "../models/mechModel";
 import UserRepository from "./userRepository";
@@ -10,10 +11,12 @@ import MechRepository from "./mechRepository";
 class AdminRepository extends BaseRepository<AdminInterface & Document> {
   private userRepository: UserRepository;
   private mechRepository: MechRepository;
+  private serviceRepository : BaseRepository<IServices>
   constructor() {
     super(AdminModel);
     this.userRepository = new UserRepository();
     this.mechRepository = new MechRepository();
+    this.serviceRepository = new BaseRepository<IServices>(serviceModel)
   }
   async getAdminById(id: string): Promise<AdminInterface | null> {
     try {
@@ -28,7 +31,7 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
   async isAdminExist(email: string): Promise<AdminInterface | null> {
     try {
       console.log("enterd in the isAdminExist", email);
-      const admin = await this.findOne({email: email});
+      const admin = await this.findOne({ email: email });
       if (admin) {
         console.log("admin is exist in the database !dlkghdopgokdgdgj");
         return admin as AdminInterface;
@@ -67,6 +70,22 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
       const regex = new RegExp(searchQuery, "i");
       const result = await this.mechRepository.getMechList(page, limit, regex);
       return result as MechInterface[];
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
+    }
+  }
+
+
+  async getAllServices(
+    page: number,
+    limit: number,
+    searchQuery: string
+  ): Promise<IServices[]> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      const result = await this.serviceRepository.findAll(page, limit, regex);
+      return result as IServices[];
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
@@ -146,23 +165,52 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
       return null;
     }
   }
+  
 
-  async addNewServices(values:string){
-    try{
-      const addedService = await this.mechRepository.AddService(values);
-      if(addedService){
-        return addedService
-      } else{
+  async deleteService(serviceId: string) {
+    try {
+      const serivce = await this.serviceRepository.findById(serviceId);
+      if (serivce) {
+        serivce.isDeleted = !serivce?.isDeleted;
+        await this.serviceRepository.save(serivce);
+        return serivce;
+      } else {
+        throw new Error("Somthing went wrong!!!");
+      }
+    } catch (error) {
+      console.log(error as Error);
+      return null;
+    }
+  }
+
+
+  async addNewServices(values: string) {
+    try {
+      const addedService = await this.serviceRepository.addService(values);
+      if (addedService) {
+        return addedService;
+      } else {
         throw new Error("Something went wrong ");
       }
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
     }
   }
+
   async getMechCount(searchQuery: string): Promise<number> {
     try {
       const regex = new RegExp(searchQuery, "i");
       return await this.mechRepository.getMechCount(regex);
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
+    }
+  }
+
+  async getServiceCount(searchQuery: string): Promise<number> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      return await this.serviceRepository.countDocument(regex);
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");

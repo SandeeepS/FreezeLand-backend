@@ -10,6 +10,7 @@ export interface AdminInterface extends Document {
 }
 
 const adminSchema: Schema<AdminInterface> = new Schema({
+
   name: {
     type: String,
     required: true,
@@ -19,14 +20,17 @@ const adminSchema: Schema<AdminInterface> = new Schema({
     type: String,
     unique: true,
   },
+
   password: {
     type: String,
     required: true,
   },
+
 });
 
 const AdminModel: Model<AdminInterface> = mongoose.model<AdminInterface>(
   "admin",
   adminSchema
 );
+
 export default AdminModel;

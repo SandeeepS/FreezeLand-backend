@@ -9,6 +9,7 @@ import {
   AdminAuthResponse,
   IUsersAndCount,
 } from "../interfaces/serviceInterfaces/InaAdminService";
+import { IUserServiceAndCount } from "../interfaces/serviceInterfaces/userServiceInterfaces";
 
 class adminService implements comService<AdminAuthResponse> {
   constructor(
@@ -111,6 +112,35 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
+  
+  async getServices(
+    page: number,
+    limit: number,
+    searchQuery: string | undefined
+  ): Promise<IApiRes<IUserServiceAndCount>> {
+    try {
+      if (isNaN(page)) page = 1;
+      if (isNaN(limit)) limit = 10;
+      if (!searchQuery) searchQuery = "";
+      const services = await this.adminRepository.getAllServices(
+        page,
+        limit,
+        searchQuery
+      );
+      console.log("list of services  is ", services);
+      const  servicesCount = await this.adminRepository.getServiceCount(searchQuery);
+
+      return {
+        status: STATUS_CODES.OK,
+        data: {services,  servicesCount },
+        message: "success",
+      };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error occured.");
+    }
+  }
+
   async blockUser(userId: string) {
     try {
       return await this.adminRepository.blockUser(userId);
@@ -138,6 +168,15 @@ class adminService implements comService<AdminAuthResponse> {
   async deleteMech(mechId: string) {
     try {
       return await this.adminRepository.deleteMech(mechId);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+
+  async deleteService(serviceId: string) {
+    try {
+      return await this.adminRepository.deleteService(serviceId);
     } catch (error) {
       console.log(error as Error);
     }

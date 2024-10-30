@@ -6,8 +6,8 @@ interface Deletable {
 }
 
 interface Searchable extends Deletable {
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
 }
 
 export interface IBaseRepository<T> {
@@ -21,6 +21,7 @@ export interface IBaseRepository<T> {
     addressId: string,
     qr: Partial<T>
   ): Promise<T | null>;
+  addService(values:string):Promise <T | null >;
 }
 
 export class BaseRepository<T extends Searchable>
