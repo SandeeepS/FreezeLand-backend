@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
 import { LoginValidation } from "../utils/validator";
-const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
+const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR ,BAD_REQUEST } = STATUS_CODES;
 
 class adminController {
   constructor(private adminService: AdminService) {}
@@ -218,6 +218,20 @@ class adminController {
     }
   }
 
+  async getService(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllServices funciton in the admin controller"
+      );
+      const id = req.params.id;
+      const result = await this.adminService.getService(id);
+      res.status(OK).json(result);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
 
   async deleteService(req: Request, res: Response, next: NextFunction) {
     try {
@@ -238,7 +252,29 @@ class adminController {
       next(error);
     }
   }
+ 
 
+  async editExistingService (req:Request,res:Response,next:NextFunction){
+    try{
+      const {_id,values} = req.body;
+      console.log("the id from the fronedn is ",_id);
+      const editedSevice = await this.adminService.editExistingService(_id,values);
+      if(editedSevice){
+        res
+        .status(OK)
+        .json({success:true,message:"Existing service  updated successfully"});
+      }else{
+        res.status(BAD_REQUEST).json({
+          success:false,
+          message:"service updation failed"
+        })
+      }
+
+    }catch(error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
 
 
   async adminLogout(req: Request, res: Response, next: NextFunction) {

@@ -10,6 +10,7 @@ import {
   IUsersAndCount,
 } from "../interfaces/serviceInterfaces/InaAdminService";
 import { IUserServiceAndCount } from "../interfaces/serviceInterfaces/userServiceInterfaces";
+import { IServices } from "../models/serviceModel";
 
 class adminService implements comService<AdminAuthResponse> {
   constructor(
@@ -141,6 +142,19 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
+
+  async getService(id:string) {
+    try{
+        console.log('reached the getService in the adminService');
+        const result = await this.adminRepository.getService(id);
+        if(result){
+          return result;
+        }
+    }catch(error){
+      console.log(error as Error);
+      throw new Error
+    }
+  }
   async blockUser(userId: string) {
     try {
       return await this.adminRepository.blockUser(userId);
@@ -188,6 +202,15 @@ class adminService implements comService<AdminAuthResponse> {
 
     }catch(error){
       console.log(error as Error);
+    }
+  }
+
+  async editExistingService(_id:string,values:IServices){
+    try{
+      return await this.adminRepository.editExistService(_id,values);
+    }catch(error){
+      console.log(error as Error);
+      throw error as Error
     }
   }
 }

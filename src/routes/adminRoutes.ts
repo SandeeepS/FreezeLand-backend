@@ -25,7 +25,9 @@ adminRouter.put('/mech/block/:mechId',  async (req: Request, res: Response,next:
 adminRouter.put('/mech/delete/:mechId', async (req: Request, res: Response,next:NextFunction) => controller.deleteMech(req, res,next));
 adminRouter.post('/addNewService',async(req:Request,res:Response,next:NextFunction) => controller.addNewServices(req,res,next));
 adminRouter.get('/getAllServices',async(req:Request,res:Response,next:NextFunction) => controller.getAllServices(req,res,next));
+adminRouter.get('/getService/:id',async(req:Request,res:Response,next:NextFunction) => controller.getService(req,res,next));
 adminRouter.put('/deleteService/:serviceId',async(req:Request,res:Response,next:NextFunction) => controller.deleteService(req,res,next));
+adminRouter.put('/editExistService',async(req:Request,res:Response,next:NextFunction) => controller.editExistingService(req,res,next));
 
 
 export default adminRouter;

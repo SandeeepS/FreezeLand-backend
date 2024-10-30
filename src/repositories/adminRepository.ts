@@ -102,6 +102,28 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
+
+  async getService(id:string) {
+    try{
+      console.log("entered in the getService in the adminRepository");
+      const result = await this.serviceRepository.findById(id);
+      return result;
+    }catch(error){
+      console.log(error as Error);
+      throw new Error;
+    }
+  }
+
+  async editExistService(_id:string,values:IServices){
+    try{
+      const editedService = await this.serviceRepository.update(_id,values);
+      return editedService;
+    }catch(error){
+      console.log(error as Error);
+      throw new Error;
+    }
+  }
+
   async blockUser(userId: string) {
     try {
       const user = await this.userRepository.findById(userId);

@@ -326,7 +326,7 @@ class userController {
       if(check){
         const editedUser = await this.userServices.editUser(_id, name, phone);
         console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
-        if (editedUser) {
+        if (editedUser){
           res
             .status(OK)
             .json({ success: true, message: "UserData updated sucessfully" });
