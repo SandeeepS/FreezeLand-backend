@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
-import { LoginValidation } from "../utils/validator";
+import { AddNewServiceValidation, LoginValidation } from "../utils/validator";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
 class adminController {
@@ -174,16 +174,26 @@ class adminController {
         "entered in the backend for adding new Service in the admin Controller"
       );
       const { values } = req.body;
+      
       console.log("values from the frontend is ", values);
-      const result = await this.adminService.addService(values);
-      if (result) {
-        res.json({ success: true, message: "added the service successfully" });
-      } else {
+      const  check = AddNewServiceValidation(values.name,values.discription);
+      if(check){
+        const result = await this.adminService.addService(values);
+        if (result) {
+          res.json({ success: true, message: "added the service successfully" });
+        } else {
+          res.json({
+            success: false,
+            message: "Something went wrong while adding the service ",
+          });
+        }
+      }else{
         res.json({
           success: false,
-          message: "Something went wrong while adding the service ",
+          message: "validation failed , please provide the correct data !! ",
         });
       }
+      
     } catch (error) {
       console.log(error as Error);
       next(error);

@@ -88,19 +88,18 @@ export const SignUpValidation = (
     return false;
   }
 
-
   if (password == null || password == undefined) {
     console.log("password is null or undefined");
     return false;
   }
 
-  if (cpassword== null || cpassword== undefined) {
+  if (cpassword == null || cpassword == undefined) {
     console.log("cpasswordis null or undefined");
     return false;
   }
 
   if (!Phoneregx.test(phone)) {
-    console.log("Phone number is ",phone);
+    console.log("Phone number is ", phone);
     console.log("phone number is not valid");
     return false;
   }
@@ -122,6 +121,21 @@ export const SignUpValidation = (
 
   if (checkWhiteSpace(password)) {
     console.log("white space is present in the password");
+    return false;
+  }
+
+  return true;
+};
+
+export const AddNewServiceValidation = (name: string, discription: string) => {
+  if(name == null || name == undefined){
+    console.log("name is null or undefined ");
+    return false ;
+  }
+
+
+  if(discription == null || discription == undefined){
+    console.log("discritpion is null or undefined ");
     return false;
   }
 
