@@ -174,26 +174,28 @@ class adminController {
         "entered in the backend for adding new Service in the admin Controller"
       );
       const { values } = req.body;
-      
+
       console.log("values from the frontend is ", values);
-      const  check = AddNewServiceValidation(values.name,values.discription);
-      if(check){
+      const check = AddNewServiceValidation(values.name, values.discription);
+      if (check) {
         const result = await this.adminService.addService(values);
         if (result) {
-          res.json({ success: true, message: "added the service successfully" });
+          res.json({
+            success: true,
+            message: "added the service successfully",
+          });
         } else {
           res.json({
             success: false,
             message: "Something went wrong while adding the service ",
           });
         }
-      }else{
+      } else {
         res.json({
           success: false,
           message: "validation failed , please provide the correct data !! ",
         });
       }
-      
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -244,17 +246,16 @@ class adminController {
     try {
       console.log("reached the listUnlistServices at adminController");
       const _id = req.params.serviceId;
-      console.log("id reached from the front is ",_id);
+      console.log("id reached from the front is ", _id);
       const result = await this.adminService.blockService(_id);
-      if(result){
-        res.json({success:true,message:"blocked/unblocked the service "});
-      }else{
+      if (result) {
+        res.json({ success: true, message: "blocked/unblocked the service " });
+      } else {
         res.json({
-          success:false,
-          message:"Something went wrong please try again",
-        })
+          success: false,
+          message: "Something went wrong please try again",
+        });
       }
-
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -285,21 +286,32 @@ class adminController {
     try {
       const { _id, values } = req.body;
       console.log("the id from the fronedn is ", _id);
-      const editedSevice = await this.adminService.editExistingService(
-        _id,
-        values
-      );
-      if (editedSevice) {
-        res
-          .status(OK)
-          .json({
+
+      const check = AddNewServiceValidation(values.name, values.discription);
+      if (check) {
+        console.log("validation has no problem in the editExistingService");
+        const editedSevice = await this.adminService.editExistingService(
+          _id,
+          values
+        );
+        if (editedSevice) {
+          res.status(OK).json({
             success: true,
             message: "Existing service  updated successfully",
           });
+        } else {
+          res.status(BAD_REQUEST).json({
+            success: false,
+            message: "service updation failed",
+          });
+        }
       } else {
+        console.log(
+          "validation failed from the editExistService in the admincontroller"
+        );
         res.status(BAD_REQUEST).json({
           success: false,
-          message: "service updation failed",
+          message: "validation failed ",
         });
       }
     } catch (error) {
