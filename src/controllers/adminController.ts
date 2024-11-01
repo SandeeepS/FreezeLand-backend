@@ -302,21 +302,32 @@ class adminController {
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
         console.log("validation has no problem in the editExistingService");
-        const editedSevice = await this.adminService.editExistingService(
-          _id,
-          values
-        );
-        if (editedSevice) {
-          res.status(OK).json({
-            success: true,
-            message: "Existing service  updated successfully",
-          });
-        } else {
+        const isExist = await this.adminService.isServiceExist(values.name);
+
+        if(!isExist){
+          const editedSevice = await this.adminService.editExistingService(
+            _id,
+            values
+          );
+          if (editedSevice) {
+            res.status(OK).json({
+              success: true,
+              message: "Existing service  updated successfully",
+            });
+          } else {
+            res.status(BAD_REQUEST).json({
+              success: false,
+              message: "service updation failed",
+            });
+          }
+        }else{
+          console.log("the service which you are trying to edit is already exist in the data base ");
           res.status(BAD_REQUEST).json({
             success: false,
-            message: "service updation failed",
+            message: "Editing service already exist in the database ",
           });
         }
+        
       } else {
         console.log(
           "validation failed from the editExistService in the admincontroller"
