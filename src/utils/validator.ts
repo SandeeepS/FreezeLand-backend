@@ -139,6 +139,28 @@ export const AddNewServiceValidation = (name: string, discription: string) => {
     return false;
   }
 
-  
+
   return true;
 };
+
+export const AddressValidation = (
+  name: string,
+  phone: string,
+  email: string,
+  state: string,
+  pin: string,
+  district: string,
+  landMark: string
+): boolean => {
+  const fields = { name, phone, email, state, pin, district, landMark };
+
+  for (const [key, value] of Object.entries(fields)) {
+    if (value == null || value == undefined) {
+      console.log(`${key} is null or undefined`);
+      return false;
+    }
+  }
+
+  return true; 
+};
+

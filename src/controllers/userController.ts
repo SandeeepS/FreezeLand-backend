@@ -4,7 +4,7 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
-import { LoginValidation, SignUpValidation } from "../utils/validator";
+import { AddressValidation, LoginValidation, SignUpValidation } from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
 
 class userController {
@@ -374,16 +374,25 @@ class userController {
         "enterd in the addAddress fucniton in the backend userController"
       );
       const { values, _id } = req.body;
-      const addedAddress = await this.userServices.AddUserAddress(_id, values);
-      if (addedAddress) {
+      const check = AddressValidation(values.name,values.phone,values.email,values.state,values.pin,values.district,values.landMark)
+      if(check){
+        const addedAddress = await this.userServices.AddUserAddress(_id, values);
+        if (addedAddress) {
+          res
+            .status(OK)
+            .json({ success: true, message: "User address added successfully" });
+        } else {
+          res
+            .status(BAD_REQUEST)
+            .json({ success: false, message: "User Address addingh failed" });
+        }
+      }else{
+        console.log("address validation failed form the addAddress in the userController");
         res
-          .status(OK)
-          .json({ success: true, message: "User address added successfully" });
-      } else {
-        res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "User Address addingh failed" });
+        .status(BAD_REQUEST)
+        .json({ success: false, message: "Address validation failed " });
       }
+
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -394,21 +403,31 @@ class userController {
     try {
       console.log("entered in teh userController for editing the address");
       const { values, _id, addressId } = req.body;
-      const editedAddress = await this.userServices.editAddress(
-        _id,
-        addressId,
-        values
-      );
-      if (editedAddress) {
-        res.status(OK).json({
-          success: true,
-          message: "Address edited  added successfully",
-        });
-      } else {
+      const check = AddressValidation(values.name,values.phone,values.email,values.state,values.pin,values.district,values.landMark)
+      if(check){
+        console.log("address validation done ");
+        const editedAddress = await this.userServices.editAddress(
+          _id,
+          addressId,
+          values
+        );
+        if (editedAddress) {
+          res.status(OK).json({
+            success: true,
+            message: "Address edited  added successfully",
+          });
+        } else {
+          res
+            .status(BAD_REQUEST)
+            .json({ success: false, message: "Address editing  failed" });
+        }
+      }else{
+        console.log("address validation failed while editing the address");
         res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "Address editing  failed" });
+        .status(BAD_REQUEST)
+        .json({ success: false, message: "address validation fialed while editing the address" });
       }
+ 
     } catch (error) {
       console.log(error as Error);
       next(error);
