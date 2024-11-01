@@ -3,7 +3,7 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import mechService from "../services/mechServices";
 import { generateAndSendOTP } from "../utils/generateOtp";
 const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
-import {LoginValidation} from "../utils/validator";
+import { LoginValidation, SignUpValidation } from "../utils/validator";
 
 class mechController {
   constructor(private mechServices: mechService) {}
@@ -18,34 +18,54 @@ class mechController {
     try {
       console.log("req body is ", req.body);
       req.app.locals.mechData = req.body;
-
-      const newMechanic = await this.mechServices.signupMech(
-        req.app.locals.mechData
+      const { name, email, phone, password, cpassword } = req.body;
+      console.log(
+        "mechanic details from the req body in the mechSignup in mech Controller ",
+        name,
+        email,
+        phone,
+        password,
+        cpassword
       );
+      const check = SignUpValidation(name, phone, email, password, cpassword);
+      if (check) {
+        const newMechanic = await this.mechServices.signupMech(
+          req.app.locals.mechData
+        );
 
-      if (!newMechanic) {
-        req.app.locals.newMechanic = true;
-        req.app.locals.mechData = req.body;
-        req.app.locals.mechEmail = req.body.email;
-        const otp = await generateAndSendOTP(req.body.email);
-        req.app.locals.mechOtp = otp;
+        if (!newMechanic) {
+          req.app.locals.newMechanic = true;
+          req.app.locals.mechData = req.body;
+          req.app.locals.mechEmail = req.body.email;
 
-        const expirationMinutes = 1;
-        setTimeout(() => {
-          delete req.app.locals.mechOtp;
-        }, expirationMinutes * 60 * 1000);
+          const otp = await generateAndSendOTP(email);
+          req.app.locals.mechOtp = otp;
 
-        res.status(OK).json({
-          mechId: null,
-          success: true,
-          message: "OTP sent for verification...",
-        });
+          const expirationMinutes = 1;
+          setTimeout(() => {
+            delete req.app.locals.mechOtp;
+          }, expirationMinutes * 60 * 1000);
+
+          res.status(OK).json({
+            mechId: null,
+            success: true,
+            message: "OTP sent for verification...",
+          });
+        } else {
+          res
+            .status(BAD_REQUEST)
+            .json({ success: false, message: "The email is already in use!" });
+        }
       } else {
+        console.log("mechanic details validation from the backend is failed");
         res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "The email is already in use!" });
+          .status(UNAUTHORIZED)
+          .json({
+            success: false,
+            message: "Please enter  valid mechanic  details !!",
+          });
       }
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       next(error);
     }
