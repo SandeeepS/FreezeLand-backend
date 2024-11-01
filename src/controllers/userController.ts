@@ -4,7 +4,7 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
-import {LoginValidation} from "../utils/validator";
+import { LoginValidation, SignUpValidation } from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
 
 class userController {
@@ -19,31 +19,51 @@ class userController {
   ): Promise<void> {
     try {
       req.app.locals.userData = req.body;
-      const newUser = await this.userServices.userSignup(
-        req.app.locals.userData
+      console.log("userData is ilsgfhsdlgs", req.app.locals.userData);
+      const { email, name, phone, password, cpassword } = req.body;
+      console.log(
+        "userDetials from the signup Form is",
+        email,
+        name,
+        phone,
+        password,
+        cpassword
       );
-      if (!newUser) {
-        req.app.locals.newUser = true;
-        req.app.locals.userData = req.body;
-        req.app.locals.userEmail = req.body.email;
-        const otp = await generateAndSendOTP(req.body.email);
-        req.app.locals.userOtp = otp;
-        console.log("otp print ", req.app.locals.userOtp);
+      console.log(typeof(phone));
+      const check = SignUpValidation(name,phone,email,password,cpassword);
+      if (check) {
+        console.log("user details are validated from the backend and it is ok");
+        const newUser = await this.userServices.userSignup(
+          req.app.locals.userData
+        );
+        if (!newUser) {
+          req.app.locals.newUser = true;
+          req.app.locals.userData = req.body;
+          req.app.locals.userEmail = req.body.email;
+          const otp = await generateAndSendOTP(req.body.email);
+          req.app.locals.userOtp = otp;
+          console.log("otp print ", req.app.locals.userOtp);
 
-        const expirationMinutes = 1;
-        setTimeout(() => {
-          delete req.app.locals.userOtp;
-        }, expirationMinutes * 60 * 1000);
+          const expirationMinutes = 1;
+          setTimeout(() => {
+            delete req.app.locals.userOtp;
+          }, expirationMinutes * 60 * 1000);
 
-        res.status(OK).json({
-          userId: null,
-          success: true,
-          message: "OTP sent for verification...",
-        });
-      } else {
+          res.status(OK).json({
+            userId: null,
+            success: true,
+            message: "OTP sent for verification...",
+          });
+        } else {
+          res
+            .status(BAD_REQUEST)
+            .json({ success: false, message: "The email is already in use!" });
+        }
+      }else{
+        console.log("user details validation from the backend is failed");
         res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "The email is already in use!" });
+        .status(UNAUTHORIZED)
+        .json({ success: false, message: "Please enter  valid user  details !!" });
       }
     } catch (error) {
       console.log(error as Error);
@@ -322,11 +342,11 @@ class userController {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
       const { _id, name, phone } = req.body;
-      const check = EditUserDetailsValidator(name,phone);
-      if(check){
+      const check = EditUserDetailsValidator(name, phone);
+      if (check) {
         const editedUser = await this.userServices.editUser(_id, name, phone);
         console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
-        if (editedUser){
+        if (editedUser) {
           res
             .status(OK)
             .json({ success: true, message: "UserData updated sucessfully" });
@@ -336,13 +356,12 @@ class userController {
             message: "UserData updation is not updated !!",
           });
         }
-      }else{
+      } else {
         res.status(UNAUTHORIZED).json({
           success: false,
           message: "Please check the name and phone number  !!",
         });
       }
-     
     } catch (error) {
       console.log(error as Error);
       next(error);

@@ -33,7 +33,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
 
   async emailExistCheck(email: string): Promise<UserInterface | null> {
     console.log("email find in userRepsoi", email);
-    return this.findOne({ email });
+    return this.findOne({ email : email });
   }
 
   async updateNewPassword(
