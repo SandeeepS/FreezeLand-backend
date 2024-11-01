@@ -92,7 +92,7 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async getUserCount(searchQuery: string): Promise<number> {
+  async getUserCount(searchQuery: string): Promise<number>{
     try {
       const regex = new RegExp(searchQuery, "i");
       return await this.userRepository.getUserCount(regex);
@@ -215,6 +215,18 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     } catch (error) {
       console.log(error as Error);
       return null;
+    }
+  }
+
+  async isServiceExist(name:string) {
+    try{
+      const serviceExist = await this.serviceRepository.findOne({name:name});
+      if(serviceExist){
+        return serviceExist
+      }
+      return false ;
+    }catch(error){
+      console.log(error as Error);
     }
   }
 

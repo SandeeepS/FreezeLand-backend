@@ -178,16 +178,28 @@ class adminController {
       console.log("values from the frontend is ", values);
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
-        const result = await this.adminService.addService(values);
-        if (result) {
-          res.json({
-            success: true,
-            message: "added the service successfully",
-          });
+        //lets check the serviec is allready present in the service collection for avoiding duplication
+        const isExist = await this.adminService.isServiceExist(values.name);
+        if (!isExist) {
+          const result = await this.adminService.addService(values);
+          if (result) {
+            res.json({
+              success: true,
+              message: "added the service successfully",
+            });
+          } else {
+            res.json({
+              success: false,
+              message: "Something went wrong while adding the service ",
+            });
+          }
         } else {
+          console.log(
+            "adding the new service is failed because service already exist"
+          );
           res.json({
             success: false,
-            message: "Something went wrong while adding the service ",
+            message: "Service already existed",
           });
         }
       } else {
