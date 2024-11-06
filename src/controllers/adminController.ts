@@ -229,9 +229,10 @@ class adminController {
       if (check) {
         //lets check the device  is allready present in the device  collection for avoiding duplication
         const isExist = await this.adminService.isDeviceExist(name);
+        console.log("is devices exits or not ", isExist);
         if (!isExist) {
           const result = await this.adminService.addDevice(name);
-          if (result) {
+          if (result){
             res.json({
               success: true,
               message: "added the service successfully",
@@ -291,6 +292,33 @@ class adminController {
     }
   }
 
+
+  async getAllDevices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllDevces  funciton in the admin controller to  access the all the devices "
+      );
+      const page = parseInt(req.query.page as string);
+      const limit = parseInt(req.query.limit as string);
+      const searchQuery = req.query.searchQuery as string | undefined;
+      console.log(" page is ", page);
+      console.log("limit is ", limit);
+      const data = await this.adminService.getDevcies(
+        page,
+        limit,
+        searchQuery
+      );
+      console.log(
+        "listed services from the database is in the admin controller is",
+        data
+      );
+      res.status(OK).json(data);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async getService(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
@@ -325,6 +353,26 @@ class adminController {
     }
   }
 
+  async listUnlistDevices(req: Request, res: Response, next: NextFunction){
+    try {
+      console.log("reached the listUnlistDevice at adminController");
+      const _id = req.params.deviceId;
+      console.log("id reached from the front is ", _id);
+      const result = await this.adminService.blockDevice(_id);
+      if (result) {
+        res.json({ success: true, message: "blocked/unblocked the device " });
+      } else {
+        res.json({
+          success: false,
+          message: "Something went wrong please try again",
+        });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async deleteService(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("entered in the admin controller for deleting the service ");
@@ -338,6 +386,28 @@ class adminController {
           success: false,
           message:
             "Something Went wrong while deleting the service please try again",
+        });
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
+  
+  async deleteDevice(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("entered in the admin controller for deleting the device ");
+      console.log(req.params.deviceId);
+      const result = await this.adminService.deleteDevice(
+        req.params.deviceId as string
+      );
+      if (result) res.json({ success: true, message: "Device deleted" });
+      else
+        res.json({
+          success: false,
+          message:
+            "Something Went wrong while deleting the device please try again",
         });
     } catch (error) {
       console.log(error as Error);

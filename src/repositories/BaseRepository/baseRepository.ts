@@ -55,7 +55,7 @@ export class BaseRepository<T extends Searchable>
 
   async findOne(filter: Partial<T>): Promise<T | null> {
     try {
-      console.log("filter is from UserBaseRepositoy is ", filter);
+      console.log("filter is from BaseRepositoy is ", filter);
       return (await this.model.findOne(filter)) as T;
     } catch (error) {
       console.log("Error in BaseRepository findOne:", error as Error);

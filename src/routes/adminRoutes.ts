@@ -27,9 +27,15 @@ adminRouter.post('/addNewService',async(req:Request,res:Response,next:NextFuncti
 adminRouter.post('/addNewDevice',async(req:Request,res:Response,next:NextFunction) => controller.addNewDevice(req,res,next));
 
 adminRouter.get('/getAllServices',async(req:Request,res:Response,next:NextFunction) => controller.getAllServices(req,res,next));
+adminRouter.get('/getAllDevices',async(req:Request,res:Response,next:NextFunction) => controller.getAllDevices(req,res,next));
+
 adminRouter.get('/getService/:id',async(req:Request,res:Response,next:NextFunction) => controller.getService(req,res,next));
 adminRouter.put('/listUnlistServices/:serviceId',async(req:Request,res:Response,next:NextFunction) => controller.listUnlistServices(req,res,next));
+adminRouter.put('/listUnlistDevices/:deviceId',async(req:Request,res:Response,next:NextFunction) => controller.listUnlistDevices(req,res,next));
+
 adminRouter.put('/deleteService/:serviceId',async(req:Request,res:Response,next:NextFunction) => controller.deleteService(req,res,next));
+adminRouter.put('/deleteDevice/:deviceId',async(req:Request,res:Response,next:NextFunction) => controller.deleteDevice(req,res,next));
+
 adminRouter.put('/editExistService',async(req:Request,res:Response,next:NextFunction) => controller.editExistingService(req,res,next));
 
 

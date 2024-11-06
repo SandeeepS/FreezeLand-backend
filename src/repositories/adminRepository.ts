@@ -95,6 +95,22 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
+
+  async getAllDevices(
+    page: number,
+    limit: number,
+    searchQuery: string
+  ): Promise<IServices[]> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      const result = await this.deviceRepository.findAll(page, limit, regex);
+      return result as IServices[];
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
+    }
+  }
+
   async getUserCount(searchQuery: string): Promise<number>{
     try {
       const regex = new RegExp(searchQuery, "i");
@@ -172,6 +188,23 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
 
     }
    }
+
+
+   async BlockDevice(_id:string){
+    try{
+      const service = await this.deviceRepository.findById(_id);
+      if(service){
+        service.isBlocked = !service?.isBlocked;
+        await this.deviceRepository.save(service);
+        return service;
+      }
+    }catch(error){
+      console.log(error as Error);
+
+    }
+   }
+
+   
   async deleteUser(userId: string) {
     try {
       const user = await this.userRepository.findById(userId);
@@ -221,6 +254,22 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
+  async deleteDevice(deviceId: string) {
+    try {
+      const device = await this.deviceRepository.findById(deviceId);
+      if (device) {
+        device.isDeleted = !device?.isDeleted;
+        await this.deviceRepository.save(device);
+        return device;
+      } else {
+        throw new Error("Somthing went wrong!!!");
+      }
+    } catch (error) {
+      console.log(error as Error);
+      return null;
+    }
+  }
+
   async isServiceExist(name:string) {
     try{
       const serviceExist = await this.serviceRepository.findOne({name:name});
@@ -238,6 +287,7 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     try{
       const DeviceExist = await this.deviceRepository.findOne({name:name});
       if( DeviceExist){
+        console.log("divice is exist 1111")
         return  DeviceExist
       }
       return false ;
@@ -288,6 +338,17 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     try {
       const regex = new RegExp(searchQuery, "i");
       return await this.serviceRepository.countDocument(regex);
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
+    }
+  }
+
+
+  async getDeviceCount(searchQuery: string): Promise<number> {
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      return await this.deviceRepository.countDocument(regex);
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");

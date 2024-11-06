@@ -10,6 +10,7 @@ import {
   IUsersAndCount,
 } from "../interfaces/serviceInterfaces/InaAdminService";
 import { IUserServiceAndCount } from "../interfaces/serviceInterfaces/userServiceInterfaces";
+import { IUserDeviceAndCount } from "../interfaces/serviceInterfaces/userDeviceResponseInterfaces";
 import { IServices } from "../models/serviceModel";
 
 class adminService implements comService<AdminAuthResponse> {
@@ -28,7 +29,7 @@ class adminService implements comService<AdminAuthResponse> {
       const admin = await this.adminRepository.isAdminExist(email);
 
       if (admin?.password === password) {
-        console.log("passwrod from the admin side is ",admin.password);
+        console.log("passwrod from the admin side is ", admin.password);
         const token = this.createjwt.generateToken(admin?.id);
         const refreshToken = this.createjwt.generateRefreshToken(admin?.id);
         console.log("admin is exist", admin);
@@ -113,7 +114,6 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-  
   async getServices(
     page: number,
     limit: number,
@@ -129,11 +129,13 @@ class adminService implements comService<AdminAuthResponse> {
         searchQuery
       );
       console.log("list of services  is ", services);
-      const  servicesCount = await this.adminRepository.getServiceCount(searchQuery);
+      const servicesCount = await this.adminRepository.getServiceCount(
+        searchQuery
+      );
 
       return {
         status: STATUS_CODES.OK,
-        data: {services,  servicesCount },
+        data: { services, servicesCount },
         message: "success",
       };
     } catch (error) {
@@ -142,17 +144,46 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
+  async getDevcies(
+    page: number,
+    limit: number,
+    searchQuery: string | undefined
+  ): Promise<IApiRes<IUserDeviceAndCount>> {
+    try {
+      if (isNaN(page)) page = 1;
+      if (isNaN(limit)) limit = 10;
+      if (!searchQuery) searchQuery = "";
+      const devices = await this.adminRepository.getAllDevices(
+        page,
+        limit,
+        searchQuery
+      );
+      console.log("list of device  is ", devices);
+      const devicesCount = await this.adminRepository.getDeviceCount(
+        searchQuery
+      );
 
-  async getService(id:string) {
-    try{
-        console.log('reached the getService in the adminService');
-        const result = await this.adminRepository.getService(id);
-        if(result){
-          return result;
-        }
-    }catch(error){
+      return {
+        status: STATUS_CODES.OK,
+        data: { devices, devicesCount },
+        message: "success",
+      };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error occured.");
+    }
+  }
+
+  async getService(id: string) {
+    try {
+      console.log("reached the getService in the adminService");
+      const result = await this.adminRepository.getService(id);
+      if (result) {
+        return result;
+      }
+    } catch (error) {
       console.log(error as Error);
-      throw new Error
+      throw new Error();
     }
   }
   async blockUser(userId: string) {
@@ -171,12 +202,19 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-  async blockService(_id:string){
-    try{
+  async blockService(_id: string) {
+    try {
       return await this.adminRepository.BlockService(_id);
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
+    }
+  }
 
+  async blockDevice(_id: string) {
+    try {
+      return await this.adminRepository.BlockDevice(_id);
+    } catch (error) {
+      console.log(error as Error);
     }
   }
 
@@ -196,7 +234,6 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-
   async deleteService(serviceId: string) {
     try {
       return await this.adminRepository.deleteService(serviceId);
@@ -205,51 +242,54 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-
-  async isServiceExist (name:string){
-    try{
-      return await this.adminRepository.isServiceExist(name);
-    }catch(error){
-      console.log(error as Error)
-    }
-  }
-
-
-
-  async addService (values:string){
-    try{
-      return await this.adminRepository.addNewServices(values);
-
-    }catch(error){
+  async deleteDevice(serviceId: string) {
+    try {
+      return await this.adminRepository.deleteDevice(serviceId);
+    } catch (error) {
       console.log(error as Error);
     }
   }
 
-  //adding new devices 
-  async addDevice (name:string){
-    try{
-      return await this.adminRepository.addNewDevice(name);
+  async isServiceExist(name: string) {
+    try {
+      return await this.adminRepository.isServiceExist(name);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
 
-    }catch(error){
+  async addService(values: string) {
+    try {
+      return await this.adminRepository.addNewServices(values);
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+  //adding new devices
+  async addDevice(name: string) {
+    try {
+      return await this.adminRepository.addNewDevice(name);
+    } catch (error) {
       console.log(error as Error);
     }
   }
 
   //checking for the divce is existing or not for avoding the duplication
-  async isDeviceExist (name:string){
-    try{
+  async isDeviceExist(name: string) {
+    try {
       return await this.adminRepository.isDeviceExist(name);
-    }catch(error){
-      console.log(error as Error)
+    } catch (error) {
+      console.log(error as Error);
     }
   }
 
-  async editExistingService(_id:string,values:IServices){
-    try{
-      return await this.adminRepository.editExistService(_id,values);
-    }catch(error){
+  async editExistingService(_id: string, values: IServices) {
+    try {
+      return await this.adminRepository.editExistService(_id, values);
+    } catch (error) {
       console.log(error as Error);
-      throw error as Error
+      throw error as Error;
     }
   }
 }
