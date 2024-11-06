@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
-import { AddNewServiceValidation, LoginValidation } from "../utils/validator";
+import { AddNewServiceValidation, LoginValidation ,AddNewDeviceValidation } from "../utils/validator";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
 class adminController {
@@ -205,7 +205,7 @@ class adminController {
       } else {
         res.json({
           success: false,
-          message: "validation failed , please provide the correct data !! ",
+          message: "validation failed , please provide the correct data !!",
         });
       }
     } catch (error) {
@@ -213,6 +213,57 @@ class adminController {
       next(error);
     }
   }
+  
+
+  //adding new device
+
+  async addNewDevice(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "entered in the backend for adding new Device in the admin Controller"
+      );
+      const { name } = req.body;
+
+      console.log("name  from the frontend is ", name);
+      const check = AddNewDeviceValidation(name);
+      if (check) {
+        //lets check the device  is allready present in the device  collection for avoiding duplication
+        const isExist = await this.adminService.isDeviceExist(name);
+        if (!isExist) {
+          const result = await this.adminService.addDevice(name);
+          if (result) {
+            res.json({
+              success: true,
+              message: "added the service successfully",
+            });
+          } else {
+            res.json({
+              success: false,
+              message: "Something went wrong while adding the service ",
+            });
+          }
+        } else {
+          console.log(
+            "adding the new service is failed because service already exist"
+          );
+          res.json({
+            success: false,
+            message: "Service already existed",
+          });
+        }
+      } else {
+        res.json({
+          success: false,
+          message: "validation failed , please provide the correct data !!",
+        });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
 
   async getAllServices(req: Request, res: Response, next: NextFunction) {
     try {
@@ -248,13 +299,13 @@ class adminController {
       const id = req.params.id;
       const result = await this.adminService.getService(id);
       res.status(OK).json(result);
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       next(error);
     }
   }
 
-  async listUnlistServices(req: Request, res: Response, next: NextFunction) {
+  async listUnlistServices(req: Request, res: Response, next: NextFunction){
     try {
       console.log("reached the listUnlistServices at adminController");
       const _id = req.params.serviceId;

@@ -7,16 +7,19 @@ import { UserInterface } from "../models/userModel";
 import { MechInterface } from "../models/mechModel";
 import UserRepository from "./userRepository";
 import MechRepository from "./mechRepository";
+import deviceModel, { IDevice } from "../models/deviceModel";
 
 class AdminRepository extends BaseRepository<AdminInterface & Document> {
   private userRepository: UserRepository;
   private mechRepository: MechRepository;
   private serviceRepository : BaseRepository<IServices>
+  private deviceRepository : BaseRepository<IDevice>
   constructor() {
     super(AdminModel);
     this.userRepository = new UserRepository();
     this.mechRepository = new MechRepository();
     this.serviceRepository = new BaseRepository<IServices>(serviceModel)
+    this.deviceRepository = new BaseRepository<IDevice>(deviceModel)
   }
   async getAdminById(id: string): Promise<AdminInterface | null> {
     try {
@@ -231,11 +234,38 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
   }
 
 
+  async isDeviceExist(name:string) {
+    try{
+      const DeviceExist = await this.deviceRepository.findOne({name:name});
+      if( DeviceExist){
+        return  DeviceExist
+      }
+      return false ;
+    }catch(error){
+      console.log(error as Error);
+    }
+  }
+
+
   async addNewServices(values: string) {
     try {
       const addedService = await this.serviceRepository.addService(values);
       if (addedService) {
         return addedService;
+      } else {
+        throw new Error("Something went wrong ");
+      }
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+
+  async addNewDevice(name: string) {
+    try {
+      const addedDevice = await this.deviceRepository.addDevice(name);
+      if (addedDevice) {
+        return addedDevice;
       } else {
         throw new Error("Something went wrong ");
       }

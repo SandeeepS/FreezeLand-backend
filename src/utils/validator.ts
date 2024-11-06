@@ -143,6 +143,14 @@ export const AddNewServiceValidation = (name: string, discription: string) => {
   return true;
 };
 
+export const AddNewDeviceValidation = (name : string) => {
+  if(name == null || name == undefined){
+    console.log("name is null or undefined ");
+    return false ;
+  }
+  return true;
+}
+
 export const AddressValidation = (
   name: string,
   phone: string,

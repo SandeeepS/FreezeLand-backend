@@ -214,12 +214,33 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
+
+
   async addService (values:string){
     try{
       return await this.adminRepository.addNewServices(values);
 
     }catch(error){
       console.log(error as Error);
+    }
+  }
+
+  //adding new devices 
+  async addDevice (name:string){
+    try{
+      return await this.adminRepository.addNewDevice(name);
+
+    }catch(error){
+      console.log(error as Error);
+    }
+  }
+
+  //checking for the divce is existing or not for avoding the duplication
+  async isDeviceExist (name:string){
+    try{
+      return await this.adminRepository.isDeviceExist(name);
+    }catch(error){
+      console.log(error as Error)
     }
   }
 

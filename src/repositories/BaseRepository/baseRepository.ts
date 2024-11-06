@@ -166,4 +166,16 @@ export class BaseRepository<T extends Searchable>
       throw error;
     }
   }
+
+
+  async addDevice(name:string):Promise<T | null>{
+    try{
+      const newSerive = new this.model({name : name })
+      await newSerive.save();
+      return newSerive as T;
+    }catch(error){
+      console.log(error);
+      throw error;
+    }
+  }
 }
