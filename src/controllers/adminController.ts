@@ -1,7 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
-import { AddNewServiceValidation, LoginValidation ,AddNewDeviceValidation } from "../utils/validator";
+import {
+  AddNewServiceValidation,
+  LoginValidation,
+  AddNewDeviceValidation,
+} from "../utils/validator";
+import { storage } from "../firebase";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
 class adminController {
@@ -170,18 +176,75 @@ class adminController {
 
   async addNewServices(req: Request, res: Response, next: NextFunction) {
     try {
+
       console.log(
         "entered in the backend for adding new Service in the admin Controller"
       );
       const { values } = req.body;
-
       console.log("values from the frontend is ", values);
+      const storageRef = ref(storage, `ServiceImages/${values.name}`); // imageName can be any unique identifier
+
+      // Assume `base64String` is your Base64 image string, e.g., "data:image/jpeg;base64,..."
+      await uploadString(storageRef, values.image, "data_url");
+      const downloadURL = await getDownloadURL(storageRef);
+      console.log("the url from the firebase is ", downloadURL);
+      values.image = downloadURL;
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
         //lets check the serviec is allready present in the service collection for avoiding duplication
         const isExist = await this.adminService.isServiceExist(values.name);
         if (!isExist) {
           const result = await this.adminService.addService(values);
+          if (result) {
+            res.json({
+              success: true,
+              message: "added the service successfully",
+            });
+          } else {
+            res.json({
+              success: false,
+              message: "Something went wrong while adding the service",
+            });
+          }
+        } else {
+          console.log(
+            "adding the new service is failed because service already exist"
+          );
+          res.json({
+            success: false,
+            message: "Service already existed",
+          });
+        }
+      } else {
+        res.json({
+          success: false,
+          message: "validation failed , please provide the correct data !!",
+        });
+      }
+    } catch (error) {
+      console.log("error occured while adding new service in the adminController.ts");
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  //adding new device
+
+  async addNewDevice(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "entered in the backend for adding new Device in the admin Controller"
+      );
+      const { name } = req.body;
+
+      console.log("name  from the frontend is ", name);
+      const check = AddNewDeviceValidation(name);
+      if (check) {
+        //lets check the device  is allready present in the device  collection for avoiding duplication
+        const isExist = await this.adminService.isDeviceExist(name);
+        console.log("is devices exits or not ", isExist);
+        if (!isExist) {
+          const result = await this.adminService.addDevice(name);
           if (result) {
             res.json({
               success: true,
@@ -213,58 +276,6 @@ class adminController {
       next(error);
     }
   }
-  
-
-  //adding new device
-
-  async addNewDevice(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log(
-        "entered in the backend for adding new Device in the admin Controller"
-      );
-      const { name } = req.body;
-
-      console.log("name  from the frontend is ", name);
-      const check = AddNewDeviceValidation(name);
-      if (check) {
-        //lets check the device  is allready present in the device  collection for avoiding duplication
-        const isExist = await this.adminService.isDeviceExist(name);
-        console.log("is devices exits or not ", isExist);
-        if (!isExist) {
-          const result = await this.adminService.addDevice(name);
-          if (result){
-            res.json({
-              success: true,
-              message: "added the service successfully",
-            });
-          } else {
-            res.json({
-              success: false,
-              message: "Something went wrong while adding the service ",
-            });
-          }
-        } else {
-          console.log(
-            "adding the new service is failed because service already exist"
-          );
-          res.json({
-            success: false,
-            message: "Service already existed",
-          });
-        }
-      } else {
-        res.json({
-          success: false,
-          message: "validation failed , please provide the correct data !!",
-        });
-      }
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-
 
   async getAllServices(req: Request, res: Response, next: NextFunction) {
     try {
@@ -292,7 +303,6 @@ class adminController {
     }
   }
 
-
   async getAllDevices(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
@@ -303,11 +313,7 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log(" page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getDevcies(
-        page,
-        limit,
-        searchQuery
-      );
+      const data = await this.adminService.getDevcies(page, limit, searchQuery);
       console.log(
         "listed services from the database is in the admin controller is",
         data
@@ -327,13 +333,13 @@ class adminController {
       const id = req.params.id;
       const result = await this.adminService.getService(id);
       res.status(OK).json(result);
-    } catch (error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
   }
 
-  async listUnlistServices(req: Request, res: Response, next: NextFunction){
+  async listUnlistServices(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("reached the listUnlistServices at adminController");
       const _id = req.params.serviceId;
@@ -353,7 +359,7 @@ class adminController {
     }
   }
 
-  async listUnlistDevices(req: Request, res: Response, next: NextFunction){
+  async listUnlistDevices(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("reached the listUnlistDevice at adminController");
       const _id = req.params.deviceId;
@@ -393,8 +399,6 @@ class adminController {
     }
   }
 
-
-  
   async deleteDevice(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("entered in the admin controller for deleting the device ");
@@ -425,7 +429,7 @@ class adminController {
         console.log("validation has no problem in the editExistingService");
         const isExist = await this.adminService.isServiceExist(values.name);
 
-        if(!isExist){
+        if (!isExist) {
           const editedSevice = await this.adminService.editExistingService(
             _id,
             values
@@ -441,14 +445,15 @@ class adminController {
               message: "service updation failed",
             });
           }
-        }else{
-          console.log("the service which you are trying to edit is already exist in the data base ");
+        } else {
+          console.log(
+            "the service which you are trying to edit is already exist in the data base "
+          );
           res.status(BAD_REQUEST).json({
             success: false,
             message: "Editing service already exist in the database ",
           });
         }
-        
       } else {
         console.log(
           "validation failed from the editExistService in the admincontroller"

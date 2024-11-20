@@ -47,16 +47,49 @@ export class BaseRepository<T extends Searchable>
   async findById(id: string): Promise<T | null> {
     try {
       return (await this.model.findById(id)) as T;
+ 
     } catch (error) {
       console.log("Error in BaseRepository findById:", error as Error);
       throw error;
     }
   }
 
+
+  // async findById(id: string): Promise<T | null> {
+  //   try {
+  //     const result = await this.model.aggregate([
+  //       { $match: { _id: id } },
+  //       {
+  //         $addFields: {
+  //           defaultAddressDetails: {
+  //             $arrayElemAt: [
+  //               {
+  //                 $filter: {
+  //                   input: "$address",
+  //                   as: "addr",
+  //                   cond: { $eq: ["$$addr._id", "$defaultAddress"] },
+  //                 },
+  //               },
+  //               0,
+  //             ],
+  //           },
+  //         },
+  //       },
+  //     ]); 
+
+  //     return result.length > 0 ? (result[0] as T) : null;
+  //   } catch (error) {
+  //     console.log("Error in BaseRepository findById:", error as Error);
+  //     throw error;
+  //   }
+  // }
+
   async findOne(filter: Partial<T>): Promise<T | null> {
     try {
       console.log("filter is from BaseRepositoy is ", filter);
-      return (await this.model.findOne(filter)) as T;
+      return (
+        await this.model.findOne(filter)
+      ) as T;
     } catch (error) {
       console.log("Error in BaseRepository findOne:", error as Error);
       throw error;

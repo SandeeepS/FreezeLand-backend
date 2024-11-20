@@ -10,10 +10,14 @@ import logger from "./utils/logger";
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 
+
 dotenv.config();
 const morganFormat = ":method :url :status :response-time ms";
 const app: Express = express();
 const PORT: string | number = process.env.PORT || 3000;
+
+
+
 
 app.use(
   cors({
