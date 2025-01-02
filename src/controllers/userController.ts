@@ -8,7 +8,7 @@ import { AddressValidation, LoginValidation, SignUpValidation } from "../utils/v
 import { EditUserDetailsValidator } from "../utils/validator";
 
 class userController {
-  constructor(private userServices: userService) {}
+  constructor(private userServices: userService) {}  
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
@@ -31,7 +31,7 @@ class userController {
       );
       console.log(typeof(phone));
       const check = SignUpValidation(name,phone,email,password,cpassword);
-      if (check) {
+      if (check){
         console.log("user details are validated from the backend and it is ok");
         const newUser = await this.userServices.userSignup(
           req.app.locals.userData

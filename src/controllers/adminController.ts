@@ -24,7 +24,7 @@ class adminController {
       if (check) {
         const loginStatus = await this.adminService.adminLogin(email, password);
 
-        if (!loginStatus.data.success) {
+        if (!loginStatus.data.success){
           res
             .status(UNAUTHORIZED)
             .json({ success: false, message: loginStatus.data.message });
@@ -176,7 +176,6 @@ class adminController {
 
   async addNewServices(req: Request, res: Response, next: NextFunction) {
     try {
-
       console.log(
         "entered in the backend for adding new Service in the admin Controller"
       );
@@ -222,7 +221,9 @@ class adminController {
         });
       }
     } catch (error) {
-      console.log("error occured while adding new service in the adminController.ts");
+      console.log(
+        "error occured while adding new service in the adminController.ts"
+      );
       console.log(error as Error);
       next(error);
     }
