@@ -4,11 +4,15 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
-import { AddressValidation, LoginValidation, SignUpValidation } from "../utils/validator";
+import {
+  AddressValidation,
+  LoginValidation,
+  SignUpValidation,
+} from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
 
 class userController {
-  constructor(private userServices: userService) {}  
+  constructor(private userServices: userService) {}
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
@@ -29,9 +33,9 @@ class userController {
         password,
         cpassword
       );
-      console.log(typeof(phone));
-      const check = SignUpValidation(name,phone,email,password,cpassword);
-      if (check){
+      console.log(typeof phone);
+      const check = SignUpValidation(name, phone, email, password, cpassword);
+      if (check) {
         console.log("user details are validated from the backend and it is ok");
         const newUser = await this.userServices.userSignup(
           req.app.locals.userData
@@ -59,11 +63,14 @@ class userController {
             .status(BAD_REQUEST)
             .json({ success: false, message: "The email is already in use!" });
         }
-      }else{
+      } else {
         console.log("user details validation from the backend is failed");
         res
-        .status(UNAUTHORIZED)
-        .json({ success: false, message: "Please enter  valid user  details !!" });
+          .status(UNAUTHORIZED)
+          .json({
+            success: false,
+            message: "Please enter  valid user  details !!",
+          });
       }
     } catch (error) {
       console.log(error as Error);
@@ -374,25 +381,40 @@ class userController {
         "enterd in the addAddress fucniton in the backend userController"
       );
       const { values, _id } = req.body;
-      const check = AddressValidation(values.name,values.phone,values.email,values.state,values.pin,values.district,values.landMark)
-      if(check){
-        const addedAddress = await this.userServices.AddUserAddress(_id, values);
+      const check = AddressValidation(
+        values.name,
+        values.phone,
+        values.email,
+        values.state,
+        values.pin,
+        values.district,
+        values.landMark
+      );
+      if (check) {
+        const addedAddress = await this.userServices.AddUserAddress(
+          _id,
+          values
+        );
         if (addedAddress) {
           res
             .status(OK)
-            .json({ success: true, message: "User address added successfully" });
+            .json({
+              success: true,
+              message: "User address added successfully",
+            });
         } else {
           res
             .status(BAD_REQUEST)
             .json({ success: false, message: "User Address addingh failed" });
         }
-      }else{
-        console.log("address validation failed form the addAddress in the userController");
+      } else {
+        console.log(
+          "address validation failed form the addAddress in the userController"
+        );
         res
-        .status(BAD_REQUEST)
-        .json({ success: false, message: "Address validation failed " });
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Address validation failed " });
       }
-
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -403,8 +425,16 @@ class userController {
     try {
       console.log("entered in teh userController for editing the address");
       const { values, _id, addressId } = req.body;
-      const check = AddressValidation(values.name,values.phone,values.email,values.state,values.pin,values.district,values.landMark)
-      if(check){
+      const check = AddressValidation(
+        values.name,
+        values.phone,
+        values.email,
+        values.state,
+        values.pin,
+        values.district,
+        values.landMark
+      );
+      if (check) {
         console.log("address validation done ");
         const editedAddress = await this.userServices.editAddress(
           _id,
@@ -421,13 +451,15 @@ class userController {
             .status(BAD_REQUEST)
             .json({ success: false, message: "Address editing  failed" });
         }
-      }else{
+      } else {
         console.log("address validation failed while editing the address");
         res
-        .status(BAD_REQUEST)
-        .json({ success: false, message: "address validation fialed while editing the address" });
+          .status(BAD_REQUEST)
+          .json({
+            success: false,
+            message: "address validation fialed while editing the address",
+          });
       }
- 
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -459,13 +491,25 @@ class userController {
     }
   }
 
-  async registerService(req:Request,res:Response,next:NextFunction){
-    try{
-      console.log("entered in the register service in the backend userController");
-      const {data} = req.body;
-      console.log("data from the frontend is ",data);
+  async registerService(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "entered in the register service in the backend userController"
+      );
+      const { data } = req.body;
+      console.log("data from the frontend is ", data);
       const result = await this.userServices.registerService(data);
-    }catch(error){
+      if (result) {
+        res.status(OK).json({
+          success: true,
+          message: "Complaint registered successfully",
+        });
+      } else {
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Complaint registration failed"});
+      }
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }

@@ -9,8 +9,7 @@ import dotenv from "dotenv";
 import Cryptr from "cryptr";
 import User from "../interfaces/entityInterface/Iuser";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
-import Service from "../interfaces/entityInterface/Iservices";
-
+import { Iconcern } from "../models/concernModel";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND, INTERNAL_SERVER_ERROR } = STATUS_CODES;
@@ -258,7 +257,7 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async registerService(data:Service){
+  async registerService(data:Iconcern){
     try{
       console.log("entered in the userService for register Service");
       return await this.userRepository.registerService(data);

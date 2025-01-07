@@ -2,11 +2,16 @@ import userModel, { UserInterface } from "../models/userModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
-import Service from "../interfaces/entityInterface/Iservices";
+import { Iconcern } from "../models/concernModel";
+import concernModel from "../models/concernModel";
 
 class UserRepository extends BaseRepository<UserInterface & Document> {
+
+  private concernRepository : BaseRepository<Iconcern>
+
   constructor() {
     super(userModel);
+    this.concernRepository = new BaseRepository<Iconcern>(concernModel)
   }
 
   async saveUser(
@@ -130,13 +135,13 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     try {
       const editedAddress = await this.editExistAddress(_id, addressId, values);
       return editedAddress;
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       throw error;
     }
   }
 
-  async setDefaultAddress(userId: string, addressId: string) {
+  async setDefaultAddress(userId: string, addressId: string){
     try {
       console.log(
         "enterd in the userRepository for upaidng the default address",
@@ -152,10 +157,11 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async registerService(data:Service){
+  async registerService(data:Iconcern){
     try{
       console.log("enterd in the userRepository for registering the user complaint");
-      
+      const newConcern = await this.concernRepository.addConcern(data);
+      return newConcern as Iconcern;
     }catch(error){
       console.log(error as Error);
     }

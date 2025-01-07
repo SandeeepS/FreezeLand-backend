@@ -1,5 +1,6 @@
 import { Model } from "mongoose";
 import { ObjectId } from "mongodb";
+import { Iconcern } from "../../models/concernModel";
 
 interface Deletable {
   isDeleted: boolean;
@@ -21,7 +22,8 @@ export interface IBaseRepository<T> {
     addressId: string,
     qr: Partial<T>
   ): Promise<T | null>;
-  addService(values:string):Promise <T | null >;
+  addService(values:string):Promise <T | null>;
+  addConcern(data:Iconcern):Promise<T | null>;
 }
 
 export class BaseRepository<T extends Searchable>
@@ -197,6 +199,17 @@ export class BaseRepository<T extends Searchable>
     }catch(error){
       console.log(error);
       throw error;
+    }
+  }
+
+  async addConcern(data:Iconcern) : Promise<T | null>{
+    try{
+      const newConcern = new this.model(data)
+      await newConcern.save();
+      return newConcern as T;
+    }catch(error){
+      console.log("error from the addconcern form the baseRepository is ",error as Error);
+      throw Error;
     }
   }
 
