@@ -2,6 +2,7 @@ import userModel, { UserInterface } from "../models/userModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
+import Service from "../interfaces/entityInterface/Iservices";
 
 class UserRepository extends BaseRepository<UserInterface & Document> {
   constructor() {
@@ -148,6 +149,15 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     } catch (error) {
       console.log(error as Error);
       throw error;
+    }
+  }
+
+  async registerService(data:Service){
+    try{
+      console.log("enterd in the userRepository for registering the user complaint");
+      
+    }catch(error){
+      console.log(error as Error);
     }
   }
 }

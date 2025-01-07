@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import Cryptr from "cryptr";
 import User from "../interfaces/entityInterface/Iuser";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
+import Service from "../interfaces/entityInterface/Iservices";
 
 dotenv.config();
 
@@ -254,6 +255,16 @@ class userService implements comService<UserResponseInterface> {
       return await this.userRepository.setDefaultAddress(userId, addressId);
     } catch (error) {
       console.log(error as Error);
+    }
+  }
+
+  async registerService(data:Service){
+    try{
+      console.log("entered in the userService for register Service");
+      return await this.userRepository.registerService(data);
+    }catch(error){
+      console.log(error as Error);
+      
     }
   }
 }

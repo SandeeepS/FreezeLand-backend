@@ -459,6 +459,18 @@ class userController {
     }
   }
 
+  async registerService(req:Request,res:Response,next:NextFunction){
+    try{
+      console.log("entered in the register service in the backend userController");
+      const {data} = req.body;
+      console.log("data from the frontend is ",data);
+      const result = await this.userServices.registerService(data);
+    }catch(error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       res
