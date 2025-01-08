@@ -18,7 +18,7 @@ class userService implements comService<UserResponseInterface> {
     private userRepository: UserRepository,
     private createjwt: CreateJWT,
     private encrypt: Encrypt
-  ) {}
+  ){}
 
   async userSignup(userData: UserInterface): Promise<UserInterface | null> {
     try {
