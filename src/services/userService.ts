@@ -202,6 +202,20 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
+
+  //getting the user registered complaint details 
+  async getAllRegisteredServices(   page: number,
+    limit: number,
+    searchQuery: string):Promise<unknown> {
+    try{
+      const data = await this.userRepository.getAllUserRegisteredServices(page,limit,searchQuery);
+      return data;
+    }catch(error){
+      console.log("Error occured while fetching the user registerd complaint in the userSercvice ",error as Error);
+      throw error
+    }
+  }
+
   async updateNewPassword(password: string, userId: string) {
     try {
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;

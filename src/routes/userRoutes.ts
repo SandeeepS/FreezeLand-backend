@@ -30,6 +30,7 @@ userRouter.post('/user/addAddress',async(req:Request,res:Response,next:NextFunct
 userRouter.put('/user/setDefaultAddress',async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
 userRouter.put('/user/editAddress', async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 userRouter.post('/user/registerService',async(req:Request,res:Response,next:NextFunction) => await controller.registerService(req,res,next));
+userRouter.get('/user/getAllRegisteredService',async(req:Request,res:Response,next:NextFunction) => await controller.getAllRegisteredService(req,res,next));
 
 
 export default userRouter;

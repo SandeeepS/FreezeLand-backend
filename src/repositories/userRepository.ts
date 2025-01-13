@@ -97,6 +97,22 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
+  //function for getting all the userRegistered services 
+  async getAllUserRegisteredServices(   page: number,
+    limit: number,
+    searchQuery: string) : Promise<unknown>{
+    try{
+      const regex = new RegExp(searchQuery, "i");
+
+      const data = await this.concernRepository.findAll(page,limit,regex);
+      console.log("all the user registred complaints is hree sdlfsdflsdfd",data);
+      return data as unknown;
+    }catch(error){
+      console.log("error occured while fetching the data from the database in the userRepositry",error as Error);
+      throw new Error;
+    }
+  }
+
   async editUser(
     id: string,
     name: string,

@@ -3,7 +3,7 @@ import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
-const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
+const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR ,NOT_FOUND} = STATUS_CODES;
 import {
   AddressValidation,
   LoginValidation,
@@ -511,6 +511,32 @@ class userController {
       }
     } catch (error) {
       console.log(error as Error);
+      next(error);
+    }
+  }
+
+  //getting all the registered complaints from the user 
+  async getAllRegisteredService(req:Request,res:Response,next:NextFunction){
+    try{
+            const  page = 1;
+            const  limit = 10;
+          const  searchQuery = "";
+      const allRegisteredUserServices = await this.userServices.getAllRegisteredServices(page,limit,searchQuery);
+      if(allRegisteredUserServices){
+        res.status(OK).json({
+          success:true,
+          message:"data fetched successfully",
+          allRegisteredUserServices:allRegisteredUserServices
+        })
+      }else{
+        res.status(NOT_FOUND).json({
+          success:true,
+          message:"Not Found",
+
+        })
+      }
+    }catch(error){
+      console.log("error while getting the allregistered complaints from the database in the userController",error as Error)
       next(error);
     }
   }

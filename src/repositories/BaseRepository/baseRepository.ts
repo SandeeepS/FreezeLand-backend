@@ -155,7 +155,7 @@ export class BaseRepository<T extends Searchable>
   async findAll(
     page: number,
     limit: number,
-    regex: RegExp
+    regex: RegExp | null
   ): Promise<T[] | null> {
     try {
       return await this.model
