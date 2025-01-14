@@ -3,14 +3,15 @@ import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
-const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR ,NOT_FOUND} = STATUS_CODES;
+const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
+  STATUS_CODES;
 import {
   AddressValidation,
   LoginValidation,
   SignUpValidation,
 } from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
-import { SaveUserResponse } from "../interfaces/DTOs/User/IController.dto";
+import { EditUserDTO, SaveUserResponse } from "../interfaces/DTOs/User/IController.dto";
 
 class userController {
   constructor(private userServices: userService) {}
@@ -66,12 +67,10 @@ class userController {
         }
       } else {
         console.log("user details validation from the backend is failed");
-        res
-          .status(UNAUTHORIZED)
-          .json({
-            success: false,
-            message: "Please enter  valid user  details !!",
-          });
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Please enter  valid user  details !!",
+        });
       }
     } catch (error) {
       console.log(error as Error);
@@ -79,7 +78,11 @@ class userController {
     }
   }
 
-  async userLogin(req: Request, res: Response, next: NextFunction):Promise<void> {
+  async userLogin(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
       console.log(
@@ -90,7 +93,10 @@ class userController {
 
       const check = LoginValidation(email, password);
       if (check) {
-        const loginStatus = await this.userServices.userLogin({email, password});
+        const loginStatus = await this.userServices.userLogin({
+          email,
+          password,
+        });
         console.log(loginStatus);
         if (
           loginStatus &&
@@ -152,8 +158,8 @@ class userController {
           });
           // throw new Error('user has been blocked by admin...');
         } else {
-          const token = this.userServices.generateToken(user.id);
-          const refreshToken = this.userServices.generateRefreshToken(user.id);
+          const token = this.userServices.generateToken({payload:user.id});
+          const refreshToken = this.userServices.generateRefreshToken({payload:user.id});
           const data = {
             success: true,
             message: "Success",
@@ -182,16 +188,12 @@ class userController {
           generatedPassword
         );
 
-        const newUser : SaveUserResponse=
-          await this.userServices.saveUser({
-
-            name: name,
-            email: email,
-            password: hashedPassword,
-            profile_picture:googlePhotoUrl,
-
-            
-          });
+        const newUser: SaveUserResponse = await this.userServices.saveUser({
+          name: name,
+          email: email,
+          password: hashedPassword,
+          profile_picture: googlePhotoUrl,
+        });
         if (newUser?.data) {
           // const time = this.milliseconds(23, 30, 0);
           res
@@ -332,7 +334,8 @@ class userController {
 
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const currentUser = await this.userServices.getProfile(req.userId);
+      const { userId } = req.body;
+      const currentUser = await this.userServices.getProfile(userId);
       if (!currentUser)
         res
           .status(UNAUTHORIZED)
@@ -352,10 +355,10 @@ class userController {
   async editUser(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
-      const { _id, name, phone } = req.body;
+      const { _id, name, phone } : EditUserDTO = req.body;
       const check = EditUserDetailsValidator(name, phone);
       if (check) {
-        const editedUser = await this.userServices.editUser(_id, name, phone);
+        const editedUser = await this.userServices.editUser({_id, name, phone});
         console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
         if (editedUser) {
           res
@@ -395,17 +398,15 @@ class userController {
         values.landMark
       );
       if (check) {
-        const addedAddress = await this.userServices.AddUserAddress(
+        const addedAddress = await this.userServices.AddUserAddress({
           _id,
-          values
+          values}
         );
         if (addedAddress) {
-          res
-            .status(OK)
-            .json({
-              success: true,
-              message: "User address added successfully",
-            });
+          res.status(OK).json({
+            success: true,
+            message: "User address added successfully",
+          });
         } else {
           res
             .status(BAD_REQUEST)
@@ -440,10 +441,11 @@ class userController {
       );
       if (check) {
         console.log("address validation done ");
-        const editedAddress = await this.userServices.editAddress(
+        const editedAddress = await this.userServices.editAddress({
           _id,
           addressId,
           values
+        }
         );
         if (editedAddress) {
           res.status(OK).json({
@@ -457,12 +459,10 @@ class userController {
         }
       } else {
         console.log("address validation failed while editing the address");
-        res
-          .status(BAD_REQUEST)
-          .json({
-            success: false,
-            message: "address validation fialed while editing the address",
-          });
+        res.status(BAD_REQUEST).json({
+          success: false,
+          message: "address validation fialed while editing the address",
+        });
       }
     } catch (error) {
       console.log(error as Error);
@@ -478,7 +478,7 @@ class userController {
       const { userId, addressId } = req.body;
       console.log("userId and addressId is ", userId, addressId);
       const updatedDefaultAddress =
-        await this.userServices.setUserDefaultAddress(userId, addressId);
+        await this.userServices.setUserDefaultAddress({userId, addressId});
       if (updatedDefaultAddress) {
         res.status(OK).json({
           success: true,
@@ -511,7 +511,7 @@ class userController {
       } else {
         res
           .status(BAD_REQUEST)
-          .json({ success: false, message: "Complaint registration failed"});
+          .json({ success: false, message: "Complaint registration failed" });
       }
     } catch (error) {
       console.log(error as Error);
@@ -519,28 +519,39 @@ class userController {
     }
   }
 
-  //getting all the registered complaints from the user 
-  async getAllRegisteredService(req:Request,res:Response,next:NextFunction){
-    try{
-            const  page = 1;
-            const  limit = 10;
-          const  searchQuery = "";
-      const allRegisteredUserServices = await this.userServices.getAllRegisteredServices(page,limit,searchQuery);
-      if(allRegisteredUserServices){
+  //getting all the registered complaints from the user
+  async getAllRegisteredService(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const page = 1;
+      const limit = 10;
+      const searchQuery = "";
+      const allRegisteredUserServices =
+        await this.userServices.getAllRegisteredServices(
+          page,
+          limit,
+          searchQuery
+        );
+      if (allRegisteredUserServices) {
         res.status(OK).json({
-          success:true,
-          message:"data fetched successfully",
-          allRegisteredUserServices:allRegisteredUserServices
-        })
-      }else{
+          success: true,
+          message: "data fetched successfully",
+          allRegisteredUserServices: allRegisteredUserServices,
+        });
+      } else {
         res.status(NOT_FOUND).json({
-          success:true,
-          message:"Not Found",
-
-        })
+          success: true,
+          message: "Not Found",
+        });
       }
-    }catch(error){
-      console.log("error while getting the allregistered complaints from the database in the userController",error as Error)
+    } catch (error) {
+      console.log(
+        "error while getting the allregistered complaints from the database in the userController",
+        error as Error
+      );
       next(error);
     }
   }

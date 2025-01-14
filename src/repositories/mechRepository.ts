@@ -1,3 +1,9 @@
+import {
+  EmailExitCheck,
+  SaveMechDTO,
+  SaveMechResponse,
+  UpdateNewPasswordDTO,
+} from "../interfaces/DTOs/Mech/IRepository.dto";
 import MechModel, { MechInterface } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository"; // Import the base repository
 import { Document } from "mongoose";
@@ -7,14 +13,13 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
     super(MechModel);
   }
 
-  async saveMechanic(
-    mechData: Partial<MechInterface>
-  ): Promise<MechInterface | null> {
+  async saveMechanic(mechData: SaveMechDTO): Promise<SaveMechResponse | null> {
     return this.save(mechData);
   }
 
-  async emailExistCheck(email: string): Promise<MechInterface | null> {
+  async emailExistCheck(data: EmailExitCheck): Promise<MechInterface | null> {
     try {
+      const { email } = data;
       const mechFound = await this.findOne({ email });
       console.log("Mechanic found in the MechRepository:", mechFound);
       return mechFound;
@@ -28,10 +33,10 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
   }
 
   async updateNewPassword(
-    password: string,
-    userId: string
+    data: UpdateNewPasswordDTO
   ): Promise<MechInterface | null> {
     try {
+      const { userId, password } = data;
       const user = await this.findById(userId);
       if (user) {
         user.password = password;
@@ -84,7 +89,7 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
   async AddService(values: string) {
     try {
       const result = await this.addService(values);
-      return result ;
+      return result;
     } catch (error) {
       console.log(error as Error);
       throw new Error();

@@ -30,3 +30,9 @@ export interface SaveUserResponse{
     token?:string | undefined;
     refresh_token?:string | undefined;
 }
+
+export interface EditUserDTO {
+    _id:string;
+    name:string;
+    phone:number;
+}

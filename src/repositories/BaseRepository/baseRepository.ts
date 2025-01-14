@@ -1,6 +1,7 @@
 import { Model } from "mongoose";
 import { ObjectId } from "mongodb";
 import { Iconcern } from "../../models/concernModel";
+import { RegisterServiceDTO } from "../../interfaces/DTOs/User/IService.dto";
 
 interface Deletable {
   isDeleted: boolean;
@@ -22,8 +23,8 @@ export interface IBaseRepository<T> {
     addressId: string,
     qr: Partial<T>
   ): Promise<T | null>;
-  addService(values:string):Promise <T | null>;
-  addConcern(data:Iconcern):Promise<T | null>;
+  addService(values: string): Promise<T | null>;
+  addConcern(data: Iconcern): Promise<T | null>;
 }
 
 export class BaseRepository<T extends Searchable>
@@ -49,13 +50,11 @@ export class BaseRepository<T extends Searchable>
   async findById(id: string): Promise<T | null> {
     try {
       return (await this.model.findById(id)) as T;
- 
     } catch (error) {
       console.log("Error in BaseRepository findById:", error as Error);
       throw error;
     }
   }
-
 
   // async findById(id: string): Promise<T | null> {
   //   try {
@@ -77,7 +76,7 @@ export class BaseRepository<T extends Searchable>
   //           },
   //         },
   //       },
-  //     ]); 
+  //     ]);
 
   //     return result.length > 0 ? (result[0] as T) : null;
   //   } catch (error) {
@@ -89,9 +88,7 @@ export class BaseRepository<T extends Searchable>
   async findOne(filter: Partial<T>): Promise<T | null> {
     try {
       console.log("filter is from BaseRepositoy is ", filter);
-      return (
-        await this.model.findOne(filter)
-      ) as T;
+      return (await this.model.findOne(filter)) as T;
     } catch (error) {
       console.log("Error in BaseRepository findOne:", error as Error);
       throw error;
@@ -191,35 +188,37 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  async addService(values:string):Promise<T | null>{
-    try{
-      const newSerive = new this.model(values)
+  async addService(values: string): Promise<T | null> {
+    try {
+      const newSerive = new this.model(values);
       await newSerive.save();
       return newSerive as T;
-    }catch(error){
+    } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  async addConcern(data:Iconcern) : Promise<T | null>{
-    try{
-      const newConcern = new this.model(data)
+  async addConcern(data: RegisterServiceDTO): Promise<T | null> {
+    try {
+      const newConcern = new this.model(data);
       await newConcern.save();
       return newConcern as T;
-    }catch(error){
-      console.log("error from the addconcern form the baseRepository is ",error as Error);
+    } catch (error) {
+      console.log(
+        "error from the addconcern form the baseRepository is ",
+        error as Error
+      );
       throw Error;
     }
   }
 
-
-  async addDevice(name:string):Promise<T | null>{
-    try{
-      const newSerive = new this.model({name : name })
+  async addDevice(name: string): Promise<T | null> {
+    try {
+      const newSerive = new this.model({ name: name });
       await newSerive.save();
       return newSerive as T;
-    }catch(error){
+    } catch (error) {
       console.log(error);
       throw error;
     }

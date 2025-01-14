@@ -4,7 +4,7 @@ import { Document } from "mongoose";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { Iconcern } from "../models/concernModel";
 import concernModel from "../models/concernModel";
-import { EmailExistCheckDTO, EmailExistCheckResponse } from "../interfaces/DTOs/User/IRepository.dto";
+import { AddUserAddressDTO, AddUserAddressResponse, EditAddressDTO, EditUserDTO, EditUserResponse, EmailExistCheckDTO, EmailExistCheckResponse, RegisterServiceDTO, SetUserDefaultAddressDTO } from "../interfaces/DTOs/User/IRepository.dto";
 
 class UserRepository extends BaseRepository<UserInterface & Document> {
   private concernRepository: BaseRepository<Iconcern>;
@@ -37,7 +37,8 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async emailExistCheck(email: string): Promise<EmailExistCheckResponse | null> {
+  async emailExistCheck(data:EmailExistCheckDTO): Promise<EmailExistCheckResponse | null> {
+    const {email} = data;
     console.log("email find in userRepsoi", email);
     return this.findOne({ email: email });
   }
@@ -122,13 +123,11 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
   }
 
   async editUser(
-    id: string,
-    name: string,
-    phone: number
-  ): Promise<UserInterface | null> {
+  data:EditUserDTO
+  ): Promise<EditUserResponse | null> {
     try {
-      const qr = { name: name, phone: phone };
-      const editedUser = await this.update(id, qr);
+      const qr = { name: data.name, phone: data.phone };
+      const editedUser = await this.update(data._id, qr);
       return editedUser;
     } catch (error) {
       console.log(error as Error);
@@ -137,14 +136,14 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
   }
 
   async addAddress(
-    _id: string,
-    values: AddAddress
-  ): Promise<UserInterface | null> {
+   data:AddUserAddressDTO
+  ): Promise<AddUserAddressResponse | null> {
     try {
+      const {_id,values} = data;
       console.log("new address from the userRepository is ", values);
       const qr = { address: [values] };
       const addedAddress = await this.updateAddress(_id, qr);
-      return addedAddress;
+      return addedAddress ;
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -152,11 +151,10 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
   }
 
   async editAddress(
-    _id: string,
-    addressId: string,
-    values: AddAddress
+    data:EditAddressDTO
   ): Promise<UserInterface | null> {
     try {
+      const {_id,addressId,values} = data;
       const editedAddress = await this.editExistAddress(_id, addressId, values);
       return editedAddress;
     } catch (error) {
@@ -165,8 +163,9 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async setDefaultAddress(userId: string, addressId: string) {
+  async setDefaultAddress(data:SetUserDefaultAddressDTO) {
     try {
+      const {userId,addressId} = data;
       console.log(
         "enterd in the userRepository for upaidng the default address",
         userId,
@@ -181,8 +180,9 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async registerService(data: Iconcern) {
+  async registerService(data: RegisterServiceDTO) {
     try {
+    
       console.log(
         "enterd in the userRepository for registering the user complaint"
       );

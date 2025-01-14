@@ -20,6 +20,16 @@ import {
   UserLoginResponse,
   EmailExistCheckDTO,
   EmailExistCheckResponse,
+  GetProfileDTO,
+  GetProfileResponse,
+  EditUserDTO,
+  AddUserAddressDTO,
+  EditAddressDTO,
+  SetUserDefaultAddressDTO,
+  GetUserByEmail,
+  GenerateTokenDTO,
+  GenerateRefreshToken,
+  RegisterServiceDTO,
 } from "../interfaces/DTOs/User/IService.dto";
 dotenv.config();
 
@@ -31,9 +41,12 @@ class userService implements comService<UserResponseInterface> {
     private encrypt: Encrypt
   ) {}
 
-  async isUserExist(userData: UserSignUpDTO): Promise<EmailExistCheckResponse | null> {
+  async isUserExist(
+    userData: UserSignUpDTO
+  ): Promise<EmailExistCheckResponse | null> {
     try {
-      return await this.userRepository.emailExistCheck(userData.email);
+      const {email} = userData;
+      return await this.userRepository.emailExistCheck({email});
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -91,8 +104,9 @@ class userService implements comService<UserResponseInterface> {
 
   async userLogin(userData: UserLoginDTO): Promise<UserLoginResponse> {
     try {
+      const {email} = userData
       const user: EmailExistCheckDTO | null =
-        await this.userRepository.emailExistCheck(userData.email);
+        await this.userRepository.emailExistCheck({email});
       const token = this.createjwt.generateToken(user?.id);
       const refreshToken = this.createjwt.generateRefreshToken(user?.id);
       if (user && user.isBlocked) {
@@ -150,20 +164,23 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async getUserByEmail(email: string): Promise<EmailExistCheckResponse | null> {
+  async getUserByEmail(data:GetUserByEmail): Promise<EmailExistCheckResponse | null> {
     try {
-      return this.userRepository.emailExistCheck(email);
+      const {email} = data;
+      return this.userRepository.emailExistCheck({email});
     } catch (error) {
       console.log("error occured while getUserEmail in the userService");
       throw error;
     }
   }
 
-  generateToken(payload: string | undefined): string | undefined {
+  generateToken(data:GenerateTokenDTO): string | undefined {
+    const {payload} = data;
     if (payload) return this.createjwt.generateToken(payload);
   }
 
-  generateRefreshToken(payload: string | undefined): string | undefined {
+  generateRefreshToken(data:GenerateRefreshToken): string | undefined {
+    const {payload}  = data;
     if (payload) return this.createjwt.generateRefreshToken(payload);
   }
 
@@ -171,9 +188,9 @@ class userService implements comService<UserResponseInterface> {
     return await this.encrypt.hashPassword(password);
   }
 
-  async getProfile(id: string | undefined): Promise<UserResponseInterface> {
+  async getProfile(data: GetProfileDTO): Promise<GetProfileResponse> {
     try {
-      if (!id)
+      if (!data.id)
         return {
           status: UNAUTHORIZED,
           data: {
@@ -181,7 +198,7 @@ class userService implements comService<UserResponseInterface> {
             message: "User ID is missing",
           },
         } as const;
-      const user = await this.userRepository.getUserById(id);
+      const user = await this.userRepository.getUserById(data.id);
       if (!user) {
         return {
           status: NOT_FOUND,
@@ -249,46 +266,50 @@ class userService implements comService<UserResponseInterface> {
       });
       const newPassword = cryptr.encrypt(password);
       return await this.userRepository.updateNewPassword(newPassword, userId);
-    } catch (error){
+    } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
 
-  async editUser(_id: string, name: string, phone: number) {
+  async editUser(data: EditUserDTO) {
     try {
-      return this.userRepository.editUser(_id, name, phone);
+      const { _id, name, phone } = data;
+      return this.userRepository.editUser({ _id, name, phone });
     } catch (error) {
       console.log(error as Error);
     }
   }
 
-  async AddUserAddress(_id: string, values: AddAddress) {
+  async AddUserAddress(data:AddUserAddressDTO) {
     try {
-      return await this.userRepository.addAddress(_id, values);
+      const {_id,values} = data;
+      return await this.userRepository.addAddress({_id, values});
     } catch (error) {
       console.log(error as Error);
     }
   }
 
-  async editAddress(_id: string, addressId: string, values: AddAddress) {
+  async editAddress(data:EditAddressDTO) {
     try {
-      return await this.userRepository.editAddress(_id, addressId, values);
+      const {_id,addressId,values} = data;
+      return await this.userRepository.editAddress({_id, addressId, values});
     } catch (error) {
       console.log(error as Error);
     }
   }
 
-  async setUserDefaultAddress(userId: string, addressId: string) {
+  async setUserDefaultAddress(data:SetUserDefaultAddressDTO) {
     try {
+      const {userId,addressId} = data;
       console.log("entered in the userService ");
-      return await this.userRepository.setDefaultAddress(userId, addressId);
+      return await this.userRepository.setDefaultAddress({userId, addressId});
     } catch (error) {
       console.log(error as Error);
     }
   }
 
-  async registerService(data: Iconcern) {
+  async registerService(data: RegisterServiceDTO) {
     try {
       console.log("entered in the userService for register Service");
       return await this.userRepository.registerService(data);

@@ -58,14 +58,12 @@ class mechController {
         }
       } else {
         console.log("mechanic details validation from the backend is failed");
-        res
-          .status(UNAUTHORIZED)
-          .json({
-            success: false,
-            message: "Please enter  valid mechanic  details !!",
-          });
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Please enter  valid mechanic  details !!",
+        });
       }
-    } catch (error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
@@ -128,7 +126,10 @@ class mechController {
       const { email, password }: { email: string; password: string } = req.body;
       const check = LoginValidation(email, password);
       if (check) {
-        const loginStatus = await this.mechServices.mechLogin(email, password);
+        const loginStatus = await this.mechServices.mechLogin({
+          email,
+          password,
+        });
         console.log(loginStatus);
         if (
           loginStatus &&
@@ -222,10 +223,10 @@ class mechController {
   async updateNewPasswordMech(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, userId } = req.body;
-      const result = await this.mechServices.updateNewPassword(
+      const result = await this.mechServices.updateNewPassword({
         password,
-        userId
-      );
+        userId,
+      });
       console.log(result);
       if (result)
         res.json({ success: true, data: result, message: "successful" });

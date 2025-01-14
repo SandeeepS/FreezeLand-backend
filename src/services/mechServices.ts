@@ -6,6 +6,8 @@ import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
 import { MechResponseInterface } from "../interfaces/serviceInterfaces/InMechService";
 import Cryptr from "cryptr";
+import { MechLoginDTO, MechLoginResponse, SaveMechDTO, SignUpMechDTO, UpdateNewPasswordDTO } from "../interfaces/DTOs/Mech/IService.dto";
+import { EmailExitCheck } from "../interfaces/DTOs/Mech/IRepository.dto";
 
 const { OK, UNAUTHORIZED } = STATUS_CODES;
 class mechService implements comService<MechResponseInterface> {
@@ -53,9 +55,10 @@ class mechService implements comService<MechResponseInterface> {
   //   }
   // }
 
-  async signupMech(mechData: MechInterface): Promise<MechInterface | null> {
+  async signupMech(mechData: SignUpMechDTO): Promise<MechInterface | null> {
     try {
-      return await this.mechRepository.emailExistCheck(mechData.email);
+      const {email} = mechData;
+      return await this.mechRepository.emailExistCheck({email});
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -63,7 +66,7 @@ class mechService implements comService<MechResponseInterface> {
   }
 
   async saveMech(
-    mechData: MechInterface
+    mechData: SaveMechDTO
   ): Promise<MechResponseInterface | undefined> {
     try {
       console.log("Entered in mech Service and the mechData is ", mechData);
@@ -80,7 +83,7 @@ class mechService implements comService<MechResponseInterface> {
         saltLength: 10,
       });
       const newPassword = cryptr.encrypt(password);
-      const newDetails: Partial<MechInterface> = {
+      const newDetails : SaveMechDTO = {
         name: name,
         password: newPassword,
         email: email,
@@ -112,12 +115,12 @@ class mechService implements comService<MechResponseInterface> {
   }
 
   async mechLogin(
-    email: string,
-    password: string
-  ): Promise<MechResponseInterface> {
+   data:MechLoginDTO
+  ): Promise<MechLoginResponse> {
     try {
+      const {email,password } = data;
       const mech: MechInterface | null =
-        await this.mechRepository.emailExistCheck(email);
+        await this.mechRepository.emailExistCheck({email});
       const token = this.createjwt.generateToken(mech?.id);
       const refreshToken = this.createjwt.generateRefreshToken(mech?.id);
       if (mech && mech.isBlocked) {
@@ -176,17 +179,19 @@ class mechService implements comService<MechResponseInterface> {
     }
   }
 
-  async getUserByEmail(email: string): Promise<MechInterface | null> {
+  async getUserByEmail(data : EmailExitCheck): Promise<MechInterface | null> {
     try {
-      return this.mechRepository.emailExistCheck(email);
+      const {email} = data;
+      return this.mechRepository.emailExistCheck({email});
     } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
 
-  async updateNewPassword(password: string, userId: string) {
+  async updateNewPassword(data:UpdateNewPasswordDTO) {
     try {
+      const {password,userId} = data;
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
       if (!secret_key) {
         throw new Error(
@@ -200,7 +205,7 @@ class mechService implements comService<MechResponseInterface> {
       });
       const newPassword = cryptr.encrypt(password);
 
-      return await this.mechRepository.updateNewPassword(newPassword, userId);
+      return await this.mechRepository.updateNewPassword({password:newPassword, userId});
     } catch (error) {
       console.log(error as Error);
       throw error;
