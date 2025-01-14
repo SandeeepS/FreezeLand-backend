@@ -10,6 +10,7 @@ import {
   SignUpValidation,
 } from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
+import { SaveUserResponse } from "../interfaces/DTOs/User/IController.dto";
 
 class userController {
   constructor(private userServices: userService) {}
@@ -37,7 +38,7 @@ class userController {
       const check = SignUpValidation(name, phone, email, password, cpassword);
       if (check) {
         console.log("user details are validated from the backend and it is ok");
-        const newUser = await this.userServices.userSignup(
+        const newUser = await this.userServices.isUserExist(
           req.app.locals.userData
         );
         if (!newUser) {
@@ -78,7 +79,7 @@ class userController {
     }
   }
 
-  async userLogin(req: Request, res: Response, next: NextFunction) {
+  async userLogin(req: Request, res: Response, next: NextFunction):Promise<void> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
       console.log(
@@ -89,7 +90,7 @@ class userController {
 
       const check = LoginValidation(email, password);
       if (check) {
-        const loginStatus = await this.userServices.userLogin(email, password);
+        const loginStatus = await this.userServices.userLogin({email, password});
         console.log(loginStatus);
         if (
           loginStatus &&
@@ -181,21 +182,24 @@ class userController {
           generatedPassword
         );
 
-        const newUser: UserResponseInterface | undefined =
+        const newUser : SaveUserResponse=
           await this.userServices.saveUser({
+
             name: name,
             email: email,
             password: hashedPassword,
-            profile_picture: googlePhotoUrl,
+            profile_picture:googlePhotoUrl,
+
+            
           });
-        if (newUser?.data.data) {
+        if (newUser?.data) {
           // const time = this.milliseconds(23, 30, 0);
           res
             .status(OK)
-            .cookie("access_token", newUser.data.token, {
+            .cookie("access_token", newUser.token, {
               maxAge: accessTokenMaxAge,
             })
-            .cookie("refresh_token", newUser.data.refresh_token, {
+            .cookie("refresh_token", newUser.refresh_token, {
               maxAge: refreshTokenMaxAge,
             })
             .json(newUser.data);
@@ -231,10 +235,10 @@ class userController {
           // const time = this.milliseconds(23, 30, 0);
           res
             .status(OK)
-            .cookie("access_token", newUser?.data.token, {
+            .cookie("access_token", newUser?.token, {
               maxAge: accessTokenMaxAge,
             })
-            .cookie("refresh_token", newUser?.data.refresh_token, {
+            .cookie("refresh_token", newUser?.refresh_token, {
               maxAge: refreshTokenMaxAge,
             })
             .json(newUser);

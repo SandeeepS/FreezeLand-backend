@@ -10,6 +10,17 @@ import Cryptr from "cryptr";
 import User from "../interfaces/entityInterface/Iuser";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { Iconcern } from "../models/concernModel";
+import {
+  UserSignUpDTO,
+  SaveUserDTO,
+  UserLoginDTO,
+  UserSignUpResponse,
+  SaveUserResponse,
+  NewDetailsDTO,
+  UserLoginResponse,
+  EmailExistCheckDTO,
+  EmailExistCheckResponse,
+} from "../interfaces/DTOs/User/IService.dto";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND, INTERNAL_SERVER_ERROR } = STATUS_CODES;
@@ -18,9 +29,9 @@ class userService implements comService<UserResponseInterface> {
     private userRepository: UserRepository,
     private createjwt: CreateJWT,
     private encrypt: Encrypt
-  ){}
+  ) {}
 
-  async userSignup(userData: UserInterface): Promise<UserInterface | null> {
+  async isUserExist(userData: UserSignUpDTO): Promise<EmailExistCheckResponse | null> {
     try {
       return await this.userRepository.emailExistCheck(userData.email);
     } catch (error) {
@@ -29,7 +40,7 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async saveUser(userData: User): Promise<UserResponseInterface | undefined> {
+  async saveUser(userData: SaveUserDTO): Promise<SaveUserResponse> {
     try {
       console.log("Entered in user Service and the userData is ", userData);
       const { name, email, password, phone } = userData;
@@ -45,7 +56,7 @@ class userService implements comService<UserResponseInterface> {
         saltLength: 10,
       });
       const newPassword = cryptr.encrypt(password);
-      const newDetails: Partial<UserInterface> = {
+      const newDetails: NewDetailsDTO = {
         name: name,
         password: newPassword,
         email: email,
@@ -59,15 +70,17 @@ class userService implements comService<UserResponseInterface> {
         console.log("token is ", token);
         console.log("refresh", refresh_token);
         return {
-          status: OK,
-          data: {
-            success: true,
-            message: "Success",
-            userId: userData.id,
-            token: token,
-            data: user,
-            refresh_token,
-          },
+          success: true,
+          message: "Success",
+          userId: userData.id,
+          token: token,
+          data: user,
+          refresh_token,
+        };
+      } else {
+        return {
+          success: false,
+          message: "false",
         };
       }
     } catch (error) {
@@ -76,13 +89,10 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async userLogin(
-    email: string,
-    password: string
-  ): Promise<UserResponseInterface> {
+  async userLogin(userData: UserLoginDTO): Promise<UserLoginResponse> {
     try {
-      const user: UserInterface | null =
-        await this.userRepository.emailExistCheck(email);
+      const user: EmailExistCheckDTO | null =
+        await this.userRepository.emailExistCheck(userData.email);
       const token = this.createjwt.generateToken(user?.id);
       const refreshToken = this.createjwt.generateRefreshToken(user?.id);
       if (user && user.isBlocked) {
@@ -97,10 +107,10 @@ class userService implements comService<UserResponseInterface> {
           },
         } as const;
       }
-      if (user?.password && password) {
-        console.log("enterd password is ", password);
+      if (user?.password && userData.password) {
+        console.log("enterd password is ", userData.password);
         const passwordMatch = await this.encrypt.compare(
-          password,
+          userData.password,
           user.password as string
         );
         if (passwordMatch) {
@@ -140,7 +150,7 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async getUserByEmail(email: string): Promise<UserInterface | null> {
+  async getUserByEmail(email: string): Promise<EmailExistCheckResponse | null> {
     try {
       return this.userRepository.emailExistCheck(email);
     } catch (error) {
@@ -202,17 +212,25 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-
-  //getting the user registered complaint details 
-  async getAllRegisteredServices(   page: number,
+  //getting the user registered complaint details
+  async getAllRegisteredServices(
+    page: number,
     limit: number,
-    searchQuery: string):Promise<unknown> {
-    try{
-      const data = await this.userRepository.getAllUserRegisteredServices(page,limit,searchQuery);
+    searchQuery: string
+  ): Promise<unknown> {
+    try {
+      const data = await this.userRepository.getAllUserRegisteredServices(
+        page,
+        limit,
+        searchQuery
+      );
       return data;
-    }catch(error){
-      console.log("Error occured while fetching the user registerd complaint in the userSercvice ",error as Error);
-      throw error
+    } catch (error) {
+      console.log(
+        "Error occured while fetching the user registerd complaint in the userSercvice ",
+        error as Error
+      );
+      throw error;
     }
   }
 
@@ -230,9 +248,8 @@ class userService implements comService<UserResponseInterface> {
         saltLength: 10,
       });
       const newPassword = cryptr.encrypt(password);
-
       return await this.userRepository.updateNewPassword(newPassword, userId);
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       throw error;
     }
@@ -254,9 +271,9 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async editAddress(_id: string, addressId :string, values: AddAddress) {
+  async editAddress(_id: string, addressId: string, values: AddAddress) {
     try {
-      return await this.userRepository.editAddress(_id,addressId, values);
+      return await this.userRepository.editAddress(_id, addressId, values);
     } catch (error) {
       console.log(error as Error);
     }
@@ -271,13 +288,12 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async registerService(data:Iconcern){
-    try{
+  async registerService(data: Iconcern) {
+    try {
       console.log("entered in the userService for register Service");
       return await this.userRepository.registerService(data);
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
-      
     }
   }
 }

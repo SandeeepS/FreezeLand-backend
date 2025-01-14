@@ -4,14 +4,14 @@ import { Document } from "mongoose";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { Iconcern } from "../models/concernModel";
 import concernModel from "../models/concernModel";
+import { EmailExistCheckDTO, EmailExistCheckResponse } from "../interfaces/DTOs/User/IRepository.dto";
 
 class UserRepository extends BaseRepository<UserInterface & Document> {
-
-  private concernRepository : BaseRepository<Iconcern>
+  private concernRepository: BaseRepository<Iconcern>;
 
   constructor() {
     super(userModel);
-    this.concernRepository = new BaseRepository<Iconcern>(concernModel)
+    this.concernRepository = new BaseRepository<Iconcern>(concernModel);
   }
 
   async saveUser(
@@ -37,9 +37,9 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async emailExistCheck(email: string): Promise<UserInterface | null> {
+  async emailExistCheck(email: string): Promise<EmailExistCheckResponse | null> {
     console.log("email find in userRepsoi", email);
-    return this.findOne({ email : email });
+    return this.findOne({ email: email });
   }
 
   async updateNewPassword(
@@ -97,19 +97,27 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  //function for getting all the userRegistered services 
-  async getAllUserRegisteredServices(   page: number,
+  //function for getting all the userRegistered services
+  async getAllUserRegisteredServices(
+    page: number,
     limit: number,
-    searchQuery: string) : Promise<unknown>{
-    try{
+    searchQuery: string
+  ): Promise<unknown> {
+    try {
       const regex = new RegExp(searchQuery, "i");
 
-      const data = await this.concernRepository.findAll(page,limit,regex);
-      console.log("all the user registred complaints is hree sdlfsdflsdfd",data);
+      const data = await this.concernRepository.findAll(page, limit, regex);
+      console.log(
+        "all the user registred complaints is hree sdlfsdflsdfd",
+        data
+      );
       return data as unknown;
-    }catch(error){
-      console.log("error occured while fetching the data from the database in the userRepositry",error as Error);
-      throw new Error;
+    } catch (error) {
+      console.log(
+        "error occured while fetching the data from the database in the userRepositry",
+        error as Error
+      );
+      throw new Error();
     }
   }
 
@@ -151,13 +159,13 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     try {
       const editedAddress = await this.editExistAddress(_id, addressId, values);
       return editedAddress;
-    } catch (error){
+    } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
 
-  async setDefaultAddress(userId: string, addressId: string){
+  async setDefaultAddress(userId: string, addressId: string) {
     try {
       console.log(
         "enterd in the userRepository for upaidng the default address",
@@ -173,12 +181,14 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async registerService(data:Iconcern){
-    try{
-      console.log("enterd in the userRepository for registering the user complaint");
+  async registerService(data: Iconcern) {
+    try {
+      console.log(
+        "enterd in the userRepository for registering the user complaint"
+      );
       const newConcern = await this.concernRepository.addConcern(data);
       return newConcern as Iconcern;
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
     }
   }
