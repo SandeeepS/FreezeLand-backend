@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
-import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
   STATUS_CODES;
 import {

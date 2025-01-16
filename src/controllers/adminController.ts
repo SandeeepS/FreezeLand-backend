@@ -22,9 +22,12 @@ class adminController {
       const { email, password } = req.body;
       const check = LoginValidation(email, password);
       if (check) {
-        const loginStatus = await this.adminService.adminLogin(email, password);
+        const loginStatus = await this.adminService.adminLogin({
+          email,
+          password,
+        });
 
-        if (!loginStatus.data.success){
+        if (!loginStatus.data.success) {
           res
             .status(UNAUTHORIZED)
             .json({ success: false, message: loginStatus.data.message });
@@ -64,11 +67,11 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log("page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getUserList(
+      const data = await this.adminService.getUserList({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log("usersData from the admin controller is ", data);
       res.status(OK).json(data);
     } catch (error) {
@@ -84,11 +87,11 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log("page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getMechList(
+      const data = await this.adminService.getMechList({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log("mechsData from the admin controller is ", data);
       res.status(OK).json(data);
     } catch (error) {
@@ -99,9 +102,10 @@ class adminController {
 
   async blockUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminService.blockUser(
-        req.params.userId as string
-      );
+      const { userId } = req.params;
+      const result = await this.adminService.blockUser({
+        userId,
+      });
       if (result)
         res.json({ success: true, message: "block or unblocked the user" });
       else
@@ -120,9 +124,8 @@ class adminController {
 
   async blockMech(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminService.blockMech(
-        req.params.mechId as string
-      );
+      const { mechId } = req.params;
+      const result = await this.adminService.blockMech({ mechId });
       if (result)
         res.json({ success: true, message: "block or unblocked the mechanic" });
       else
@@ -141,9 +144,8 @@ class adminController {
 
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminService.deleteUser(
-        req.params.userId as string
-      );
+      const { userId } = req.params;
+      const result = await this.adminService.deleteUser({ userId });
       if (result) res.json({ success: true, message: "deleted  the user" });
       else
         res.json({
@@ -158,9 +160,8 @@ class adminController {
 
   async deleteMech(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminService.deleteMech(
-        req.params.mechId as string
-      );
+      const { mechId } = req.params;
+      const result = await this.adminService.deleteMech({ mechId });
       if (result) res.json({ success: true, message: "deleted  the mechanic" });
       else
         res.json({
@@ -288,11 +289,11 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log(" page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getServices(
+      const data = await this.adminService.getServices({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log(
         "listed services from the database is in the admin controller is",
         data
@@ -314,7 +315,11 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log(" page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getDevcies(page, limit, searchQuery);
+      const data = await this.adminService.getDevcies({
+        page,
+        limit,
+        searchQuery,
+      });
       console.log(
         "listed services from the database is in the admin controller is",
         data
@@ -332,7 +337,7 @@ class adminController {
         "reached the getAllServices funciton in the admin controller"
       );
       const id = req.params.id;
-      const result = await this.adminService.getService(id);
+      const result = await this.adminService.getService({ id });
       res.status(OK).json(result);
     } catch (error) {
       console.log(error as Error);
@@ -345,7 +350,7 @@ class adminController {
       console.log("reached the listUnlistServices at adminController");
       const _id = req.params.serviceId;
       console.log("id reached from the front is ", _id);
-      const result = await this.adminService.blockService(_id);
+      const result = await this.adminService.blockService({ _id });
       if (result) {
         res.json({ success: true, message: "blocked/unblocked the service " });
       } else {
@@ -365,7 +370,7 @@ class adminController {
       console.log("reached the listUnlistDevice at adminController");
       const _id = req.params.deviceId;
       console.log("id reached from the front is ", _id);
-      const result = await this.adminService.blockDevice(_id);
+      const result = await this.adminService.blockDevice({ _id });
       if (result) {
         res.json({ success: true, message: "blocked/unblocked the device " });
       } else {
@@ -384,9 +389,8 @@ class adminController {
     try {
       console.log("entered in the admin controller for deleting the service ");
       console.log(req.params.serviceId);
-      const result = await this.adminService.deleteService(
-        req.params.serviceId as string
-      );
+      const { serviceId } = req.params;
+      const result = await this.adminService.deleteService({ serviceId });
       if (result) res.json({ success: true, message: "Service deleted" });
       else
         res.json({
@@ -404,9 +408,8 @@ class adminController {
     try {
       console.log("entered in the admin controller for deleting the device ");
       console.log(req.params.deviceId);
-      const result = await this.adminService.deleteDevice(
-        req.params.deviceId as string
-      );
+      const { deviceId } = req.params;
+      const result = await this.adminService.deleteDevice({ deviceId });
       if (result) res.json({ success: true, message: "Device deleted" });
       else
         res.json({
@@ -431,10 +434,10 @@ class adminController {
         const isExist = await this.adminService.isServiceExist(values.name);
 
         if (!isExist) {
-          const editedSevice = await this.adminService.editExistingService(
+          const editedSevice = await this.adminService.editExistingService({
             _id,
-            values
-          );
+            values,
+          });
           if (editedSevice) {
             res.status(OK).json({
               success: true,

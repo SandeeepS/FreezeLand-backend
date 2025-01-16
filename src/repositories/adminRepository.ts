@@ -3,26 +3,61 @@ import AdminModel from "../models/adminModel";
 import { Document } from "mongoose";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import serviceModel, { IServices } from "../models/serviceModel";
-import { UserInterface } from "../models/userModel";
 import { MechInterface } from "../models/mechModel";
 import UserRepository from "./userRepository";
 import MechRepository from "./mechRepository";
 import deviceModel, { IDevice } from "../models/deviceModel";
+import {
+  AddNewDeviceDTO,
+  AddNewService,
+  AddNewServiceDTO,
+  BlockDeviceDTO,
+  BlockMechDTO,
+  BlockServiceDTO,
+  BlockUserDTO,
+  DeleteDeviceDTO,
+  DeleteMechDTO,
+  DeleteServiceDTO,
+  DeleteUserDTO,
+  EditExistServiceDTO,
+  GetAdminByIdDTO,
+  GetAdminByIdResponse,
+  GetAllDevicesDTO,
+  GetAllDevicesResponse,
+  GetAllServiceResponse,
+  GetAllServicesDTO,
+  GetDeviceCountDTO,
+  GetMechCountDTO,
+  GetMechListDTO,
+  GetMechListResponse,
+  GetServiceCountDTO,
+  GetServiceDTO,
+  GetUserCountDTO,
+  GetUserListDTO,
+  GetUserListResponse,
+  IsAdminExistDTO,
+  IsAdminExistResponse,
+  IsServiceExistDTO,
+} from "../interfaces/DTOs/Admin/IRepository.dto";
+import { isDeviceExistDTO } from "../interfaces/DTOs/Admin/IService.dto";
 
 class AdminRepository extends BaseRepository<AdminInterface & Document> {
   private userRepository: UserRepository;
   private mechRepository: MechRepository;
-  private serviceRepository : BaseRepository<IServices>
-  private deviceRepository : BaseRepository<IDevice>
+  private serviceRepository: BaseRepository<IServices>;
+  private deviceRepository: BaseRepository<IDevice>;
   constructor() {
     super(AdminModel);
     this.userRepository = new UserRepository();
     this.mechRepository = new MechRepository();
-    this.serviceRepository = new BaseRepository<IServices>(serviceModel)
-    this.deviceRepository = new BaseRepository<IDevice>(deviceModel)
+    this.serviceRepository = new BaseRepository<IServices>(serviceModel);
+    this.deviceRepository = new BaseRepository<IDevice>(deviceModel);
   }
-  async getAdminById(id: string): Promise<AdminInterface | null> {
+  async getAdminById(
+    data: GetAdminByIdDTO
+  ): Promise<GetAdminByIdResponse | null> {
     try {
+      const { id } = data;
       const admin = await this.findById(id);
       return admin;
     } catch (error) {
@@ -31,8 +66,11 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async isAdminExist(email: string): Promise<AdminInterface | null> {
+  async isAdminExist(
+    data: IsAdminExistDTO
+  ): Promise<IsAdminExistResponse | null> {
     try {
+      const { email } = data;
       console.log("enterd in the isAdminExist", email);
       const admin = await this.findOne({ email: email });
       if (admin) {
@@ -49,27 +87,23 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
   }
 
   async getUserList(
-    page: number,
-    limit: number,
-    searchQuery: string
-  ): Promise<UserInterface[]> {
+    data: GetUserListDTO
+  ): Promise<GetUserListResponse[] | null> {
     try {
+      const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.userRepository.findAll(page, limit, regex);
       console.log("users list is ", result);
-      return result as UserInterface[];
+      return result;
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
     }
   }
 
-  async getMechList(
-    page: number,
-    limit: number,
-    searchQuery: string
-  ): Promise<MechInterface[]> {
+  async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
+      const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.mechRepository.getMechList(page, limit, regex);
       return result as MechInterface[];
@@ -79,40 +113,37 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-
   async getAllServices(
-    page: number,
-    limit: number,
-    searchQuery: string
-  ): Promise<IServices[]> {
+    data: GetAllServicesDTO
+  ): Promise<GetAllServiceResponse[] | null> {
     try {
+      const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.serviceRepository.findAll(page, limit, regex);
-      return result as IServices[];
+      return result;
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
     }
   }
-
 
   async getAllDevices(
-    page: number,
-    limit: number,
-    searchQuery: string
-  ): Promise<IServices[]> {
+    data: GetAllDevicesDTO
+  ): Promise<GetAllDevicesResponse[] | null> {
     try {
+      const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.deviceRepository.findAll(page, limit, regex);
-      return result as IServices[];
+      return result;
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
     }
   }
 
-  async getUserCount(searchQuery: string): Promise<number>{
+  async getUserCount(data:GetUserCountDTO): Promise<number> {
     try {
+      const {searchQuery} = data;
       const regex = new RegExp(searchQuery, "i");
       return await this.userRepository.getUserCount(regex);
     } catch (error) {
@@ -121,30 +152,32 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-
-  async getService(id:string) {
-    try{
+  async getService(data:GetServiceDTO) {
+    try {
+      const {id} = data;
       console.log("entered in the getService in the adminRepository");
       const result = await this.serviceRepository.findById(id);
       return result;
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
-      throw new Error;
+      throw new Error();
     }
   }
 
-  async editExistService(_id:string,values:IServices){
-    try{
-      const editedService = await this.serviceRepository.update(_id,values);
-      return editedService;
-    }catch(error){
-      console.log(error as Error);
-      throw new Error;
-    }
-  }
-
-  async blockUser(userId: string) {
+  async editExistService(data:EditExistServiceDTO) {
     try {
+      const {_id,values } = data;
+      const editedService = await this.serviceRepository.update(_id, values);
+      return editedService;
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error();
+    }
+  }
+
+  async blockUser(data:BlockUserDTO) {
+    try {
+      const {userId} = data;
       const user = await this.userRepository.findById(userId);
       if (user) {
         user.isBlocked = !user?.isBlocked;
@@ -159,8 +192,9 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async blockMech(mechId: string) {
+  async blockMech(data:BlockMechDTO) {
     try {
+      const {mechId} = data;
       const mech = await this.mechRepository.getMechById(mechId);
       if (mech) {
         mech.isBlocked = !mech?.isBlocked;
@@ -175,38 +209,37 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-   async BlockService(_id:string){
-    try{
+  async BlockService(data:BlockServiceDTO) {
+    try {
+      const {_id} = data;
       const service = await this.serviceRepository.findById(_id);
-      if(service){
+      if (service) {
         service.isBlocked = !service?.isBlocked;
         await this.serviceRepository.save(service);
         return service;
       }
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
-
     }
-   }
+  }
 
-
-   async BlockDevice(_id:string){
-    try{
+  async BlockDevice(data:BlockDeviceDTO) {
+    try {
+      const {_id} = data;
       const service = await this.deviceRepository.findById(_id);
-      if(service){
+      if (service) {
         service.isBlocked = !service?.isBlocked;
         await this.deviceRepository.save(service);
         return service;
       }
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
-
     }
-   }
+  }
 
-   
-  async deleteUser(userId: string) {
+  async deleteUser(data:DeleteUserDTO) {
     try {
+      const {userId} = data
       const user = await this.userRepository.findById(userId);
       if (user) {
         user.isDeleted = !user?.isDeleted;
@@ -221,8 +254,9 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async deleteMech(mechId: string) {
+  async deleteMech(data:DeleteMechDTO) {
     try {
+      const {mechId} = data;
       const mech = await this.mechRepository.findById(mechId);
       if (mech) {
         mech.isDeleted = !mech?.isDeleted;
@@ -236,10 +270,10 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
       return null;
     }
   }
-  
 
-  async deleteService(serviceId: string) {
+  async deleteService(data:DeleteServiceDTO) {
     try {
+      const {serviceId} = data;
       const serivce = await this.serviceRepository.findById(serviceId);
       if (serivce) {
         serivce.isDeleted = !serivce?.isDeleted;
@@ -254,8 +288,9 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async deleteDevice(deviceId: string) {
+  async deleteDevice(data:DeleteDeviceDTO) {
     try {
+      const {deviceId} = data;
       const device = await this.deviceRepository.findById(deviceId);
       if (device) {
         device.isDeleted = !device?.isDeleted;
@@ -270,35 +305,36 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async isServiceExist(name:string) {
-    try{
-      const serviceExist = await this.serviceRepository.findOne({name:name});
-      if(serviceExist){
-        return serviceExist
-      }
-      return false ;
-    }catch(error){
-      console.log(error as Error);
-    }
-  }
-
-
-  async isDeviceExist(name:string) {
-    try{
-      const DeviceExist = await this.deviceRepository.findOne({name:name});
-      if( DeviceExist){
-        console.log("divice is exist 1111")
-        return  DeviceExist
-      }
-      return false ;
-    }catch(error){
-      console.log(error as Error);
-    }
-  }
-
-
-  async addNewServices(values: string) {
+  async isServiceExist(data:IsServiceExistDTO) {
     try {
+      const {name} = data;
+      const serviceExist = await this.serviceRepository.findOne({ name: name });
+      if (serviceExist) {
+        return serviceExist;
+      }
+      return false;
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+  async isDeviceExist(data:isDeviceExistDTO) {
+    try {
+      const {name } = data;
+      const DeviceExist = await this.deviceRepository.findOne({ name: name });
+      if (DeviceExist) {
+        console.log("divice is exist 1111");
+        return DeviceExist;
+      }
+      return false;
+    } catch (error) {
+      console.log(error as Error);
+    }
+  }
+
+  async addNewServices(data:AddNewServiceDTO) {
+    try {
+      const {values} = data;
       const addedService = await this.serviceRepository.addService(values);
       if (addedService) {
         return addedService;
@@ -310,9 +346,9 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-
-  async addNewDevice(name: string) {
+  async addNewDevice(data:AddNewDeviceDTO) {
     try {
+      const {name } = data;
       const addedDevice = await this.deviceRepository.addDevice(name);
       if (addedDevice) {
         return addedDevice;
@@ -324,8 +360,9 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async getMechCount(searchQuery: string): Promise<number> {
+  async getMechCount(data:GetMechCountDTO): Promise<number> {
     try {
+      const {searchQuery} = data;
       const regex = new RegExp(searchQuery, "i");
       return await this.mechRepository.getMechCount(regex);
     } catch (error) {
@@ -334,8 +371,9 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-  async getServiceCount(searchQuery: string): Promise<number> {
+  async getServiceCount(data:GetServiceCountDTO): Promise<number> {
     try {
+      const {searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       return await this.serviceRepository.countDocument(regex);
     } catch (error) {
@@ -344,9 +382,9 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
     }
   }
 
-
-  async getDeviceCount(searchQuery: string): Promise<number> {
+  async getDeviceCount(data:GetDeviceCountDTO): Promise<number> {
     try {
+      const {searchQuery} = data;
       const regex = new RegExp(searchQuery, "i");
       return await this.deviceRepository.countDocument(regex);
     } catch (error) {
