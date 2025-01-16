@@ -183,7 +183,7 @@ class adminService implements comService<AdminAuthResponse> {
       const { id } = data;
       console.log("reached the getService in the adminService");
       const result = await this.adminRepository.getService({id});
-      if (result) {
+      if (result){
         return result;
       }
     } catch (error) {

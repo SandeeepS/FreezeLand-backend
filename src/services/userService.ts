@@ -1,5 +1,4 @@
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import { UserInterface } from "../models/userModel";
 import UserRepository from "../repositories/userRepository";
 import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
 import { CreateJWT } from "../utils/generateToken";
@@ -7,14 +6,10 @@ import Encrypt from "../utils/comparePassword";
 import { comService } from "./comServices";
 import dotenv from "dotenv";
 import Cryptr from "cryptr";
-import User from "../interfaces/entityInterface/Iuser";
-import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
-import { Iconcern } from "../models/concernModel";
 import {
   UserSignUpDTO,
   SaveUserDTO,
   UserLoginDTO,
-  UserSignUpResponse,
   SaveUserResponse,
   NewDetailsDTO,
   UserLoginResponse,
@@ -33,7 +28,7 @@ import {
 } from "../interfaces/DTOs/User/IService.dto";
 dotenv.config();
 
-const { OK, UNAUTHORIZED, NOT_FOUND, INTERNAL_SERVER_ERROR } = STATUS_CODES;
+const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 class userService implements comService<UserResponseInterface> {
   constructor(
     private userRepository: UserRepository,
@@ -45,8 +40,8 @@ class userService implements comService<UserResponseInterface> {
     userData: UserSignUpDTO
   ): Promise<EmailExistCheckResponse | null> {
     try {
-      const {email} = userData;
-      return await this.userRepository.emailExistCheck({email});
+      const { email } = userData;
+      return await this.userRepository.emailExistCheck({ email });
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -104,9 +99,9 @@ class userService implements comService<UserResponseInterface> {
 
   async userLogin(userData: UserLoginDTO): Promise<UserLoginResponse> {
     try {
-      const {email} = userData
+      const { email } = userData;
       const user: EmailExistCheckDTO | null =
-        await this.userRepository.emailExistCheck({email});
+        await this.userRepository.emailExistCheck({ email });
       const token = this.createjwt.generateToken(user?.id);
       const refreshToken = this.createjwt.generateRefreshToken(user?.id);
       if (user && user.isBlocked) {
@@ -164,23 +159,25 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async getUserByEmail(data:GetUserByEmail): Promise<EmailExistCheckResponse | null> {
+  async getUserByEmail(
+    data: GetUserByEmail
+  ): Promise<EmailExistCheckResponse | null> {
     try {
-      const {email} = data;
-      return this.userRepository.emailExistCheck({email});
+      const { email } = data;
+      return this.userRepository.emailExistCheck({ email });
     } catch (error) {
       console.log("error occured while getUserEmail in the userService");
       throw error;
     }
   }
 
-  generateToken(data:GenerateTokenDTO): string | undefined {
-    const {payload} = data;
+  generateToken(data: GenerateTokenDTO): string | undefined {
+    const { payload } = data;
     if (payload) return this.createjwt.generateToken(payload);
   }
 
-  generateRefreshToken(data:GenerateRefreshToken): string | undefined {
-    const {payload}  = data;
+  generateRefreshToken(data: GenerateRefreshToken): string | undefined {
+    const { payload } = data;
     if (payload) return this.createjwt.generateRefreshToken(payload);
   }
 
@@ -219,14 +216,8 @@ class userService implements comService<UserResponseInterface> {
       } as const;
     } catch (error) {
       console.log(error as Error);
-      return {
-        status: INTERNAL_SERVER_ERROR,
-        data: {
-          success: false,
-          message: "An error occurred while retrieving user profile",
-        },
-      } as const;
-    }
+      throw new Error("Error while getting the user Profile ");
+        }
   }
 
   //getting the user registered complaint details
@@ -281,29 +272,29 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async AddUserAddress(data:AddUserAddressDTO) {
+  async AddUserAddress(data: AddUserAddressDTO) {
     try {
-      const {_id,values} = data;
-      return await this.userRepository.addAddress({_id, values});
+      const { _id, values } = data;
+      return await this.userRepository.addAddress({ _id, values });
     } catch (error) {
       console.log(error as Error);
     }
   }
 
-  async editAddress(data:EditAddressDTO) {
+  async editAddress(data: EditAddressDTO) {
     try {
-      const {_id,addressId,values} = data;
-      return await this.userRepository.editAddress({_id, addressId, values});
+      const { _id, addressId, values } = data;
+      return await this.userRepository.editAddress({ _id, addressId, values });
     } catch (error) {
       console.log(error as Error);
     }
   }
 
-  async setUserDefaultAddress(data:SetUserDefaultAddressDTO) {
+  async setUserDefaultAddress(data: SetUserDefaultAddressDTO) {
     try {
-      const {userId,addressId} = data;
+      const { userId, addressId } = data;
       console.log("entered in the userService ");
-      return await this.userRepository.setDefaultAddress({userId, addressId});
+      return await this.userRepository.setDefaultAddress({ userId, addressId });
     } catch (error) {
       console.log(error as Error);
     }

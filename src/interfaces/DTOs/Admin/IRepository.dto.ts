@@ -2,7 +2,7 @@ import { ObjectId, Types } from "mongoose";
 import { IServices } from "../../../models/serviceModel";
 
 export interface GetAdminByIdDTO {
-  id: string;
+  id: string 
 }
 
 export interface GetAdminByIdResponse {

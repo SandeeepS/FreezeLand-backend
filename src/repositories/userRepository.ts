@@ -1,7 +1,6 @@
 import userModel, { UserInterface } from "../models/userModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
-import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { Iconcern } from "../models/concernModel";
 import concernModel from "../models/concernModel";
 import { AddUserAddressDTO, AddUserAddressResponse, EditAddressDTO, EditUserDTO, EditUserResponse, EmailExistCheckDTO, EmailExistCheckResponse, RegisterServiceDTO, SetUserDefaultAddressDTO } from "../interfaces/DTOs/User/IRepository.dto";

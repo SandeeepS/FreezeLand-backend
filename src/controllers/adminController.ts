@@ -74,7 +74,7 @@ class adminController {
       });
       console.log("usersData from the admin controller is ", data);
       res.status(OK).json(data);
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       next(error);
     }
