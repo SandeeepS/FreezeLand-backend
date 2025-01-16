@@ -3,6 +3,7 @@ import { IServices } from "../../../models/serviceModel";
 import Device from "../../entityInterface/Idevice";
 import Mech from "../../entityInterface/Imech";
 import User from "../../entityInterface/Iuser";
+import Service from "../../entityInterface/Iservices";
 export interface AdminLoginDTO {
   email: string;
   password: string;
@@ -59,7 +60,7 @@ export interface GetServicesDTO {
 export interface GetServiceResponse {
   status: STATUS_CODES;
   data: {
-    services: IServices[];
+    services: Service[] | null;
     servicesCount: number;
   };
   message: string;
@@ -74,7 +75,7 @@ export interface GetDeviceDTO {
 export interface GetDeviceResponse {
   status: STATUS_CODES;
   data: {
-    devices: Device[];
+    devices: Device[] | null;
     devicesCount: number;
   };
   message: string;

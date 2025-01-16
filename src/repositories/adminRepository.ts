@@ -9,7 +9,6 @@ import MechRepository from "./mechRepository";
 import deviceModel, { IDevice } from "../models/deviceModel";
 import {
   AddNewDeviceDTO,
-  AddNewService,
   AddNewServiceDTO,
   BlockDeviceDTO,
   BlockMechDTO,

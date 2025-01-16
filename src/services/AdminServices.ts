@@ -86,7 +86,7 @@ class adminService implements comService<AdminAuthResponse> {
         limit,
         searchQuery,
       });
-      const usersCount = await this.adminRepository.getUserCount(searchQuery);
+      const usersCount = await this.adminRepository.getUserCount({searchQuery});
 
       return {
         status: STATUS_CODES.OK,
@@ -111,7 +111,7 @@ class adminService implements comService<AdminAuthResponse> {
         searchQuery,
       });
       console.log("list of mechanics is ", mechs);
-      const mechsCount = await this.adminRepository.getMechCount(searchQuery);
+      const mechsCount = await this.adminRepository.getMechCount({searchQuery});
 
       return {
         status: STATUS_CODES.OK,
@@ -124,25 +124,25 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-  async getServices(data: GetServicesDTO): Promise<GetServiceResponse> {
+  async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
     try {
       let { page, limit, searchQuery } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const services = await this.adminRepository.getAllServices(
+      const services = await this.adminRepository.getAllServices({
         page,
         limit,
-        searchQuery
+        searchQuery}
       );
-      console.log("list of services  is ", services);
-      const servicesCount = await this.adminRepository.getServiceCount(
-        searchQuery
+      console.log("list of services is ",services);
+      const servicesCount = await this.adminRepository.getServiceCount({
+        searchQuery}
       );
 
       return {
         status: STATUS_CODES.OK,
-        data: { services, servicesCount },
+        data: {services, servicesCount},
         message: "success",
       };
     } catch (error) {
@@ -157,14 +157,14 @@ class adminService implements comService<AdminAuthResponse> {
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const devices = await this.adminRepository.getAllDevices(
+      const devices = await this.adminRepository.getAllDevices({
         page,
         limit,
-        searchQuery
+        searchQuery}
       );
       console.log("list of device  is ", devices);
-      const devicesCount = await this.adminRepository.getDeviceCount(
-        searchQuery
+      const devicesCount = await this.adminRepository.getDeviceCount({
+        searchQuery}
       );
 
       return {
@@ -182,7 +182,7 @@ class adminService implements comService<AdminAuthResponse> {
     try {
       const { id } = data;
       console.log("reached the getService in the adminService");
-      const result = await this.adminRepository.getService(id);
+      const result = await this.adminRepository.getService({id});
       if (result) {
         return result;
       }
@@ -194,7 +194,7 @@ class adminService implements comService<AdminAuthResponse> {
   async blockUser(data: BlockUserDTO) {
     try {
       const { userId } = data;
-      return await this.adminRepository.blockUser(userId);
+      return await this.adminRepository.blockUser({userId});
     } catch (error) {
       console.log(error as Error);
     }
@@ -203,7 +203,7 @@ class adminService implements comService<AdminAuthResponse> {
   async blockMech(data: BlockMechDTO) {
     try {
       const { mechId } = data;
-      return await this.adminRepository.blockMech(mechId);
+      return await this.adminRepository.blockMech({mechId});
     } catch (error) {
       console.log(error as Error);
     }
@@ -212,7 +212,7 @@ class adminService implements comService<AdminAuthResponse> {
   async blockService(data: BlockServiceDTO) {
     try {
       const { _id } = data;
-      return await this.adminRepository.BlockService(_id);
+      return await this.adminRepository.BlockService({_id});
     } catch (error) {
       console.log(error as Error);
     }
@@ -221,7 +221,7 @@ class adminService implements comService<AdminAuthResponse> {
   async blockDevice(data: BlockDeviceDTO) {
     try {
       const { _id } = data;
-      return await this.adminRepository.BlockDevice(_id);
+      return await this.adminRepository.BlockDevice({_id});
     } catch (error) {
       console.log(error as Error);
     }
@@ -230,7 +230,7 @@ class adminService implements comService<AdminAuthResponse> {
   async deleteUser(data: DeleteUserDTO) {
     try {
       const { userId } = data;
-      return await this.adminRepository.deleteUser(userId);
+      return await this.adminRepository.deleteUser({userId});
     } catch (error) {
       console.log(error as Error);
     }
@@ -239,7 +239,7 @@ class adminService implements comService<AdminAuthResponse> {
   async deleteMech(data: DeleteMechDTO) {
     try {
       const { mechId } = data;
-      return await this.adminRepository.deleteMech(mechId);
+      return await this.adminRepository.deleteMech({mechId});
     } catch (error) {
       console.log(error as Error);
     }
@@ -248,7 +248,7 @@ class adminService implements comService<AdminAuthResponse> {
   async deleteService(data: DeleteServiceDTO) {
     try {
       const { serviceId } = data;
-      return await this.adminRepository.deleteService(serviceId);
+      return await this.adminRepository.deleteService({serviceId});
     } catch (error) {
       console.log(error as Error);
     }
@@ -257,7 +257,7 @@ class adminService implements comService<AdminAuthResponse> {
   async deleteDevice(data: DeleteDeviceDTO) {
     try {
       const { deviceId } = data;
-      return await this.adminRepository.deleteDevice(deviceId);
+      return await this.adminRepository.deleteDevice({deviceId});
     } catch (error) {
       console.log(error as Error);
     }
@@ -266,7 +266,7 @@ class adminService implements comService<AdminAuthResponse> {
   async isServiceExist(data: IsServiceExistDTO) {
     try {
       const { name } = data;
-      return await this.adminRepository.isServiceExist(name);
+      return await this.adminRepository.isServiceExist({name});
     } catch (error) {
       console.log(error as Error);
     }
@@ -275,7 +275,7 @@ class adminService implements comService<AdminAuthResponse> {
   async addService(data: AddserviceDTO) {
     try {
       const { values } = data;
-      return await this.adminRepository.addNewServices(values);
+      return await this.adminRepository.addNewServices({values});
     } catch (error) {
       console.log(error as Error);
     }
@@ -285,7 +285,7 @@ class adminService implements comService<AdminAuthResponse> {
   async addDevice(data: AddDeviceDTO) {
     try {
       const { name } = data;
-      return await this.adminRepository.addNewDevice(name);
+      return await this.adminRepository.addNewDevice({name});
     } catch (error) {
       console.log(error as Error);
     }
@@ -295,7 +295,7 @@ class adminService implements comService<AdminAuthResponse> {
   async isDeviceExist(data: isDeviceExistDTO) {
     try {
       const { name } = data;
-      return await this.adminRepository.isDeviceExist(name);
+      return await this.adminRepository.isDeviceExist({name});
     } catch (error) {
       console.log(error as Error);
     }
@@ -304,7 +304,7 @@ class adminService implements comService<AdminAuthResponse> {
   async editExistingService(data: EditExistServiceDTO) {
     try {
       const { _id, values } = data;
-      return await this.adminRepository.editExistService(_id, values);
+      return await this.adminRepository.editExistService({_id, values});
     } catch (error) {
       console.log(error as Error);
       throw error as Error;
