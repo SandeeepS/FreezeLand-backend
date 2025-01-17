@@ -187,7 +187,9 @@ class userService implements comService<UserResponseInterface> {
 
   async getProfile(data: GetProfileDTO): Promise<GetProfileResponse> {
     try {
-      if (!data.id)
+      const {id} = data
+      console.log("idddddddddddddddddddddd",id);
+      if (!id)
         return {
           status: UNAUTHORIZED,
           data: {

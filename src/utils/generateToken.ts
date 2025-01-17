@@ -28,7 +28,7 @@ export class CreateJWT {
       if (!secret) {
         throw new Error("JWT_SECRET is not defined");
       }
-
+      console.log("sercrete from the verifyToken ",secret);
       const decoded = jwt.verify(token, secret) as JwtPayload;
       return { success: true, decoded };
     } catch (error) {

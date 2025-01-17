@@ -119,7 +119,7 @@ export interface EmailExistCheckResponse {
 }
 
 export interface GetProfileDTO {
-  id: string | undefined;
+  id: string;
 }
 
 export interface GetProfileResponse {

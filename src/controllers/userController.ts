@@ -334,7 +334,8 @@ class userController {
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
       const { userId } = req.body;
-      const currentUser = await this.userServices.getProfile(userId);
+      console.log("userId from the getProfile in the useController",userId);
+      const currentUser = await this.userServices.getProfile({id:userId});
       if (!currentUser)
         res
           .status(UNAUTHORIZED)
