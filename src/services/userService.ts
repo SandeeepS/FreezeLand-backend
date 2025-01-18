@@ -198,7 +198,7 @@ class userService implements comService<UserResponseInterface> {
           },
         } as const;
       const user = await this.userRepository.getUserById(data.id);
-      if (!user) {
+      if (!user){
         return {
           status: NOT_FOUND,
           data: {
@@ -211,8 +211,8 @@ class userService implements comService<UserResponseInterface> {
       return {
         status: OK,
         data: {
-          success: true,
-          message: "User profile retrieved successfully",
+          success:true,
+          message:"User profile retrieved successfully",
           data: user,
         },
       } as const;
