@@ -59,7 +59,7 @@ app.get("/", (_req: Request, res: Response) => {
   res.status(200).send("Server is running");
 });
 
-app.use("/api", userRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/mech", mechRoutes);
 

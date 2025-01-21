@@ -333,7 +333,8 @@ class userController {
 
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId } = req.body;
+      const { userId } = req.params;
+
       console.log("userId from the getProfile in the useController",userId);
       const currentUser = await this.userServices.getProfile({id:userId});
       if (!currentUser)
@@ -388,6 +389,7 @@ class userController {
         "enterd in the addAddress fucniton in the backend userController"
       );
       const { values, _id } = req.body;
+      console.log("id from the userController while adding address is",_id);
       const check = AddressValidation(
         values.name,
         values.phone,

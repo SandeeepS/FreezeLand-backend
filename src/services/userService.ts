@@ -25,6 +25,7 @@ import {
   GenerateTokenDTO,
   GenerateRefreshToken,
   RegisterServiceDTO,
+  ReturnUserdataDTO,
 } from "../interfaces/DTOs/User/IService.dto";
 dotenv.config();
 
@@ -102,57 +103,77 @@ class userService implements comService<UserResponseInterface> {
       const { email } = userData;
       const user: EmailExistCheckDTO | null =
         await this.userRepository.emailExistCheck({ email });
-      const token = this.createjwt.generateToken(user?.id);
-      const refreshToken = this.createjwt.generateRefreshToken(user?.id);
-      if (user && user.isBlocked) {
-        return {
-          status: UNAUTHORIZED,
-          data: {
-            success: false,
-            message: "You have been blocked by the admin !",
-            token: token,
-            data: user,
-            refresh_token: refreshToken,
-          },
-        } as const;
+      
+      const returnUserData:ReturnUserdataDTO = {
+        _id: user?.id,
+        name: user?.name,
+        email: user?.email,
+        phone: user?.phone,
+        isDeleted: user?.isDeleted,
+        isBlocked: user?.isBlocked,
+        profile_picture: user?.profile_picture,
       }
-      if (user?.password && userData.password) {
-        console.log("enterd password is ", userData.password);
-        const passwordMatch = await this.encrypt.compare(
-          userData.password,
-          user.password as string
-        );
-        if (passwordMatch) {
-          const token = this.createjwt.generateToken(user.id);
-          const refreshToken = this.createjwt.generateRefreshToken(user.id);
-          return {
-            status: OK,
-            data: {
-              success: true,
-              message: "Authentication Successful !",
-              data: user,
-              userId: user.id,
-              token: token,
-              refresh_token: refreshToken,
-            },
-          } as const;
-        } else {
+      if (user?.id) {
+        const token = this.createjwt.generateToken(user.id);
+        const refreshToken = this.createjwt.generateRefreshToken(user.id);
+        if (user && user.isBlocked) {
           return {
             status: UNAUTHORIZED,
             data: {
               success: false,
-              message: "Authentication failed...",
+              message: "You have been blocked by the admin !",
+              token: token,
+              data: returnUserData,
+              refresh_token: refreshToken,
             },
           } as const;
         }
+        if (user?.password && userData.password) {
+          console.log("enterd password is ", userData.password);
+          const passwordMatch = await this.encrypt.compare(
+            userData.password,
+            user.password as string
+          );
+          if (passwordMatch) {
+            const token = this.createjwt.generateToken(user.id);
+            const refreshToken = this.createjwt.generateRefreshToken(user.id);
+            return {
+              status: OK,
+              data: {
+                success: true,
+                message: "Authentication Successful !",
+                data: returnUserData,
+                userId: user.id,
+                token: token,
+                refresh_token: refreshToken,
+              },
+            } as const;
+          } else {
+            return {
+              status: UNAUTHORIZED,
+              data: {
+                success: false,
+                message: "Authentication failed...",
+              },
+            } as const;
+          }
+        }
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Invalid email or password.",
+          },
+        } as const;
+      }else{
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Authentication failed...",
+          },
+        } as const;
       }
-      return {
-        status: UNAUTHORIZED,
-        data: {
-          success: false,
-          message: "Invalid email or password.",
-        },
-      } as const;
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -187,8 +208,8 @@ class userService implements comService<UserResponseInterface> {
 
   async getProfile(data: GetProfileDTO): Promise<GetProfileResponse> {
     try {
-      const {id} = data
-      console.log("idddddddddddddddddddddd",id);
+      const { id } = data;
+      console.log("idddddddddddddddddddddd", id);
       if (!id)
         return {
           status: UNAUTHORIZED,
@@ -198,7 +219,7 @@ class userService implements comService<UserResponseInterface> {
           },
         } as const;
       const user = await this.userRepository.getUserById(data.id);
-      if (!user){
+      if (!user) {
         return {
           status: NOT_FOUND,
           data: {
@@ -211,15 +232,15 @@ class userService implements comService<UserResponseInterface> {
       return {
         status: OK,
         data: {
-          success:true,
-          message:"User profile retrieved successfully",
+          success: true,
+          message: "User profile retrieved successfully",
           data: user,
         },
       } as const;
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error while getting the user Profile ");
-        }
+    }
   }
 
   //getting the user registered complaint details
@@ -277,6 +298,7 @@ class userService implements comService<UserResponseInterface> {
   async AddUserAddress(data: AddUserAddressDTO) {
     try {
       const { _id, values } = data;
+      console.log("id from the addUserAddress in the user service is ",_id);
       return await this.userRepository.addAddress({ _id, values });
     } catch (error) {
       console.log(error as Error);

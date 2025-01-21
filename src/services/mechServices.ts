@@ -97,7 +97,7 @@ class mechService implements comService<MechResponseInterface> {
       };
       console.log("new Encypted password with data is ", newDetails);
       const mech = await this.mechRepository.saveMechanic(newDetails);
-      if (mech) {
+      if (mech?.id) {
         const token = this.createjwt.generateToken(mech?.id);
         const refresh_token = this.createjwt.generateRefreshToken(mech?.id);
         console.log("token is ", token);
@@ -113,6 +113,14 @@ class mechService implements comService<MechResponseInterface> {
             refresh_token,
           },
         };
+      }else{
+        return {
+          status:STATUS_CODES.NOT_FOUND,
+          data:{
+            success : false,
+            message:"failed to login (error from the saveMech in mech Services)"
+          }
+        }
       }
     } catch (error) {
       console.log(error as Error);

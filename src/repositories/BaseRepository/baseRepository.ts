@@ -108,12 +108,17 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  async updateAddress(id: string, qr: Partial<T>): Promise<T | null> {
+  async updateAddress(_id: string, qr: Partial<T>): Promise<T | null> {
     try {
-      console.log("id", id);
+      console.log("id is ", _id);
 
       console.log("qr", qr);
-      const objectId = new ObjectId(id);
+
+      if (!ObjectId.isValid(_id)) {
+        throw new Error("Invalid ID format");
+      }
+
+      const objectId = new ObjectId(_id);
       return (await this.model.findByIdAndUpdate(
         objectId,
         { $push: qr },

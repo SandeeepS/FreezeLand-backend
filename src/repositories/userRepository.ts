@@ -139,6 +139,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
   ): Promise<AddUserAddressResponse | null> {
     try {
       const {_id,values} = data;
+      console.log("id from the userRepository while add addresss is ", _id);
       console.log("new address from the userRepository is ", values);
       const qr = { address: [values] };
       const addedAddress = await this.updateAddress(_id, qr);

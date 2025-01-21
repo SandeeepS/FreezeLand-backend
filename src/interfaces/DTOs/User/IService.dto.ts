@@ -69,6 +69,16 @@ export interface UserLoginDTO {
   password: string;
 }
 
+export interface ReturnUserdataDTO{
+  _id: string | undefined;
+  name: string | undefined;
+  email: string | undefined;
+  phone: number | undefined;
+  isDeleted: boolean | undefined;
+  isBlocked: boolean | undefined;
+  profile_picture: string | undefined;
+}
+
 export interface NewDetailsDTO {
   name: string;
   password: string;
