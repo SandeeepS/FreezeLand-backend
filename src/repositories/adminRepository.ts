@@ -334,6 +334,7 @@ class AdminRepository extends BaseRepository<AdminInterface & Document> {
   async addNewServices(data:AddNewServiceDTO) {
     try {
       const {values} = data;
+      console.log("values from the serviceRepository is ", values);
       const addedService = await this.serviceRepository.addService(values);
       if (addedService) {
         return addedService;

@@ -288,6 +288,7 @@ class adminService implements comService<AdminAuthResponse> {
   async addService(data: AddserviceDTO) {
     try {
       const { values } = data;
+      console.log("values from the service is ", values);
       return await this.adminRepository.addNewServices({ values });
     } catch (error) {
       console.log(error as Error);

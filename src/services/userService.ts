@@ -185,6 +185,7 @@ class userService implements comService<UserResponseInterface> {
   ): Promise<EmailExistCheckResponse | null> {
     try {
       const { email } = data;
+      console.log("email from the userSercice " ,email);
       return this.userRepository.emailExistCheck({ email });
     } catch (error) {
       console.log("error occured while getUserEmail in the userService");

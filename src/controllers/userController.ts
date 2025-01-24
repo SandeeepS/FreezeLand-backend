@@ -145,10 +145,11 @@ class userController {
     next: NextFunction
   ): Promise<void> {
     const { name, email, googlePhotoUrl } = req.body;
+    console.log("name and email from the google login", name, email);
     const accessTokenMaxAge = 5 * 60 * 1000;
     const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
     try {
-      const user = await this.userServices.getUserByEmail(email);
+      const user = await this.userServices.getUserByEmail({email});
       if (user) {
         if (user.isBlocked) {
           res.status(UNAUTHORIZED).json({
