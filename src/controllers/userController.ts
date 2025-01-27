@@ -88,11 +88,11 @@ class userController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void> {
+  ): Promise<void>{
     try {
-      const { email, password }: { email: string; password: string } = req.body;
+      const { email, password }:{ email: string; password: string } = req.body;
       console.log(
-        "email and password is from the controllers for login ",
+        "email and password is from the controllers for login",
         email,
         password
       );
@@ -110,7 +110,7 @@ class userController {
           typeof loginStatus.data == "object" &&
           "token" in loginStatus.data
         ) {
-          if (!loginStatus.data.success) {
+          if (!loginStatus.data.success){
             res
               .status(UNAUTHORIZED)
               .json({ success: false, message: loginStatus.data.message });
@@ -122,10 +122,10 @@ class userController {
           const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
           res
             .status(loginStatus.status)
-            .cookie("access_token", access_token, {
-              maxAge: accessTokenMaxAge,
+            .cookie("access_token",access_token,{
+              maxAge: accessTokenMaxAge, 
             })
-            .cookie("refresh_token", refresh_token, {
+            .cookie("refresh_token", refresh_token,{
               maxAge: refreshTokenMaxAge,
             })
             .json(loginStatus);
