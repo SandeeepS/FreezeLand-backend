@@ -30,6 +30,7 @@ userRouter.put('/setDefaultAddress',async(req:Request,res:Response,next:NextFunc
 userRouter.put('/editAddress', async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 userRouter.post('/registerService',async(req:Request,res:Response,next:NextFunction) => await controller.registerService(req,res,next));
 userRouter.get('/getAllRegisteredService',async(req:Request,res:Response,next:NextFunction) => await controller.getAllRegisteredService(req,res,next));
+userRouter.get('/getImageUrl',async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 
 
 export default userRouter;

@@ -3,8 +3,7 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
 import S3Client from "../awsConfig";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import {
   AddNewServiceValidation,
@@ -181,37 +180,46 @@ class adminController {
   }
 
   async getPresignedUrl(req: Request, res: Response, next: NextFunction) {
-    try{
-      const {fileName,fileType } = req.body;
-      console.log("file from the front end is ",fileName,fileType);
-      const imageName =  uuidv4() + "-" + fileName; ; // Generate a unique name for the image
+    try {
+      const { fileName, fileType } = req.query as { 
+        fileName: string; 
+        fileType: string 
+      };      console.log("file from the front end is ", fileName, fileType);
+
+      if (!fileName || !fileType) {
+        return res
+          .status(400)
+          .json({ success: false, message: "File name and type are required" });
+      }
+
+      const imageName = uuidv4() + "-" + fileName; // Generate a unique name for the image
       const bucketName = process.env.S3_BUCKET_NAME;
       const region = process.env.S3_REGION;
 
-      if (!bucketName || !region) {
-        throw new Error("AWS_S3_BUCKET_NAME or AWS_REGION is not defined in environment variables");
+      if (!bucketName || !region){
+        throw new Error(
+          "AWS_S3_BUCKET_NAME or AWS_REGION is not defined in environment variables"
+        );
       }
 
       const s3Params = {
         Bucket: bucketName,
         Key: `ServiceImages/${imageName}`,
-        ContentType: 'image/jpeg',
+        expires:7200,
+        ContentType: fileType,
       };
-
+      const key = `ServiceImages/${imageName}`
       const command = new PutObjectCommand(s3Params);
-      const uploadURL = await getSignedUrl(S3Client, command, { expiresIn: 60 });
+      const uploadURL = await getSignedUrl(S3Client, command);
       console.log("Presigned URL: ", uploadURL);
 
       // Send the presigned URL to the client
-      return res.status(200).json({ success: true, uploadURL, imageName });
-
-
-    }catch(error){
+      return res.status(200).json({ success: true, uploadURL, imageName ,key });
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
   }
-
 
   async addNewServices(req: Request, res: Response, next: NextFunction) {
     try {
@@ -223,8 +231,7 @@ class adminController {
 
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
-
-        //comented code is used to upoload to firebase 
+        //comented code is used to upoload to firebase
         // const storageRef = ref(storage, `ServiceImages/${values.name}`); // imageName can be any unique identifier
         // // Assume `base64String` is your Base64 image string, e.g., "data:image/jpeg;base64,..."
         // await uploadString(storageRef, values.image, "data_url");
@@ -232,28 +239,9 @@ class adminController {
         // console.log("the url from the firebase is ", downloadURL);
         // values.image = downloadURL;
 
-        //below code is used to upload to the s3 bucket 
-        const imageName = `${uuidv4()}.jpg`; 
-        const s3Params = {
-          Bucket: process.env.S3_BUCKET_NAME,
-          Key: `ServiceImages/${imageName}`,
-          ContentType: 'image/jpeg',
-        };
-
-        const command = new PutObjectCommand(s3Params);
-        const uploadURL = await getSignedUrl(S3Client, command, { expiresIn: 60 });
-        console.log("Presigned URL: ", uploadURL);
-
-        // Here you would send the presigned URL to the client and let the client upload the image
-        // For this example, let's assume the client has uploaded the image and we have the image URL
-
-        const imageUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_REGION}.amazonaws.com/ServiceImages/${imageName}`;
-        values.image = imageUrl;
-        console.log("image url is ssssss",values.image);
-        //lets check the serviec is allready present in the service collection for avoiding duplication
         const isExist = await this.adminService.isServiceExist(values.name);
         if (!isExist) {
-          const result = await this.adminService.addService({values});
+          const result = await this.adminService.addService({ values });
           if (result) {
             res.json({
               success: true,

@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IServices extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
-  image: string;
+  imageKey: string;
   discription: string;
   createdAt: Date;
   isBlocked: boolean;
@@ -15,7 +15,7 @@ const serviceSchema: Schema<IServices> = new Schema({
     type: String,
     required: true,
   },
-  image: {
+  imageKey: {
     type: String,
     required: false,
   },

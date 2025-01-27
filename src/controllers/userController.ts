@@ -2,6 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import S3Client from "../awsConfig";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
   STATUS_CODES;
 import {
@@ -10,7 +14,10 @@ import {
   SignUpValidation,
 } from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
-import { EditUserDTO, SaveUserResponse } from "../interfaces/DTOs/User/IController.dto";
+import {
+  EditUserDTO,
+  SaveUserResponse,
+} from "../interfaces/DTOs/User/IController.dto";
 
 class userController {
   constructor(private userServices: userService) {}
@@ -149,7 +156,7 @@ class userController {
     const accessTokenMaxAge = 5 * 60 * 1000;
     const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
     try {
-      const user = await this.userServices.getUserByEmail({email});
+      const user = await this.userServices.getUserByEmail({ email });
       if (user) {
         if (user.isBlocked) {
           res.status(UNAUTHORIZED).json({
@@ -158,8 +165,10 @@ class userController {
           });
           // throw new Error('user has been blocked by admin...');
         } else {
-          const token = this.userServices.generateToken({payload:user.id});
-          const refreshToken = this.userServices.generateRefreshToken({payload:user.id});
+          const token = this.userServices.generateToken({ payload: user.id });
+          const refreshToken = this.userServices.generateRefreshToken({
+            payload: user.id,
+          });
           const data = {
             success: true,
             message: "Success",
@@ -336,8 +345,8 @@ class userController {
     try {
       const { userId } = req.params;
 
-      console.log("userId from the getProfile in the useController",userId);
-      const currentUser = await this.userServices.getProfile({id:userId});
+      console.log("userId from the getProfile in the useController", userId);
+      const currentUser = await this.userServices.getProfile({ id: userId });
       if (!currentUser)
         res
           .status(UNAUTHORIZED)
@@ -357,10 +366,14 @@ class userController {
   async editUser(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
-      const { _id, name, phone } : EditUserDTO = req.body;
+      const { _id, name, phone }: EditUserDTO = req.body;
       const check = EditUserDetailsValidator(name, phone);
       if (check) {
-        const editedUser = await this.userServices.editUser({_id, name, phone});
+        const editedUser = await this.userServices.editUser({
+          _id,
+          name,
+          phone,
+        });
         console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
         if (editedUser) {
           res
@@ -390,7 +403,7 @@ class userController {
         "enterd in the addAddress fucniton in the backend userController"
       );
       const { values, _id } = req.body;
-      console.log("id from the userController while adding address is",_id);
+      console.log("id from the userController while adding address is", _id);
       const check = AddressValidation(
         values.name,
         values.phone,
@@ -403,8 +416,8 @@ class userController {
       if (check) {
         const addedAddress = await this.userServices.AddUserAddress({
           _id,
-          values}
-        );
+          values,
+        });
         if (addedAddress) {
           res.status(OK).json({
             success: true,
@@ -447,9 +460,8 @@ class userController {
         const editedAddress = await this.userServices.editAddress({
           _id,
           addressId,
-          values
-        }
-        );
+          values,
+        });
         if (editedAddress) {
           res.status(OK).json({
             success: true,
@@ -481,7 +493,7 @@ class userController {
       const { userId, addressId } = req.body;
       console.log("userId and addressId is ", userId, addressId);
       const updatedDefaultAddress =
-        await this.userServices.setUserDefaultAddress({userId, addressId});
+        await this.userServices.setUserDefaultAddress({ userId, addressId });
       if (updatedDefaultAddress) {
         res.status(OK).json({
           success: true,
@@ -559,7 +571,27 @@ class userController {
     }
   }
 
-  async logout(req: Request, res: Response, next: NextFunction) {
+  async getImageUrl(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { imageKey } = req.query;
+      console.log("imageKey from the frontend is ", imageKey);
+      if (typeof imageKey !== "string") {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid image key" });
+      }
+
+      const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: imageKey,
+      });
+      const url = await getSignedUrl(S3Client, command, { expiresIn: 3600 });
+      res.status(200).json({ success: true, url });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async logout(req: Request, res: Response, next: NextFunction){
     try {
       res
         .cookie("access_token", "", {
@@ -570,7 +602,7 @@ class userController {
         });
       res
         .status(200)
-        .json({ success: true, message: "user logout - clearing cookie" });
+        .json({ success: true, message: "user logout - clearing cookie"});
     } catch (err) {
       console.log(err);
       next(err);

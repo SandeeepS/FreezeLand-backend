@@ -79,7 +79,7 @@ export interface GetAllServicesDTO {
 export interface GetAllServiceResponse {
   id?: Types.ObjectId;
   name: string;
-  image: string;
+  imageKey: string;
   discription: string;
   createdAt: Date;
   isBlocked: boolean;
