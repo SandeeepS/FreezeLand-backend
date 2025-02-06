@@ -18,6 +18,7 @@ mechRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) 
 mechRouter.post('/forgot-password',async(req:Request,res:Response,next:NextFunction) => await controller.forgotResentOtpMech(req,res,next));
 mechRouter.post('/verify-forgot-otp',async(req:Request,res:Response,next:NextFunction) => await controller.VerifyForgotOtpMech(req,res,next));
 mechRouter.put('/update-newpassword',async(req:Request,res:Response,next:NextFunction) => await controller.updateNewPasswordMech(req,res,next));
+mechRouter.get('/getAllMechanics',async(req:Request,res:Response,next:NextFunction) => await controller.getAllMechanics(req,res,next));
 mechRouter.get('/logout',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogout(req,res,next));
 
 export default mechRouter;

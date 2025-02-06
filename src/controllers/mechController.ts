@@ -237,6 +237,24 @@ class mechController {
     }
   }
 
+  async getAllMechanics(req:Request,res:Response,next:NextFunction){
+    try{
+      console.log("reached the getAllService function in the admin controller");
+      const page = parseInt(req.query.page as string);
+      const limit = parseInt(req.query.limit as string);
+      const searchQuery = req.query.searchQuery as string;
+
+      const data = await this.mechServices.getAllMechanics({
+        page,limit,searchQuery
+      })
+      console.log("listed mechanic from the database is in the mechcontroller is ",data);
+      res.status(OK).json(data);
+    }catch(error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
       res

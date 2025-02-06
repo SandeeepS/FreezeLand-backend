@@ -2,7 +2,7 @@ import { ObjectId, Types } from "mongoose";
 import { IServices } from "../../../models/serviceModel";
 
 export interface GetAdminByIdDTO {
-  id: string 
+  id: string;
 }
 
 export interface GetAdminByIdResponse {
@@ -10,7 +10,7 @@ export interface GetAdminByIdResponse {
   name: string;
   email: string;
   password: string;
-  role:string;
+  role: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -68,6 +68,8 @@ export interface GetMechListResponse {
   email: string;
   password: string;
   phone: number;
+  role: string;
+  isVerified: boolean;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -101,78 +103,74 @@ export interface GetAllDevicesResponse {
 }
 
 export interface GetUserCountDTO {
-  searchQuery : string;
+  searchQuery: string;
 }
 
-export interface GetServiceDTO{
-   id:string;
+export interface GetServiceDTO {
+  id: string;
 }
 
 export interface EditExistServiceDTO {
-  _id:string;
-  values:IServices
+  _id: string;
+  values: IServices;
 }
 
-export interface BlockUserDTO{
-  userId:string;
+export interface BlockUserDTO {
+  userId: string;
 }
 
 export interface BlockMechDTO {
-  mechId:string;
+  mechId: string;
 }
 
-export interface BlockServiceDTO{
-  _id:string;
+export interface BlockServiceDTO {
+  _id: string;
 }
 
-export interface BlockDeviceDTO{
-  _id:string;
+export interface BlockDeviceDTO {
+  _id: string;
 }
 
 export interface DeleteUserDTO {
-  userId:string;
+  userId: string;
 }
 
 export interface DeleteMechDTO {
-  mechId:string;
+  mechId: string;
 }
 
 export interface DeleteServiceDTO {
-  serviceId :string
+  serviceId: string;
 }
 
-export interface DeleteDeviceDTO{
-  deviceId : string;
+export interface DeleteDeviceDTO {
+  deviceId: string;
 }
 
 export interface IsServiceExistDTO {
-  name:string ;
+  name: string;
 }
 
 export interface IsDeviceExistDTO {
-  name:string;
+  name: string;
 }
 
-export interface AddNewServiceDTO{
-  values:string;
+export interface AddNewServiceDTO {
+  values: string;
 }
 
-export interface AddNewDeviceDTO{
-  name :string;
+export interface AddNewDeviceDTO {
+  name: string;
 }
 
 export interface GetMechCountDTO {
-  searchQuery:string;
+  searchQuery: string;
 }
 
-export interface GetServiceCountDTO{
-  searchQuery:string;
+export interface GetServiceCountDTO {
+  searchQuery: string;
 }
 
-export interface GetDeviceCountDTO{
-  searchQuery:string;
+export interface GetDeviceCountDTO {
+  searchQuery: string;
 }
-
-
-
-

@@ -7,6 +7,8 @@ import { comService } from "./comServices";
 import { MechResponseInterface } from "../interfaces/serviceInterfaces/InMechService";
 import Cryptr from "cryptr";
 import {
+  GetAllMechanicResponse,
+  GetAllMechanicsDTO,
   MechLoginDTO,
   MechLoginResponse,
   SaveMechDTO,
@@ -197,6 +199,33 @@ class mechService implements comService<MechResponseInterface> {
     } catch (error) {
       console.log(error as Error);
       throw error;
+    }
+  }
+
+  async getAllMechanics(
+    data: GetAllMechanicsDTO
+  ): Promise<GetAllMechanicResponse | null> {
+    try {
+      const { page, limit, searchQuery } = data;
+      const regex = new RegExp(searchQuery, "i");
+
+      const mech = await this.mechRepository.getMechList(
+        page,
+        limit,
+        regex,
+      );
+      console.log("list of all mechanics is from the mechService is ",mech);
+      const  mechCount = await this.mechRepository.getMechCount(regex);
+      return {
+        status:STATUS_CODES.OK,
+        data:{mech,mechCount},
+        message:"success",
+      }
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error(
+        "Error occured while getting registered mechanic in the mechService "
+      );
     }
   }
 
