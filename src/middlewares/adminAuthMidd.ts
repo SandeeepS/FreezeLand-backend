@@ -22,12 +22,10 @@ const adminAuth = (allowedRoles: string[]) => {
     try {
       const token = req.cookies.admin_access_token;
       if (!token)
-        return res
-          .status(401)
-          .json({
-            success: false,
-            message: "Unauthorized - No token provided",
-          });
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized - No token provided",
+        });
 
       const decoded = jwt.verifyToken(token);
 
