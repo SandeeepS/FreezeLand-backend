@@ -6,15 +6,12 @@ import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
 import adminAuth from "../middlewares/adminAuthMidd";
 
-
 const adminRouter = express.Router();
-
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT()
 const adminReopsitory = new AdminRepository();
 const adminService: AdminService = new AdminService(adminReopsitory, encrypt, createjwt);
 const controller = new adminController(adminService);
-
 
 adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => controller.adminLogin(req, res,next));
 adminRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => controller.adminLogout(req, res,next));
@@ -35,7 +32,5 @@ adminRouter.put('/listUnlistDevices/:deviceId',adminAuth(["admin"]),async(req:Re
 adminRouter.put('/deleteService/:serviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.deleteService(req,res,next));
 adminRouter.put('/deleteDevice/:deviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.deleteDevice(req,res,next));
 adminRouter.put('/editExistService',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.editExistingService(req,res,next));
-
-
 
 export default adminRouter;

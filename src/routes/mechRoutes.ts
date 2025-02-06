@@ -5,7 +5,6 @@ import mechController from '../controllers/mechController';
 import { CreateJWT } from '../utils/generateToken';
 import mechService from '../services/mechServices';
 
-
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const mechRouter:Router = express.Router();
@@ -20,6 +19,5 @@ mechRouter.post('/forgot-password',async(req:Request,res:Response,next:NextFunct
 mechRouter.post('/verify-forgot-otp',async(req:Request,res:Response,next:NextFunction) => await controller.VerifyForgotOtpMech(req,res,next));
 mechRouter.put('/update-newpassword',async(req:Request,res:Response,next:NextFunction) => await controller.updateNewPasswordMech(req,res,next));
 mechRouter.get('/logout',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogout(req,res,next));
-
 
 export default mechRouter;
