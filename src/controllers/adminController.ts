@@ -29,6 +29,7 @@ class adminController {
         const loginStatus = await this.adminService.adminLogin({
           email,
           password,
+          role: "admin",
         });
 
         if (!loginStatus.data.success) {

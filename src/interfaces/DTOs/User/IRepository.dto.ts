@@ -6,12 +6,13 @@ export interface EmailExistCheckDTO {
 }
 
 export interface EmailExistCheckResponse{
-    id?: string;
+    id: string;
     name: string;
     password: string;
     email: string;
     phone: number;
     profile_picture: string;
+    role: string;
     address: {
       name: string;
       phone: number;
@@ -53,6 +54,23 @@ export interface EditUserResponse{
     isDeleted: boolean;
 }
 
+export interface GetAllServicesDTO {
+  page: number;
+  limit: number;
+  searchQuery: string;
+}
+
+
+export interface GetAllServiceResponse {
+  id?: Types.ObjectId;
+  name: string;
+  imageKey: string;
+  discription: string;
+  createdAt: Date;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
 export interface AddUserAddressDTO {
   _id:string;
   values: AddAddress;
@@ -91,3 +109,6 @@ export interface RegisterServiceDTO {
     isDeleted: boolean;
 }
 
+export interface GetServiceCountDTO{
+  searchQuery:string;
+}

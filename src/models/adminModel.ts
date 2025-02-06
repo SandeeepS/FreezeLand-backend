@@ -5,12 +5,12 @@ export interface AdminInterface extends Document {
   name: string;
   email: string;
   password: string;
+  role: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
 
 const adminSchema: Schema<AdminInterface> = new Schema({
-
   name: {
     type: String,
     required: true,
@@ -21,11 +21,15 @@ const adminSchema: Schema<AdminInterface> = new Schema({
     unique: true,
   },
 
+  role: {
+    type: String,
+    default: "admin",
+  },
+
   password: {
     type: String,
     required: true,
   },
-
 });
 
 const AdminModel: Model<AdminInterface> = mongoose.model<AdminInterface>(

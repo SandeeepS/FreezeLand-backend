@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import User from "../../entityInterface/Iuser";
 
 export interface UserSignUpDTO{
@@ -11,10 +10,7 @@ export interface UserSignUpDTO{
       
 }
 
-export interface UserResponseDTO{
-    
-    
-}
+
 
 export interface SaveUserDTO {
     name:string;

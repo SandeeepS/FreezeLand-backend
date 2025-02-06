@@ -88,9 +88,9 @@ class userController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void>{
+  ): Promise<void> {
     try {
-      const { email, password }:{ email: string; password: string } = req.body;
+      const { email, password }: { email: string; password: string } = req.body;
       console.log(
         "email and password is from the controllers for login",
         email,
@@ -110,7 +110,7 @@ class userController {
           typeof loginStatus.data == "object" &&
           "token" in loginStatus.data
         ) {
-          if (!loginStatus.data.success){
+          if (!loginStatus.data.success) {
             res
               .status(UNAUTHORIZED)
               .json({ success: false, message: loginStatus.data.message });
@@ -122,11 +122,17 @@ class userController {
           const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
           res
             .status(loginStatus.status)
-            .cookie("access_token",access_token,{
-              maxAge: accessTokenMaxAge, 
+            .cookie("access_token", access_token, {
+              maxAge: accessTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
             })
-            .cookie("refresh_token", refresh_token,{
+            .cookie("refresh_token", refresh_token, {
               maxAge: refreshTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
             })
             .json(loginStatus);
         } else {
@@ -165,7 +171,10 @@ class userController {
           });
           // throw new Error('user has been blocked by admin...');
         } else {
-          const token = this.userServices.generateToken({ payload: user.id });
+          const token = this.userServices.generateToken(
+            { payload: user.id },
+            user.role
+          );
           const refreshToken = this.userServices.generateRefreshToken({
             payload: user.id,
           });
@@ -534,6 +543,33 @@ class userController {
     }
   }
 
+  //getting all service which is provided by the website.
+  async getAllServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllServices funciton in the admin controller"
+      );
+      const page = parseInt(req.query.page as string);
+      const limit = parseInt(req.query.limit as string);
+      const searchQuery = req.query.searchQuery as string | undefined;
+      console.log(" page is ", page);
+      console.log("limit is ", limit);
+      const data = await this.userServices.getServices({
+        page,
+        limit,
+        searchQuery,
+      });
+      console.log(
+        "listed services from the database is in the admin controller is",
+        data
+      );
+      res.status(OK).json(data);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   //getting all the registered complaints from the user
   async getAllRegisteredService(
     req: Request,
@@ -591,7 +627,7 @@ class userController {
       next(error);
     }
   }
-  async logout(req: Request, res: Response, next: NextFunction){
+  async logout(req: Request, res: Response, next: NextFunction) {
     try {
       res
         .cookie("access_token", "", {
@@ -602,7 +638,7 @@ class userController {
         });
       res
         .status(200)
-        .json({ success: true, message: "user logout - clearing cookie"});
+        .json({ success: true, message: "user logout - clearing cookie" });
     } catch (err) {
       console.log(err);
       next(err);

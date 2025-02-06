@@ -16,6 +16,7 @@ export interface SaveMechDTO {
     email: string;
     password: string;
     phone: number;
+    role: string;
     isBlocked?:boolean;
     isDeleted?:boolean;
 }

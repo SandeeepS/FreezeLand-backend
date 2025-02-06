@@ -9,7 +9,6 @@ import mechRoutes from "./routes/mechRoutes";
 import logger from "./utils/logger";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import AWS from "aws-sdk";
 
 dotenv.config();
 const morganFormat = ":method :url :status :response-time ms";

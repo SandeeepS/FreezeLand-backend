@@ -17,35 +17,45 @@ declare global {
 }
 /* eslint-enable @typescript-eslint/no-namespace */
 
-const adminAuth = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const token = req.cookies.admin_access_token;
-    if (!token)
+const adminAuth = (allowedRoles: string[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = req.cookies.admin_access_token;
+      if (!token)
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message: "Unauthorized - No token provided",
+          });
+
+      const decoded = jwt.verifyToken(token);
+
+      if (decoded) {
+        const admin = await adminRepository.getAdminById({
+          id: decoded.toString(),
+        });
+        console.log("admin is present ", admin);
+        req.adminId = decoded.toString();
+        // Check user role
+        if (admin != null && !allowedRoles.includes(admin.role)) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+
+        next();
+      } else {
+        return res
+          .status(401)
+          .json({ success: false, message: "Unauthorized - Invalid token" });
+      }
+    } catch (err) {
+      console.log(err);
+      console.log("error is in the catch block!");
       return res
         .status(401)
-        .json({ success: false, message: "Unauthorized - No token provided" });
-
-    const decoded = jwt.verifyToken(token);
-
-    if (decoded) {
-      const admin = await adminRepository.getAdminById({
-        id: decoded.toString(),
-      });
-      console.log("admin is present ", admin);
-      req.adminId = decoded.toString();
-      next();
-    } else {
-      return res
-        .status(401)
-        .json({ success: false, message: "Unauthorized - Invalid token" });
+        .send({ success: false, message: "Unauthorized - Invalid token" });
     }
-  } catch (err) {
-    console.log(err);
-    console.log("error is in the catch block!");
-    return res
-      .status(401)
-      .send({ success: false, message: "Unauthorized - Invalid token" });
-  }
+  };
 };
 
 export default adminAuth;

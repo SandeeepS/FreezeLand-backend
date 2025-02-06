@@ -94,12 +94,13 @@ class mechService implements comService<MechResponseInterface> {
         password: newPassword,
         email: email,
         phone: phone,
+        role: "mechanic",
       };
       console.log("new Encypted password with data is ", newDetails);
       const mech = await this.mechRepository.saveMechanic(newDetails);
       if (mech?.id) {
-        const token = this.createjwt.generateToken(mech?.id);
-        const refresh_token = this.createjwt.generateRefreshToken(mech?.id);
+        const token = this.createjwt.generateToken(mech.id, mech.role);
+        const refresh_token = this.createjwt.generateRefreshToken(mech.id);
         console.log("token is ", token);
         console.log("refresh", refresh_token);
         return {
@@ -113,14 +114,15 @@ class mechService implements comService<MechResponseInterface> {
             refresh_token,
           },
         };
-      }else{
+      } else {
         return {
-          status:STATUS_CODES.NOT_FOUND,
-          data:{
-            success : false,
-            message:"failed to login (error from the saveMech in mech Services)"
-          }
-        }
+          status: STATUS_CODES.NOT_FOUND,
+          data: {
+            success: false,
+            message:
+              "failed to login (error from the saveMech in mech Services)",
+          },
+        };
       }
     } catch (error) {
       console.log(error as Error);
@@ -133,17 +135,14 @@ class mechService implements comService<MechResponseInterface> {
       const { email, password } = data;
       const mech: MechInterface | null =
         await this.mechRepository.emailExistCheck({ email });
-      const token = this.createjwt.generateToken(mech?.id);
-      const refreshToken = this.createjwt.generateRefreshToken(mech?.id);
+
       if (mech && mech.isBlocked) {
         return {
           status: UNAUTHORIZED,
           data: {
             success: false,
             message: "You have been blocked by the mech !",
-            token: token,
             data: mech,
-            refresh_token: refreshToken,
           },
         } as const;
       }
@@ -154,7 +153,7 @@ class mechService implements comService<MechResponseInterface> {
           mech.password as string
         );
         if (passwordMatch) {
-          const token = this.createjwt.generateToken(mech.id);
+          const token = this.createjwt.generateToken(mech.id, mech.role);
           const refreshToken = this.createjwt.generateRefreshToken(mech.id);
           return {
             status: OK,

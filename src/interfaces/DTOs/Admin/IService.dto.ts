@@ -7,6 +7,7 @@ import Service from "../../entityInterface/Iservices";
 export interface AdminLoginDTO {
   email: string;
   password: string;
+  role: string;
 }
 
 export interface AdminLoginResponse {
@@ -30,7 +31,7 @@ export interface GetUserList {
 export interface GetUserListResponse {
   status: STATUS_CODES;
   data: {
-    users: User[] | null;
+    users: Partial<User>[];
     usersCount: number;
   };
   message: string;

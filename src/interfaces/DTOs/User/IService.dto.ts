@@ -1,7 +1,8 @@
 import { UserInterface } from "../../../models/userModel";
-import User from "../../entityInterface/Iuser";
+import Iuser from "../../entityInterface/Iuser";
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
+import Service from "../../entityInterface/Iservices";
 import { Types } from "mongoose";
 
 export interface UserSignUpDTO {
@@ -39,7 +40,7 @@ export interface UserLoginResponse {
   data: {
     success: boolean;
     message: string;
-    data?: User;
+    data?: Iuser;
     userId?: string;
     token?: string;
     refresh_token?: string;
@@ -59,7 +60,7 @@ export interface SaveUserResponse {
   success: boolean;
   message: string;
   userId?: string;
-  data?: User;
+  data?: Iuser;
   token?: string | undefined;
   refresh_token?: string | undefined;
 }
@@ -70,13 +71,14 @@ export interface UserLoginDTO {
 }
 
 export interface ReturnUserdataDTO{
-  _id: string | undefined;
-  name: string | undefined;
-  email: string | undefined;
-  phone: number | undefined;
-  isDeleted: boolean | undefined;
-  isBlocked: boolean | undefined;
-  profile_picture: string | undefined;
+  _id: string ;
+  name: string;
+  email: string ;
+  phone: number ;
+  role: string ;
+  isDeleted: boolean ;
+  isBlocked: boolean ;
+  profile_picture: string ;
 }
 
 export interface NewDetailsDTO {
@@ -87,12 +89,13 @@ export interface NewDetailsDTO {
 }
 
 export interface EmailExistCheckDTO {
-  id?: string;
+  id: string;
   name: string;
   password: string;
   email: string;
   phone: number;
   profile_picture: string;
+  role: string;
   address: {
     name: string;
     phone: number;
@@ -108,12 +111,13 @@ export interface EmailExistCheckDTO {
 }
 
 export interface EmailExistCheckResponse {
-  id?: string;
+  id: string;
   name: string;
   password: string;
   email: string;
   phone: number;
   profile_picture: string;
+  role: string;
   address: {
     name: string;
     phone: number;
@@ -137,9 +141,27 @@ export interface GetProfileResponse {
   data: {
     success: boolean;
     message: string;
-    data?: User;
+    data?: Iuser;
   };
 }
+
+export interface GetServicesDTO {
+  page: number;
+  limit: number;
+  searchQuery: string | undefined;
+}
+
+
+
+export interface GetServiceResponse {
+  status: STATUS_CODES;
+  data: {
+    services: Service[] | null;
+    servicesCount: number;
+  };
+  message: string;
+}
+
 
 export interface EditUserDTO {
   _id:string;

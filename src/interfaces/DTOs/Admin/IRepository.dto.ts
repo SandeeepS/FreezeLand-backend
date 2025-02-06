@@ -10,6 +10,7 @@ export interface GetAdminByIdResponse {
   name: string;
   email: string;
   password: string;
+  role:string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -23,6 +24,7 @@ export interface IsAdminExistResponse {
   name: string;
   email: string;
   password: string;
+  role: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }

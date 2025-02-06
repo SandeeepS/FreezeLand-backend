@@ -26,6 +26,8 @@ import {
   GenerateRefreshToken,
   RegisterServiceDTO,
   ReturnUserdataDTO,
+  GetServicesDTO,
+  GetServiceResponse
 } from "../interfaces/DTOs/User/IService.dto";
 dotenv.config();
 
@@ -73,8 +75,8 @@ class userService implements comService<UserResponseInterface> {
       };
       console.log("new Encypted password with data is ", newDetails);
       const user = await this.userRepository.saveUser(newDetails);
-      if (user) {
-        const token = this.createjwt.generateToken(user?.id);
+      if (user && user?.role) {
+        const token = this.createjwt.generateToken(user.id, user.role);
         const refresh_token = this.createjwt.generateRefreshToken(user?.id);
         console.log("token is ", token);
         console.log("refresh", refresh_token);
@@ -103,18 +105,20 @@ class userService implements comService<UserResponseInterface> {
       const { email } = userData;
       const user: EmailExistCheckDTO | null =
         await this.userRepository.emailExistCheck({ email });
-      
-      const returnUserData:ReturnUserdataDTO = {
-        _id: user?.id,
-        name: user?.name,
-        email: user?.email,
-        phone: user?.phone,
-        isDeleted: user?.isDeleted,
-        isBlocked: user?.isBlocked,
-        profile_picture: user?.profile_picture,
-      }
+
       if (user?.id) {
-        const token = this.createjwt.generateToken(user.id);
+        const returnUserData: ReturnUserdataDTO = {
+          _id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          isDeleted: user.isDeleted,
+          isBlocked: user.isBlocked,
+          profile_picture: user.profile_picture,
+        };
+
+        const token = this.createjwt.generateToken(user.id, user.role);
         const refreshToken = this.createjwt.generateRefreshToken(user.id);
         if (user && user.isBlocked) {
           return {
@@ -135,7 +139,7 @@ class userService implements comService<UserResponseInterface> {
             user.password as string
           );
           if (passwordMatch) {
-            const token = this.createjwt.generateToken(user.id);
+            const token = this.createjwt.generateToken(user.id, user.role);
             const refreshToken = this.createjwt.generateRefreshToken(user.id);
             return {
               status: OK,
@@ -165,7 +169,7 @@ class userService implements comService<UserResponseInterface> {
             message: "Invalid email or password.",
           },
         } as const;
-      }else{
+      } else {
         return {
           status: UNAUTHORIZED,
           data: {
@@ -185,7 +189,7 @@ class userService implements comService<UserResponseInterface> {
   ): Promise<EmailExistCheckResponse | null> {
     try {
       const { email } = data;
-      console.log("email from the userSercice " ,email);
+      console.log("email from the userSercice ", email);
       return this.userRepository.emailExistCheck({ email });
     } catch (error) {
       console.log("error occured while getUserEmail in the userService");
@@ -193,9 +197,9 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  generateToken(data: GenerateTokenDTO): string | undefined {
+  generateToken(data: GenerateTokenDTO, role: string): string | undefined {
     const { payload } = data;
-    if (payload) return this.createjwt.generateToken(payload);
+    if (payload) return this.createjwt.generateToken(payload, role);
   }
 
   generateRefreshToken(data: GenerateRefreshToken): string | undefined {
@@ -243,6 +247,34 @@ class userService implements comService<UserResponseInterface> {
       throw new Error("Error while getting the user Profile ");
     }
   }
+
+    //getting all the services provided by the website 
+    async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
+      try {
+        let { page, limit, searchQuery } = data;
+        if (isNaN(page)) page = 1;
+        if (isNaN(limit)) limit = 10;
+        if (!searchQuery) searchQuery = "";
+        const services = await this.userRepository.getAllServices({
+          page,
+          limit,
+          searchQuery,
+        });
+        console.log("list of services is ", services);
+        const servicesCount = await this.userRepository.getServiceCount({
+          searchQuery,
+        });
+  
+        return {
+          status: STATUS_CODES.OK,
+          data: { services, servicesCount },
+          message: "success",
+        };
+      } catch (error) {
+        console.log(error);
+        throw new Error("Error occured.");
+      }
+    }
 
   //getting the user registered complaint details
   async getAllRegisteredServices(
@@ -299,7 +331,7 @@ class userService implements comService<UserResponseInterface> {
   async AddUserAddress(data: AddUserAddressDTO) {
     try {
       const { _id, values } = data;
-      console.log("id from the addUserAddress in the user service is ",_id);
+      console.log("id from the addUserAddress in the user service is ", _id);
       return await this.userRepository.addAddress({ _id, values });
     } catch (error) {
       console.log(error as Error);

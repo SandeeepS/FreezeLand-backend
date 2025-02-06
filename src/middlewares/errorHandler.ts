@@ -19,6 +19,7 @@ const errorHandlerMiddleware = (
         success: false,
         message: message,
     });
+    next(err);
 
 }
 

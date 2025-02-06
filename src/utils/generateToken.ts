@@ -12,13 +12,17 @@ interface VerifyResult {
 }
 
 export class CreateJWT {
-  generateToken(payload: string): string {
+  generateToken(payload: string, role: string): string {
     if (!payload) {
       throw new Error("Payload is required for token generation");
     }
-    const token = jwt.sign({ data: payload }, process.env.JWT_SECRET as Secret, {
-      expiresIn: "1m",
-    });
+    const token = jwt.sign(
+      { data: payload, role: role },
+      process.env.JWT_SECRET as Secret,
+      {
+        expiresIn: "1m",
+      }
+    );
     return token;
   }
 
@@ -40,10 +44,10 @@ export class CreateJWT {
         throw new Error("JWT_SECRET is not defined");
       }
       const decoded = jwt.verify(token, secret) as JwtPayload;
-      return { success: true, decoded ,message:"verified"};
+      return { success: true, decoded, message: "verified" };
     } catch (error) {
       console.error("Error while verifying JWT token:", error);
-        return { success: false, message: "Token Expired!"};
+      return { success: false, message: "Token Expired!" };
     }
   }
   verifyRefreshToken(token: string, res: Response): VerifyResult {
@@ -53,18 +57,18 @@ export class CreateJWT {
         throw new Error("JWT_REFRESH_SECRET is not defined");
       }
       const decoded = jwt.verify(token, secret) as JwtPayload;
+      console.log("decoded data from the jwt.varify fucniton ", decoded);
       return { success: true, decoded, message: "verified" };
     } catch (error) {
       console.error("Error while verifying refresh token:", error);
       if (error instanceof jwt.TokenExpiredError) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+        res.clearCookie("access_token");
+        res.clearCookie("refresh_token");
         return { success: false, message: "Refresh Token Expired!" };
       }
-      res.clearCookie('access_token');
-      res.clearCookie('refresh_token');
+      res.clearCookie("access_token");
+      res.clearCookie("refresh_token");
       return { success: false, message: "Internal server error" };
     }
   }
 }
-

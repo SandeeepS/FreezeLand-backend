@@ -18,6 +18,7 @@ export interface SaveMechResponse{
     email: string;
     password: string;
     phone: number;
+    role: string;
     isBlocked?: boolean;
     isDeleted?:boolean;
 }

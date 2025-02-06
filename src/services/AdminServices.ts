@@ -46,7 +46,7 @@ class adminService implements comService<AdminAuthResponse> {
       if (admin?.id) {
         if (admin?.password === password) {
           console.log("passwrod from the admin side is ", admin.password);
-          const token = this.createjwt.generateToken(admin.id);
+          const token = this.createjwt.generateToken(admin.id, admin.role);
           const refreshToken = this.createjwt.generateRefreshToken(admin.id);
           console.log("admin is exist", admin);
           return {
@@ -95,15 +95,23 @@ class adminService implements comService<AdminAuthResponse> {
         limit,
         searchQuery,
       });
-      const usersCount = await this.adminRepository.getUserCount({
-        searchQuery,
-      });
+      if (users) {
+        const usersCount = await this.adminRepository.getUserCount({
+          searchQuery,
+        });
 
-      return {
-        status: STATUS_CODES.OK,
-        data: { users, usersCount },
-        message: "success",
-      };
+        return {
+          status: STATUS_CODES.OK,
+          data: { users, usersCount},
+          message: "success",
+        };
+      } else {
+        return {
+          status: STATUS_CODES.NOT_FOUND,
+          data: { users: [], usersCount: 0 },
+          message: "No users found",
+        };
+      }
     } catch (error) {
       console.log(error);
       throw new Error("Error occured.");
