@@ -13,7 +13,6 @@ const userRepository = new UserRepository()
 const userServices = new userService(userRepository,createjwt,encrypt);
 const controller = new userController(userServices);
 
-
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
 userRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next) )
 userRouter.post('/google-login', async (req: Request, res: Response, next: NextFunction) => await controller.googleLogin(req, res, next));
@@ -28,10 +27,8 @@ userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,
 userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
 userRouter.put('/editAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 userRouter.post('/registerService',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.registerService(req,res,next));
-userRouter.get('/getAllServices',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllServices(req,res,next));
-
-userRouter.get('/getAllRegisteredService',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllRegisteredService(req,res,next));
+userRouter.get('/getAllServices',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllServices(req,res,next));//getting all service which is provided by the website
+userRouter.get('/getAllRegisteredService',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllRegisteredService(req,res,next)); //getting all compliantes registrerd by user 
 userRouter.get('/getImageUrl',userAuth(["user"]), async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
-
 
 export default userRouter;
