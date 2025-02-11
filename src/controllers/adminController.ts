@@ -47,9 +47,15 @@ class adminController {
             .status(loginStatus.status)
             .cookie("admin_access_token", access_token, {
               maxAge: accessTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
             })
             .cookie("admin_refresh_token", refresh_token, {
               maxAge: refreshTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
             })
             .json(loginStatus);
         }
@@ -182,10 +188,11 @@ class adminController {
 
   async getPresignedUrl(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fileName, fileType } = req.query as { 
-        fileName: string; 
-        fileType: string 
-      };      console.log("file from the front end is ", fileName, fileType);
+      const { fileName, fileType } = req.query as {
+        fileName: string;
+        fileType: string;
+      };
+      console.log("file from the front end is ", fileName, fileType);
 
       if (!fileName || !fileType) {
         return res
@@ -197,7 +204,7 @@ class adminController {
       const bucketName = process.env.S3_BUCKET_NAME;
       const region = process.env.S3_REGION;
 
-      if (!bucketName || !region){
+      if (!bucketName || !region) {
         throw new Error(
           "AWS_S3_BUCKET_NAME or AWS_REGION is not defined in environment variables"
         );
@@ -206,16 +213,16 @@ class adminController {
       const s3Params = {
         Bucket: bucketName,
         Key: `ServiceImages/${imageName}`,
-        expires:7200,
+        expires: 7200,
         ContentType: fileType,
       };
-      const key = `ServiceImages/${imageName}`
+      const key = `ServiceImages/${imageName}`;
       const command = new PutObjectCommand(s3Params);
       const uploadURL = await getSignedUrl(S3Client, command);
       console.log("Presigned URL: ", uploadURL);
 
       // Send the presigned URL to the client
-      return res.status(200).json({ success: true, uploadURL, imageName ,key });
+      return res.status(200).json({ success: true, uploadURL, imageName, key });
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -523,10 +530,17 @@ class adminController {
 
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
-      res.cookie("admin_access_token", "", {
-        httpOnly: true,
-        expires: new Date(0),
-      });
+      res
+        .clearCookie("admin_access_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
+        })
+        .clearCookie("admin_refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
+        });
       res.status(200).json({ success: true, message: "logout sucessfully" });
     } catch (error) {
       console.log(error as Error);

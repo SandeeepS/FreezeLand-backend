@@ -122,13 +122,13 @@ class userController {
           const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
           res
             .status(loginStatus.status)
-            .cookie("access_token", access_token, {
+            .cookie("user_access_token", access_token, {
               maxAge: accessTokenMaxAge,
               httpOnly: true,
               secure: process.env.NODE_ENV === "production", // Set to true in production
               sameSite: "strict",
             })
-            .cookie("refresh_token", refresh_token, {
+            .cookie("user_refresh_token", refresh_token, {
               maxAge: refreshTokenMaxAge,
               httpOnly: true,
               secure: process.env.NODE_ENV === "production", // Set to true in production
@@ -629,16 +629,25 @@ class userController {
   }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("Entered in the function for logout");
+
+      // Clear the access_token and refresh_token cookies
       res
-        .cookie("access_token", "", {
-          maxAge: 0,
+        .clearCookie("user_access_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
         })
-        .cookie("refresh_token", "", {
-          maxAge: 0,
+        .clearCookie("user_refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
         });
+
+      // Send a success response
       res
         .status(200)
-        .json({ success: true, message: "user logout - clearing cookie" });
+        .json({ success: true, message: "User logged out successfully" });
     } catch (err) {
       console.log(err);
       next(err);

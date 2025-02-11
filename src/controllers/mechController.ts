@@ -148,14 +148,20 @@ class mechController {
           const accessTokenMaxAge = 5 * 60 * 1000;
           const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
           res
-            .status(loginStatus.status)
-            .cookie("m_access_token", access_token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("m_refresh_token", refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json(loginStatus);
+          .status(loginStatus.status)
+          .cookie("mech_access_token", access_token, {
+            maxAge: accessTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Set to true in production
+            sameSite: "strict",
+          })
+          .cookie("mech_refresh_token", refresh_token, {
+            maxAge: refreshTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Set to true in production
+            sameSite: "strict",
+          })
+          .json(loginStatus);
         } else {
           res
             .status(UNAUTHORIZED)
@@ -257,13 +263,18 @@ class mechController {
 
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("Entered in the function for logout of mech")
       res
-        .cookie("m_access_token", "", {
-          maxAge: 0,
-        })
-        .cookie("m_refresh_token", "", {
-          maxAge: 0,
-        });
+      .clearCookie("mech_access_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+        sameSite: "strict",
+      })
+      .clearCookie("mech_refresh_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+        sameSite: "strict",
+      });
       res
         .status(200)
         .json({ success: true, message: "user logout - clearing cookie" });

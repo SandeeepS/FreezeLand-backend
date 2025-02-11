@@ -11,8 +11,8 @@ const userAuth = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       console.log("entered in the userAuth");
-      const token = req.cookies.access_token;
-      const refresh_token = req.cookies.refresh_token;
+      const token = req.cookies.user_access_token;
+      const refresh_token = req.cookies.user_refresh_token;
       console.log("access token and refresh token are", token, refresh_token);
 
       if (!refresh_token) {
