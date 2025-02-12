@@ -16,10 +16,13 @@ import {
 import { EditUserDetailsValidator } from "../utils/validator";
 import {
   EditUserDTO,
+  ForgotResentOtpResponse,
+  GetImageUrlResponse,
   SaveUserResponse,
 } from "../interfaces/DTOs/User/IController.dto";
+import { IUserController } from "../interfaces/IController/IUserController";
 
-class userController {
+class userController implements IUserController {
   constructor(private userServices: userService) {}
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
@@ -284,19 +287,27 @@ class userController {
     }
   }
 
-  async forgotResentOtp(req: Request, res: Response, next: NextFunction) {
+  async forgotResentOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<ForgotResentOtpResponse | void> {
     try {
       const { email } = req.body;
       req.app.locals.userEmail = email;
-      if (!email)
-        return res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "please enter the email" });
+      if (!email) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "please enter the email",
+        }) as ForgotResentOtpResponse;
+      }
       const user = await this.userServices.getUserByEmail(email);
-      if (!user)
-        return res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "user with email is not exist!" });
+      if (!user) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "user with email is not exist!",
+        }) as ForgotResentOtpResponse;
+      }
       const otp = await generateAndSendOTP(email);
       req.app.locals.resendOtp = otp;
 
@@ -309,7 +320,7 @@ class userController {
         success: true,
         data: user,
         message: "OTP sent for verification...",
-      });
+      } as ForgotResentOtpResponse);
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -607,14 +618,21 @@ class userController {
     }
   }
 
-  async getImageUrl(req: Request, res: Response, next: NextFunction) {
+  async getImageUrl(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetImageUrlResponse | void> {
     try {
       const { imageKey } = req.query;
       console.log("imageKey from the frontend is ", imageKey);
       if (typeof imageKey !== "string") {
         return res
           .status(400)
-          .json({ success: false, message: "Invalid image key" });
+          .json({
+            success: false,
+            message: "Invalid image key",
+          }) as GetImageUrlResponse;
       }
 
       const command = new GetObjectCommand({
@@ -625,6 +643,7 @@ class userController {
       res.status(200).json({ success: true, url });
     } catch (error) {
       next(error);
+      
     }
   }
   async logout(req: Request, res: Response, next: NextFunction) {

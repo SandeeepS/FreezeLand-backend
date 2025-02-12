@@ -1,4 +1,5 @@
 import User from "../../entityInterface/Iuser";
+import { EmailExistCheckResponse } from "./IService.dto";
 
 export interface UserSignUpDTO{
   
@@ -31,4 +32,16 @@ export interface EditUserDTO {
     _id:string;
     name:string;
     phone:number;
+}
+
+export interface ForgotResentOtpResponse{
+    success?:boolean;
+    data?: EmailExistCheckResponse;
+    message?:string;
+}
+
+export interface GetImageUrlResponse{
+    success?:boolean;
+    message?:string;
+    url?:string;
 }
