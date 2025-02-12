@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
-import S3Client from "../awsConfig";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { v4 as uuidv4 } from "uuid";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
 import {
   AddNewServiceValidation,
   LoginValidation,
@@ -188,6 +185,9 @@ class adminController implements IAdminController {
     }
   }
 
+  //changing getPresignedUrl functionality to adminService ..........
+  /************************ */
+
   async getPresignedUrl(
     req: Request,
     res: Response,
@@ -199,46 +199,27 @@ class adminController implements IAdminController {
         fileType: string;
       };
       console.log("file from the front end is ", fileName, fileType);
-
-      if (!fileName || !fileType) {
+      const result = await this.adminService.getPresignedUrl({fileName,fileType})
+      console.log("presinged Url is from teh adminController is ",result);
+      if(result.success === false){
         return res
-          .status(400)
-          .json({
-            success: false,
-            message: "File name and type are required",
-          }) as GetPreSignedUrlResponse;
-      }
-
-      const imageName = uuidv4() + "-" + fileName; // Generate a unique name for the image
-      const bucketName = process.env.S3_BUCKET_NAME;
-      const region = process.env.S3_REGION;
-
-      if (!bucketName || !region) {
-        throw new Error(
-          "AWS_S3_BUCKET_NAME or AWS_REGION is not defined in environment variables"
-        );
-      }
-
-      const s3Params = {
-        Bucket: bucketName,
-        Key: `ServiceImages/${imageName}`,
-        expires: 7200,
-        ContentType: fileType,
-      };
-      const key = `ServiceImages/${imageName}`;
-      const command = new PutObjectCommand(s3Params);
-      const uploadURL = await getSignedUrl(S3Client, command);
-      console.log("Presigned URL: ", uploadURL);
-
-      // Send the presigned URL to the client
-      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "File name and type are required",
+        }) as GetPreSignedUrlResponse;
+      }else{
+        return res
         .status(200)
         .json({
           success: true,
-          uploadURL,
-          imageName,
-          key,
+          uploadURL: result.uploadURL,
+          imageName:result.imageName,
+          key:result.key,
         }) as GetPreSignedUrlResponse;
+      }
+
+
     } catch (error) {
       console.log(error as Error);
       next(error);

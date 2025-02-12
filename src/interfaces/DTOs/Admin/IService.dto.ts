@@ -291,3 +291,17 @@ export interface EditExistServiceResponse{
   isBlocked: boolean;
   isDeleted: boolean;
 }
+
+export interface GetPreSignedUrlDTO{
+  fileName:string;
+  fileType:string;
+}
+
+export interface GetPreSignedUrlResponse {
+  success?:boolean;
+  message?:string;
+  uploadURL?:string;
+  imageName?:string;
+  key?:string;
+
+}
