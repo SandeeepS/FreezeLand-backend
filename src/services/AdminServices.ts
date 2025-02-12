@@ -1,37 +1,50 @@
-import { comService } from "./comServices";
 import AdminRepository from "../repositories/adminRepository";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
-import { AdminAuthResponse } from "../interfaces/serviceInterfaces/InaAdminService";
 import {
   AddDeviceDTO,
+  AddNewDeviceResponse,
+  AddNewServiceResponse,
   AddserviceDTO,
   AdminLoginDTO,
   AdminLoginResponse,
   BlockDeviceDTO,
+  BlockDeviceResponse,
   BlockMechDTO,
+  BlockMechResponse,
   BlockServiceDTO,
+  BlockServiceResponse,
   BlockUserDTO,
+  BlockUserResponse,
   DeleteDeviceDTO,
+  DeleteDeviceResponse,
   DeleteMechDTO,
+  DeleteMechResponse,
   DeleteServiceDTO,
+  DeleteServiceResponse,
   DeleteUserDTO,
+  DeleteUserResponse,
   EditExistServiceDTO,
+  EditExistServiceResponse,
   GetDeviceDTO,
   GetDeviceResponse,
   GetMechList,
   GetMechListResponse,
   GetServiceDTO,
   GetServiceResponse,
+  GetServiceResponse2,
   GetServicesDTO,
   GetUserList,
   GetUserListResponse,
   isDeviceExistDTO,
+  isDeviceExistResponse,
   IsServiceExistDTO,
+  IsServiceExistResponse,
 } from "../interfaces/DTOs/Admin/IService.dto";
+import { IAdminService } from "../interfaces/IServices/IAdminService";
 
-class adminService implements comService<AdminAuthResponse> {
+class adminService implements IAdminService {
   constructor(
     private adminRepository: AdminRepository,
     private encrypt: Encrypt,
@@ -199,137 +212,151 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-  async getService(data: GetServiceDTO) {
+  async getService(data: GetServiceDTO):Promise<GetServiceResponse2 | null> {
     try {
       const { id } = data;
       console.log("reached the getService in the adminService");
       const result = await this.adminRepository.getService({ id });
       if (result) {
         return result;
+      } else{
+        return null;
       }
     } catch (error) {
       console.log(error as Error);
       throw new Error();
     }
   }
-  async blockUser(data: BlockUserDTO) {
+  async blockUser(data: BlockUserDTO):Promise<BlockUserResponse | null> {
     try {
       const { userId } = data;
       return await this.adminRepository.blockUser({ userId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error occured while blocking user in AdminService ");
     }
   }
 
-  async blockMech(data: BlockMechDTO) {
+  async blockMech(data: BlockMechDTO):Promise<BlockMechResponse | null> {
     try {
       const { mechId } = data;
       return await this.adminRepository.blockMech({ mechId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error occured while blocking the mechanic from the AdminService");
     }
   }
 
-  async blockService(data: BlockServiceDTO) {
+  async blockService(data: BlockServiceDTO):Promise<BlockServiceResponse|null> {
     try {
       const { _id } = data;
       return await this.adminRepository.BlockService({ _id });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error occured while blocking the service from the adminService");
     }
   }
 
-  async blockDevice(data: BlockDeviceDTO) {
+  async blockDevice(data: BlockDeviceDTO):Promise<BlockDeviceResponse|null> {
     try {
       const { _id } = data;
       return await this.adminRepository.BlockDevice({ _id });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("error while blocking the device from the adminService");
     }
   }
 
-  async deleteUser(data: DeleteUserDTO) {
+  async deleteUser(data: DeleteUserDTO):Promise<DeleteUserResponse | null> {
     try {
       const { userId } = data;
       return await this.adminRepository.deleteUser({ userId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error occured while deleting the user");
     }
   }
 
-  async deleteMech(data: DeleteMechDTO) {
+  async deleteMech(data: DeleteMechDTO) :Promise<DeleteMechResponse| null>{
     try {
       const { mechId } = data;
       return await this.adminRepository.deleteMech({ mechId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while deleting the mechanic from the adminService ");
     }
   }
 
-  async deleteService(data: DeleteServiceDTO) {
+  async deleteService(data: DeleteServiceDTO):Promise<DeleteServiceResponse |null> {
     try {
       const { serviceId } = data;
       return await this.adminRepository.deleteService({ serviceId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while deleting a service from the admin Services");
     }
   }
 
-  async deleteDevice(data: DeleteDeviceDTO) {
+  async deleteDevice(data: DeleteDeviceDTO):Promise<DeleteDeviceResponse|null> {
     try {
       const { deviceId } = data;
       return await this.adminRepository.deleteDevice({ deviceId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while deleteDevice from the adminService");
     }
   }
 
-  async isServiceExist(data: IsServiceExistDTO) {
+  async isServiceExist(data: IsServiceExistDTO):Promise<IsServiceExistResponse |null> {
     try {
       const { name } = data;
       return await this.adminRepository.isServiceExist({ name });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("error while checking isServiceExist or not ");
     }
   }
 
-  async addService(data: AddserviceDTO) {
+  async addService(data: AddserviceDTO):Promise<AddNewServiceResponse | null> {
     try {
       const { values } = data;
       console.log("values from the service is ", values);
       return await this.adminRepository.addNewServices({ values });
     } catch (error) {
       console.log(error as Error);
+      throw new Error ("Error while adding new Services in the adminService ");
     }
   }
 
   //adding new devices
-  async addDevice(data: AddDeviceDTO) {
+  async addDevice(data: AddDeviceDTO):Promise<AddNewDeviceResponse|null> {
     try {
       const { name } = data;
       return await this.adminRepository.addNewDevice({ name });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while adding new Device form the adminService");
     }
   }
 
   //checking for the divce is existing or not for avoding the duplication
-  async isDeviceExist(data: isDeviceExistDTO) {
+  async isDeviceExist(data: isDeviceExistDTO):Promise<isDeviceExistResponse|null>{
     try {
       const { name } = data;
       return await this.adminRepository.isDeviceExist({ name });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("error while checking the isDeviceExist in the adminService");
     }
   }
 
-  async editExistingService(data: EditExistServiceDTO) {
+  async editExistingService(data: EditExistServiceDTO):Promise<EditExistServiceResponse|null> {
     try {
       const { _id, values } = data;
       return await this.adminRepository.editExistService({ _id, values });
     } catch (error) {
       console.log(error as Error);
-      throw error as Error;
+      throw new Error("error while editExistingService in AdminService");
     }
   }
 }

@@ -1,9 +1,8 @@
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import UserRepository from "../repositories/userRepository";
-import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
-import { comService } from "./comServices";
+
 import dotenv from "dotenv";
 import Cryptr from "cryptr";
 import {
@@ -27,12 +26,18 @@ import {
   RegisterServiceDTO,
   ReturnUserdataDTO,
   GetServicesDTO,
-  GetServiceResponse
+  GetServiceResponse,
+  AddUserAddressResponse,
+  EditUserResponse,
+  RegisterServiceResponse
 } from "../interfaces/DTOs/User/IService.dto";
+import { IUserServices } from "../interfaces/IServices/IUserServices";
+import { UserInterface } from "../models/userModel";
+import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
-class userService implements comService<UserResponseInterface> {
+class userService implements IUserServices {
   constructor(
     private userRepository: UserRepository,
     private createjwt: CreateJWT,
@@ -298,7 +303,7 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async updateNewPassword(password: string, userId: string) {
+  async updateNewPassword(password: string, userId: string):Promise<UserInterface | null> {
     try {
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
       if (!secret_key) {
@@ -319,50 +324,64 @@ class userService implements comService<UserResponseInterface> {
     }
   }
 
-  async editUser(data: EditUserDTO) {
+  async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
     try {
       const { _id, name, phone } = data;
       return this.userRepository.editUser({ _id, name, phone });
     } catch (error) {
       console.log(error as Error);
+      throw error
     }
   }
 
-  async AddUserAddress(data: AddUserAddressDTO) {
+  async AddUserAddress(data: AddUserAddressDTO): Promise<AddUserAddressResponse | null> {
     try {
       const { _id, values } = data;
       console.log("id from the addUserAddress in the user service is ", _id);
-      return await this.userRepository.addAddress({ _id, values });
+      const address =  await this.userRepository.addAddress({ _id, values });
+      if(address){
+        return {
+          _id:address._id,
+          values:address as AddAddress
+        }
+      }else{
+        return null;
+      }
+ 
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while AddUserAddress in userService ");
     }
   }
 
-  async editAddress(data: EditAddressDTO) {
+  async editAddress(data: EditAddressDTO): Promise<UserInterface | null> {
     try {
       const { _id, addressId, values } = data;
       return await this.userRepository.editAddress({ _id, addressId, values });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while editAddress in userService ");
     }
   }
 
-  async setUserDefaultAddress(data: SetUserDefaultAddressDTO) {
+  async setUserDefaultAddress(data: SetUserDefaultAddressDTO): Promise<UserInterface | null>  {
     try {
       const { userId, addressId } = data;
       console.log("entered in the userService ");
       return await this.userRepository.setDefaultAddress({ userId, addressId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("error while setUserDefaultAddress in userService");
     }
   }
 
-  async registerService(data: RegisterServiceDTO) {
+  async registerService(data: RegisterServiceDTO) :Promise<RegisterServiceResponse | null>{
     try {
       console.log("entered in the userService for register Service");
       return await this.userRepository.registerService(data);
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while Registering user compliantes in userService");
     }
   }
 }

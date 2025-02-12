@@ -77,6 +77,7 @@ export interface AddUserAddressDTO {
 }
 
 export interface AddUserAddressResponse{
+    _id:Types.ObjectId;
     name:string,
     phone:number,
     email:string,

@@ -1,24 +1,26 @@
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import { MechInterface } from "../models/mechModel";
 import MechRepository from "../repositories/mechRepository";
 import { CreateJWT } from "../utils/generateToken";
 import Encrypt from "../utils/comparePassword";
-import { comService } from "./comServices";
-import { MechResponseInterface } from "../interfaces/serviceInterfaces/InMechService";
 import Cryptr from "cryptr";
 import {
+  EmailExistResponse,
+  EmailExitCheckDTO,
   GetAllMechanicResponse,
   GetAllMechanicsDTO,
   MechLoginDTO,
   MechLoginResponse,
   SaveMechDTO,
+  SaveMechResponse,
   SignUpMechDTO,
+  SignUpMechResponse,
   UpdateNewPasswordDTO,
+  UpdateNewPasswordResponse,
 } from "../interfaces/DTOs/Mech/IService.dto";
-import { EmailExitCheck } from "../interfaces/DTOs/Mech/IRepository.dto";
+import { IMechServices } from "../interfaces/IServices/IMechServices";
 
 const { OK, UNAUTHORIZED } = STATUS_CODES;
-class mechService implements comService<MechResponseInterface> {
+class mechService implements IMechServices {
   constructor(
     private mechRepository: MechRepository,
     private createjwt: CreateJWT,
@@ -63,7 +65,9 @@ class mechService implements comService<MechResponseInterface> {
   //   }
   // }
 
-  async signupMech(mechData: SignUpMechDTO): Promise<MechInterface | null> {
+  async signupMech(
+    mechData: SignUpMechDTO
+  ): Promise<SignUpMechResponse | null> {
     try {
       const { email } = mechData;
       return await this.mechRepository.emailExistCheck({ email });
@@ -73,9 +77,7 @@ class mechService implements comService<MechResponseInterface> {
     }
   }
 
-  async saveMech(
-    mechData: SaveMechDTO
-  ): Promise<MechResponseInterface | undefined> {
+  async saveMech(mechData: SaveMechDTO): Promise<SaveMechResponse> {
     try {
       console.log("Entered in mech Service and the mechData is ", mechData);
       const { name, email, password, phone } = mechData;
@@ -135,8 +137,7 @@ class mechService implements comService<MechResponseInterface> {
   async mechLogin(data: MechLoginDTO): Promise<MechLoginResponse> {
     try {
       const { email, password } = data;
-      const mech: MechInterface | null =
-        await this.mechRepository.emailExistCheck({ email });
+      const mech = await this.mechRepository.emailExistCheck({ email });
 
       if (mech && mech.isBlocked) {
         return {
@@ -155,15 +156,17 @@ class mechService implements comService<MechResponseInterface> {
           mech.password as string
         );
         if (passwordMatch) {
-          const token = this.createjwt.generateToken(mech.id, mech.role);
-          const refreshToken = this.createjwt.generateRefreshToken(mech.id);
+          const mechId = mech._id.toString();
+
+          const token = this.createjwt.generateToken(mechId, mech.role);
+          const refreshToken = this.createjwt.generateRefreshToken(mechId);
           return {
             status: OK,
             data: {
               success: true,
               message: "Authentication Successful !",
               data: mech,
-              mechId: mech.id,
+              mechId: mechId,
               token: token,
               refresh_token: refreshToken,
             },
@@ -192,7 +195,9 @@ class mechService implements comService<MechResponseInterface> {
     }
   }
 
-  async getUserByEmail(data: EmailExitCheck): Promise<MechInterface | null> {
+  async getUserByEmail(
+    data: EmailExitCheckDTO
+  ): Promise<EmailExistResponse | null> {
     try {
       const { email } = data;
       return this.mechRepository.emailExistCheck({ email });
@@ -209,18 +214,14 @@ class mechService implements comService<MechResponseInterface> {
       const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
 
-      const mech = await this.mechRepository.getMechList(
-        page,
-        limit,
-        regex,
-      );
-      console.log("list of all mechanics is from the mechService is ",mech);
-      const  mechCount = await this.mechRepository.getMechCount(regex);
+      const mech = await this.mechRepository.getMechList(page, limit, regex);
+      console.log("list of all mechanics is from the mechService is ", mech);
+      const mechCount = await this.mechRepository.getMechCount(regex);
       return {
-        status:STATUS_CODES.OK,
-        data:{mech,mechCount},
-        message:"success",
-      }
+        status: STATUS_CODES.OK,
+        data: { mech, mechCount },
+        message: "success",
+      };
     } catch (error) {
       console.log(error as Error);
       throw new Error(
@@ -229,9 +230,11 @@ class mechService implements comService<MechResponseInterface> {
     }
   }
 
-  async updateNewPassword(data: UpdateNewPasswordDTO) {
+  async updateNewPassword(
+    data: UpdateNewPasswordDTO
+  ): Promise<UpdateNewPasswordResponse | null> {
     try {
-      const { password, userId } = data;
+      const { password, mechId } = data;
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
       if (!secret_key) {
         throw new Error(
@@ -247,7 +250,7 @@ class mechService implements comService<MechResponseInterface> {
 
       return await this.mechRepository.updateNewPassword({
         password: newPassword,
-        userId,
+        mechId,
       });
     } catch (error) {
       console.log(error as Error);

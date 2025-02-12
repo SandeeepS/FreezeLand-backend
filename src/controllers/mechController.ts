@@ -228,10 +228,10 @@ class mechController {
 
   async updateNewPasswordMech(req: Request, res: Response, next: NextFunction) {
     try {
-      const { password, userId } = req.body;
+      const { password, mechId } = req.body;
       const result = await this.mechServices.updateNewPassword({
         password,
-        userId,
+        mechId,
       });
       console.log(result);
       if (result)

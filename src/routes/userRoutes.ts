@@ -6,9 +6,10 @@ import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
 import userAuth from "../middlewares/userAuthMidd";
 
+const userRouter:Router = express.Router();
+
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
-const userRouter:Router = express.Router();
 const userRepository = new UserRepository()
 const userServices = new userService(userRepository,createjwt,encrypt);
 const controller = new userController(userServices);

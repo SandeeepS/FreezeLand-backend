@@ -1,14 +1,16 @@
 import {
+  EmailExistResponse,
   EmailExitCheck,
   SaveMechDTO,
   SaveMechResponse,
   UpdateNewPasswordDTO,
+  UpdateNewPasswordResponse,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import MechModel, { MechInterface } from "../models/mechModel";
-import { BaseRepository } from "./BaseRepository/baseRepository"; // Import the base repository
+import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
 
-class MechRepository extends BaseRepository<MechInterface & Document> {
+class MechRepository extends BaseRepository<MechInterface & Document>{
   constructor() {
     super(MechModel);
   }
@@ -17,7 +19,9 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
     return this.save(mechData);
   }
 
-  async emailExistCheck(data: EmailExitCheck): Promise<MechInterface | null> {
+  async emailExistCheck(
+    data: EmailExitCheck
+  ): Promise<EmailExistResponse | null> {
     try {
       const { email } = data;
       const mechFound = await this.findOne({ email });
@@ -34,13 +38,13 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
 
   async updateNewPassword(
     data: UpdateNewPasswordDTO
-  ): Promise<MechInterface | null> {
+  ): Promise<UpdateNewPasswordResponse | null> {
     try {
-      const { userId, password } = data;
-      const user = await this.findById(userId);
-      if (user) {
-        user.password = password;
-        return await user.save();
+      const { mechId, password } = data;
+      const mech = await this.findById(mechId);
+      if (mech) {
+        mech.password = password;
+        return await mech.save();
       }
       return null;
     } catch (error) {
@@ -77,7 +81,7 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
     try {
       const result = await this.countDocument(regex);
       return result as number;
-    } catch (error) {
+    } catch (error){
       console.log(
         "error occured while getting the count in the userRepository",
         error

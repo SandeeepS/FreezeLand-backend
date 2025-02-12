@@ -119,11 +119,17 @@ export class BaseRepository<T extends Searchable>
       }
 
       const objectId = new ObjectId(_id);
-      return (await this.model.findByIdAndUpdate(
+      const address =  await this.model.findByIdAndUpdate(
         objectId,
         { $push: qr },
         { new: true }
-      )) as T;
+      )
+
+     if(!address){
+      return null;
+     }
+     return address;
+      
     } catch (error) {
       console.log(error as Error);
       throw error;

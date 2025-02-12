@@ -206,7 +206,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async setDefaultAddress(data: SetUserDefaultAddressDTO) {
+  async setDefaultAddress(data: SetUserDefaultAddressDTO): Promise<UserInterface | null>  {
     try {
       const { userId, addressId } = data;
       console.log(
@@ -223,15 +223,16 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async registerService(data: RegisterServiceDTO) {
+  async registerService(data: RegisterServiceDTO):Promise<Iconcern | null> {
     try {
       console.log(
         "enterd in the userRepository for registering the user complaint"
       );
       const newConcern = await this.concernRepository.addConcern(data);
-      return newConcern as Iconcern;
+      return newConcern ;
     } catch (error) {
       console.log(error as Error);
+      throw error
     }
   }
 }

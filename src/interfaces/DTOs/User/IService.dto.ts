@@ -197,13 +197,8 @@ export interface AddUserAddressDTO {
 
 
 export interface AddUserAddressResponse{
-  name:string,
-  phone:number,
-  email:string,
-  state:string,
-  pin:number,
-  district:string,
-  landMark:string,
+  _id:Types.ObjectId ;
+  values: AddAddress;
 }
 
 export interface EditAddressDTO{
@@ -240,6 +235,18 @@ export interface RegisterServiceDTO {
     locationName: object;
     isBlocked: boolean;
     isDeleted: boolean;
+}
+
+export interface RegisterServiceResponse{
+  _id: Types.ObjectId ;
+  name: string;
+  image: [];
+  service: Types.ObjectId;
+  defaultAddress: Types.ObjectId;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
 
