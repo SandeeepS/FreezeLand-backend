@@ -4,8 +4,13 @@ import mechService from "../services/mechServices";
 import { generateAndSendOTP } from "../utils/generateOtp";
 const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
 import { LoginValidation, SignUpValidation } from "../utils/validator";
+import { IMechController } from "../interfaces/IController/IMechController";
+import {
+  ForgotResentOtpResponse,
+  VerifyForgotOtpMech,
+} from "../interfaces/DTOs/User/IController.dto";
 
-class mechController {
+class mechController implements IMechController {
   constructor(private mechServices: mechService) {}
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
@@ -148,20 +153,20 @@ class mechController {
           const accessTokenMaxAge = 5 * 60 * 1000;
           const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
           res
-          .status(loginStatus.status)
-          .cookie("mech_access_token", access_token, {
-            maxAge: accessTokenMaxAge,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Set to true in production
-            sameSite: "strict",
-          })
-          .cookie("mech_refresh_token", refresh_token, {
-            maxAge: refreshTokenMaxAge,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Set to true in production
-            sameSite: "strict",
-          })
-          .json(loginStatus);
+            .status(loginStatus.status)
+            .cookie("mech_access_token", access_token, {
+              maxAge: accessTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
+            })
+            .cookie("mech_refresh_token", refresh_token, {
+              maxAge: refreshTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
+            })
+            .json(loginStatus);
         } else {
           res
             .status(UNAUTHORIZED)
@@ -177,19 +182,29 @@ class mechController {
     }
   }
 
-  async forgotResentOtpMech(req: Request, res: Response, next: NextFunction) {
+  async forgotResentOtpMech(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<ForgotResentOtpResponse | void> {
     try {
       const { email } = req.body;
       req.app.locals.mechEmail = email;
-      if (!email)
-        return res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "please enter the email" });
+      if (!email) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "please enter the email",
+        }) as ForgotResentOtpResponse;
+      }
       const mech = await this.mechServices.getUserByEmail(email);
-      if (!mech)
+      if (!mech) {
         return res
           .status(BAD_REQUEST)
-          .json({ success: false, message: "mech with email is not exist!" });
+          .json({
+            success: false,
+            message: "mech with email is not exist!",
+          }) as ForgotResentOtpResponse;
+      }
       const otp = await generateAndSendOTP(email);
       req.app.locals.resendOtp = otp;
 
@@ -209,14 +224,24 @@ class mechController {
     }
   }
 
-  async VerifyForgotOtpMech(req: Request, res: Response, next: NextFunction) {
+  async VerifyForgotOtpMech(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<VerifyForgotOtpMech | void> {
     try {
       const otp = req.body.otp;
       console.log("otp from the req body is ", otp);
       if (!otp)
-        return res.json({ success: false, message: "Please enter the otp!" });
+        return res.json({
+          success: false,
+          message: "Please enter the otp!",
+        }) as VerifyForgotOtpMech;
       if (!req.app.locals.resendOtp)
-        return res.json({ success: false, message: "Otp is expired!" });
+        return res.json({
+          success: false,
+          message: "Otp is expired!",
+        }) as VerifyForgotOtpMech;
       if (otp === req.app.locals.resendOtp)
         res.json({ success: true, message: "both otp are same." });
       else res.json({ success: false, message: "Entered otp is not correct!" });
@@ -243,19 +268,24 @@ class mechController {
     }
   }
 
-  async getAllMechanics(req:Request,res:Response,next:NextFunction){
-    try{
+  async getAllMechanics(req: Request, res: Response, next: NextFunction) {
+    try {
       console.log("reached the getAllService function in the admin controller");
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string;
 
       const data = await this.mechServices.getAllMechanics({
-        page,limit,searchQuery
-      })
-      console.log("listed mechanic from the database is in the mechcontroller is ",data);
+        page,
+        limit,
+        searchQuery,
+      });
+      console.log(
+        "listed mechanic from the database is in the mechcontroller is ",
+        data
+      );
       res.status(OK).json(data);
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
@@ -263,18 +293,18 @@ class mechController {
 
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("Entered in the function for logout of mech")
+      console.log("Entered in the function for logout of mech");
       res
-      .clearCookie("mech_access_token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Match the same settings as in login
-        sameSite: "strict",
-      })
-      .clearCookie("mech_refresh_token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Match the same settings as in login
-        sameSite: "strict",
-      });
+        .clearCookie("mech_access_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
+        })
+        .clearCookie("mech_refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
+        });
       res
         .status(200)
         .json({ success: true, message: "user logout - clearing cookie" });

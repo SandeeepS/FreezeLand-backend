@@ -10,11 +10,13 @@ import {
   LoginValidation,
   AddNewDeviceValidation,
 } from "../utils/validator";
+import { IAdminController } from "../interfaces/IController/IAdminController";
+import { GetPreSignedUrlResponse } from "../interfaces/DTOs/Admin/IController.dto";
 // import { storage } from "../firebase";
 // import { ref, uploadString, getDownloadURL } from "firebase/storage";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
-class adminController {
+class adminController implements IAdminController {
   constructor(private adminService: AdminService) {}
 
   milliseconds = (h: number, m: number, s: number) =>
@@ -186,7 +188,11 @@ class adminController {
     }
   }
 
-  async getPresignedUrl(req: Request, res: Response, next: NextFunction) {
+  async getPresignedUrl(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetPreSignedUrlResponse | void> {
     try {
       const { fileName, fileType } = req.query as {
         fileName: string;
@@ -197,7 +203,10 @@ class adminController {
       if (!fileName || !fileType) {
         return res
           .status(400)
-          .json({ success: false, message: "File name and type are required" });
+          .json({
+            success: false,
+            message: "File name and type are required",
+          }) as GetPreSignedUrlResponse;
       }
 
       const imageName = uuidv4() + "-" + fileName; // Generate a unique name for the image
@@ -222,7 +231,14 @@ class adminController {
       console.log("Presigned URL: ", uploadURL);
 
       // Send the presigned URL to the client
-      return res.status(200).json({ success: true, uploadURL, imageName, key });
+      return res
+        .status(200)
+        .json({
+          success: true,
+          uploadURL,
+          imageName,
+          key,
+        }) as GetPreSignedUrlResponse;
     } catch (error) {
       console.log(error as Error);
       next(error);

@@ -45,3 +45,9 @@ export interface GetImageUrlResponse{
     message?:string;
     url?:string;
 }
+
+export interface VerifyForgotOtpMech{
+    success?:boolean;
+    message?:string;
+    url?:string;
+}
