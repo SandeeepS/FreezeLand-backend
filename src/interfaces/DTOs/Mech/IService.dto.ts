@@ -1,7 +1,6 @@
 // import { Types } from "mongoose";
 import Mech from "../../entityInterface/Imech";
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
-import { MechInterface } from "../../../models/mechModel";
 import { Types } from "mongoose";
 export interface SignUpMechDTO {
   name: string;
@@ -106,7 +105,7 @@ export interface GetAllMechanicsDTO {
 export interface GetAllMechanicResponse {
   status: STATUS_CODES;
   data: {
-    mech: MechInterface[] | null;
+    mech: Mech[] | null;
     mechCount: number;
   };
   message: string;

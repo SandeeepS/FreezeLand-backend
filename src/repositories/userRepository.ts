@@ -17,10 +17,26 @@ import {
   EmailExistCheckResponse,
   RegisterServiceDTO,
   SetUserDefaultAddressDTO,
-  GetServiceCountDTO
+  GetServiceCountDTO,
+  SaveUserDTO,
+  SaveUserResponse,
+  FindEmailDTO,
+  FindEmailResponse,
+  GetUserByIdDTO,
+  GetUserByIdResponse,
+  UpdateNewPasswordDTO,
+  UpdateNewPasswordResponse,
+  GetUserListResponse,
+  GetUserListDTO,
+  GetAllUserRegisteredServicesDTO,
+  GetAllUserRegisteredServicesResponse,
+  EditAddressResponse,
+  SetUserDefaultAddressResponse,
+  RegisterServiceResponse,
 } from "../interfaces/DTOs/User/IRepository.dto";
+import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 
-class UserRepository extends BaseRepository<UserInterface & Document> {
+class UserRepository extends BaseRepository<UserInterface & Document> implements IUserRepository {
   private concernRepository: BaseRepository<Iconcern>;
   private serviceRepository: BaseRepository<IServices>;
   
@@ -32,13 +48,14 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
   }
 
   async saveUser(
-    userData: Partial<UserInterface>
-  ): Promise<UserInterface | null> {
-    return this.save(userData);
+    newDetails: SaveUserDTO
+  ): Promise<SaveUserResponse | null> {
+    return this.save(newDetails);
   }
 
-  async findEmail(email: string): Promise<UserInterface | null> {
+  async findEmail(data:FindEmailDTO): Promise<FindEmailResponse | null> {
     try {
+      const {email} = data;
       const userFound = await this.findOne({ email });
       if (userFound) {
         console.log("user email found successfully", userFound);
@@ -62,11 +79,9 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     return this.findOne({ email: email }) as unknown as EmailExistCheckResponse;
   }
 
-  async updateNewPassword(
-    password: string,
-    userId: string
-  ): Promise<UserInterface | null> {
+  async updateNewPassword(data:UpdateNewPasswordDTO): Promise<UpdateNewPasswordResponse | null> {
     try {
+      const {userId,password} = data;
       const user = await this.findById(userId);
       if (user) {
         user.password = password;
@@ -82,17 +97,22 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async getUserById(id: string): Promise<UserInterface | null> {
-    return this.findById(id);
+  async getUserById(data:GetUserByIdDTO): Promise<GetUserByIdResponse | null> {
+    try{
+      const {id} = data;
+      return this.findById(id);
+    }catch(error){
+      console.log(error as Error);
+      throw new Error("error occured while getting the getUserById in the userRepsoitory ");
+    }
   }
 
   //methods used in the admin side
   async getUserList(
-    page: number,
-    limit: number,
-    searchQuery: string
-  ): Promise<UserInterface[]> {
+     data:GetUserListDTO
+  ): Promise<GetUserListResponse[]> {
     try {
+      const {page,limit,searchQuery} = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.findAll(page, limit, regex);
       console.log("users list is ", result);
@@ -145,20 +165,17 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
   }
 
   //function for getting all the userRegistered services
-  async getAllUserRegisteredServices(
-    page: number,
-    limit: number,
-    searchQuery: string
-  ): Promise<unknown> {
+  async getAllUserRegisteredServices(data: GetAllUserRegisteredServicesDTO): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
+      const {page,limit,searchQuery} = data;
       const regex = new RegExp(searchQuery, "i");
 
-      const data = await this.concernRepository.findAll(page, limit, regex);
+      const result = await this.concernRepository.findAll(page, limit, regex);
       console.log(
         "all the user registred complaints is hree sdlfsdflsdfd",
-        data
+        result
       );
-      return data as unknown;
+      return result ;
     } catch (error) {
       console.log(
         "error occured while fetching the data from the database in the userRepositry",
@@ -195,7 +212,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async editAddress(data: EditAddressDTO): Promise<UserInterface | null> {
+  async editAddress(data: EditAddressDTO): Promise<EditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
       const editedAddress = await this.editExistAddress(_id, addressId, values);
@@ -206,7 +223,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async setDefaultAddress(data: SetUserDefaultAddressDTO): Promise<UserInterface | null>  {
+  async setDefaultAddress(data: SetUserDefaultAddressDTO): Promise<SetUserDefaultAddressResponse| null>  {
     try {
       const { userId, addressId } = data;
       console.log(
@@ -223,7 +240,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> {
     }
   }
 
-  async registerService(data: RegisterServiceDTO):Promise<Iconcern | null> {
+  async registerService(data: RegisterServiceDTO):Promise<RegisterServiceResponse | null> {
     try {
       console.log(
         "enterd in the userRepository for registering the user complaint"

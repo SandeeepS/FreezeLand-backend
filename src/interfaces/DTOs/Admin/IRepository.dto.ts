@@ -110,7 +110,7 @@ export interface GetServiceDTO {
   id: string;
 }
 
-export interface GetServiceResponse{
+export interface GetServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
@@ -124,7 +124,7 @@ export interface EditExistServiceDTO {
   _id: string;
   values: IServices;
 }
-export interface EditExistServiceResponse{
+export interface EditExistServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
@@ -179,7 +179,7 @@ export interface BlockServiceDTO {
   _id: string;
 }
 
-export interface BlockServiceResponse{
+export interface BlockServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
@@ -193,7 +193,7 @@ export interface BlockDeviceDTO {
   _id: string;
 }
 
-export interface BlockDeviceResponse{
+export interface BlockDeviceResponse {
   name: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -243,7 +243,7 @@ export interface DeleteServiceDTO {
   serviceId: string;
 }
 
-export interface DeleteServiceResponse{
+export interface DeleteServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
@@ -255,7 +255,7 @@ export interface DeleteServiceResponse{
 export interface DeleteDeviceDTO {
   deviceId: string;
 }
-export interface DeleteDeviceResponse{
+export interface DeleteDeviceResponse {
   name: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -265,7 +265,7 @@ export interface IsServiceExistDTO {
   name: string;
 }
 
-export interface IsServiceExistResponse{
+export interface IsServiceExistResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
@@ -279,7 +279,7 @@ export interface IsDeviceExistDTO {
   name: string;
 }
 
-export interface isDeviceExistResponse{
+export interface isDeviceExistResponse {
   name: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -289,7 +289,7 @@ export interface AddNewServiceDTO {
   values: string;
 }
 
-export interface AddNewServiceResponse{
+export interface AddNewServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
@@ -303,7 +303,7 @@ export interface AddNewDeviceDTO {
   name: string;
 }
 
-export interface AddNewDeviceResponse{
+export interface AddNewDeviceResponse {
   name: string;
   isBlocked: boolean;
   isDeleted: boolean;

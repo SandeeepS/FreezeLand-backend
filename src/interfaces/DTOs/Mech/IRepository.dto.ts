@@ -53,3 +53,41 @@ export interface UpdateNewPasswordResponse {
   isBlocked?: boolean;
   isDeleted?: boolean;
 }
+
+export interface GetMechByIdDTO {
+  id: string;
+}
+
+export interface GetMechByIdResponse {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  password: string;
+  phone: number;
+  role: string;
+  isVerified: boolean;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+export interface GetMechListDTO {
+  page: number;
+  limit: number;
+  searchQuery: string;
+}
+
+export interface GetMechListResponse {
+  id?: string;
+  name: string;
+  email: string;
+  password: string;
+  phone: number;
+  role: string;
+  isVerified: boolean;
+  isBlocked?: boolean;
+  isDeleted?: boolean;
+}
+
+export interface AddServiceDTO {
+  values: string;
+}

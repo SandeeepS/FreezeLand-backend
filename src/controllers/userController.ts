@@ -336,10 +336,10 @@ class userController {
   async updateNewPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, userId } = req.body;
-      const result = await this.userServices.updateNewPassword(
+      const result = await this.userServices.updateNewPassword({
         password,
-        userId
-      );
+        userId,
+      });
       console.log(result);
       if (result)
         res.json({ success: true, data: result, message: "successful" });

@@ -1,16 +1,25 @@
 import {
+  AddServiceDTO,
   EmailExistResponse,
   EmailExitCheck,
+  GetMechByIdDTO,
+  GetMechByIdResponse,
+  GetMechListDTO,
+  GetMechListResponse,
   SaveMechDTO,
   SaveMechResponse,
   UpdateNewPasswordDTO,
   UpdateNewPasswordResponse,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
+import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import MechModel, { MechInterface } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
 
-class MechRepository extends BaseRepository<MechInterface & Document>{
+class MechRepository
+  extends BaseRepository<MechInterface & Document>
+  implements IMechRepository
+{
   constructor() {
     super(MechModel);
   }
@@ -56,16 +65,18 @@ class MechRepository extends BaseRepository<MechInterface & Document>{
     }
   }
 
-  async getMechById(id: string): Promise<MechInterface | null> {
-    return this.findById(id);
+  async getMechById(data: GetMechByIdDTO): Promise<GetMechByIdResponse | null> {
+    try {
+      return this.findById(data.id);
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured while getmechById");
+    }
   }
 
-  async getMechList(
-    page: number,
-    limit: number,
-    searchQuery: RegExp
-  ): Promise<MechInterface[]> {
+  async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
+      const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.findAll(page, limit, regex);
       console.log("mech list is ", result);
@@ -81,7 +92,7 @@ class MechRepository extends BaseRepository<MechInterface & Document>{
     try {
       const result = await this.countDocument(regex);
       return result as number;
-    } catch (error){
+    } catch (error) {
       console.log(
         "error occured while getting the count in the userRepository",
         error
@@ -90,8 +101,9 @@ class MechRepository extends BaseRepository<MechInterface & Document>{
     }
   }
 
-  async AddService(values: string) {
+  async AddService(data: AddServiceDTO): Promise<unknown> {
     try {
+      const { values } = data;
       const result = await this.addService(values);
       return result;
     } catch (error) {

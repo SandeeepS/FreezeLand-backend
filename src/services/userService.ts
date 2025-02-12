@@ -29,10 +29,13 @@ import {
   GetServiceResponse,
   AddUserAddressResponse,
   EditUserResponse,
-  RegisterServiceResponse
+  RegisterServiceResponse,
+  UpdateNewPasswordDTO,
+  UpdateNewPasswordResponse,
+  EditAddressResponse,
+  SetUserDefaultAddressResponse,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
-import { UserInterface } from "../models/userModel";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 dotenv.config();
 
@@ -79,10 +82,16 @@ class userService implements IUserServices {
         phone: phone,
       };
       console.log("new Encypted password with data is ", newDetails);
-      const user = await this.userRepository.saveUser(newDetails);
+      const user = await this.userRepository.saveUser({
+        name,
+        password,
+        email,
+        phone,
+      });
       if (user && user?.role) {
-        const token = this.createjwt.generateToken(user.id, user.role);
-        const refresh_token = this.createjwt.generateRefreshToken(user?.id);
+        const userId = user._id.toString();
+        const token = this.createjwt.generateToken(userId, user.role);
+        const refresh_token = this.createjwt.generateRefreshToken(userId);
         console.log("token is ", token);
         console.log("refresh", refresh_token);
         return {
@@ -228,7 +237,7 @@ class userService implements IUserServices {
             message: "User ID is missing",
           },
         } as const;
-      const user = await this.userRepository.getUserById(data.id);
+      const user = await this.userRepository.getUserById({ id: data.id });
       if (!user) {
         return {
           status: NOT_FOUND,
@@ -253,33 +262,33 @@ class userService implements IUserServices {
     }
   }
 
-    //getting all the services provided by the website 
-    async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
-      try {
-        let { page, limit, searchQuery } = data;
-        if (isNaN(page)) page = 1;
-        if (isNaN(limit)) limit = 10;
-        if (!searchQuery) searchQuery = "";
-        const services = await this.userRepository.getAllServices({
-          page,
-          limit,
-          searchQuery,
-        });
-        console.log("list of services is ", services);
-        const servicesCount = await this.userRepository.getServiceCount({
-          searchQuery,
-        });
-  
-        return {
-          status: STATUS_CODES.OK,
-          data: { services, servicesCount },
-          message: "success",
-        };
-      } catch (error) {
-        console.log(error);
-        throw new Error("Error occured.");
-      }
+  //getting all the services provided by the website
+  async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
+    try {
+      let { page, limit, searchQuery } = data;
+      if (isNaN(page)) page = 1;
+      if (isNaN(limit)) limit = 10;
+      if (!searchQuery) searchQuery = "";
+      const services = await this.userRepository.getAllServices({
+        page,
+        limit,
+        searchQuery,
+      });
+      console.log("list of services is ", services);
+      const servicesCount = await this.userRepository.getServiceCount({
+        searchQuery,
+      });
+
+      return {
+        status: STATUS_CODES.OK,
+        data: { services, servicesCount },
+        message: "success",
+      };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error occured.");
     }
+  }
 
   //getting the user registered complaint details
   async getAllRegisteredServices(
@@ -288,11 +297,11 @@ class userService implements IUserServices {
     searchQuery: string
   ): Promise<unknown> {
     try {
-      const data = await this.userRepository.getAllUserRegisteredServices(
+      const data = await this.userRepository.getAllUserRegisteredServices({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       return data;
     } catch (error) {
       console.log(
@@ -303,8 +312,11 @@ class userService implements IUserServices {
     }
   }
 
-  async updateNewPassword(password: string, userId: string):Promise<UserInterface | null> {
+  async updateNewPassword(
+    data: UpdateNewPasswordDTO
+  ): Promise<UpdateNewPasswordResponse | null> {
     try {
+      const { password, userId } = data;
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
       if (!secret_key) {
         throw new Error(
@@ -317,7 +329,10 @@ class userService implements IUserServices {
         saltLength: 10,
       });
       const newPassword = cryptr.encrypt(password);
-      return await this.userRepository.updateNewPassword(newPassword, userId);
+      return await this.userRepository.updateNewPassword({
+        password: newPassword,
+        userId,
+      });
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -330,31 +345,32 @@ class userService implements IUserServices {
       return this.userRepository.editUser({ _id, name, phone });
     } catch (error) {
       console.log(error as Error);
-      throw error
+      throw error;
     }
   }
 
-  async AddUserAddress(data: AddUserAddressDTO): Promise<AddUserAddressResponse | null> {
+  async AddUserAddress(
+    data: AddUserAddressDTO
+  ): Promise<AddUserAddressResponse | null> {
     try {
       const { _id, values } = data;
       console.log("id from the addUserAddress in the user service is ", _id);
-      const address =  await this.userRepository.addAddress({ _id, values });
-      if(address){
+      const address = await this.userRepository.addAddress({ _id, values });
+      if (address) {
         return {
-          _id:address._id,
-          values:address as AddAddress
-        }
-      }else{
+          _id: address._id,
+          values: address as AddAddress,
+        };
+      } else {
         return null;
       }
- 
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error while AddUserAddress in userService ");
     }
   }
 
-  async editAddress(data: EditAddressDTO): Promise<UserInterface | null> {
+  async editAddress(data: EditAddressDTO): Promise<EditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
       return await this.userRepository.editAddress({ _id, addressId, values });
@@ -364,7 +380,9 @@ class userService implements IUserServices {
     }
   }
 
-  async setUserDefaultAddress(data: SetUserDefaultAddressDTO): Promise<UserInterface | null>  {
+  async setUserDefaultAddress(
+    data: SetUserDefaultAddressDTO
+  ): Promise<SetUserDefaultAddressResponse | null> {
     try {
       const { userId, addressId } = data;
       console.log("entered in the userService ");
@@ -375,13 +393,17 @@ class userService implements IUserServices {
     }
   }
 
-  async registerService(data: RegisterServiceDTO) :Promise<RegisterServiceResponse | null>{
+  async registerService(
+    data: RegisterServiceDTO
+  ): Promise<RegisterServiceResponse | null> {
     try {
       console.log("entered in the userService for register Service");
       return await this.userRepository.registerService(data);
     } catch (error) {
       console.log(error as Error);
-      throw new Error("Error while Registering user compliantes in userService");
+      throw new Error(
+        "Error while Registering user compliantes in userService"
+      );
     }
   }
 }

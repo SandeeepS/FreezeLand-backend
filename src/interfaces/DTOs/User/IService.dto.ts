@@ -91,9 +91,9 @@ export interface NewDetailsDTO {
 export interface EmailExistCheckDTO {
   id: string;
   name: string;
-  password: string;
   email: string;
   phone: number;
+  password?:string;
   profile_picture: string;
   role: string;
   address: {
@@ -113,7 +113,6 @@ export interface EmailExistCheckDTO {
 export interface EmailExistCheckResponse {
   id: string;
   name: string;
-  password: string;
   email: string;
   phone: number;
   profile_picture: string;
@@ -151,7 +150,32 @@ export interface GetServicesDTO {
   searchQuery: string | undefined;
 }
 
+export interface UpdateNewPasswordDTO{
+  password:string;
+  userId:string;
+}
 
+
+export interface UpdateNewPasswordResponse {
+  id?: string;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  role: string;
+  address: {
+    name: string;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
 
 export interface GetServiceResponse {
   status: STATUS_CODES;
@@ -206,10 +230,51 @@ export interface EditAddressDTO{
   addressId:string;
   values:AddAddress;
 }
+export interface EditAddressResponse{
+    _id: Types.ObjectId;
+    name: string;
+    email: string;
+    phone: number;
+    profile_picture: string;
+    address: {
+      name: string;
+      phone: number;
+      email: string;
+      state: string;
+      pin: number;
+      district: string;
+      landMark: string;
+    }[];
+    defaultAddress: string;
+    role: string;
+    isBlocked: boolean;
+    isDeleted: boolean;
+}
 
 export interface SetUserDefaultAddressDTO {
   userId:string;
   addressId:string;
+}
+
+export interface SetUserDefaultAddressResponse{
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  address: {
+    name: string;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  role: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
 export interface GetUserByEmail {

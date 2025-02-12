@@ -1,57 +1,187 @@
 import { AddAddress } from "../../commonInterfaces/AddAddress";
 import { Types } from "mongoose";
 
+export interface SaveUserDTO {
+  name: string;
+  password: string;
+  email: string;
+  phone?: number;
+
+}
+
+export interface SaveUserResponse {
+  _id: Types.ObjectId;
+  name: string;
+  password: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  address: {
+    name: string;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  role: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+export interface FindEmailDTO {
+  email: string;
+}
+
+export interface FindEmailResponse {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  address: {
+    name: string;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  role: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
 export interface EmailExistCheckDTO {
-    email:string,
+  email: string;
 }
 
-export interface EmailExistCheckResponse{
-    id: string;
+export interface EmailExistCheckResponse {
+  id: string;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  role: string;
+  address: {
     name: string;
-    password: string;
-    email: string;
     phone: number;
-    profile_picture: string;
-    role: string;
-    address: {
-      name: string;
-      phone: number;
-      email: string;
-      state: string;
-      pin: number;
-      district: string;
-      landMark: string;
-    }[];
-    defaultAddress:string;
-    isBlocked: boolean;
-    isDeleted: boolean;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
+export interface UpdateNewPasswordDTO {
+  password: string;
+  userId: string;
+}
+
+export interface UpdateNewPasswordResponse {
+  id?: string;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  role: string;
+  address: {
+    name: string;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+export interface GetUserByIdDTO {
+  id: string;
+}
+export interface GetUserByIdResponse {
+  id?: string;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  role: string;
+  address: {
+    name: string;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+export interface GetUserListDTO {
+  page: number;
+  limit: number;
+  searchQuery: string;
+}
+
+export interface GetUserListResponse {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  address: {
+    name: string;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  role: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
 export interface EditUserDTO {
-    _id:string;
-    name:string;
-    phone:number;
-  }
+  _id: string;
+  name: string;
+  phone: number;
+}
 
-export interface EditUserResponse{
-    id?: string;
+export interface EditUserResponse {
+  id?: string;
+  name: string;
+  password: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  address: {
     name: string;
-    password: string;
-    email: string;
     phone: number;
-    profile_picture: string;
-    address: {
-      name: string;
-      phone: number;
-      email: string;
-      state: string;
-      pin: number;
-      district: string;
-      landMark: string;
-    }[];
-    defaultAddress:string;
-    isBlocked: boolean;
-    isDeleted: boolean;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
 export interface GetAllServicesDTO {
@@ -59,7 +189,6 @@ export interface GetAllServicesDTO {
   limit: number;
   searchQuery: string;
 }
-
 
 export interface GetAllServiceResponse {
   id?: Types.ObjectId;
@@ -72,44 +201,115 @@ export interface GetAllServiceResponse {
 }
 
 export interface AddUserAddressDTO {
-  _id:string;
+  _id: string;
   values: AddAddress;
 }
 
-export interface AddUserAddressResponse{
-    _id:Types.ObjectId;
-    name:string,
-    phone:number,
-    email:string,
-    state?:string,
-    pin?:number,
-    district?:string,
-    landMark?:string
+export interface AddUserAddressResponse {
+  _id: Types.ObjectId;
+  name: string;
+  phone: number;
+  email: string;
+  state?: string;
+  pin?: number;
+  district?: string;
+  landMark?: string;
 }
 
-export interface EditAddressDTO{
-    _id:string;
-    addressId:string;
-    values:AddAddress;
-  }
+export interface EditAddressDTO {
+  _id: string;
+  addressId: string;
+  values: AddAddress;
+}
 
-  export interface SetUserDefaultAddressDTO {
-    userId:string;
-    addressId:string;
-  }
-
-export interface RegisterServiceDTO {
-    _id: Types.ObjectId ;
+export interface EditAddressResponse{
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  phone: number;
+  role:string;
+  profile_picture: string;
+  address: {
     name: string;
-    image: [];
-    service: Types.ObjectId;
-    defaultAddress: Types.ObjectId;
-    discription: string;
-    locationName: object;
-    isBlocked: boolean;
-    isDeleted: boolean;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
-export interface GetServiceCountDTO{
-  searchQuery:string;
+export interface SetUserDefaultAddressDTO {
+  userId: string;
+  addressId: string;
+}
+
+export interface SetUserDefaultAddressResponse{
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  role:string;
+  address: {
+    name: string;
+    phone: number;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+export interface RegisterServiceDTO {
+  _id: Types.ObjectId;
+  name: string;
+  image: [];
+  service: Types.ObjectId;
+  defaultAddress: Types.ObjectId;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+export interface RegisterServiceResponse{
+  _id: Types.ObjectId;
+  name: string;
+  image: [];
+  service: Types.ObjectId;
+  defaultAddress: Types.ObjectId;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+export interface GetServiceCountDTO {
+  searchQuery: string;
+}
+
+export interface GetAllUserRegisteredServicesDTO {
+  page: number;
+  limit: number;
+  searchQuery: string;
+}
+
+export interface GetAllUserRegisteredServicesResponse {
+  _id: Types.ObjectId;
+  name: string;
+  image: [];
+  service: Types.ObjectId;
+  defaultAddress: Types.ObjectId;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
