@@ -13,10 +13,8 @@ export interface GetPreSignedUrlResponse {
   
   }
 
-export const generatePresignedUrl = async (fileName:string,fileType:string):Promise<GetPreSignedUrlResponse> => {
+export const generatePresignedUrl = async (fileName:string,fileType:string,folderName:string):Promise<GetPreSignedUrlResponse> => {
     try{
-
- 
     const imageName = uuidv4() + "-" + fileName; // Generate a unique name for the image
     const bucketName = process.env.S3_BUCKET_NAME;
     const region = process.env.S3_REGION;
@@ -29,11 +27,11 @@ export const generatePresignedUrl = async (fileName:string,fileType:string):Prom
    
     const s3Params = {
       Bucket: bucketName,
-      Key: `ServiceImages/${imageName}`,
+      Key: `${folderName}/${imageName}`,
       expires: 7200,
       ContentType: fileType,
     };
-    const key = `ServiceImages/${imageName}`;
+    const key = `${folderName}/${imageName}`;
     const command = new PutObjectCommand(s3Params);
     const uploadURL = await getSignedUrl(S3Client, command);
     console.log("Presigned URL: ", uploadURL);

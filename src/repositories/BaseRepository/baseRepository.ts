@@ -56,34 +56,7 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  // async findById(id: string): Promise<T | null> {
-  //   try {
-  //     const result = await this.model.aggregate([
-  //       { $match: { _id: id } },
-  //       {
-  //         $addFields: {
-  //           defaultAddressDetails: {
-  //             $arrayElemAt: [
-  //               {
-  //                 $filter: {
-  //                   input: "$address",
-  //                   as: "addr",
-  //                   cond: { $eq: ["$$addr._id", "$defaultAddress"] },
-  //                 },
-  //               },
-  //               0,
-  //             ],
-  //           },
-  //         },
-  //       },
-  //     ]);
 
-  //     return result.length > 0 ? (result[0] as T) : null;
-  //   } catch (error) {
-  //     console.log("Error in BaseRepository findById:", error as Error);
-  //     throw error;
-  //   }
-  // }
 
   async findOne(filter: Partial<T>): Promise<T | null> {
     try {
@@ -174,6 +147,23 @@ export class BaseRepository<T extends Searchable>
         .limit(limit)
         .select("-password")
         .exec();
+    } catch (error) {
+      console.log(
+        "Error while getting the user details from the baseRepository",
+        error
+      );
+      return null;
+    }
+  }
+
+  
+  async findAll2(
+  ): Promise<T[] | null> {
+    try {
+      return await this.model
+        .find({
+          isDeleted: false,
+        })
     } catch (error) {
       console.log(
         "Error while getting the user details from the baseRepository",

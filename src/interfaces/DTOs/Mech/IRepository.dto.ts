@@ -91,3 +91,19 @@ export interface GetMechListResponse {
 export interface AddServiceDTO {
   values: string;
 }
+
+export interface GetAllDevicesResponse {
+  name: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+
+export interface VerifyMechanicDTO {
+  name:string;
+  id:string;
+  mechanicType: string[];
+  photo: string;
+  adharProof: string;
+  employeeLicense: string;
+}

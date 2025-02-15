@@ -4,7 +4,6 @@ import AdminService from "../services/AdminServices";
 
 import {
   AddNewServiceValidation,
-  LoginValidation,
   AddNewDeviceValidation,
 } from "../utils/validator";
 import { IAdminController } from "../interfaces/IController/IAdminController";
@@ -23,46 +22,39 @@ class adminController implements IAdminController {
     try {
       console.log("enterd in the backend adminlogin in adminController");
       const { email, password } = req.body;
-      const check = LoginValidation(email, password);
-      if (check) {
-        const loginStatus = await this.adminService.adminLogin({
-          email,
-          password,
-          role: "admin",
-        });
 
-        if (!loginStatus.data.success) {
-          res
-            .status(UNAUTHORIZED)
-            .json({ success: false, message: loginStatus.data.message });
-          return;
-        } else {
-          const access_token = loginStatus.data.token;
-          const refresh_token = loginStatus.data.refresh_token;
-          const accessTokenMaxAge = 5 * 60 * 1000;
-          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-          console.log("respose is going to send to the frontend");
-          res
-            .status(loginStatus.status)
-            .cookie("admin_access_token", access_token, {
-              maxAge: accessTokenMaxAge,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production", // Set to true in production
-              sameSite: "strict",
-            })
-            .cookie("admin_refresh_token", refresh_token, {
-              maxAge: refreshTokenMaxAge,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production", // Set to true in production
-              sameSite: "strict",
-            })
-            .json(loginStatus);
-        }
+      const loginStatus = await this.adminService.adminLogin({
+        email,
+        password,
+        role: "admin",
+      });
+
+      if (loginStatus.data.success === false) {
+        res
+          .status(OK)
+          .json({ success: false, message: loginStatus.data.message });
+        return;
       } else {
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "Please check the email and password",
-        });
+        const access_token = loginStatus.data.token;
+        const refresh_token = loginStatus.data.refresh_token;
+        const accessTokenMaxAge = 5 * 60 * 1000;
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+        console.log("respose is going to send to the frontend");
+        res
+          .status(loginStatus.status)
+          .cookie("admin_access_token", access_token, {
+            maxAge: accessTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Set to true in production
+            sameSite: "strict",
+          })
+          .cookie("admin_refresh_token", refresh_token, {
+            maxAge: refreshTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Set to true in production
+            sameSite: "strict",
+          })
+          .json(loginStatus);
       }
     } catch (error) {
       console.log(error as Error);
@@ -199,27 +191,24 @@ class adminController implements IAdminController {
         fileType: string;
       };
       console.log("file from the front end is ", fileName, fileType);
-      const result = await this.adminService.getPresignedUrl({fileName,fileType})
-      console.log("presinged Url is from teh adminController is ",result);
-      if(result.success === false){
-        return res
-        .status(400)
-        .json({
+      const result = await this.adminService.getPresignedUrl({
+        fileName,
+        fileType,
+      });
+      console.log("presinged Url is from teh adminController is ", result);
+      if (result.success === false) {
+        return res.status(400).json({
           success: false,
           message: "File name and type are required",
         }) as GetPreSignedUrlResponse;
-      }else{
-        return res
-        .status(200)
-        .json({
+      } else {
+        return res.status(200).json({
           success: true,
           uploadURL: result.uploadURL,
-          imageName:result.imageName,
-          key:result.key,
+          imageName: result.imageName,
+          key: result.key,
         }) as GetPreSignedUrlResponse;
       }
-
-
     } catch (error) {
       console.log(error as Error);
       next(error);

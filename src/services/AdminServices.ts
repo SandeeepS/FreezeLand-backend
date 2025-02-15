@@ -46,6 +46,7 @@ import {
 } from "../interfaces/DTOs/Admin/IService.dto";
 import { IAdminService } from "../interfaces/IServices/IAdminService";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
+import { LoginValidation } from "../utils/validator";
 
 class adminService implements IAdminService {
   constructor(
@@ -58,6 +59,10 @@ class adminService implements IAdminService {
     try {
       console.log("entered in the admin login");
       const { email, password } = data;
+      const check = LoginValidation(email,password);
+      if(check){
+
+    
       const admin = await this.adminRepository.isAdminExist({ email });
       if (admin?.id) {
         if (admin?.password === password) {
@@ -66,7 +71,7 @@ class adminService implements IAdminService {
           const refreshToken = this.createjwt.generateRefreshToken(admin.id);
           console.log("admin is exist", admin);
           return {
-            status: STATUS_CODES.OK,
+            status: STATUS_CODES.OK || 200,
             data: {
               success: true,
               message: "Authentication Successful !",
@@ -77,6 +82,7 @@ class adminService implements IAdminService {
             },
           };
         } else {
+          console.log("Incorrted password");
           return {
             status: STATUS_CODES.UNAUTHORIZED,
             data: {
@@ -90,10 +96,19 @@ class adminService implements IAdminService {
           status: STATUS_CODES.UNAUTHORIZED,
           data: {
             success: false,
-            message: "Authentication failed",
+            message: "Email not exist",
           },
         } as const;
       }
+    }else{
+      return {
+        status: STATUS_CODES.UNAUTHORIZED,
+        data: {
+          success: false,
+          message: "Email or password is incorrect",
+        },
+      } as const;
+    }
     } catch (error) {
       console.log("error occured while login admin");
       throw error;
@@ -395,13 +410,13 @@ class adminService implements IAdminService {
           message: "File name and type are required",
         } as GetPreSignedUrlResponse;
       }
-      const result = await generatePresignedUrl(fileName,fileType);
+      const folderName = "ServiceImages";
+      const result = await generatePresignedUrl(fileName,fileType,folderName);
       return result as GetPreSignedUrlResponse;
     }catch(error){
       console.log(error);
       throw new Error("error while generating the presinged url from the adminService")
     }
-  
    
   }
 }

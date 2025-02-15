@@ -9,6 +9,7 @@ import {
   ForgotResentOtpResponse,
   VerifyForgotOtpMech,
 } from "../interfaces/DTOs/User/IController.dto";
+import { GetPreSignedUrlResponse } from "../interfaces/DTOs/Mech/IController.dto";
 
 class mechController implements IMechController {
   constructor(private mechServices: mechService) {}
@@ -290,6 +291,77 @@ class mechController implements IMechController {
       next(error);
     }
   }
+
+  async getAllDevices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllDevces  funciton in the mech controller to  access the all the devices "
+      );
+      const data = await this.mechServices.getDevcies();
+      console.log(
+        "listed services from the database is in the mech controller is",
+        data
+      );
+      res.status(OK).json(data);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async verifyMechanic (req:Request,res:Response,next:NextFunction){
+    try{
+      const {values} = req.body;
+      console.log("reached in the mechController for mech Verification ",values);
+      const data = await this.mechServices.VerifyMechanic(values);
+      res.status(OK).json(data);
+    }catch(error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
+    async getS3SingUrlForMechCredinential(
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ): Promise<GetPreSignedUrlResponse | void> {
+      try {
+        const { fileName, fileType,name } = req.query as {
+          fileName: string;
+          fileType: string;
+          name: string;
+        };
+        console.log("file from the front end is ", fileName, fileType);
+        const result = await this.mechServices.getS3SingUrlForMechCredinential({
+          fileName,
+          fileType,
+          name
+       
+        });
+        console.log("presinged Url is from teh adminController is ", result);
+        if (result.success === false) {
+          return res.status(400).json({
+            success: false,
+            message: "File name and type are required",
+          }) as GetPreSignedUrlResponse;
+        } else {
+          return res.status(200).json({
+            success: true,
+            uploadURL: result.uploadURL,
+            imageName: result.imageName,
+            key: result.key,
+          }) as GetPreSignedUrlResponse;
+        }
+      } catch (error) {
+        console.log(error as Error);
+        next(error);
+      }
+    }
+
+
+
 
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {

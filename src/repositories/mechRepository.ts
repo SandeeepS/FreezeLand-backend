@@ -2,6 +2,7 @@ import {
   AddServiceDTO,
   EmailExistResponse,
   EmailExitCheck,
+  GetAllDevicesResponse,
   GetMechByIdDTO,
   GetMechByIdResponse,
   GetMechListDTO,
@@ -10,8 +11,10 @@ import {
   SaveMechResponse,
   UpdateNewPasswordDTO,
   UpdateNewPasswordResponse,
+  VerifyMechanicDTO,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
+import deviceModel, { IDevice } from "../models/deviceModel";
 import MechModel, { MechInterface } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
@@ -20,8 +23,11 @@ class MechRepository
   extends BaseRepository<MechInterface & Document>
   implements IMechRepository
 {
+  private deviceRepository: BaseRepository<IDevice>;
+
   constructor() {
     super(MechModel);
+    this.deviceRepository = new BaseRepository<IDevice>(deviceModel);
   }
 
   async saveMechanic(mechData: SaveMechDTO): Promise<SaveMechResponse | null> {
@@ -109,6 +115,30 @@ class MechRepository
     } catch (error) {
       console.log(error as Error);
       throw new Error();
+    }
+  }
+
+  async verifyMechanic(values:VerifyMechanicDTO){
+    try{
+      console.log("entered in the mechRepository");
+      console.log("valeu sdfsdo dso",values);
+      const id = values.id;
+      console.log("id  ",id);
+      const response  = await this.update(id,values)
+      return response;
+    }catch(error){
+      console.log(error);
+      throw new Error();
+    }
+  }
+
+  async getAllDevices(): Promise<GetAllDevicesResponse[]> {
+    try {
+      const result = await this.deviceRepository.findAll2();
+      return result as GetAllDevicesResponse[];
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
     }
   }
 }

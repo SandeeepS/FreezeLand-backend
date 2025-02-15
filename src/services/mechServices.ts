@@ -6,8 +6,11 @@ import Cryptr from "cryptr";
 import {
   EmailExistResponse,
   EmailExitCheckDTO,
+  GetAllDevicesResponse,
   GetAllMechanicResponse,
   GetAllMechanicsDTO,
+  GetPreSignedUrlDTO,
+  GetPreSignedUrlResponse,
   MechLoginDTO,
   MechLoginResponse,
   SaveMechDTO,
@@ -16,8 +19,11 @@ import {
   SignUpMechResponse,
   UpdateNewPasswordDTO,
   UpdateNewPasswordResponse,
+  VerifyMechanicDTO,
+ 
 } from "../interfaces/DTOs/Mech/IService.dto";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
+import { generatePresignedUrl } from "../utils/generatePresignedUrl";
 
 const { OK, UNAUTHORIZED } = STATUS_CODES;
 class mechService implements IMechServices {
@@ -231,6 +237,50 @@ class mechService implements IMechServices {
       throw new Error(
         "Error occured while getting registered mechanic in the mechService "
       );
+    }
+  }
+
+  async VerifyMechanic (values:VerifyMechanicDTO){
+    try{
+      
+      console.log("Entered in the mechService for verifiying mechanic",values);
+      const response = await this.mechRepository.verifyMechanic(values);
+      return response;
+    }catch(error){
+      console.log(error);
+      throw new Error("Erorr occured while vefirication fo the Mechanic from the mechService.tsx");
+    }
+  }
+
+    async getS3SingUrlForMechCredinential(data: GetPreSignedUrlDTO) {
+      try{
+        const { fileName, fileType,name } = data;
+  
+        if (!fileName || !fileType) {
+          return {
+            success: false,
+            message: "File name and type are required",
+          } as GetPreSignedUrlResponse;
+        }
+        const folderName = `MechanicImages/MechanicCredential/${name}Credential`;
+        const result = await generatePresignedUrl(fileName,fileType,folderName);
+        return result as GetPreSignedUrlResponse;
+      }catch(error){
+        console.log(error);
+        throw new Error("error while generating the presinged url from the adminService")
+      }
+     
+    }
+
+  //getting all devices
+  async getDevcies(): Promise<GetAllDevicesResponse[]> {
+    try {
+      const devices = await this.mechRepository.getAllDevices();
+      console.log("list of device  is ", devices);
+      return devices as GetAllDevicesResponse[];
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error occured.");
     }
   }
 

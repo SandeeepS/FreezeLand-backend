@@ -17,13 +17,16 @@ declare global {
 
 const mechAuth = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const access_token = req.cookies.mechanic_access_token;
-      const refresh_token = req.cookies.mechanic_refresh_token;
+    try { 
+      console.log("reched the mechAuth");
+
+      const access_token = req.cookies.mech_access_token;
+      const refresh_token = req.cookies.mech_refresh_token;
 
       if (!refresh_token) {
-        res.clearCookie("mechanic_access_token");
-        res.clearCookie("mechanic_refresh_token");
+        console.log("refresh token is not presnet")
+        res.clearCookie("mech_access_token");
+        res.clearCookie("mech_refresh_token");
         return res.status(401).json({
           success: false,
           message: "Token expired or not available. Please log in again.",
@@ -47,7 +50,7 @@ const mechAuth = (allowedRoles: string[]) => {
         }
 
         const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
-        res.cookie("mechanic_access_token", newAccessToken, {
+        res.cookie("mech_access_token", newAccessToken, {
           maxAge: accessTokenMaxAge,
         });
         decoded = jwt.verifyToken(newAccessToken);
@@ -55,7 +58,8 @@ const mechAuth = (allowedRoles: string[]) => {
 
       if (decoded.success && decoded.decoded) {
         const id = decoded.decoded.data.toString();
-        const mechanic = await mechanicRepository.getMechById(id);
+        console.log("id from the decoded",id);
+        const mechanic = await mechanicRepository.getMechById({id});
 
         if (!mechanic) {
           return res.status(404).json({
