@@ -4,8 +4,14 @@ import mechService from "../services/mechServices";
 import { generateAndSendOTP } from "../utils/generateOtp";
 const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
 import { LoginValidation, SignUpValidation } from "../utils/validator";
+import { IMechController } from "../interfaces/IController/IMechController";
+import {
+  ForgotResentOtpResponse,
+  VerifyForgotOtpMech,
+} from "../interfaces/DTOs/User/IController.dto";
+import { GetPreSignedUrlResponse } from "../interfaces/DTOs/Mech/IController.dto";
 
-class mechController {
+class mechController implements IMechController {
   constructor(private mechServices: mechService) {}
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
@@ -58,14 +64,12 @@ class mechController {
         }
       } else {
         console.log("mechanic details validation from the backend is failed");
-        res
-          .status(UNAUTHORIZED)
-          .json({
-            success: false,
-            message: "Please enter  valid mechanic  details !!",
-          });
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Please enter  valid mechanic  details !!",
+        });
       }
-    } catch (error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
@@ -128,7 +132,10 @@ class mechController {
       const { email, password }: { email: string; password: string } = req.body;
       const check = LoginValidation(email, password);
       if (check) {
-        const loginStatus = await this.mechServices.mechLogin(email, password);
+        const loginStatus = await this.mechServices.mechLogin({
+          email,
+          password,
+        });
         console.log(loginStatus);
         if (
           loginStatus &&
@@ -148,11 +155,17 @@ class mechController {
           const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
           res
             .status(loginStatus.status)
-            .cookie("m_access_token", access_token, {
+            .cookie("mech_access_token", access_token, {
               maxAge: accessTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
             })
-            .cookie("m_refresh_token", refresh_token, {
+            .cookie("mech_refresh_token", refresh_token, {
               maxAge: refreshTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
             })
             .json(loginStatus);
         } else {
@@ -170,19 +183,29 @@ class mechController {
     }
   }
 
-  async forgotResentOtpMech(req: Request, res: Response, next: NextFunction) {
+  async forgotResentOtpMech(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<ForgotResentOtpResponse | void> {
     try {
       const { email } = req.body;
       req.app.locals.mechEmail = email;
-      if (!email)
-        return res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "please enter the email" });
+      if (!email) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "please enter the email",
+        }) as ForgotResentOtpResponse;
+      }
       const mech = await this.mechServices.getUserByEmail(email);
-      if (!mech)
+      if (!mech) {
         return res
           .status(BAD_REQUEST)
-          .json({ success: false, message: "mech with email is not exist!" });
+          .json({
+            success: false,
+            message: "mech with email is not exist!",
+          }) as ForgotResentOtpResponse;
+      }
       const otp = await generateAndSendOTP(email);
       req.app.locals.resendOtp = otp;
 
@@ -202,14 +225,24 @@ class mechController {
     }
   }
 
-  async VerifyForgotOtpMech(req: Request, res: Response, next: NextFunction) {
+  async VerifyForgotOtpMech(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<VerifyForgotOtpMech | void> {
     try {
       const otp = req.body.otp;
       console.log("otp from the req body is ", otp);
       if (!otp)
-        return res.json({ success: false, message: "Please enter the otp!" });
+        return res.json({
+          success: false,
+          message: "Please enter the otp!",
+        }) as VerifyForgotOtpMech;
       if (!req.app.locals.resendOtp)
-        return res.json({ success: false, message: "Otp is expired!" });
+        return res.json({
+          success: false,
+          message: "Otp is expired!",
+        }) as VerifyForgotOtpMech;
       if (otp === req.app.locals.resendOtp)
         res.json({ success: true, message: "both otp are same." });
       else res.json({ success: false, message: "Entered otp is not correct!" });
@@ -221,11 +254,11 @@ class mechController {
 
   async updateNewPasswordMech(req: Request, res: Response, next: NextFunction) {
     try {
-      const { password, userId } = req.body;
-      const result = await this.mechServices.updateNewPassword(
+      const { password, mechId } = req.body;
+      const result = await this.mechServices.updateNewPassword({
         password,
-        userId
-      );
+        mechId,
+      });
       console.log(result);
       if (result)
         res.json({ success: true, data: result, message: "successful" });
@@ -236,14 +269,113 @@ class mechController {
     }
   }
 
+  async getAllMechanics(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("reached the getAllService function in the admin controller");
+      const page = parseInt(req.query.page as string);
+      const limit = parseInt(req.query.limit as string);
+      const searchQuery = req.query.searchQuery as string;
+
+      const data = await this.mechServices.getAllMechanics({
+        page,
+        limit,
+        searchQuery,
+      });
+      console.log(
+        "listed mechanic from the database is in the mechcontroller is ",
+        data
+      );
+      res.status(OK).json(data);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async getAllDevices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllDevces  funciton in the mech controller to  access the all the devices "
+      );
+      const data = await this.mechServices.getDevcies();
+      console.log(
+        "listed services from the database is in the mech controller is",
+        data
+      );
+      res.status(OK).json(data);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async verifyMechanic (req:Request,res:Response,next:NextFunction){
+    try{
+      const {values} = req.body;
+      console.log("reached in the mechController for mech Verification ",values);
+      const data = await this.mechServices.VerifyMechanic(values);
+      res.status(OK).json(data);
+    }catch(error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
+    async getS3SingUrlForMechCredinential(
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ): Promise<GetPreSignedUrlResponse | void> {
+      try {
+        const { fileName, fileType,name } = req.query as {
+          fileName: string;
+          fileType: string;
+          name: string;
+        };
+        console.log("file from the front end is ", fileName, fileType);
+        const result = await this.mechServices.getS3SingUrlForMechCredinential({
+          fileName,
+          fileType,
+          name
+       
+        });
+        console.log("presinged Url is from teh adminController is ", result);
+        if (result.success === false) {
+          return res.status(400).json({
+            success: false,
+            message: "File name and type are required",
+          }) as GetPreSignedUrlResponse;
+        } else {
+          return res.status(200).json({
+            success: true,
+            uploadURL: result.uploadURL,
+            imageName: result.imageName,
+            key: result.key,
+          }) as GetPreSignedUrlResponse;
+        }
+      } catch (error) {
+        console.log(error as Error);
+        next(error);
+      }
+    }
+
+
+
+
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("Entered in the function for logout of mech");
       res
-        .cookie("m_access_token", "", {
-          maxAge: 0,
+        .clearCookie("mech_access_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
         })
-        .cookie("m_refresh_token", "", {
-          maxAge: 0,
+        .clearCookie("mech_refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
         });
       res
         .status(200)

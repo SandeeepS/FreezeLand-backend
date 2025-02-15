@@ -1,30 +1,32 @@
 import { Request, Response, NextFunction } from "express";
 import { CreateJWT } from "../utils/generateToken";
-import AdminRepository from "../repositories/adminRepository";
+import MechRepository from "../repositories/mechRepository";
 
 const jwt = new CreateJWT();
-const adminRepository = new AdminRepository();
+const mechanicRepository = new MechRepository();
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace Express {
     interface Request {
-      adminId?: string;
+      mechanicId?: string;
     }
   }
 }
-
 /* eslint-enable @typescript-eslint/no-namespace */
 
-const adminAuth = (allowedRoles: string[]) => {
+const mechAuth = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const access_token = req.cookies.admin_access_token;
-      const refresh_token = req.cookies.admin_refresh_token;
+    try { 
+      console.log("reched the mechAuth");
+
+      const access_token = req.cookies.mech_access_token;
+      const refresh_token = req.cookies.mech_refresh_token;
 
       if (!refresh_token) {
-        res.clearCookie("admin_access_token");
-        res.clearCookie("admin_refresh_token");
+        console.log("refresh token is not presnet")
+        res.clearCookie("mech_access_token");
+        res.clearCookie("mech_refresh_token");
         return res.status(401).json({
           success: false,
           message: "Token expired or not available. Please log in again.",
@@ -35,7 +37,7 @@ const adminAuth = (allowedRoles: string[]) => {
 
       if (!access_token || !decoded.success) {
         console.log("Access token expired or invalid, generating a new one");
-        const newAccessToken = await refreshAdminAccessToken(
+        const newAccessToken = await refreshMechanicAccessToken(
           refresh_token,
           res
         );
@@ -48,28 +50,28 @@ const adminAuth = (allowedRoles: string[]) => {
         }
 
         const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
-        res.cookie("admin_access_token", newAccessToken, {
+        res.cookie("mech_access_token", newAccessToken, {
           maxAge: accessTokenMaxAge,
         });
         decoded = jwt.verifyToken(newAccessToken);
       }
 
       if (decoded.success && decoded.decoded) {
-        const admin = await adminRepository.getAdminById({
-          id: decoded.decoded.data.toString(),
-        });
+        const id = decoded.decoded.data.toString();
+        console.log("id from the decoded",id);
+        const mechanic = await mechanicRepository.getMechById({id});
 
-        if (!admin) {
+        if (!mechanic) {
           return res.status(404).json({
             success: false,
-            message: "Admin not found",
+            message: "Mechanic not found",
           });
         }
 
-        req.adminId = decoded.decoded.data.toString();
+        req.mechanicId = decoded.decoded.data.toString();
 
-        // Check user role
-        if (admin != null && !allowedRoles.includes(admin.role)) {
+        // Check mechanic role
+        if (mechanic != null && !allowedRoles.includes(mechanic.role)) {
           return res.status(403).json({
             success: false,
             message: "Forbidden",
@@ -93,7 +95,10 @@ const adminAuth = (allowedRoles: string[]) => {
   };
 };
 
-const refreshAdminAccessToken = async (refreshToken: string, res: Response) => {
+const refreshMechanicAccessToken = async (
+  refreshToken: string,
+  res: Response
+) => {
   try {
     if (!refreshToken) throw new Error("No refresh token found");
 
@@ -114,4 +119,4 @@ const refreshAdminAccessToken = async (refreshToken: string, res: Response) => {
   }
 };
 
-export default adminAuth;
+export default mechAuth;

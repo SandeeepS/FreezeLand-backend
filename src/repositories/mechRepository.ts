@@ -1,20 +1,44 @@
+import {
+  AddServiceDTO,
+  EmailExistResponse,
+  EmailExitCheck,
+  GetAllDevicesResponse,
+  GetMechByIdDTO,
+  GetMechByIdResponse,
+  GetMechListDTO,
+  GetMechListResponse,
+  SaveMechDTO,
+  SaveMechResponse,
+  UpdateNewPasswordDTO,
+  UpdateNewPasswordResponse,
+  VerifyMechanicDTO,
+} from "../interfaces/DTOs/Mech/IRepository.dto";
+import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
+import deviceModel, { IDevice } from "../models/deviceModel";
 import MechModel, { MechInterface } from "../models/mechModel";
-import { BaseRepository } from "./BaseRepository/baseRepository"; // Import the base repository
+import { BaseRepository } from "./BaseRepository/baseRepository";
 import { Document } from "mongoose";
 
-class MechRepository extends BaseRepository<MechInterface & Document> {
+class MechRepository
+  extends BaseRepository<MechInterface & Document>
+  implements IMechRepository
+{
+  private deviceRepository: BaseRepository<IDevice>;
+
   constructor() {
     super(MechModel);
+    this.deviceRepository = new BaseRepository<IDevice>(deviceModel);
   }
 
-  async saveMechanic(
-    mechData: Partial<MechInterface>
-  ): Promise<MechInterface | null> {
+  async saveMechanic(mechData: SaveMechDTO): Promise<SaveMechResponse | null> {
     return this.save(mechData);
   }
 
-  async emailExistCheck(email: string): Promise<MechInterface | null> {
+  async emailExistCheck(
+    data: EmailExitCheck
+  ): Promise<EmailExistResponse | null> {
     try {
+      const { email } = data;
       const mechFound = await this.findOne({ email });
       console.log("Mechanic found in the MechRepository:", mechFound);
       return mechFound;
@@ -28,14 +52,14 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
   }
 
   async updateNewPassword(
-    password: string,
-    userId: string
-  ): Promise<MechInterface | null> {
+    data: UpdateNewPasswordDTO
+  ): Promise<UpdateNewPasswordResponse | null> {
     try {
-      const user = await this.findById(userId);
-      if (user) {
-        user.password = password;
-        return await user.save();
+      const { mechId, password } = data;
+      const mech = await this.findById(mechId);
+      if (mech) {
+        mech.password = password;
+        return await mech.save();
       }
       return null;
     } catch (error) {
@@ -47,16 +71,18 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
     }
   }
 
-  async getMechById(id: string): Promise<MechInterface | null> {
-    return this.findById(id);
+  async getMechById(data: GetMechByIdDTO): Promise<GetMechByIdResponse | null> {
+    try {
+      return this.findById(data.id);
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured while getmechById");
+    }
   }
 
-  async getMechList(
-    page: number,
-    limit: number,
-    searchQuery: RegExp
-  ): Promise<MechInterface[]> {
+  async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
+      const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.findAll(page, limit, regex);
       console.log("mech list is ", result);
@@ -81,13 +107,38 @@ class MechRepository extends BaseRepository<MechInterface & Document> {
     }
   }
 
-  async AddService(values: string) {
+  async AddService(data: AddServiceDTO): Promise<unknown> {
     try {
+      const { values } = data;
       const result = await this.addService(values);
-      return result ;
+      return result;
     } catch (error) {
       console.log(error as Error);
       throw new Error();
+    }
+  }
+
+  async verifyMechanic(values:VerifyMechanicDTO){
+    try{
+      console.log("entered in the mechRepository");
+      console.log("valeu sdfsdo dso",values);
+      const id = values.id;
+      console.log("id  ",id);
+      const response  = await this.update(id,values)
+      return response;
+    }catch(error){
+      console.log(error);
+      throw new Error();
+    }
+  }
+
+  async getAllDevices(): Promise<GetAllDevicesResponse[]> {
+    try {
+      const result = await this.deviceRepository.findAll2();
+      return result as GetAllDevicesResponse[];
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured");
     }
   }
 }

@@ -4,7 +4,7 @@ import MechRepository from '../repositories/mechRepository';
 import mechController from '../controllers/mechController';
 import { CreateJWT } from '../utils/generateToken';
 import mechService from '../services/mechServices';
-
+import mechAuth from '../middlewares/mechAuthMidd';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
@@ -19,7 +19,10 @@ mechRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) 
 mechRouter.post('/forgot-password',async(req:Request,res:Response,next:NextFunction) => await controller.forgotResentOtpMech(req,res,next));
 mechRouter.post('/verify-forgot-otp',async(req:Request,res:Response,next:NextFunction) => await controller.VerifyForgotOtpMech(req,res,next));
 mechRouter.put('/update-newpassword',async(req:Request,res:Response,next:NextFunction) => await controller.updateNewPasswordMech(req,res,next));
+mechRouter.get('/getAllMechanics',async(req:Request,res:Response,next:NextFunction) => await controller.getAllMechanics(req,res,next));
+mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllDevices(req,res,next));
+mechRouter.post('/verifyMechanic',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.verifyMechanic(req,res,next));
 mechRouter.get('/logout',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogout(req,res,next));
-
+mechRouter.get('/getS3SingUrlForMechCredinential',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.getS3SingUrlForMechCredinential(req,res,next));
 
 export default mechRouter;

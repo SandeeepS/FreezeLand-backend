@@ -1,16 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
+
 import {
   AddNewServiceValidation,
-  LoginValidation,
   AddNewDeviceValidation,
 } from "../utils/validator";
-import { storage } from "../firebase";
-import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { IAdminController } from "../interfaces/IController/IAdminController";
+import { GetPreSignedUrlResponse } from "../interfaces/DTOs/Admin/IController.dto";
+// import { storage } from "../firebase";
+// import { ref, uploadString, getDownloadURL } from "firebase/storage";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
-class adminController {
+class adminController implements IAdminController {
   constructor(private adminService: AdminService) {}
 
   milliseconds = (h: number, m: number, s: number) =>
@@ -20,36 +22,39 @@ class adminController {
     try {
       console.log("enterd in the backend adminlogin in adminController");
       const { email, password } = req.body;
-      const check = LoginValidation(email, password);
-      if (check) {
-        const loginStatus = await this.adminService.adminLogin(email, password);
 
-        if (!loginStatus.data.success){
-          res
-            .status(UNAUTHORIZED)
-            .json({ success: false, message: loginStatus.data.message });
-          return;
-        } else {
-          const access_token = loginStatus.data.token;
-          const refresh_token = loginStatus.data.refresh_token;
-          const accessTokenMaxAge = 5 * 60 * 1000;
-          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-          console.log("respose is going to send to the frontend");
-          res
-            .status(loginStatus.status)
-            .cookie("admin_access_token", access_token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("admin_refresh_token", refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json(loginStatus);
-        }
+      const loginStatus = await this.adminService.adminLogin({
+        email,
+        password,
+        role: "admin",
+      });
+
+      if (loginStatus.data.success === false) {
+        res
+          .status(OK)
+          .json({ success: false, message: loginStatus.data.message });
+        return;
       } else {
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "Please check the email and password",
-        });
+        const access_token = loginStatus.data.token;
+        const refresh_token = loginStatus.data.refresh_token;
+        const accessTokenMaxAge = 5 * 60 * 1000;
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+        console.log("respose is going to send to the frontend");
+        res
+          .status(loginStatus.status)
+          .cookie("admin_access_token", access_token, {
+            maxAge: accessTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Set to true in production
+            sameSite: "strict",
+          })
+          .cookie("admin_refresh_token", refresh_token, {
+            maxAge: refreshTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Set to true in production
+            sameSite: "strict",
+          })
+          .json(loginStatus);
       }
     } catch (error) {
       console.log(error as Error);
@@ -64,11 +69,11 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log("page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getUserList(
+      const data = await this.adminService.getUserList({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log("usersData from the admin controller is ", data);
       res.status(OK).json(data);
     } catch (error) {
@@ -84,11 +89,11 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log("page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getMechList(
+      const data = await this.adminService.getMechList({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log("mechsData from the admin controller is ", data);
       res.status(OK).json(data);
     } catch (error) {
@@ -99,9 +104,10 @@ class adminController {
 
   async blockUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminService.blockUser(
-        req.params.userId as string
-      );
+      const { userId } = req.params;
+      const result = await this.adminService.blockUser({
+        userId,
+      });
       if (result)
         res.json({ success: true, message: "block or unblocked the user" });
       else
@@ -120,9 +126,8 @@ class adminController {
 
   async blockMech(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminService.blockMech(
-        req.params.mechId as string
-      );
+      const { mechId } = req.params;
+      const result = await this.adminService.blockMech({ mechId });
       if (result)
         res.json({ success: true, message: "block or unblocked the mechanic" });
       else
@@ -141,9 +146,8 @@ class adminController {
 
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminService.deleteUser(
-        req.params.userId as string
-      );
+      const { userId } = req.params;
+      const result = await this.adminService.deleteUser({ userId });
       if (result) res.json({ success: true, message: "deleted  the user" });
       else
         res.json({
@@ -158,9 +162,8 @@ class adminController {
 
   async deleteMech(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminService.deleteMech(
-        req.params.mechId as string
-      );
+      const { mechId } = req.params;
+      const result = await this.adminService.deleteMech({ mechId });
       if (result) res.json({ success: true, message: "deleted  the mechanic" });
       else
         res.json({
@@ -174,6 +177,44 @@ class adminController {
     }
   }
 
+  //changing getPresignedUrl functionality to adminService ..........
+  /************************ */
+
+  async getPresignedUrl(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetPreSignedUrlResponse | void> {
+    try {
+      const { fileName, fileType } = req.query as {
+        fileName: string;
+        fileType: string;
+      };
+      console.log("file from the front end is ", fileName, fileType);
+      const result = await this.adminService.getPresignedUrl({
+        fileName,
+        fileType,
+      });
+      console.log("presinged Url is from teh adminController is ", result);
+      if (result.success === false) {
+        return res.status(400).json({
+          success: false,
+          message: "File name and type are required",
+        }) as GetPreSignedUrlResponse;
+      } else {
+        return res.status(200).json({
+          success: true,
+          uploadURL: result.uploadURL,
+          imageName: result.imageName,
+          key: result.key,
+        }) as GetPreSignedUrlResponse;
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async addNewServices(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
@@ -181,19 +222,20 @@ class adminController {
       );
       const { values } = req.body;
       console.log("values from the frontend is ", values);
-      const storageRef = ref(storage, `ServiceImages/${values.name}`); // imageName can be any unique identifier
 
-      // Assume `base64String` is your Base64 image string, e.g., "data:image/jpeg;base64,..."
-      await uploadString(storageRef, values.image, "data_url");
-      const downloadURL = await getDownloadURL(storageRef);
-      console.log("the url from the firebase is ", downloadURL);
-      values.image = downloadURL;
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
-        //lets check the serviec is allready present in the service collection for avoiding duplication
+        //comented code is used to upoload to firebase
+        // const storageRef = ref(storage, `ServiceImages/${values.name}`); // imageName can be any unique identifier
+        // // Assume `base64String` is your Base64 image string, e.g., "data:image/jpeg;base64,..."
+        // await uploadString(storageRef, values.image, "data_url");
+        // const downloadURL = await getDownloadURL(storageRef);
+        // console.log("the url from the firebase is ", downloadURL);
+        // values.image = downloadURL;
+
         const isExist = await this.adminService.isServiceExist(values.name);
         if (!isExist) {
-          const result = await this.adminService.addService(values);
+          const result = await this.adminService.addService({ values });
           if (result) {
             res.json({
               success: true,
@@ -222,7 +264,7 @@ class adminController {
       }
     } catch (error) {
       console.log(
-        "error occured while adding new service in the adminController.ts"
+        "error occured while adding new service in the  adminController.ts"
       );
       console.log(error as Error);
       next(error);
@@ -288,11 +330,11 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log(" page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getServices(
+      const data = await this.adminService.getServices({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log(
         "listed services from the database is in the admin controller is",
         data
@@ -314,7 +356,11 @@ class adminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log(" page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getDevcies(page, limit, searchQuery);
+      const data = await this.adminService.getDevcies({
+        page,
+        limit,
+        searchQuery,
+      });
       console.log(
         "listed services from the database is in the admin controller is",
         data
@@ -332,7 +378,7 @@ class adminController {
         "reached the getAllServices funciton in the admin controller"
       );
       const id = req.params.id;
-      const result = await this.adminService.getService(id);
+      const result = await this.adminService.getService({ id });
       res.status(OK).json(result);
     } catch (error) {
       console.log(error as Error);
@@ -345,7 +391,7 @@ class adminController {
       console.log("reached the listUnlistServices at adminController");
       const _id = req.params.serviceId;
       console.log("id reached from the front is ", _id);
-      const result = await this.adminService.blockService(_id);
+      const result = await this.adminService.blockService({ _id });
       if (result) {
         res.json({ success: true, message: "blocked/unblocked the service " });
       } else {
@@ -365,7 +411,7 @@ class adminController {
       console.log("reached the listUnlistDevice at adminController");
       const _id = req.params.deviceId;
       console.log("id reached from the front is ", _id);
-      const result = await this.adminService.blockDevice(_id);
+      const result = await this.adminService.blockDevice({ _id });
       if (result) {
         res.json({ success: true, message: "blocked/unblocked the device " });
       } else {
@@ -384,9 +430,8 @@ class adminController {
     try {
       console.log("entered in the admin controller for deleting the service ");
       console.log(req.params.serviceId);
-      const result = await this.adminService.deleteService(
-        req.params.serviceId as string
-      );
+      const { serviceId } = req.params;
+      const result = await this.adminService.deleteService({ serviceId });
       if (result) res.json({ success: true, message: "Service deleted" });
       else
         res.json({
@@ -404,9 +449,8 @@ class adminController {
     try {
       console.log("entered in the admin controller for deleting the device ");
       console.log(req.params.deviceId);
-      const result = await this.adminService.deleteDevice(
-        req.params.deviceId as string
-      );
+      const { deviceId } = req.params;
+      const result = await this.adminService.deleteDevice({ deviceId });
       if (result) res.json({ success: true, message: "Device deleted" });
       else
         res.json({
@@ -431,10 +475,10 @@ class adminController {
         const isExist = await this.adminService.isServiceExist(values.name);
 
         if (!isExist) {
-          const editedSevice = await this.adminService.editExistingService(
+          const editedSevice = await this.adminService.editExistingService({
             _id,
-            values
-          );
+            values,
+          });
           if (editedSevice) {
             res.status(OK).json({
               success: true,
@@ -472,10 +516,17 @@ class adminController {
 
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
-      res.cookie("admin_access_token", "", {
-        httpOnly: true,
-        expires: new Date(0),
-      });
+      res
+        .clearCookie("admin_access_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
+        })
+        .clearCookie("admin_refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
+        });
       res.status(200).json({ success: true, message: "logout sucessfully" });
     } catch (error) {
       console.log(error as Error);

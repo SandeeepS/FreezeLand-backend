@@ -2,13 +2,28 @@ import { Request, Response, NextFunction } from "express";
 import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
-import { UserResponseInterface } from "../interfaces/serviceInterfaces/InUserService";
-const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = STATUS_CODES;
-import { AddressValidation, LoginValidation, SignUpValidation } from "../utils/validator";
-import { EditUserDetailsValidator } from "../utils/validator";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import S3Client from "../awsConfig";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 
-class userController {
-  constructor(private userServices: userService) {}  
+const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
+  STATUS_CODES;
+import {
+  AddressValidation,
+  LoginValidation,
+  SignUpValidation,
+} from "../utils/validator";
+import { EditUserDetailsValidator } from "../utils/validator";
+import {
+  EditUserDTO,
+  ForgotResentOtpResponse,
+  GetImageUrlResponse,
+  SaveUserResponse,
+} from "../interfaces/DTOs/User/IController.dto";
+import { IUserController } from "../interfaces/IController/IUserController";
+
+class userController implements IUserController {
+  constructor(private userServices: userService) {}
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
@@ -29,11 +44,11 @@ class userController {
         password,
         cpassword
       );
-      console.log(typeof(phone));
-      const check = SignUpValidation(name,phone,email,password,cpassword);
-      if (check){
+      console.log(typeof phone);
+      const check = SignUpValidation(name, phone, email, password, cpassword);
+      if (check) {
         console.log("user details are validated from the backend and it is ok");
-        const newUser = await this.userServices.userSignup(
+        const newUser = await this.userServices.isUserExist(
           req.app.locals.userData
         );
         if (!newUser) {
@@ -59,11 +74,12 @@ class userController {
             .status(BAD_REQUEST)
             .json({ success: false, message: "The email is already in use!" });
         }
-      }else{
+      } else {
         console.log("user details validation from the backend is failed");
-        res
-        .status(UNAUTHORIZED)
-        .json({ success: false, message: "Please enter  valid user  details !!" });
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Please enter  valid user  details !!",
+        });
       }
     } catch (error) {
       console.log(error as Error);
@@ -71,18 +87,25 @@ class userController {
     }
   }
 
-  async userLogin(req: Request, res: Response, next: NextFunction) {
+  async userLogin(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
       console.log(
-        "email and password is from the controllers for login ",
+        "email and password is from the controllers for login",
         email,
         password
       );
 
       const check = LoginValidation(email, password);
       if (check) {
-        const loginStatus = await this.userServices.userLogin(email, password);
+        const loginStatus = await this.userServices.userLogin({
+          email,
+          password,
+        });
         console.log(loginStatus);
         if (
           loginStatus &&
@@ -102,11 +125,17 @@ class userController {
           const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
           res
             .status(loginStatus.status)
-            .cookie("access_token", access_token, {
+            .cookie("user_access_token", access_token, {
               maxAge: accessTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
             })
-            .cookie("refresh_token", refresh_token, {
+            .cookie("user_refresh_token", refresh_token, {
               maxAge: refreshTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production", // Set to true in production
+              sameSite: "strict",
             })
             .json(loginStatus);
         } else {
@@ -132,10 +161,11 @@ class userController {
     next: NextFunction
   ): Promise<void> {
     const { name, email, googlePhotoUrl } = req.body;
+    console.log("name and email from the google login", name, email);
     const accessTokenMaxAge = 5 * 60 * 1000;
     const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
     try {
-      const user = await this.userServices.getUserByEmail(email);
+      const user = await this.userServices.getUserByEmail({ email });
       if (user) {
         if (user.isBlocked) {
           res.status(UNAUTHORIZED).json({
@@ -144,8 +174,13 @@ class userController {
           });
           // throw new Error('user has been blocked by admin...');
         } else {
-          const token = this.userServices.generateToken(user.id);
-          const refreshToken = this.userServices.generateRefreshToken(user.id);
+          const token = this.userServices.generateToken(
+            { payload: user.id },
+            user.role
+          );
+          const refreshToken = this.userServices.generateRefreshToken({
+            payload: user.id,
+          });
           const data = {
             success: true,
             message: "Success",
@@ -174,21 +209,20 @@ class userController {
           generatedPassword
         );
 
-        const newUser: UserResponseInterface | undefined =
-          await this.userServices.saveUser({
-            name: name,
-            email: email,
-            password: hashedPassword,
-            profile_picture: googlePhotoUrl,
-          });
-        if (newUser?.data.data) {
+        const newUser: SaveUserResponse = await this.userServices.saveUser({
+          name: name,
+          email: email,
+          password: hashedPassword,
+          profile_picture: googlePhotoUrl,
+        });
+        if (newUser?.data) {
           // const time = this.milliseconds(23, 30, 0);
           res
             .status(OK)
-            .cookie("access_token", newUser.data.token, {
+            .cookie("access_token", newUser.token, {
               maxAge: accessTokenMaxAge,
             })
-            .cookie("refresh_token", newUser.data.refresh_token, {
+            .cookie("refresh_token", newUser.refresh_token, {
               maxAge: refreshTokenMaxAge,
             })
             .json(newUser.data);
@@ -224,10 +258,10 @@ class userController {
           // const time = this.milliseconds(23, 30, 0);
           res
             .status(OK)
-            .cookie("access_token", newUser?.data.token, {
+            .cookie("access_token", newUser?.token, {
               maxAge: accessTokenMaxAge,
             })
-            .cookie("refresh_token", newUser?.data.refresh_token, {
+            .cookie("refresh_token", newUser?.refresh_token, {
               maxAge: refreshTokenMaxAge,
             })
             .json(newUser);
@@ -253,19 +287,27 @@ class userController {
     }
   }
 
-  async forgotResentOtp(req: Request, res: Response, next: NextFunction) {
+  async forgotResentOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<ForgotResentOtpResponse | void> {
     try {
       const { email } = req.body;
       req.app.locals.userEmail = email;
-      if (!email)
-        return res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "please enter the email" });
+      if (!email) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "please enter the email",
+        }) as ForgotResentOtpResponse;
+      }
       const user = await this.userServices.getUserByEmail(email);
-      if (!user)
-        return res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "user with email is not exist!" });
+      if (!user) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "user with email is not exist!",
+        }) as ForgotResentOtpResponse;
+      }
       const otp = await generateAndSendOTP(email);
       req.app.locals.resendOtp = otp;
 
@@ -278,7 +320,7 @@ class userController {
         success: true,
         data: user,
         message: "OTP sent for verification...",
-      });
+      } as ForgotResentOtpResponse);
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -305,10 +347,10 @@ class userController {
   async updateNewPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, userId } = req.body;
-      const result = await this.userServices.updateNewPassword(
+      const result = await this.userServices.updateNewPassword({
         password,
-        userId
-      );
+        userId,
+      });
       console.log(result);
       if (result)
         res.json({ success: true, data: result, message: "successful" });
@@ -321,7 +363,10 @@ class userController {
 
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const currentUser = await this.userServices.getProfile(req.userId);
+      const { userId } = req.params;
+
+      console.log("userId from the getProfile in the useController", userId);
+      const currentUser = await this.userServices.getProfile({ id: userId });
       if (!currentUser)
         res
           .status(UNAUTHORIZED)
@@ -341,10 +386,14 @@ class userController {
   async editUser(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
-      const { _id, name, phone } = req.body;
+      const { _id, name, phone }: EditUserDTO = req.body;
       const check = EditUserDetailsValidator(name, phone);
       if (check) {
-        const editedUser = await this.userServices.editUser(_id, name, phone);
+        const editedUser = await this.userServices.editUser({
+          _id,
+          name,
+          phone,
+        });
         console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
         if (editedUser) {
           res
@@ -374,25 +423,39 @@ class userController {
         "enterd in the addAddress fucniton in the backend userController"
       );
       const { values, _id } = req.body;
-      const check = AddressValidation(values.name,values.phone,values.email,values.state,values.pin,values.district,values.landMark)
-      if(check){
-        const addedAddress = await this.userServices.AddUserAddress(_id, values);
+      console.log("id from the userController while adding address is", _id);
+      const check = AddressValidation(
+        values.name,
+        values.phone,
+        values.email,
+        values.state,
+        values.pin,
+        values.district,
+        values.landMark
+      );
+      if (check) {
+        const addedAddress = await this.userServices.AddUserAddress({
+          _id,
+          values,
+        });
         if (addedAddress) {
-          res
-            .status(OK)
-            .json({ success: true, message: "User address added successfully" });
+          res.status(OK).json({
+            success: true,
+            message: "User address added successfully",
+          });
         } else {
           res
             .status(BAD_REQUEST)
             .json({ success: false, message: "User Address addingh failed" });
         }
-      }else{
-        console.log("address validation failed form the addAddress in the userController");
+      } else {
+        console.log(
+          "address validation failed form the addAddress in the userController"
+        );
         res
-        .status(BAD_REQUEST)
-        .json({ success: false, message: "Address validation failed " });
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Address validation failed " });
       }
-
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -403,14 +466,22 @@ class userController {
     try {
       console.log("entered in teh userController for editing the address");
       const { values, _id, addressId } = req.body;
-      const check = AddressValidation(values.name,values.phone,values.email,values.state,values.pin,values.district,values.landMark)
-      if(check){
+      const check = AddressValidation(
+        values.name,
+        values.phone,
+        values.email,
+        values.state,
+        values.pin,
+        values.district,
+        values.landMark
+      );
+      if (check) {
         console.log("address validation done ");
-        const editedAddress = await this.userServices.editAddress(
+        const editedAddress = await this.userServices.editAddress({
           _id,
           addressId,
-          values
-        );
+          values,
+        });
         if (editedAddress) {
           res.status(OK).json({
             success: true,
@@ -421,13 +492,13 @@ class userController {
             .status(BAD_REQUEST)
             .json({ success: false, message: "Address editing  failed" });
         }
-      }else{
+      } else {
         console.log("address validation failed while editing the address");
-        res
-        .status(BAD_REQUEST)
-        .json({ success: false, message: "address validation fialed while editing the address" });
+        res.status(BAD_REQUEST).json({
+          success: false,
+          message: "address validation fialed while editing the address",
+        });
       }
- 
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -442,7 +513,7 @@ class userController {
       const { userId, addressId } = req.body;
       console.log("userId and addressId is ", userId, addressId);
       const updatedDefaultAddress =
-        await this.userServices.setUserDefaultAddress(userId, addressId);
+        await this.userServices.setUserDefaultAddress({ userId, addressId });
       if (updatedDefaultAddress) {
         res.status(OK).json({
           success: true,
@@ -459,18 +530,143 @@ class userController {
     }
   }
 
+  async registerService(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "entered in the register service in the backend userController"
+      );
+      const { data } = req.body;
+      console.log("data from the frontend is ", data);
+      const result = await this.userServices.registerService(data);
+      if (result) {
+        res.status(OK).json({
+          success: true,
+          message: "Complaint registered successfully",
+        });
+      } else {
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Complaint registration failed" });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  //getting all service which is provided by the website.
+  async getAllServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllServices funciton in the admin controller"
+      );
+      const page = parseInt(req.query.page as string);
+      const limit = parseInt(req.query.limit as string);
+      const searchQuery = req.query.searchQuery as string | undefined;
+      console.log(" page is ", page);
+      console.log("limit is ", limit);
+      const data = await this.userServices.getServices({
+        page,
+        limit,
+        searchQuery,
+      });
+      console.log(
+        "listed services from the database is in the admin controller is",
+        data
+      );
+      res.status(OK).json(data);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  //getting all the registered complaints from the user
+  async getAllRegisteredService(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const page = 1;
+      const limit = 10;
+      const searchQuery = "";
+      const allRegisteredUserServices =
+        await this.userServices.getAllRegisteredServices(
+          page,
+          limit,
+          searchQuery
+        );
+      if (allRegisteredUserServices) {
+        res.status(OK).json({
+          success: true,
+          message: "data fetched successfully",
+          allRegisteredUserServices: allRegisteredUserServices,
+        });
+      } else {
+        res.status(NOT_FOUND).json({
+          success: true,
+          message: "Not Found",
+        });
+      }
+    } catch (error) {
+      console.log(
+        "error while getting the allregistered complaints from the database in the userController",
+        error as Error
+      );
+      next(error);
+    }
+  }
+
+  async getImageUrl(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetImageUrlResponse | void> {
+    try {
+      const { imageKey } = req.query;
+      console.log("imageKey from the frontend is ", imageKey);
+      if (typeof imageKey !== "string") {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Invalid image key",
+          }) as GetImageUrlResponse;
+      }
+
+      const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: imageKey,
+      });
+      const url = await getSignedUrl(S3Client, command, { expiresIn: 3600 });
+      res.status(200).json({ success: true, url });
+    } catch (error) {
+      next(error);
+      
+    }
+  }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("Entered in the function for logout");
+
+      // Clear the access_token and refresh_token cookies
       res
-        .cookie("access_token", "", {
-          maxAge: 0,
+        .clearCookie("user_access_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
         })
-        .cookie("refresh_token", "", {
-          maxAge: 0,
+        .clearCookie("user_refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
+          sameSite: "strict",
         });
+
+      // Send a success response
       res
         .status(200)
-        .json({ success: true, message: "user logout - clearing cookie" });
+        .json({ success: true, message: "User logged out successfully" });
     } catch (err) {
       console.log(err);
       next(err);

@@ -1,107 +1,169 @@
-import { comService } from "./comServices";
 import AdminRepository from "../repositories/adminRepository";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
-import { IApiRes } from "../interfaces/commonInterfaces/getDetailInterface";
-import { IMechsAndCount } from "../interfaces/serviceInterfaces/InMechService";
 import {
-  AdminAuthResponse,
-  IUsersAndCount,
-} from "../interfaces/serviceInterfaces/InaAdminService";
-import { IUserServiceAndCount } from "../interfaces/serviceInterfaces/userServiceInterfaces";
-import { IUserDeviceAndCount } from "../interfaces/serviceInterfaces/userDeviceResponseInterfaces";
-import { IServices } from "../models/serviceModel";
+  AddDeviceDTO,
+  AddNewDeviceResponse,
+  AddNewServiceResponse,
+  AddserviceDTO,
+  AdminLoginDTO,
+  AdminLoginResponse,
+  BlockDeviceDTO,
+  BlockDeviceResponse,
+  BlockMechDTO,
+  BlockMechResponse,
+  BlockServiceDTO,
+  BlockServiceResponse,
+  BlockUserDTO,
+  BlockUserResponse,
+  DeleteDeviceDTO,
+  DeleteDeviceResponse,
+  DeleteMechDTO,
+  DeleteMechResponse,
+  DeleteServiceDTO,
+  DeleteServiceResponse,
+  DeleteUserDTO,
+  DeleteUserResponse,
+  EditExistServiceDTO,
+  EditExistServiceResponse,
+  GetDeviceDTO,
+  GetDeviceResponse,
+  GetMechList,
+  GetMechListResponse,
+  GetPreSignedUrlDTO,
+  GetPreSignedUrlResponse,
+  GetServiceDTO,
+  GetServiceResponse,
+  GetServiceResponse2,
+  GetServicesDTO,
+  GetUserList,
+  GetUserListResponse,
+  isDeviceExistDTO,
+  isDeviceExistResponse,
+  IsServiceExistDTO,
+  IsServiceExistResponse,
+} from "../interfaces/DTOs/Admin/IService.dto";
+import { IAdminService } from "../interfaces/IServices/IAdminService";
+import { generatePresignedUrl } from "../utils/generatePresignedUrl";
+import { LoginValidation } from "../utils/validator";
 
-class adminService implements comService<AdminAuthResponse> {
+class adminService implements IAdminService {
   constructor(
     private adminRepository: AdminRepository,
     private encrypt: Encrypt,
     private createjwt: CreateJWT
   ) {}
 
-  async adminLogin(
-    email: string,
-    password: string
-  ): Promise<AdminAuthResponse> {
+  async adminLogin(data: AdminLoginDTO): Promise<AdminLoginResponse> {
     try {
       console.log("entered in the admin login");
-      const admin = await this.adminRepository.isAdminExist(email);
+      const { email, password } = data;
+      const check = LoginValidation(email,password);
+      if(check){
 
-      if (admin?.password === password) {
-        console.log("passwrod from the admin side is ", admin.password);
-        const token = this.createjwt.generateToken(admin?.id);
-        const refreshToken = this.createjwt.generateRefreshToken(admin?.id);
-        console.log("admin is exist", admin);
-        return {
-          status: STATUS_CODES.OK,
-          data: {
-            success: true,
-            message: "Authentication Successful !",
-            data: admin,
-            adminId: admin.id,
-            token: token,
-            refresh_token: refreshToken,
-          },
-        };
+    
+      const admin = await this.adminRepository.isAdminExist({ email });
+      if (admin?.id) {
+        if (admin?.password === password) {
+          console.log("passwrod from the admin side is ", admin.password);
+          const token = this.createjwt.generateToken(admin.id, admin.role);
+          const refreshToken = this.createjwt.generateRefreshToken(admin.id);
+          console.log("admin is exist", admin);
+          return {
+            status: STATUS_CODES.OK || 200,
+            data: {
+              success: true,
+              message: "Authentication Successful !",
+              data: admin,
+              adminId: admin.id,
+              token: token,
+              refresh_token: refreshToken,
+            },
+          };
+        } else {
+          console.log("Incorrted password");
+          return {
+            status: STATUS_CODES.UNAUTHORIZED,
+            data: {
+              success: false,
+              message: "Incorrect password!",
+            },
+          } as const;
+        }
       } else {
         return {
           status: STATUS_CODES.UNAUTHORIZED,
           data: {
             success: false,
-            message: "Incorrect password!",
+            message: "Email not exist",
           },
         } as const;
       }
+    }else{
+      return {
+        status: STATUS_CODES.UNAUTHORIZED,
+        data: {
+          success: false,
+          message: "Email or password is incorrect",
+        },
+      } as const;
+    }
     } catch (error) {
       console.log("error occured while login admin");
       throw error;
     }
   }
 
-  async getUserList(
-    page: number,
-    limit: number,
-    searchQuery: string | undefined
-  ): Promise<IApiRes<IUsersAndCount>> {
+  async getUserList(data: GetUserList): Promise<GetUserListResponse> {
     try {
+      let { page, limit, searchQuery } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const users = await this.adminRepository.getUserList(
+      const users = await this.adminRepository.getUserList({
         page,
         limit,
-        searchQuery
-      );
-      const usersCount = await this.adminRepository.getUserCount(searchQuery);
+        searchQuery,
+      });
+      if (users) {
+        const usersCount = await this.adminRepository.getUserCount({
+          searchQuery,
+        });
 
-      return {
-        status: STATUS_CODES.OK,
-        data: { users, usersCount },
-        message: "success",
-      };
+        return {
+          status: STATUS_CODES.OK,
+          data: { users, usersCount },
+          message: "success",
+        };
+      } else {
+        return {
+          status: STATUS_CODES.NOT_FOUND,
+          data: { users: [], usersCount: 0 },
+          message: "No users found",
+        };
+      }
     } catch (error) {
       console.log(error);
       throw new Error("Error occured.");
     }
   }
 
-  async getMechList(
-    page: number,
-    limit: number,
-    searchQuery: string | undefined
-  ): Promise<IApiRes<IMechsAndCount>> {
+  async getMechList(data: GetMechList): Promise<GetMechListResponse> {
     try {
+      let { page, limit, searchQuery } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const mechs = await this.adminRepository.getMechList(
+      const mechs = await this.adminRepository.getMechList({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log("list of mechanics is ", mechs);
-      const mechsCount = await this.adminRepository.getMechCount(searchQuery);
+      const mechsCount = await this.adminRepository.getMechCount({
+        searchQuery,
+      });
 
       return {
         status: STATUS_CODES.OK,
@@ -114,24 +176,21 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-  async getServices(
-    page: number,
-    limit: number,
-    searchQuery: string | undefined
-  ): Promise<IApiRes<IUserServiceAndCount>> {
+  async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
     try {
+      let { page, limit, searchQuery } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const services = await this.adminRepository.getAllServices(
+      const services = await this.adminRepository.getAllServices({
         page,
         limit,
-        searchQuery
-      );
-      console.log("list of services  is ", services);
-      const servicesCount = await this.adminRepository.getServiceCount(
-        searchQuery
-      );
+        searchQuery,
+      });
+      console.log("list of services is ", services);
+      const servicesCount = await this.adminRepository.getServiceCount({
+        searchQuery,
+      });
 
       return {
         status: STATUS_CODES.OK,
@@ -144,24 +203,21 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-  async getDevcies(
-    page: number,
-    limit: number,
-    searchQuery: string | undefined
-  ): Promise<IApiRes<IUserDeviceAndCount>> {
+  async getDevcies(data: GetDeviceDTO): Promise<GetDeviceResponse> {
     try {
+      let { page, limit, searchQuery } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const devices = await this.adminRepository.getAllDevices(
+      const devices = await this.adminRepository.getAllDevices({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log("list of device  is ", devices);
-      const devicesCount = await this.adminRepository.getDeviceCount(
-        searchQuery
-      );
+      const devicesCount = await this.adminRepository.getDeviceCount({
+        searchQuery,
+      });
 
       return {
         status: STATUS_CODES.OK,
@@ -174,123 +230,194 @@ class adminService implements comService<AdminAuthResponse> {
     }
   }
 
-  async getService(id: string) {
+  async getService(data: GetServiceDTO): Promise<GetServiceResponse2 | null> {
     try {
+      const { id } = data;
       console.log("reached the getService in the adminService");
-      const result = await this.adminRepository.getService(id);
+      const result = await this.adminRepository.getService({ id });
       if (result) {
         return result;
+      } else {
+        return null;
       }
     } catch (error) {
       console.log(error as Error);
       throw new Error();
     }
   }
-  async blockUser(userId: string) {
+  async blockUser(data: BlockUserDTO): Promise<BlockUserResponse | null> {
     try {
-      return await this.adminRepository.blockUser(userId);
+      const { userId } = data;
+      return await this.adminRepository.blockUser({ userId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error occured while blocking user in AdminService ");
     }
   }
 
-  async blockMech(mechId: string) {
+  async blockMech(data: BlockMechDTO): Promise<BlockMechResponse | null> {
     try {
-      return await this.adminRepository.blockMech(mechId);
+      const { mechId } = data;
+      return await this.adminRepository.blockMech({ mechId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error(
+        "Error occured while blocking the mechanic from the AdminService"
+      );
     }
   }
 
-  async blockService(_id: string) {
+  async blockService(
+    data: BlockServiceDTO
+  ): Promise<BlockServiceResponse | null> {
     try {
-      return await this.adminRepository.BlockService(_id);
+      const { _id } = data;
+      return await this.adminRepository.BlockService({ _id });
     } catch (error) {
       console.log(error as Error);
+      throw new Error(
+        "Error occured while blocking the service from the adminService"
+      );
     }
   }
 
-  async blockDevice(_id: string) {
+  async blockDevice(data: BlockDeviceDTO): Promise<BlockDeviceResponse | null> {
     try {
-      return await this.adminRepository.BlockDevice(_id);
+      const { _id } = data;
+      return await this.adminRepository.BlockDevice({ _id });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("error while blocking the device from the adminService");
     }
   }
 
-  async deleteUser(userId: string) {
+  async deleteUser(data: DeleteUserDTO): Promise<DeleteUserResponse | null> {
     try {
-      return await this.adminRepository.deleteUser(userId);
+      const { userId } = data;
+      return await this.adminRepository.deleteUser({ userId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error occured while deleting the user");
     }
   }
 
-  async deleteMech(mechId: string) {
+  async deleteMech(data: DeleteMechDTO): Promise<DeleteMechResponse | null> {
     try {
-      return await this.adminRepository.deleteMech(mechId);
+      const { mechId } = data;
+      return await this.adminRepository.deleteMech({ mechId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error(
+        "Error while deleting the mechanic from the adminService "
+      );
     }
   }
 
-  async deleteService(serviceId: string) {
+  async deleteService(
+    data: DeleteServiceDTO
+  ): Promise<DeleteServiceResponse | null> {
     try {
-      return await this.adminRepository.deleteService(serviceId);
+      const { serviceId } = data;
+      return await this.adminRepository.deleteService({ serviceId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while deleting a service from the admin Services");
     }
   }
 
-  async deleteDevice(serviceId: string) {
+  async deleteDevice(
+    data: DeleteDeviceDTO
+  ): Promise<DeleteDeviceResponse | null> {
     try {
-      return await this.adminRepository.deleteDevice(serviceId);
+      const { deviceId } = data;
+      return await this.adminRepository.deleteDevice({ deviceId });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while deleteDevice from the adminService");
     }
   }
 
-  async isServiceExist(name: string) {
+  async isServiceExist(
+    data: IsServiceExistDTO
+  ): Promise<IsServiceExistResponse | null> {
     try {
-      return await this.adminRepository.isServiceExist(name);
+      const { name } = data;
+      return await this.adminRepository.isServiceExist({ name });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("error while checking isServiceExist or not ");
     }
   }
 
-  async addService(values: string) {
+  async addService(data: AddserviceDTO): Promise<AddNewServiceResponse | null> {
     try {
-      return await this.adminRepository.addNewServices(values);
+      const { values } = data;
+      console.log("values from the service is ", values);
+      return await this.adminRepository.addNewServices({ values });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while adding new Services in the adminService ");
     }
   }
 
   //adding new devices
-  async addDevice(name: string) {
+  async addDevice(data: AddDeviceDTO): Promise<AddNewDeviceResponse | null> {
     try {
-      return await this.adminRepository.addNewDevice(name);
+      const { name } = data;
+      return await this.adminRepository.addNewDevice({ name });
     } catch (error) {
       console.log(error as Error);
+      throw new Error("Error while adding new Device form the adminService");
     }
   }
 
   //checking for the divce is existing or not for avoding the duplication
-  async isDeviceExist(name: string) {
+  async isDeviceExist(
+    data: isDeviceExistDTO
+  ): Promise<isDeviceExistResponse | null> {
     try {
-      return await this.adminRepository.isDeviceExist(name);
+      const { name } = data;
+      return await this.adminRepository.isDeviceExist({ name });
     } catch (error) {
       console.log(error as Error);
+      throw new Error(
+        "error while checking the isDeviceExist in the adminService"
+      );
     }
   }
 
-  async editExistingService(_id: string, values: IServices) {
+  async editExistingService(
+    data: EditExistServiceDTO
+  ): Promise<EditExistServiceResponse | null> {
     try {
-      return await this.adminRepository.editExistService(_id, values);
+      const { _id, values } = data;
+      return await this.adminRepository.editExistService({ _id, values });
     } catch (error) {
       console.log(error as Error);
-      throw error as Error;
+      throw new Error("error while editExistingService in AdminService");
     }
+  }
+
+
+  //changing this generating presinged url code ot differtnt comon place 
+  async getPresignedUrl(data: GetPreSignedUrlDTO) {
+    try{
+      const { fileName, fileType } = data;
+
+      if (!fileName || !fileType) {
+        return {
+          success: false,
+          message: "File name and type are required",
+        } as GetPreSignedUrlResponse;
+      }
+      const folderName = "ServiceImages";
+      const result = await generatePresignedUrl(fileName,fileType,folderName);
+      return result as GetPreSignedUrlResponse;
+    }catch(error){
+      console.log(error);
+      throw new Error("error while generating the presinged url from the adminService")
+    }
+   
   }
 }
 export default adminService;

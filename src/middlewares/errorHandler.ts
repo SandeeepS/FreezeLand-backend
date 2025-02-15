@@ -15,9 +15,11 @@ const errorHandlerMiddleware = (
     const message = err.message || 'Internal Server Error';
 
     res.status(statusCode).json({
+    
         success: false,
         message: message,
     });
+    next(err);
 
 }
 

@@ -1,9 +1,11 @@
 interface Mech {
-    id?: string;
-    name?: string;
-    email?: string;
+    id?:string;
+    name: string;
+    email: string;
     password?: string ;
-    phone?:number;
+    phone:number;
+    role:string;
+    isVerified:boolean;
     isBlocked?:boolean; 
     isDeleted?:boolean; 
 }

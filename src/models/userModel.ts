@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model} from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 const AddressSchema = new Schema({
   name: { type: String, require: true },
@@ -26,7 +26,8 @@ export interface UserInterface extends Document {
     district: string;
     landMark: string;
   }[];
-  defaultAddress:string;
+  defaultAddress: string;
+  role: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -36,32 +37,46 @@ const userSchema: Schema<UserInterface> = new Schema({
     type: String,
     required: true,
   },
+
   password: {
     type: String,
   },
+
   email: {
     type: String,
     required: true,
   },
+
   phone: {
     type: Number,
   },
+
   profile_picture: {
     type: String,
     default:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/680px-Default_pfp.svg.png",
   },
+
   address: {
     type: [AddressSchema],
     required: false,
   },
-  defaultAddress:{
-    type:String,
+
+  defaultAddress: {
+    type: String,
   },
+
+  role: {
+    type: String,
+    default: "user",
+    required: true,
+  },
+
   isBlocked: {
     type: Boolean,
     default: false,
   },
+
   isDeleted: {
     type: Boolean,
     default: false,
