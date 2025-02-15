@@ -117,31 +117,25 @@ export interface GetAllDevicesResponse {
   isDeleted: boolean;
 }
 
-
-
 export interface VerifyMechanicDTO {
-  name:string;
-  id:string;
+  name: string;
+  id: string;
   mechanicType: string[];
   photo: string;
   adharProof: string;
   employeeLicense: string;
 }
 
-
-
-export interface GetPreSignedUrlDTO{
-
-  fileName:string;
-  fileType:string;
-  name:string;
+export interface GetPreSignedUrlDTO {
+  fileName: string;
+  fileType: string;
+  name: string;
 }
 
 export interface GetPreSignedUrlResponse {
-  success?:boolean;
-  message?:string;
-  uploadURL?:string;
-  imageName?:string;
-  key?:string;
-
+  success?: boolean;
+  message?: string;
+  uploadURL?: string;
+  imageName?: string;
+  key?: string;
 }

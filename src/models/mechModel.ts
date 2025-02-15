@@ -7,10 +7,10 @@ export interface MechInterface extends Document {
   password: string;
   phone: number;
   role: string;
-  mechanicType:string[];
+  mechanicType: string[];
   photo: string;
   adharProof: string;
-  employeeLicense : string;
+  employeeLicense: string;
   isVerified: boolean;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -53,7 +53,7 @@ const mechSchema: Schema<MechInterface> = new Schema({
     type: String,
     required: false,
   },
-  employeeLicense : {
+  employeeLicense: {
     type: String,
     required: false,
   },
