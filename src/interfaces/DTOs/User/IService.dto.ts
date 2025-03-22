@@ -132,7 +132,7 @@ export interface EmailExistCheckResponse {
 }
 
 export interface GetProfileDTO {
-  id: string;
+  id: string  
 }
 
 export interface GetProfileResponse {

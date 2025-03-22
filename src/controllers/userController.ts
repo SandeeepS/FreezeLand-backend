@@ -363,20 +363,21 @@ class userController implements IUserController {
 
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userId } = req.params;
-
-      console.log("userId from the getProfile in the useController", userId);
-      const currentUser = await this.userServices.getProfile({ id: userId });
-      if (!currentUser)
-        res
-          .status(UNAUTHORIZED)
-          .json({ success: false, message: "Authentication failed..!" });
-      else if (currentUser?.data.data?.isBlocked)
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "user has been blocked by the admin!",
-        });
-      else res.status(OK).json(currentUser);
+      const { userId } = req.query;
+      if (userId) {
+        console.log("userId from the getProfile in the useController", userId);
+        const currentUser = await this.userServices.getProfile({ id: userId as string });
+        if (!currentUser)
+          res
+            .status(UNAUTHORIZED)
+            .json({ success: false, message: "Authentication failed..!" });
+        else if (currentUser?.data.data?.isBlocked)
+          res.status(UNAUTHORIZED).json({
+            success: false,
+            message: "user has been blocked by the admin!",
+          });
+        else res.status(OK).json(currentUser);
+      }
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -627,12 +628,10 @@ class userController implements IUserController {
       const { imageKey } = req.query;
       console.log("imageKey from the frontend is ", imageKey);
       if (typeof imageKey !== "string") {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid image key",
-          }) as GetImageUrlResponse;
+        return res.status(400).json({
+          success: false,
+          message: "Invalid image key",
+        }) as GetImageUrlResponse;
       }
 
       const command = new GetObjectCommand({
@@ -643,7 +642,6 @@ class userController implements IUserController {
       res.status(200).json({ success: true, url });
     } catch (error) {
       next(error);
-      
     }
   }
   async logout(req: Request, res: Response, next: NextFunction) {
