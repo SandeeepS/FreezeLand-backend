@@ -344,6 +344,7 @@ class userController implements IUserController {
     }
   }
 
+  //funciton to update New password 
   async updateNewPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, userId } = req.body;
