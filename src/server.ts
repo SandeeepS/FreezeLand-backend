@@ -22,8 +22,8 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: '50mb' })); 
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
 app.use(
   morgan(morganFormat, {
@@ -42,10 +42,6 @@ app.use(
 );
 
 app.use(errorHandlerMiddleware);
-
-
-
-
 const uri: string =
   process.env.MONGODB_URI || "mongodb://localhost:27017/your-app";
 
