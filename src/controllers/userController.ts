@@ -560,7 +560,7 @@ class userController implements IUserController {
   async getAllServices(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
-        "reached the getAllServices funciton in the admin controller"
+        "reached the getAllServices funciton in the user controller"
       );
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
