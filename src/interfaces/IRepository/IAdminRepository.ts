@@ -20,6 +20,8 @@ import {
     DeleteServiceResponse,
     DeleteUserDTO,
     DeleteUserResponse,
+    EditExistServiceDTO,
+    EditExistServiceResponse,
     GetAllDevicesDTO,
     GetAllDevicesResponse,
     GetAllServiceResponse,
@@ -29,9 +31,13 @@ import {
     GetMechListDTO,
     GetMechListResponse,
     GetServiceCountDTO,
+    GetServiceDTO,
+    GetServiceResponse,
     GetUserCountDTO,
     GetUserListDTO,
     GetUserListResponse,
+    IsAdminExistDTO,
+    IsAdminExistResponse,
     IsDeviceExistDTO,
     isDeviceExistResponse,
     IsServiceExistDTO,
@@ -61,7 +67,11 @@ export interface IAdminRepository{
 
     isServiceExist(data: IsServiceExistDTO): Promise<IsServiceExistResponse | null>;
     isDeviceExist(data: IsDeviceExistDTO): Promise<isDeviceExistResponse | null>;
+    isAdminExist(data: IsAdminExistDTO): Promise<IsAdminExistResponse | null>
 
     addNewServices(data: AddNewServiceDTO): Promise<AddNewServiceResponse | null>;
     addNewDevice(data: AddNewDeviceDTO): Promise<AddNewDeviceResponse | null>;
+    getService(data: GetServiceDTO): Promise<GetServiceResponse | null>
+
+    editExistService(data: EditExistServiceDTO): Promise<EditExistServiceResponse | null>
 }
