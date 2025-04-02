@@ -9,7 +9,7 @@ import userAuth from "../middlewares/userAuthMidd";
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
-const userRepository = new UserRepository()
+const userRepository = new UserRepository();
 const userServices = new userService(userRepository,createjwt,encrypt);
 const controller = new userController(userServices);
 

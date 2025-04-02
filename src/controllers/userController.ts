@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { generateAndSendOTP } from "../utils/generateOtp";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -21,9 +20,12 @@ import {
   SaveUserResponse,
 } from "../interfaces/DTOs/User/IController.dto";
 import { IUserController } from "../interfaces/IController/IUserController";
+import { IUserServices } from "../interfaces/IServices/IUserServices";
 
 class userController implements IUserController {
-  constructor(private userServices: userService) {}
+  constructor(private userServices: IUserServices) {
+    this.userServices = userServices
+  }
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
