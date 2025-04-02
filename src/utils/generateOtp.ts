@@ -1,7 +1,4 @@
 
-
-
-
 export interface IgenerateOTP {
   generateRandomOTP(): string 
 }

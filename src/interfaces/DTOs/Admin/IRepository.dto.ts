@@ -35,6 +35,25 @@ export interface GetUserListDTO {
   searchQuery: string;
 }
 
+export interface GetMechanicByIdDTO {
+  id:string;
+}
+
+export interface GetMechanicByIdResponse{
+    _id: Types.ObjectId;
+    name: string;
+    email: string;
+    phone: number;
+    role: string;
+    mechanicType: string[];
+    photo: string;
+    adharProof: string;
+    employeeLicense: string;
+    isVerified: boolean;
+    isBlocked: boolean;
+    isDeleted: boolean;
+}
+
 export interface GetUserListResponse {
   _id: Types.ObjectId;
   name: string;

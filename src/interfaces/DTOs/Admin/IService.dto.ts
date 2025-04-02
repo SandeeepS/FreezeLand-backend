@@ -88,6 +88,7 @@ export interface GetServiceDTO {
   id: string;
 }
 
+
 export interface GetServiceResponse2 {
   id?: Types.ObjectId;
   name: string;
@@ -96,6 +97,25 @@ export interface GetServiceResponse2 {
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
+}
+
+export interface GetMechanicByIdDTO {
+  id:string;
+}
+
+export interface GetMechanicByIdResponse{
+    _id: Types.ObjectId;
+    name: string;
+    email: string;
+    phone: number;
+    role: string;
+    mechanicType: string[];
+    photo: string;
+    adharProof: string;
+    employeeLicense: string;
+    isVerified: boolean;
+    isBlocked: boolean;
+    isDeleted: boolean;
 }
 
 export interface BlockUserDTO {

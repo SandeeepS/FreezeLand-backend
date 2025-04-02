@@ -27,6 +27,8 @@ import {
     GetAllServiceResponse,
     GetAllServicesDTO,
     GetDeviceCountDTO,
+    GetMechanicByIdDTO,
+    GetMechanicByIdResponse,
     GetMechCountDTO,
     GetMechListDTO,
     GetMechListResponse,
@@ -72,6 +74,6 @@ export interface IAdminRepository{
     addNewServices(data: AddNewServiceDTO): Promise<AddNewServiceResponse | null>;
     addNewDevice(data: AddNewDeviceDTO): Promise<AddNewDeviceResponse | null>;
     getService(data: GetServiceDTO): Promise<GetServiceResponse | null>
-
+    getMechanicById(data: GetMechanicByIdDTO): Promise<GetMechanicByIdResponse | null> 
     editExistService(data: EditExistServiceDTO): Promise<EditExistServiceResponse | null>
 }

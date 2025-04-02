@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import mechService from "../services/mechServices";
-import { generateAndSendOTP } from "../utils/generateOtp";
 const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
 import { LoginValidation, SignUpValidation } from "../utils/validator";
 import { IMechController } from "../interfaces/IController/IMechController";
@@ -10,9 +9,22 @@ import {
   VerifyForgotOtpMech,
 } from "../interfaces/DTOs/User/IController.dto";
 import { GetPreSignedUrlResponse } from "../interfaces/DTOs/Mech/IController.dto";
+import { compareInterface } from "../utils/comparePassword";
+import { ICreateJWT } from "../utils/generateToken";
+import { Iemail } from "../utils/email";
 
 class mechController implements IMechController {
-  constructor(private mechServices: mechService) {}
+  constructor(
+    private mechServices: mechService,
+    private encrypt: compareInterface,
+    private createdjwt: ICreateJWT,
+    private email:Iemail,
+  ) {
+      this.mechServices = mechServices
+      this.encrypt = encrypt;
+      this.createdjwt = createdjwt;
+      this.email = email
+  }
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
@@ -44,7 +56,7 @@ class mechController implements IMechController {
           req.app.locals.mechData = req.body;
           req.app.locals.mechEmail = req.body.email;
 
-          const otp = await generateAndSendOTP(email);
+          const otp = await this.email.generateAndSendOTP(email);
           req.app.locals.mechOtp = otp;
 
           const expirationMinutes = 1;
@@ -206,7 +218,7 @@ class mechController implements IMechController {
             message: "mech with email is not exist!",
           }) as ForgotResentOtpResponse;
       }
-      const otp = await generateAndSendOTP(email);
+      const otp = await this.email.generateAndSendOTP(email);
       req.app.locals.resendOtp = otp;
 
       const expirationMinutes = 1;

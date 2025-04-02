@@ -5,13 +5,17 @@ import mechController from '../controllers/mechController';
 import { CreateJWT } from '../utils/generateToken';
 import mechService from '../services/mechServices';
 import mechAuth from '../middlewares/mechAuthMidd';
+import { Email } from '../utils/email';
+import { GenerateOTP } from '../utils/generateOtp';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const mechRouter:Router = express.Router();
 const mechRepository = new MechRepository();
+const generateOTP  = new GenerateOTP();
+const email = new Email(generateOTP);
 const mechServices = new mechService(mechRepository,createjwt,encrypt);
-const controller = new mechController(mechServices);
+const controller = new mechController(mechServices,encrypt,createjwt,email);
 
 mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next));
 mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await controller.mechSignup(req,res,next));
@@ -24,5 +28,6 @@ mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Res
 mechRouter.post('/verifyMechanic',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.verifyMechanic(req,res,next));
 mechRouter.get('/logout',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogout(req,res,next));
 mechRouter.get('/getS3SingUrlForMechCredinential',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.getS3SingUrlForMechCredinential(req,res,next));
+
 
 export default mechRouter;

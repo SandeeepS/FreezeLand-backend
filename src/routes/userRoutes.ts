@@ -5,13 +5,17 @@ import userService from "../services/userService";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
 import userAuth from "../middlewares/userAuthMidd";
+import { GenerateOTP } from "../utils/generateOtp";
+import { Email } from "../utils/email";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const userRepository = new UserRepository();
+const generateOTP  = new GenerateOTP();
+const email = new Email(generateOTP);
 const userServices = new userService(userRepository,createjwt,encrypt);
-const controller = new userController(userServices);
+const controller = new userController(userServices,encrypt,createjwt,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
 userRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next))

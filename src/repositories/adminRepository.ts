@@ -37,6 +37,8 @@ import {
   GetAllServiceResponse,
   GetAllServicesDTO,
   GetDeviceCountDTO,
+  GetMechanicByIdDTO,
+  GetMechanicByIdResponse,
   GetMechCountDTO,
   GetMechListDTO,
   GetMechListResponse,
@@ -180,6 +182,19 @@ class AdminRepository
       return result;
     } catch (error) {
       console.log(error as Error);
+      throw new Error();
+    }
+  }
+
+  async getMechanicById(
+    data: GetMechanicByIdDTO
+  ): Promise<GetMechanicByIdResponse | null>{
+    try {
+      const { id } = data;
+      const result = await this.mechRepository.findById(id);
+      return result;
+    } catch (error) {
+      console.log(error);
       throw new Error();
     }
   }

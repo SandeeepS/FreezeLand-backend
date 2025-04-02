@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import { generateAndSendOTP } from "../utils/generateOtp";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { compareInterface } from "../utils/comparePassword";
 
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
   STATUS_CODES;
@@ -21,10 +21,20 @@ import {
 } from "../interfaces/DTOs/User/IController.dto";
 import { IUserController } from "../interfaces/IController/IUserController";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
+import { ICreateJWT } from "../utils/generateToken";
+import { Iemail } from "../utils/email";
 
 class userController implements IUserController {
-  constructor(private userServices: IUserServices) {
+  constructor(
+    private userServices: IUserServices,
+    private encrypt: compareInterface,
+    private createjwt : ICreateJWT,
+    private email : Iemail,
+  ) {
     this.userServices = userServices
+    this.encrypt = encrypt;
+    this.createjwt = createjwt;
+    this.email = email;
   }
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
@@ -44,7 +54,7 @@ class userController implements IUserController {
         name,
         phone,
         password,
-        cpassword
+        cpassword,
       );
       console.log(typeof phone);
       const check = SignUpValidation(name, phone, email, password, cpassword);
@@ -57,7 +67,7 @@ class userController implements IUserController {
           req.app.locals.newUser = true;
           req.app.locals.userData = req.body;
           req.app.locals.userEmail = req.body.email;
-          const otp = await generateAndSendOTP(req.body.email);
+          const otp = await this.email.generateAndSendOTP(req.body.email);
           req.app.locals.userOtp = otp;
           console.log("otp print ", req.app.locals.userOtp);
 
@@ -85,6 +95,115 @@ class userController implements IUserController {
       }
     } catch (error) {
       console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async veryfyOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { otp } = req.body;
+      const isNuewUser = req.app.locals.newUser;
+      const savedUser = req.app.locals.userData;
+
+      const accessTokenMaxAge = 15 * 60 * 1000;
+      const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+
+      if (otp === Number(req.app.locals.userOtp)) {
+        console.log(typeof otp);
+        console.log(typeof req.app.locals.userOtp);
+        if (isNuewUser) {
+          const newUser = await this.userServices.saveUser(savedUser);
+          req.app.locals = {};
+          // const time = this.milliseconds(23, 30, 0);
+          res
+            .status(OK)
+            .cookie("access_token", newUser?.token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("refresh_token", newUser?.refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(newUser);
+        } else {
+          res
+            .status(OK)
+            .cookie("access_token", isNuewUser.data.token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("refresh_token", isNuewUser.data.refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json({ success: true, message: "old user verified" });
+        }
+      } else {
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Incorrect otp !" });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  
+  async forgotResentOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<ForgotResentOtpResponse | void> {
+    try {
+      const { email } = req.body;
+      req.app.locals.userEmail = email;
+      if (!email) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "please enter the email",
+        }) as ForgotResentOtpResponse;
+      }
+      const user = await this.userServices.getUserByEmail(email);
+      if (!user) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "user with email is not exist!",
+        }) as ForgotResentOtpResponse;
+      }
+      const otp = await this.email.generateAndSendOTP(email);
+      req.app.locals.resendOtp = otp;
+
+      const expirationMinutes = 1;
+      setTimeout(() => {
+        delete req.app.locals.resendOtp;
+      }, expirationMinutes * 60 * 1000);
+
+      res.status(OK).json({
+        success: true,
+        data: user,
+        message: "OTP sent for verification...",
+      } as ForgotResentOtpResponse);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async VerifyForgotOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+      const otp = req.body.otp;
+      console.log("otp from the req body is ", otp);
+      if (!otp)
+        return res.json({ success: false, message: "Please enter the otp!" });
+      if (!req.app.locals.resendOtp)
+        return res.json({ success: false, message: "Otp is expired!" });
+      if (otp === req.app.locals.resendOtp)
+        res.json({ success: true, message: "both otp are same." });
+      else res.json({ success: false, message: "Entered otp is not correct!" });
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   }
@@ -238,113 +357,8 @@ class userController implements IUserController {
     }
   }
 
-  async veryfyOtp(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const { otp } = req.body;
-      const isNuewUser = req.app.locals.newUser;
-      const savedUser = req.app.locals.userData;
 
-      const accessTokenMaxAge = 15 * 60 * 1000;
-      const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
 
-      if (otp === Number(req.app.locals.userOtp)) {
-        console.log(typeof otp);
-        console.log(typeof req.app.locals.userOtp);
-        if (isNuewUser) {
-          const newUser = await this.userServices.saveUser(savedUser);
-          req.app.locals = {};
-          // const time = this.milliseconds(23, 30, 0);
-          res
-            .status(OK)
-            .cookie("access_token", newUser?.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", newUser?.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json(newUser);
-        } else {
-          res
-            .status(OK)
-            .cookie("access_token", isNuewUser.data.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", isNuewUser.data.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json({ success: true, message: "old user verified" });
-        }
-      } else {
-        res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "Incorrect otp !" });
-      }
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  async forgotResentOtp(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<ForgotResentOtpResponse | void> {
-    try {
-      const { email } = req.body;
-      req.app.locals.userEmail = email;
-      if (!email) {
-        return res.status(BAD_REQUEST).json({
-          success: false,
-          message: "please enter the email",
-        }) as ForgotResentOtpResponse;
-      }
-      const user = await this.userServices.getUserByEmail(email);
-      if (!user) {
-        return res.status(BAD_REQUEST).json({
-          success: false,
-          message: "user with email is not exist!",
-        }) as ForgotResentOtpResponse;
-      }
-      const otp = await generateAndSendOTP(email);
-      req.app.locals.resendOtp = otp;
-
-      const expirationMinutes = 1;
-      setTimeout(() => {
-        delete req.app.locals.resendOtp;
-      }, expirationMinutes * 60 * 1000);
-
-      res.status(OK).json({
-        success: true,
-        data: user,
-        message: "OTP sent for verification...",
-      } as ForgotResentOtpResponse);
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  async VerifyForgotOtp(req: Request, res: Response, next: NextFunction) {
-    try {
-      const otp = req.body.otp;
-      console.log("otp from the req body is ", otp);
-      if (!otp)
-        return res.json({ success: false, message: "Please enter the otp!" });
-      if (!req.app.locals.resendOtp)
-        return res.json({ success: false, message: "Otp is expired!" });
-      if (otp === req.app.locals.resendOtp)
-        res.json({ success: true, message: "both otp are same." });
-      else res.json({ success: false, message: "Entered otp is not correct!" });
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
-  }
 
   //funciton to update New password 
   async updateNewPassword(req: Request, res: Response, next: NextFunction) {

@@ -28,6 +28,8 @@ import {
   EditExistServiceResponse,
   GetDeviceDTO,
   GetDeviceResponse,
+  GetMechanicByIdDTO,
+  GetMechanicByIdResponse,
   GetMechList,
   GetMechListResponse,
   GetPreSignedUrlDTO,
@@ -52,7 +54,7 @@ class adminService implements IAdminService {
   constructor(
     private adminRepository: IAdminRepository,
     private encrypt: compareInterface,
-    private createjwt: ICreateJWT,
+    private createjwt: ICreateJWT
   ) {
     this.adminRepository = adminRepository;
     this.encrypt = encrypt;
@@ -247,6 +249,21 @@ class adminService implements IAdminService {
       throw new Error();
     }
   }
+
+  async getMechanicById(
+    data: GetMechanicByIdDTO
+  ): Promise<GetMechanicByIdResponse | null> {
+    try {
+      const { id } = data;
+      console.log("Reached the getMehanic in the adminservice");
+      const result = await this.adminRepository.getMechanicById({ id });
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error();
+    }
+  }
+
   async blockUser(data: BlockUserDTO): Promise<BlockUserResponse | null> {
     try {
       const { userId } = data;

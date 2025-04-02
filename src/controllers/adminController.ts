@@ -7,7 +7,10 @@ import {
   AddNewDeviceValidation,
 } from "../utils/validator";
 import { IAdminController } from "../interfaces/IController/IAdminController";
-import { GetPreSignedUrlResponse } from "../interfaces/DTOs/Admin/IController.dto";
+import { GetImageUrlResponse, GetPreSignedUrlResponse } from "../interfaces/DTOs/Admin/IController.dto";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import S3Client from "../awsConfig";
 // import { storage } from "../firebase";
 // import { ref, uploadString, getDownloadURL } from "firebase/storage";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
@@ -386,6 +389,18 @@ class adminController implements IAdminController {
     }
   }
 
+  async getMechanicById(req:Request,res:Response,next:NextFunction) {
+    try{
+       const {id} = req.params;
+       console.log("id in the adminController is ",id); 
+       const result = await this.adminService.getMechanicById({id});
+       res.status(OK).json(result);
+    }catch(error){
+      console.log(error);
+      next(error);
+    }
+  }
+
   async listUnlistServices(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("reached the listUnlistServices at adminController");
@@ -513,6 +528,33 @@ class adminController implements IAdminController {
       next(error);
     }
   }
+
+  async getImageUrl(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetImageUrlResponse | void> {
+    try {
+      const { imageKey } = req.query;
+      console.log("imageKey from the frontend is ", imageKey);
+      if (typeof imageKey !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid image key",
+        }) as GetImageUrlResponse;
+      }
+
+      const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: imageKey,
+      });
+      const url = await getSignedUrl(S3Client, command, { expiresIn: 3600 });
+      res.status(200).json({ success: true, url });
+    } catch (error) {
+      next(error);
+    }
+  }
+
 
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
