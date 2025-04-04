@@ -44,6 +44,8 @@ import {
   isDeviceExistResponse,
   IsServiceExistDTO,
   IsServiceExistResponse,
+  UpdateApproveDTO,
+  UpdateApproveResponse,
 } from "../interfaces/DTOs/Admin/IService.dto";
 import { IAdminService } from "../interfaces/IServices/IAdminService";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
@@ -417,6 +419,25 @@ class adminService implements IAdminService {
     }
   }
 
+  async updateApprove (data:UpdateApproveDTO) : Promise<UpdateApproveResponse | null> {
+    try{
+      const {id , verificationStatus } = data;
+      let modifiedVerificationStatus ;
+      if(verificationStatus == "false"){
+        modifiedVerificationStatus = true;
+      }else{
+        modifiedVerificationStatus= false;
+      }
+      if(id){
+        const result = await this.adminRepository.updateApprove({id,modifiedVerificationStatus});
+        return result;
+      }
+      return {result : false};
+    }catch(error){
+      console.log(error as Error);
+      throw new Error("Error while approving the mechanic in the AdminSerivce");
+    }
+  }
   //changing this generating presinged url code ot differtnt comon place
   async getPresignedUrl(data: GetPreSignedUrlDTO) {
     try {

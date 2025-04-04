@@ -194,7 +194,8 @@ export interface GetAllServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -269,10 +270,11 @@ export interface SetUserDefaultAddressResponse{
   isDeleted: boolean;
 }
 export interface RegisterServiceDTO {
-  _id: Types.ObjectId;
+  _id: Types.ObjectId ;
   name: string;
   image: [];
-  service: Types.ObjectId;
+  serviceId: Types.ObjectId;
+  userId:Types.ObjectId;
   defaultAddress: Types.ObjectId;
   discription: string;
   locationName: object;
@@ -281,10 +283,11 @@ export interface RegisterServiceDTO {
 }
 
 export interface RegisterServiceResponse{
-  _id: Types.ObjectId;
+  _id: Types.ObjectId ;
   name: string;
   image: [];
-  service: Types.ObjectId;
+  serviceId: Types.ObjectId;
+  userId:Types.ObjectId;
   defaultAddress: Types.ObjectId;
   discription: string;
   locationName: object;
@@ -303,10 +306,11 @@ export interface GetAllUserRegisteredServicesDTO {
 }
 
 export interface GetAllUserRegisteredServicesResponse {
-  _id: Types.ObjectId;
+  _id: Types.ObjectId ;
   name: string;
   image: [];
-  service: Types.ObjectId;
+  serviceId: Types.ObjectId;
+  userId:Types.ObjectId;
   defaultAddress: Types.ObjectId;
   discription: string;
   locationName: object;

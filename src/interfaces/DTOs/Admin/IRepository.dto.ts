@@ -29,6 +29,15 @@ export interface IsAdminExistResponse {
   isDeleted: boolean;
 }
 
+export interface UpdateApproveDTO{
+  id:string ;
+  modifiedVerificationStatus:boolean | undefined;
+}
+
+export interface UpdateApproveResponse{
+   result : boolean;
+}
+
 export interface GetUserListDTO {
   page: number;
   limit: number;
@@ -103,7 +112,8 @@ export interface GetAllServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -133,7 +143,8 @@ export interface GetServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -147,7 +158,8 @@ export interface EditExistServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -202,7 +214,8 @@ export interface BlockServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -266,7 +279,8 @@ export interface DeleteServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge: number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -288,7 +302,8 @@ export interface IsServiceExistResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -312,7 +327,8 @@ export interface AddNewServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;

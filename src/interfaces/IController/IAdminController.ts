@@ -17,4 +17,5 @@ export interface IAdminController{
     editExistingService(req: Request, res: Response, next: NextFunction): Promise<void>;
     deleteService(req: Request, res: Response, next: NextFunction): Promise<void>;
     adminLogout(req: Request, res: Response, next: NextFunction): Promise<void>;
+    updateApprove (req:Request,res:Response,next:NextFunction) :Promise<void>;
 }

@@ -54,11 +54,12 @@ import {
   isDeviceExistResponse,
   IsServiceExistDTO,
   IsServiceExistResponse,
+  UpdateApproveDTO,
+  UpdateApproveResponse,
 } from "../interfaces/DTOs/Admin/IRepository.dto";
 import { IAdminRepository } from "../interfaces/IRepository/IAdminRepository";
 
-class AdminRepository
-  extends BaseRepository<AdminInterface & Document>
+class AdminRepository extends BaseRepository<AdminInterface & Document>
   implements IAdminRepository
 {
   private userRepository: UserRepository;
@@ -85,6 +86,22 @@ class AdminRepository
     }
   }
 
+  async updateApprove(data: UpdateApproveDTO): Promise<UpdateApproveResponse | null>  {
+      try{
+        const {id , modifiedVerificationStatus} = data;
+        const qr = {"isVerified":modifiedVerificationStatus}
+        const result = await this.mechRepository.update(id,qr)
+        if(result ){
+          return {result : true}
+        }else{
+          return {result : false}
+        }
+      }catch(error){
+        console.log(error as Error);
+        throw error;
+      }
+  }
+  
   async isAdminExist(
     data: IsAdminExistDTO
   ): Promise<IsAdminExistResponse | null> {
@@ -99,7 +116,7 @@ class AdminRepository
         console.log("admin is not exists");
         return null;
       }
-    } catch (error) {
+    } catch (error){
       console.log("error occured in the isAmdinExist in the admin repository");
       throw error;
     }

@@ -145,7 +145,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> implements
       const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.serviceRepository.findAll(page, limit, regex);
-      return result ;
+      return result  ;
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");

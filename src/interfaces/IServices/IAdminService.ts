@@ -38,6 +38,8 @@ import {
     isDeviceExistResponse,
     IsServiceExistDTO,
     IsServiceExistResponse,
+    UpdateApproveDTO,
+    UpdateApproveResponse,
   } from "../DTOs/Admin/IService.dto";
 
 
@@ -70,4 +72,5 @@ export interface IAdminService {
         blockDevice(data: BlockDeviceDTO):Promise<BlockDeviceResponse | null>;
         deleteDevice(data: DeleteDeviceDTO):Promise<DeleteDeviceResponse|null>;
         isDeviceExist(data: isDeviceExistDTO):Promise<isDeviceExistResponse|null>;
+        updateApprove (data:UpdateApproveDTO) : Promise<UpdateApproveResponse  | null>;
 }

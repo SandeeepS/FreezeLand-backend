@@ -6,7 +6,8 @@ export interface Iconcern extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   image: [];
-  service: mongoose.Types.ObjectId;
+  serviceId: mongoose.Types.ObjectId;
+  userId:mongoose.Types.ObjectId;
   defaultAddress: mongoose.Types.ObjectId;
   discription: string;
   locationName: object;
@@ -21,11 +22,15 @@ const concernSchema: Schema<Iconcern> = new Schema({
   },
   image: {
     type: [],
-    required: true,
+    required: false,
   },
-  service: {
+  serviceId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+  },
+  userId:{
+    type:mongoose.Schema.Types.ObjectId,
+    required:true
   },
   defaultAddress: {
     type: mongoose.Schema.Types.ObjectId,

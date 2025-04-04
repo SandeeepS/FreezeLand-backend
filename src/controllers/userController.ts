@@ -214,7 +214,7 @@ class userController implements IUserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { email, password }: { email: string; password: string } = req.body;
+      const {email,password }: { email: string; password: string } = req.body;
       console.log(
         "email and password is from the controllers for login",
         email,

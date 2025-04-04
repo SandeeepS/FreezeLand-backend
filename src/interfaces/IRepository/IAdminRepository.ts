@@ -44,6 +44,8 @@ import {
     isDeviceExistResponse,
     IsServiceExistDTO,
     IsServiceExistResponse,
+    UpdateApproveDTO,
+    UpdateApproveResponse,
   } from "../DTOs/Admin/IRepository.dto";
 
 export interface IAdminRepository{
@@ -76,4 +78,5 @@ export interface IAdminRepository{
     getService(data: GetServiceDTO): Promise<GetServiceResponse | null>
     getMechanicById(data: GetMechanicByIdDTO): Promise<GetMechanicByIdResponse | null> 
     editExistService(data: EditExistServiceDTO): Promise<EditExistServiceResponse | null>
+    updateApprove (data:UpdateApproveDTO) : Promise<UpdateApproveResponse | null> 
 }

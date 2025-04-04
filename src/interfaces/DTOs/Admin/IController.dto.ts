@@ -12,3 +12,8 @@ export interface GetImageUrlResponse{
     message?:string;
     url?:string;
 }
+
+export interface UpdateApproveResponse{
+    result : boolean;
+ }
+ 

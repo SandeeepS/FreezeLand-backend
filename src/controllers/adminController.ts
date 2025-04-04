@@ -7,7 +7,11 @@ import {
   AddNewDeviceValidation,
 } from "../utils/validator";
 import { IAdminController } from "../interfaces/IController/IAdminController";
-import { GetImageUrlResponse, GetPreSignedUrlResponse } from "../interfaces/DTOs/Admin/IController.dto";
+import {
+  GetImageUrlResponse,
+  GetPreSignedUrlResponse,
+  UpdateApproveResponse,
+} from "../interfaces/DTOs/Admin/IController.dto";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
@@ -389,13 +393,13 @@ class adminController implements IAdminController {
     }
   }
 
-  async getMechanicById(req:Request,res:Response,next:NextFunction) {
-    try{
-       const {id} = req.params;
-       console.log("id in the adminController is ",id); 
-       const result = await this.adminService.getMechanicById({id});
-       res.status(OK).json(result);
-    }catch(error){
+  async getMechanicById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      console.log("id in the adminController is ", id);
+      const result = await this.adminService.getMechanicById({ id });
+      res.status(OK).json(result);
+    } catch (error) {
       console.log(error);
       next(error);
     }
@@ -533,7 +537,7 @@ class adminController implements IAdminController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<GetImageUrlResponse | void> {
+  ): Promise<GetImageUrlResponse | void>{
     try {
       const { imageKey } = req.query;
       console.log("imageKey from the frontend is ", imageKey);
@@ -555,6 +559,34 @@ class adminController implements IAdminController {
     }
   }
 
+  async updateApprove(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.query.id as string;
+      const verificationStatus = req.query.verificationStatus as string;
+      console.log(typeof verificationStatus);
+      console.log(
+        "id and verification status  from the front end in the adminController is ",
+        id,
+        verificationStatus
+      );
+      if (id && verificationStatus) {
+        const result = await this.adminService.updateApprove({
+          id,
+          verificationStatus,
+        });
+        res.status(200).json({ success: true, result });
+      } else {
+        res
+          .status(304)
+          .json({
+            success: false,
+            result: "Not modifeid , id or verificationStatus is undefined",
+          });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {

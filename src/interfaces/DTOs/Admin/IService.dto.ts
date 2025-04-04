@@ -30,6 +30,15 @@ export interface GetUserList {
   searchQuery: string | undefined;
 }
 
+export interface UpdateApproveDTO{
+  id:string ;
+  verificationStatus: string;
+}
+
+export interface UpdateApproveResponse{
+   result : boolean;
+}
+
 export interface GetUserListResponse {
   status: STATUS_CODES;
   data: {
@@ -93,7 +102,8 @@ export interface GetServiceResponse2 {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -167,7 +177,8 @@ export interface BlockServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -234,7 +245,8 @@ export interface DeleteServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -258,7 +270,8 @@ export interface IsServiceExistResponse{
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -271,7 +284,8 @@ export interface AddNewServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -306,7 +320,8 @@ export interface EditExistServiceResponse{
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;

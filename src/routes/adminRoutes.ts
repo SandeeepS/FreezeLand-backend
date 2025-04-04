@@ -34,6 +34,7 @@ adminRouter.put('/deleteService/:serviceId',adminAuth(["admin"]),async(req:Reque
 adminRouter.put('/deleteDevice/:deviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.deleteDevice(req,res,next));
 adminRouter.put('/editExistService',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.editExistingService(req,res,next));
 adminRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
+adminRouter.put('/updateApprove',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.updateApprove(req,res,next))
 
 
 export default adminRouter;

@@ -294,7 +294,8 @@ export interface RegisterServiceDTO {
     _id: Types.ObjectId ;
     name: string;
     image: [];
-    service: Types.ObjectId;
+    serviceId: Types.ObjectId;
+    userId:Types.ObjectId;
     defaultAddress: Types.ObjectId;
     discription: string;
     locationName: object;
@@ -306,7 +307,8 @@ export interface RegisterServiceResponse{
   _id: Types.ObjectId ;
   name: string;
   image: [];
-  service: Types.ObjectId;
+  serviceId: Types.ObjectId;
+  userId:Types.ObjectId;
   defaultAddress: Types.ObjectId;
   discription: string;
   locationName: object;
