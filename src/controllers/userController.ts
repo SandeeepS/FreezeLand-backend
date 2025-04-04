@@ -559,7 +559,7 @@ class userController implements IUserController {
       if (result) {
         res.status(OK).json({
           success: true,
-          message: "Complaint registered successfully",
+          message: "Service  registered successfully",
         });
       } else {
         res
