@@ -9,6 +9,8 @@ import {
   GetAllDevicesResponse,
   GetAllMechanicResponse,
   GetAllMechanicsDTO,
+  getMechanicDetailsDTO,
+  getMechanicDetailsResponse,
   GetPreSignedUrlDTO,
   GetPreSignedUrlResponse,
   MechLoginDTO,
@@ -307,6 +309,19 @@ class mechService implements IMechServices {
         mechId,
       });
     } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+
+  async getMechanicDetails ( data : getMechanicDetailsDTO ): Promise <getMechanicDetailsResponse | null> {
+    try{
+      const {id} = data;
+      console.log("Id in the mechService is ",id);
+      const result = await this.mechRepository.getMechanicDetails({id});
+      return result;
+    }catch(error){
       console.log(error as Error);
       throw error;
     }

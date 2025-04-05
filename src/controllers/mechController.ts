@@ -333,6 +333,24 @@ class mechController implements IMechController {
     }
   }
 
+  async getMechanicDetails (req:Request,res:Response,next:NextFunction){
+    try{
+      const {id} = req.query;
+      console.log("id reached in the mechController for getting mech details",id);
+      if(typeof id === "string"){
+        const result = await this.mechServices.getMechanicDetails({id});
+        res.status(OK).json({success:true,result:result});
+      }else{
+        console.log("Id is undifined in the getMechanicDetails in mechController");
+        res.status(STATUS_CODES.CONFLICT).json({success:false});
+      }
+ 
+    }catch(error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
 
     async getS3SingUrlForMechCredinential(
       req: Request,

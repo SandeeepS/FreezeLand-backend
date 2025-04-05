@@ -1,7 +1,4 @@
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import UserRepository from "../repositories/userRepository";
-import { CreateJWT } from "../utils/generateToken";
-import Encrypt from "../utils/comparePassword";
 
 import dotenv from "dotenv";
 import Cryptr from "cryptr";
@@ -37,15 +34,22 @@ import {
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
+import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
+import { ICreateJWT } from "../utils/generateToken";
+import { compareInterface } from "../utils/comparePassword";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 class userService implements IUserServices {
   constructor(
-    private userRepository: UserRepository,
-    private createjwt: CreateJWT,
-    private encrypt: Encrypt
-  ) {}
+    private userRepository: IUserRepository,
+    private createjwt: ICreateJWT,
+    private encrypt: compareInterface
+  ) {
+    this.userRepository = userRepository;
+    this.createjwt = createjwt;
+    this.encrypt = encrypt;
+  }
 
   async isUserExist(
     userData: UserSignUpDTO

@@ -36,7 +36,7 @@ import {
 } from "../interfaces/DTOs/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 
-class UserRepository extends BaseRepository<UserInterface & Document> implements IUserRepository {
+class UserRepository extends BaseRepository<UserInterface & Document> implements IUserRepository{
   private concernRepository: BaseRepository<Iconcern>;
   private serviceRepository: BaseRepository<IServices>;
   

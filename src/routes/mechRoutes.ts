@@ -26,6 +26,7 @@ mechRouter.put('/update-newpassword',async(req:Request,res:Response,next:NextFun
 mechRouter.get('/getAllMechanics',async(req:Request,res:Response,next:NextFunction) => await controller.getAllMechanics(req,res,next));
 mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllDevices(req,res,next));
 mechRouter.post('/verifyMechanic',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.verifyMechanic(req,res,next));
+mechRouter.get('/getMechanicDetails',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getMechanicDetails(req,res,next));
 mechRouter.get('/logout',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogout(req,res,next));
 mechRouter.get('/getS3SingUrlForMechCredinential',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.getS3SingUrlForMechCredinential(req,res,next));
 

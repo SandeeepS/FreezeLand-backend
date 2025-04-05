@@ -139,3 +139,22 @@ export interface GetPreSignedUrlResponse {
   imageName?: string;
   key?: string;
 }
+
+export interface getMechanicDetailsDTO {
+  id:string;
+}
+
+export interface getMechanicDetailsResponse {
+  _id:Types.ObjectId | string;
+  name: string;
+  email: string;
+  phone: number;
+  role: string;
+  photo: string;
+  adharProof: string | null; 
+  employeeLicense: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  isVerified: boolean;
+  mechanicType: string[];
+}

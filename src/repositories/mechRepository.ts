@@ -3,6 +3,8 @@ import {
   EmailExistResponse,
   EmailExitCheck,
   GetAllDevicesResponse,
+  getMechanicDetailsDTO,
+  getMechanicDetailsResponse,
   GetMechByIdDTO,
   GetMechByIdResponse,
   GetMechListDTO,
@@ -77,6 +79,17 @@ class MechRepository
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured while getmechById");
+    }
+  }
+
+  async getMechanicDetails (data:getMechanicDetailsDTO):Promise<getMechanicDetailsResponse | null>{
+    try{
+      const {id} = data ;
+      const result = await this.findById(id);
+      return result
+    }catch(error){
+      console.log(error as Error)
+      throw new Error("Error occured while getting mechanic Details in mechRepository");
     }
   }
 
