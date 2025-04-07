@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, response } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
@@ -28,10 +28,10 @@ class userController implements IUserController {
   constructor(
     private userServices: IUserServices,
     private encrypt: compareInterface,
-    private createjwt : ICreateJWT,
-    private email : Iemail,
+    private createjwt: ICreateJWT,
+    private email: Iemail
   ) {
-    this.userServices = userServices
+    this.userServices = userServices;
     this.encrypt = encrypt;
     this.createjwt = createjwt;
     this.email = email;
@@ -54,7 +54,7 @@ class userController implements IUserController {
         name,
         phone,
         password,
-        cpassword,
+        cpassword
       );
       console.log(typeof phone);
       const check = SignUpValidation(name, phone, email, password, cpassword);
@@ -150,7 +150,6 @@ class userController implements IUserController {
     }
   }
 
-  
   async forgotResentOtp(
     req: Request,
     res: Response,
@@ -214,65 +213,73 @@ class userController implements IUserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const {email,password }: { email: string; password: string } = req.body;
-      console.log(
-        "email and password is from the controllers for login",
-        email,
-        password
-      );
+      const { email, password }: { email: string; password: string } = req.body;
 
-      const check = LoginValidation(email, password);
-      if (check) {
-        const loginStatus = await this.userServices.userLogin({
-          email,
-          password,
-        });
-        console.log(loginStatus);
-        if (
-          loginStatus &&
-          loginStatus.data &&
-          typeof loginStatus.data == "object" &&
-          "token" in loginStatus.data
-        ) {
-          if (!loginStatus.data.success) {
-            res
-              .status(UNAUTHORIZED)
-              .json({ success: false, message: loginStatus.data.message });
-            return;
-          }
-          const access_token = loginStatus.data.token;
-          const refresh_token = loginStatus.data.refresh_token;
-          const accessTokenMaxAge = 5 * 60 * 1000;
-          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-          res
-            .status(loginStatus.status)
-            .cookie("user_access_token", access_token, {
-              maxAge: accessTokenMaxAge,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production", // Set to true in production
-              sameSite: "strict",
-            })
-            .cookie("user_refresh_token", refresh_token, {
-              maxAge: refreshTokenMaxAge,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production", // Set to true in production
-              sameSite: "strict",
-            })
-            .json(loginStatus);
-        } else {
-          res
-            .status(UNAUTHORIZED)
-            .json({ success: false, message: "Authentication error" });
-        }
-      } else {
+      // Validate input
+      const isValid = LoginValidation(email, password);
+      if (!isValid) {
         res.status(UNAUTHORIZED).json({
           success: false,
-          message: "Please check the email and password",
+          message: "Please provide valid email and password",
         });
+        return;
       }
+
+      // Call service
+      const loginStatus = await this.userServices.userLogin({
+        email,
+        password,
+      });
+
+
+      // Handle unsuccessful login without token
+      if (
+        !loginStatus?.data ||
+        typeof loginStatus.data !== "object" ||
+        !("token" in loginStatus.data)
+      ) {
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Authentication error",
+        });
+        return;
+      }
+
+      // Handle unsuccessful login with token (blocked user case)
+      if (!loginStatus.data.success) {
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: loginStatus.data.message,
+        });
+        return;
+      }
+
+      // Successful login - set cookies and send response
+      const accessTokenMaxAge = 5 * 60 * 1000; // 5 minutes
+      const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
+
+      res
+        .status(loginStatus.status)
+        .cookie("user_access_token", loginStatus.data.token, {
+          maxAge: accessTokenMaxAge,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        .cookie("user_refresh_token", loginStatus.data.refresh_token, {
+          maxAge: refreshTokenMaxAge,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        .json(loginStatus);
     } catch (error) {
-      console.log(error as Error);
-      next();
+      console.error("Login error:", error);
+      res.status(INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "An error occurred during login",
+      });
+      next(error); // Pass error to error handling middleware
     }
   }
 
@@ -357,10 +364,7 @@ class userController implements IUserController {
     }
   }
 
-
-
-
-  //funciton to update New password 
+  //funciton to update New password
   async updateNewPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, userId } = req.body;
@@ -383,7 +387,9 @@ class userController implements IUserController {
       const { userId } = req.query;
       if (userId) {
         console.log("userId from the getProfile in the useController", userId);
-        const currentUser = await this.userServices.getProfile({ id: userId as string });
+        const currentUser = await this.userServices.getProfile({
+          id: userId as string,
+        });
         if (!currentUser)
           res
             .status(UNAUTHORIZED)
@@ -575,9 +581,7 @@ class userController implements IUserController {
   //getting all service which is provided by the website.
   async getAllServices(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(
-        "reached the getAllServices funciton in the user controller"
-      );
+      console.log("reached the getAllServices funciton in the user controller");
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -600,20 +604,24 @@ class userController implements IUserController {
   }
 
   //getting all the registered complaints from the user
-  async getAllRegisteredService(
+  async getAllUserRegisteredServices(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     try {
+      const {userId} = req.query;
+      console.log("userId in the userController in the getAllUserRegisteredService",userId);
+   
       const page = 1;
       const limit = 10;
       const searchQuery = "";
       const allRegisteredUserServices =
-        await this.userServices.getAllRegisteredServices(
+        await this.userServices.getAllUserRegisteredServices(
           page,
           limit,
-          searchQuery
+          searchQuery,
+          userId as string
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({
@@ -661,6 +669,20 @@ class userController implements IUserController {
       next(error);
     }
   }
+
+  //function to get the specified userComplaint using user Id
+  async getUserRegisteredServiceDetailsById (req:Request,res:Response,next:NextFunction) {
+    try{
+      const {id} = req.query;
+      console.log("Enterd in the getUserRegisteredServiceDetailsById function in the userController with id" ,id);
+      
+      const result = await this.userServices.getUserRegisteredServiceDetailsById(id as string);
+      res.status(200).json({success:true,result});
+    }catch(error){
+      next(error);
+    }
+  }
+
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("Entered in the function for logout");

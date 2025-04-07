@@ -25,7 +25,8 @@ export interface IUserController{
     // Service Management 
     registerService(req: Request, res: Response, next: NextFunction): Promise<void>;
     getAllServices(req: Request, res: Response, next: NextFunction): Promise<void>;
-    getAllRegisteredService(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getAllUserRegisteredServices(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getUserRegisteredServiceDetailsById(req:Request,res:Response,next:NextFunction):Promise<void>;
 
     // Utility Methods
     getImageUrl(req: Request, res: Response, next: NextFunction): Promise<GetImageUrlResponse | void>;

@@ -32,7 +32,8 @@ userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Res
 userRouter.put('/editAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 userRouter.post('/registerService',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.registerService(req,res,next));
 userRouter.get('/getAllServices',async(req:Request,res:Response,next:NextFunction) =>await controller.getAllServices(req,res,next));//getting all service which is provided by the website
-userRouter.get('/getAllRegisteredService',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllRegisteredService(req,res,next)); //getting all compliantes registrerd by user 
+userRouter.get('/getAllUserRegisteredServices',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
 userRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
+userRouter.get('/getUserRegisteredServiceDetailsById',async(req:Request,res:Response,next:NextFunction) => await controller.getUserRegisteredServiceDetailsById(req,res,next));
 
 export default userRouter;

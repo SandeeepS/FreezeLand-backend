@@ -263,9 +263,6 @@ export interface DeleteDeviceResponse{
 }
 
 
-export interface IsServiceExistDTO {
-  name: string;
-}
 export interface IsServiceExistResponse{
   id?: Types.ObjectId;
   name: string;

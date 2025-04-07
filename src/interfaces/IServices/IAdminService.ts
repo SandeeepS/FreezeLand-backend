@@ -36,7 +36,6 @@ import {
     GetUserListResponse,
     isDeviceExistDTO,
     isDeviceExistResponse,
-    IsServiceExistDTO,
     IsServiceExistResponse,
     UpdateApproveDTO,
     UpdateApproveResponse,
@@ -64,7 +63,7 @@ export interface IAdminService {
         blockService(data: BlockServiceDTO):Promise<BlockServiceResponse|null>;
         deleteService(data: DeleteServiceDTO):Promise<DeleteServiceResponse |null>;
         editExistingService(data: EditExistServiceDTO):Promise<EditExistServiceResponse|null> ;
-        isServiceExist(data: IsServiceExistDTO):Promise<IsServiceExistResponse |null> ;
+        isServiceExist(name:string):Promise<IsServiceExistResponse |null> ;
     
         // Device management
         getDevcies(data: GetDeviceDTO): Promise<GetDeviceResponse>;

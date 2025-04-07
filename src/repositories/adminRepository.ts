@@ -382,7 +382,8 @@ class AdminRepository extends BaseRepository<AdminInterface & Document>
   ): Promise<IsServiceExistResponse | null> {
     try {
       const { name } = data;
-      const serviceExist = await this.serviceRepository.findOne({ name: name });
+      console.log("name in the admin Repository ",name)
+      const serviceExist = await this.serviceRepository.findOne({ name });
       if (serviceExist) {
         return serviceExist;
       }

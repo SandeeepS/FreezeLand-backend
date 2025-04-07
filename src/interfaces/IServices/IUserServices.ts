@@ -22,7 +22,8 @@ import {
     UpdateNewPasswordDTO,
     UpdateNewPasswordResponse,
     EditAddressResponse,
-    SetUserDefaultAddressResponse
+    SetUserDefaultAddressResponse,
+    getUserRegisteredServiceDetailsByIdResponse
   } from "../DTOs/User/IService.dto";
 
 
@@ -36,7 +37,8 @@ export interface IUserServices {
     hashPassword(password: string): Promise<string>;
     getProfile(data: GetProfileDTO): Promise<GetProfileResponse>;
     getServices(data: GetServicesDTO): Promise<GetServiceResponse | null>;
-    getAllRegisteredServices(page: number, limit: number, searchQuery: string): Promise<unknown>;
+    getAllUserRegisteredServices(page: number, limit: number, searchQuery: string,userId:string): Promise<unknown>;
+    getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[] >
     updateNewPassword(data:UpdateNewPasswordDTO):Promise<UpdateNewPasswordResponse | null>;
     editUser(data: EditUserDTO): Promise<EditUserResponse | null> ;
     AddUserAddress(data: AddUserAddressDTO): Promise<AddUserAddressResponse | null>;

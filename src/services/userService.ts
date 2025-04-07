@@ -31,6 +31,7 @@ import {
   UpdateNewPasswordResponse,
   EditAddressResponse,
   SetUserDefaultAddressResponse,
+  getUserRegisteredServiceDetailsByIdResponse,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -124,84 +125,86 @@ class userService implements IUserServices {
       const user: EmailExistCheckDTO | null =
         await this.userRepository.emailExistCheck({ email });
 
-      if (user?.id) {
-        const returnUserData: ReturnUserdataDTO = {
-          _id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-          isDeleted: user.isDeleted,
-          isBlocked: user.isBlocked,
-          profile_picture: user.profile_picture,
-        };
-
-        const token = this.createjwt.generateToken(user.id, user.role);
-        const refreshToken = this.createjwt.generateRefreshToken(user.id);
-        if (user && user.isBlocked) {
-          return {
-            status: UNAUTHORIZED,
-            data: {
-              success: false,
-              message: "You have been blocked by the admin !",
-              token: token,
-              data: returnUserData,
-              refresh_token: refreshToken,
-            },
-          } as const;
-        }
-        if (user?.password && userData.password) {
-          console.log("enterd password is ", userData.password);
-          const passwordMatch = await this.encrypt.compare(
-            userData.password,
-            user.password as string
-          );
-          if (passwordMatch) {
-            const token = this.createjwt.generateToken(user.id, user.role);
-            const refreshToken = this.createjwt.generateRefreshToken(user.id);
-            return {
-              status: OK,
-              data: {
-                success: true,
-                message: "Authentication Successful !",
-                data: returnUserData,
-                userId: user.id,
-                token: token,
-                refresh_token: refreshToken,
-              },
-            } as const;
-          } else {
-            return {
-              status: UNAUTHORIZED,
-              data: {
-                success: false,
-                message: "Authentication failed...",
-              },
-            } as const;
-          }
-        }
+      // If user doesn't exist
+      if (!user?.id) {
         return {
           status: UNAUTHORIZED,
           data: {
             success: false,
-            message: "Invalid email or password.",
-          },
-        } as const;
-      } else {
-        return {
-          status: UNAUTHORIZED,
-          data: {
-            success: false,
-            message: "Authentication failed...",
+            message: "Invalid email or password",
           },
         } as const;
       }
+
+      // Create user data object that might be returned
+      const returnUserData: ReturnUserdataDTO = {
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isDeleted: user.isDeleted,
+        isBlocked: user.isBlocked,
+        profile_picture: user.profile_picture,
+      };
+
+      // Check if user is blocked
+      if (user.isBlocked) {
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Your account has been blocked by the admin",
+          },
+        } as const;
+      }
+
+      // Verify password
+      if (!user?.password || !userData.password) {
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Invalid email or password",
+          },
+        } as const;
+      }
+
+      const passwordMatch = await this.encrypt.compare(
+        userData.password,
+        user.password as string
+      );
+
+      if (!passwordMatch) {
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Invalid email or password",
+          },
+        } as const;
+      }
+
+      // Authentication successful
+      const token = this.createjwt.generateToken(user.id, user.role);
+      const refreshToken = this.createjwt.generateRefreshToken(user.id);
+
+      return {
+        status: OK,
+        data: {
+          success: true,
+          message: "Authentication Successful!",
+          data: returnUserData,
+          userId: user.id,
+          token: token,
+          refresh_token: refreshToken,
+        },
+      } as const;
     } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
-
   async getUserByEmail(
     data: GetUserByEmail
   ): Promise<EmailExistCheckResponse | null> {
@@ -295,17 +298,22 @@ class userService implements IUserServices {
   }
 
   //getting the user registered complaint details
-  async getAllRegisteredServices(
+  async getAllUserRegisteredServices(
     page: number,
     limit: number,
-    searchQuery: string
+    searchQuery: string,
+    userId:string
   ): Promise<unknown> {
     try {
+
       const data = await this.userRepository.getAllUserRegisteredServices({
         page,
         limit,
         searchQuery,
+         userId
       });
+      console.log("data in the userSErvice ",data)
+
       return data;
     } catch (error) {
       console.log(
@@ -315,6 +323,19 @@ class userService implements IUserServices {
       throw error;
     }
   }
+
+  //function to getting the specified usercomplinat using id
+  async getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[] >{
+    try{
+      console.log("Enterdin the userService");
+      const result = await this.userRepository.getUserRegisteredServiceDetailsById(id);
+      return result;
+    }catch(error){
+      console.log("Error occured while getting the specified userComplaint ",error as Error);
+      throw error;
+    }
+  }
+
 
   async updateNewPassword(
     data: UpdateNewPasswordDTO

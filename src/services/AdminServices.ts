@@ -42,7 +42,6 @@ import {
   GetUserListResponse,
   isDeviceExistDTO,
   isDeviceExistResponse,
-  IsServiceExistDTO,
   IsServiceExistResponse,
   UpdateApproveDTO,
   UpdateApproveResponse,
@@ -359,11 +358,13 @@ class adminService implements IAdminService {
   }
 
   async isServiceExist(
-    data: IsServiceExistDTO
+    name:string
   ): Promise<IsServiceExistResponse | null> {
     try {
-      const { name } = data;
+      
+      console.log("name in the adminServie ",name)
       return await this.adminRepository.isServiceExist({ name });
+      
     } catch (error) {
       console.log(error as Error);
       throw new Error("error while checking isServiceExist or not ");

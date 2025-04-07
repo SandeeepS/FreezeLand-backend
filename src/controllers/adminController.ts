@@ -487,13 +487,13 @@ class adminController implements IAdminController {
     try {
       const { _id, values } = req.body;
       console.log("the id from the fronedn is ", _id);
-
+      console.log("vales from the frontend in the admin Controller",values)
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
         console.log("validation has no problem in the editExistingService");
         const isExist = await this.adminService.isServiceExist(values.name);
 
-        if (!isExist) {
+        if (isExist == null) {
           const editedSevice = await this.adminService.editExistingService({
             _id,
             values,
@@ -513,7 +513,7 @@ class adminController implements IAdminController {
           console.log(
             "the service which you are trying to edit is already exist in the data base "
           );
-          res.status(BAD_REQUEST).json({
+          res.status(OK).json({
             success: false,
             message: "Editing service already exist in the database ",
           });
