@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
+
 import mechService from "../services/mechServices";
-const { BAD_REQUEST, OK, UNAUTHORIZED } = STATUS_CODES;
+const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 import { LoginValidation, SignUpValidation } from "../utils/validator";
 import { IMechController } from "../interfaces/IController/IMechController";
 import {
@@ -18,12 +19,12 @@ class mechController implements IMechController {
     private mechServices: mechService,
     private encrypt: compareInterface,
     private createdjwt: ICreateJWT,
-    private email:Iemail,
+    private email: Iemail
   ) {
-      this.mechServices = mechServices
-      this.encrypt = encrypt;
-      this.createdjwt = createdjwt;
-      this.email = email
+    this.mechServices = mechServices;
+    this.encrypt = encrypt;
+    this.createdjwt = createdjwt;
+    this.email = email;
   }
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
@@ -211,12 +212,10 @@ class mechController implements IMechController {
       }
       const mech = await this.mechServices.getUserByEmail(email);
       if (!mech) {
-        return res
-          .status(BAD_REQUEST)
-          .json({
-            success: false,
-            message: "mech with email is not exist!",
-          }) as ForgotResentOtpResponse;
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "mech with email is not exist!",
+        }) as ForgotResentOtpResponse;
       }
       const otp = await this.email.generateAndSendOTP(email);
       req.app.locals.resendOtp = otp;
@@ -321,77 +320,121 @@ class mechController implements IMechController {
     }
   }
 
-  async verifyMechanic (req:Request,res:Response,next:NextFunction){
-    try{
-      const {values} = req.body;
-      console.log("reached in the mechController for mech Verification ",values);
+  async verifyMechanic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { values } = req.body;
+      console.log(
+        "reached in the mechController for mech Verification ",
+        values
+      );
       const data = await this.mechServices.VerifyMechanic(values);
       res.status(OK).json(data);
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
   }
 
-  async getMechanicDetails (req:Request,res:Response,next:NextFunction){
-    try{
-      const {id} = req.query;
-      console.log("id reached in the mechController for getting mech details",id);
-      if(typeof id === "string"){
-        const result = await this.mechServices.getMechanicDetails({id});
-        res.status(OK).json({success:true,result:result});
-      }else{
-        console.log("Id is undifined in the getMechanicDetails in mechController");
-        res.status(STATUS_CODES.CONFLICT).json({success:false});
+  async getMechanicDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.query;
+      console.log(
+        "id reached in the mechController for getting mech details",
+        id
+      );
+      if (typeof id === "string") {
+        const result = await this.mechServices.getMechanicDetails({ id });
+        res.status(OK).json({ success: true, result: result });
+      } else {
+        console.log(
+          "Id is undifined in the getMechanicDetails in mechController"
+        );
+        res.status(STATUS_CODES.CONFLICT).json({ success: false });
       }
- 
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
   }
 
+  async getS3SingUrlForMechCredinential(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetPreSignedUrlResponse | void> {
+    try {
+      const { fileName, fileType, name } = req.query as {
+        fileName: string;
+        fileType: string;
+        name: string;
+      };
+      console.log("file from the front end is ", fileName, fileType);
+      const result = await this.mechServices.getS3SingUrlForMechCredinential({
+        fileName,
+        fileType,
+        name,
+      });
+      console.log("presinged Url is from teh adminController is ", result);
+      if (result.success === false) {
+        return res.status(400).json({
+          success: false,
+          message: "File name and type are required",
+        }) as GetPreSignedUrlResponse;
+      } else {
+        return res.status(200).json({
+          success: true,
+          uploadURL: result.uploadURL,
+          imageName: result.imageName,
+          key: result.key,
+        }) as GetPreSignedUrlResponse;
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
 
-    async getS3SingUrlForMechCredinential(
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ): Promise<GetPreSignedUrlResponse | void> {
-      try {
-        const { fileName, fileType,name } = req.query as {
-          fileName: string;
-          fileType: string;
-          name: string;
-        };
-        console.log("file from the front end is ", fileName, fileType);
-        const result = await this.mechServices.getS3SingUrlForMechCredinential({
-          fileName,
-          fileType,
-          name
-       
+  //function to get all userRegisterd complaints
+  async getAllUserRegisteredServices(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      console.log(
+        "userId in the mechController in the getAllUserRegisteredService",
+        
+      );
+
+      const page = 1;
+      const limit = 10;
+      const searchQuery = "";
+      const allRegisteredUserServices =
+        await this.mechServices.getAllUserRegisteredServices(
+          page,
+          limit,
+          searchQuery,
+        );
+      if (allRegisteredUserServices) {
+        res.status(OK).json({
+          success: true,
+          message: "data fetched successfully",
+          allRegisteredUserServices: allRegisteredUserServices,
         });
-        console.log("presinged Url is from teh adminController is ", result);
-        if (result.success === false) {
-          return res.status(400).json({
-            success: false,
-            message: "File name and type are required",
-          }) as GetPreSignedUrlResponse;
-        } else {
-          return res.status(200).json({
-            success: true,
-            uploadURL: result.uploadURL,
-            imageName: result.imageName,
-            key: result.key,
-          }) as GetPreSignedUrlResponse;
-        }
-      } catch (error) {
-        console.log(error as Error);
-        next(error);
+      } else {
+        res.status(NOT_FOUND).json({
+          success: true,
+          message: "Not Found",
+        });
       }
+    } catch (error) {
+      console.log(
+        "error while getting the allregistered complaints from the database in the mechController",
+        error as Error
+      );
+      next(error);
     }
-
-
-
+  }
 
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
@@ -230,7 +230,6 @@ class userController implements IUserController {
         email,
         password,
       });
-
 
       // Handle unsuccessful login without token
       if (
@@ -610,9 +609,12 @@ class userController implements IUserController {
     next: NextFunction
   ) {
     try {
-      const {userId} = req.query;
-      console.log("userId in the userController in the getAllUserRegisteredService",userId);
-   
+      const { userId } = req.query;
+      console.log(
+        "userId in the userController in the getAllUserRegisteredService",
+        userId
+      );
+
       const page = 1;
       const limit = 10;
       const searchQuery = "";
@@ -671,14 +673,24 @@ class userController implements IUserController {
   }
 
   //function to get the specified userComplaint using user Id
-  async getUserRegisteredServiceDetailsById (req:Request,res:Response,next:NextFunction) {
-    try{
-      const {id} = req.query;
-      console.log("Enterd in the getUserRegisteredServiceDetailsById function in the userController with id" ,id);
-      
-      const result = await this.userServices.getUserRegisteredServiceDetailsById(id as string);
-      res.status(200).json({success:true,result});
-    }catch(error){
+  async getUserRegisteredServiceDetailsById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.query;
+      console.log(
+        "Enterd in the getUserRegisteredServiceDetailsById function in the userController with id",
+        id
+      );
+
+      const result =
+        await this.userServices.getUserRegisteredServiceDetailsById(
+          id as string
+        );
+      res.status(200).json({ success: true, result });
+    } catch (error) {
       next(error);
     }
   }

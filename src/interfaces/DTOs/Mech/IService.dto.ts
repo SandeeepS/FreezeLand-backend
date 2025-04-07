@@ -2,6 +2,8 @@
 import Mech from "../../entityInterface/Imech";
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import { Types } from "mongoose";
+import Iuser from "../../entityInterface/Iuser";
+import { IServices } from "../../../models/serviceModel";
 export interface SignUpMechDTO {
   name: string;
   email: string;
@@ -157,4 +159,27 @@ export interface getMechanicDetailsResponse {
   isDeleted: boolean;
   isVerified: boolean;
   mechanicType: string[];
+}
+
+
+export interface GetAllUserRegisteredServicesDTO {
+  page: number;
+  limit: number;
+  searchQuery: string;
+  mechId:string;
+}
+
+export interface GetAllUserRegisteredServicesResponse {
+  _id: string ;
+  name: string;
+  image: [];
+  serviceId: string;
+  userId:string;
+  defaultAddress: string;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  userDetails:Iuser;
+  serviceDetails:IServices;
 }

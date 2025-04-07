@@ -3,6 +3,8 @@ import {
   EmailExistResponse,
   EmailExitCheck,
   GetAllDevicesResponse,
+  GetAllUserRegisteredServicesDTO,
+  GetAllUserRegisteredServicesResponse,
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
   GetMechByIdDTO,
@@ -16,6 +18,7 @@ import {
   VerifyMechanicDTO,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
+import concernModel from "../models/concernModel";
 import deviceModel, { IDevice } from "../models/deviceModel";
 import MechModel, { MechInterface } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
@@ -82,14 +85,18 @@ class MechRepository
     }
   }
 
-  async getMechanicDetails (data:getMechanicDetailsDTO):Promise<getMechanicDetailsResponse | null>{
-    try{
-      const {id} = data ;
+  async getMechanicDetails(
+    data: getMechanicDetailsDTO
+  ): Promise<getMechanicDetailsResponse | null> {
+    try {
+      const { id } = data;
       const result = await this.findById(id);
-      return result
-    }catch(error){
-      console.log(error as Error)
-      throw new Error("Error occured while getting mechanic Details in mechRepository");
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error(
+        "Error occured while getting mechanic Details in mechRepository"
+      );
     }
   }
 
@@ -131,15 +138,15 @@ class MechRepository
     }
   }
 
-  async verifyMechanic(values:VerifyMechanicDTO){
-    try{
+  async verifyMechanic(values: VerifyMechanicDTO) {
+    try {
       console.log("entered in the mechRepository");
-      console.log("valeu sdfsdo dso",values);
+      console.log("valeu sdfsdo dso", values);
       const id = values.id;
-      console.log("id  ",id);
-      const response  = await this.update(id,values)
+      console.log("id  ", id);
+      const response = await this.update(id, values);
       return response;
-    }catch(error){
+    } catch (error) {
       console.log(error);
       throw new Error();
     }
@@ -152,6 +159,54 @@ class MechRepository
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
+    }
+  }
+
+  //function for getting all the userRegistered services
+  async getAllUserRegisteredServices(
+    data: GetAllUserRegisteredServicesDTO
+  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+    try {
+      const { page, limit } = data;
+
+      // Use aggregation to get user's registered services with lookups
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            isDeleted: false,
+          },
+        },
+        {
+          $lookup: {
+            from: "users", // The users collection
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $lookup: {
+            from: "services", // The services collection
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { "userDetails.password": 0 } }, // Exclude password
+      ]);
+
+      console.log("User registered services:", result);
+      return result as GetAllUserRegisteredServicesResponse[];
+    } catch (error) {
+      console.log(
+        "Error occurred while fetching user registered services:",
+        error as Error
+      );
+      throw new Error(
+        "Error occurred while fetching user registered services."
+      );
     }
   }
 }

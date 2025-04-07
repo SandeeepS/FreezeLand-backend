@@ -3,6 +3,11 @@ import {
     AddServiceDTO,
     EmailExistResponse,
     EmailExitCheck,
+    GetAllDevicesResponse,
+    GetAllUserRegisteredServicesDTO,
+    GetAllUserRegisteredServicesResponse,
+    getMechanicDetailsDTO,
+    getMechanicDetailsResponse,
     GetMechByIdDTO,
     GetMechByIdResponse,
     GetMechListDTO,
@@ -11,6 +16,7 @@ import {
     SaveMechResponse,
     UpdateNewPasswordDTO,
     UpdateNewPasswordResponse,
+    VerifyMechanicDTO,
   } from "../DTOs/Mech/IRepository.dto";
 
 export interface IMechRepository{
@@ -20,5 +26,9 @@ export interface IMechRepository{
     getMechById(data:GetMechByIdDTO): Promise<GetMechByIdResponse|null> ;
     getMechList(  data:GetMechListDTO): Promise<GetMechListResponse[]>;
     getMechCount(regex: RegExp): Promise<number>;
+    verifyMechanic(values:VerifyMechanicDTO):Promise<unknown>
     AddService(data:AddServiceDTO):Promise<unknown>; 
+    getAllDevices(): Promise<GetAllDevicesResponse[]>
+    getMechanicDetails (data:getMechanicDetailsDTO):Promise<getMechanicDetailsResponse | null>
+    getAllUserRegisteredServices(data: GetAllUserRegisteredServicesDTO): Promise<GetAllUserRegisteredServicesResponse[] | null>
 }

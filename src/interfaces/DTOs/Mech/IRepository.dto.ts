@@ -1,4 +1,6 @@
 import  { Types } from "mongoose";
+import Iuser from "../../entityInterface/Iuser";
+import { IServices } from "../../../models/serviceModel";
 
 export interface EmailExitCheck {
   email: string;
@@ -125,4 +127,25 @@ export interface getMechanicDetailsResponse {
   isDeleted: boolean;
   isVerified: boolean;
   mechanicType: string[];
+}
+
+export interface GetAllUserRegisteredServicesDTO {
+  page: number;
+  limit: number;
+  searchQuery: string;
+}
+
+export interface GetAllUserRegisteredServicesResponse {
+  _id: string ;
+  name: string;
+  image: [];
+  serviceId: string;
+  userId:string;
+  defaultAddress: string;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  userDetails:Iuser;
+  serviceDetails:IServices;
 }

@@ -1,7 +1,6 @@
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import MechRepository from "../repositories/mechRepository";
-import { CreateJWT } from "../utils/generateToken";
-import Encrypt from "../utils/comparePassword";
+import {  ICreateJWT } from "../utils/generateToken";
+import { compareInterface } from "../utils/comparePassword";
 import Cryptr from "cryptr";
 import {
   EmailExistResponse,
@@ -9,6 +8,7 @@ import {
   GetAllDevicesResponse,
   GetAllMechanicResponse,
   GetAllMechanicsDTO,
+  GetAllUserRegisteredServicesResponse,
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
   GetPreSignedUrlDTO,
@@ -26,14 +26,19 @@ import {
 } from "../interfaces/DTOs/Mech/IService.dto";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
+import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 
 const { OK, UNAUTHORIZED } = STATUS_CODES;
 class mechService implements IMechServices {
   constructor(
-    private mechRepository: MechRepository,
-    private createjwt: CreateJWT,
-    private encrypt: Encrypt
-  ) {}
+    private mechRepository: IMechRepository,
+    private createjwt: ICreateJWT,
+    private encrypt: compareInterface
+  ) {
+    this.mechRepository = mechRepository;
+    this.createjwt = createjwt;
+    this.encrypt = encrypt;
+  }
 
   // async signupMech(mechData: MechInterface): Promise<any> {
   //   try {
@@ -323,6 +328,31 @@ class mechService implements IMechServices {
       return result;
     }catch(error){
       console.log(error as Error);
+      throw error;
+    }
+  }
+
+  async getAllUserRegisteredServices(
+    page: number,
+    limit: number,
+    searchQuery: string,
+  ): Promise<GetAllUserRegisteredServicesResponse[]  | null> {
+    try {
+
+      const data = await this.mechRepository.getAllUserRegisteredServices({
+        page,
+        limit,
+        searchQuery
+         
+      });
+      console.log("data in the mechService ",data)
+
+      return data;
+    } catch (error) {
+      console.log(
+        "Error occured while fetching the user registerd complaint in the mechService ",
+        error as Error
+      );
       throw error;
     }
   }
