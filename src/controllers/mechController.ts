@@ -9,10 +9,13 @@ import {
   ForgotResentOtpResponse,
   VerifyForgotOtpMech,
 } from "../interfaces/DTOs/User/IController.dto";
-import { GetPreSignedUrlResponse } from "../interfaces/DTOs/Mech/IController.dto";
+import { GetImageUrlResponse, GetPreSignedUrlResponse } from "../interfaces/DTOs/Mech/IController.dto";
 import { compareInterface } from "../utils/comparePassword";
 import { ICreateJWT } from "../utils/generateToken";
 import { Iemail } from "../utils/email";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import S3Client from "../awsConfig";
 
 class mechController implements IMechController {
   constructor(
@@ -435,6 +438,58 @@ class mechController implements IMechController {
       next(error);
     }
   }
+
+
+  //function to get the specified compliant  using compliant Id
+  async getComplaintDetails(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.query;
+      console.log(
+        "Enterd in the getComplaintDetails function in the mechController with id",
+        id
+      );
+
+      const result =
+        await this.mechServices.getComplaintDetails(
+          id as string
+        );
+      res.status(200).json({ success: true, result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //getImageUrl
+   async getImageUrl(
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ): Promise<GetImageUrlResponse | void> {
+      try {
+        const { imageKey } = req.query;
+        console.log("imageKey from the frontend is ", imageKey);
+        if (typeof imageKey !== "string") {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid image key",
+          }) as GetImageUrlResponse;
+        }
+  
+        const command = new GetObjectCommand({
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: imageKey,
+        });
+        const url = await getSignedUrl(S3Client, command, { expiresIn: 3600 });
+        res.status(200).json({ success: true, url });
+      } catch (error) {
+        next(error);
+      }
+    }
+  
 
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {

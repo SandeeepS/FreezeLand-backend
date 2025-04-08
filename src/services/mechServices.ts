@@ -1,5 +1,5 @@
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import {  ICreateJWT } from "../utils/generateToken";
+import { ICreateJWT } from "../utils/generateToken";
 import { compareInterface } from "../utils/comparePassword";
 import Cryptr from "cryptr";
 import {
@@ -9,6 +9,7 @@ import {
   GetAllMechanicResponse,
   GetAllMechanicsDTO,
   GetAllUserRegisteredServicesResponse,
+  getComplaintDetailsResponse,
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
   GetPreSignedUrlDTO,
@@ -22,7 +23,6 @@ import {
   UpdateNewPasswordDTO,
   UpdateNewPasswordResponse,
   VerifyMechanicDTO,
- 
 } from "../interfaces/DTOs/Mech/IService.dto";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
@@ -247,37 +247,39 @@ class mechService implements IMechServices {
     }
   }
 
-  async VerifyMechanic (values:VerifyMechanicDTO){
-    try{
-      
-      console.log("Entered in the mechService for verifiying mechanic",values);
+  async VerifyMechanic(values: VerifyMechanicDTO) {
+    try {
+      console.log("Entered in the mechService for verifiying mechanic", values);
       const response = await this.mechRepository.verifyMechanic(values);
       return response;
-    }catch(error){
+    } catch (error) {
       console.log(error);
-      throw new Error("Erorr occured while vefirication fo the Mechanic from the mechService.tsx");
+      throw new Error(
+        "Erorr occured while vefirication fo the Mechanic from the mechService.tsx"
+      );
     }
   }
 
-    async getS3SingUrlForMechCredinential(data: GetPreSignedUrlDTO) {
-      try{
-        const { fileName, fileType,name } = data;
-  
-        if (!fileName || !fileType) {
-          return {
-            success: false,
-            message: "File name and type are required",
-          } as GetPreSignedUrlResponse;
-        }
-        const folderName = `MechanicImages/MechanicCredential/${name}Credential`;
-        const result = await generatePresignedUrl(fileName,fileType,folderName);
-        return result as GetPreSignedUrlResponse;
-      }catch(error){
-        console.log(error);
-        throw new Error("error while generating the presinged url from the adminService")
+  async getS3SingUrlForMechCredinential(data: GetPreSignedUrlDTO) {
+    try {
+      const { fileName, fileType, name } = data;
+
+      if (!fileName || !fileType) {
+        return {
+          success: false,
+          message: "File name and type are required",
+        } as GetPreSignedUrlResponse;
       }
-     
+      const folderName = `MechanicImages/MechanicCredential/${name}Credential`;
+      const result = await generatePresignedUrl(fileName, fileType, folderName);
+      return result as GetPreSignedUrlResponse;
+    } catch (error) {
+      console.log(error);
+      throw new Error(
+        "error while generating the presinged url from the adminService"
+      );
     }
+  }
 
   //getting all devices
   async getDevcies(): Promise<GetAllDevicesResponse[]> {
@@ -319,14 +321,15 @@ class mechService implements IMechServices {
     }
   }
 
-
-  async getMechanicDetails ( data : getMechanicDetailsDTO ): Promise <getMechanicDetailsResponse | null> {
-    try{
-      const {id} = data;
-      console.log("Id in the mechService is ",id);
-      const result = await this.mechRepository.getMechanicDetails({id});
+  async getMechanicDetails(
+    data: getMechanicDetailsDTO
+  ): Promise<getMechanicDetailsResponse | null> {
+    try {
+      const { id } = data;
+      console.log("Id in the mechService is ", id);
+      const result = await this.mechRepository.getMechanicDetails({ id });
       return result;
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       throw error;
     }
@@ -335,22 +338,37 @@ class mechService implements IMechServices {
   async getAllUserRegisteredServices(
     page: number,
     limit: number,
-    searchQuery: string,
-  ): Promise<GetAllUserRegisteredServicesResponse[]  | null> {
+    searchQuery: string
+  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
-
       const data = await this.mechRepository.getAllUserRegisteredServices({
         page,
         limit,
-        searchQuery
-         
+        searchQuery,
       });
-      console.log("data in the mechService ",data)
+      console.log("data in the mechService ", data);
 
       return data;
     } catch (error) {
       console.log(
         "Error occured while fetching the user registerd complaint in the mechService ",
+        error as Error
+      );
+      throw error;
+    }
+  }
+
+  //function to getting the specified complinat using id
+  async getComplaintDetails(
+    id: string
+  ): Promise<getComplaintDetailsResponse[]> {
+    try {
+      console.log("Enterdin the mechService");
+      const result = await this.mechRepository.getComplaintDetails(id);
+      return result;
+    } catch (error) {
+      console.log(
+        "Error occured while getting the specified Complaint by id in the mechServices  ",
         error as Error
       );
       throw error;

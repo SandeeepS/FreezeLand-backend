@@ -11,49 +11,103 @@ export interface Iconcern extends Document {
   defaultAddress: mongoose.Types.ObjectId;
   discription: string;
   locationName: object;
+  status: string;
+  currentMechanicId: mongoose.Types.ObjectId | null;
+  acceptedAt: Date | null;
+  mechanicHistory: [
+    {
+      mechanicId: mongoose.Types.ObjectId;
+      status: string;
+      acceptedAt: Date;
+      canceledAt: Date | null;
+      reason: string | null;
+    }
+  ];
   isBlocked: boolean;
   isDeleted: boolean;
 }
 
-const concernSchema: Schema<Iconcern> = new Schema({
-  name: {
-    type: String,
-    required: true,
+const concernSchema: Schema<Iconcern> = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: [],
+      required: false,
+    },
+    serviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    defaultAddress: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    discription: {
+      type: String,
+      required: true,
+    },
+    locationName: {
+      type: Object,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "completed", "canceled"],
+      default: "pending",
+    },
+    currentMechanicId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
+    acceptedAt: {
+      type: Date,
+      default: null,
+    },
+    mechanicHistory: [
+      {
+        mechanicId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        status: {
+          type: String,
+          enum: ["accepted", "canceled", "completed"],
+          required: true,
+        },
+        acceptedAt: {
+          type: Date,
+          required: true,
+        },
+        canceledAt: {
+          type: Date,
+          default: null,
+        },
+        reason: {
+          type: String,
+          default: null,
+        },
+      },
+    ],
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  image: {
-    type: [],
-    required: false,
-  },
-  serviceId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
-  defaultAddress: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
-  discription: {
-    type: String,
-    required: true,
-  },
-  locationName: {
-    type: Object,
-    required: true,
-  },
-  isBlocked: {
-    type: Boolean,
-    default: false,
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
-});
-
+  {
+    timestamps: true,
+  }
+);
 const concernModel: Model<Iconcern> = mongoose.model<Iconcern>(
   "Concerns",
   concernSchema

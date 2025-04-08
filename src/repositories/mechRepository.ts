@@ -5,6 +5,7 @@ import {
   GetAllDevicesResponse,
   GetAllUserRegisteredServicesDTO,
   GetAllUserRegisteredServicesResponse,
+  getComplaintDetailsResponse,
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
   GetMechByIdDTO,
@@ -22,7 +23,7 @@ import concernModel from "../models/concernModel";
 import deviceModel, { IDevice } from "../models/deviceModel";
 import MechModel, { MechInterface } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 class MechRepository
   extends BaseRepository<MechInterface & Document>
@@ -207,6 +208,66 @@ class MechRepository
       throw new Error(
         "Error occurred while fetching user registered services."
       );
+    }
+  }
+
+  //function to get the specified  complaint details  by id
+  async getComplaintDetails(
+    id: string
+  ): Promise<getComplaintDetailsResponse[]> {
+    try {
+      console.log("id in the getUserRegisteredServiceDetailsById", id);
+      const objectId = new mongoose.Types.ObjectId(id);
+
+      // Use aggregation to get  registered specific user complaint with id  and  lookups
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            _id: objectId,
+            isDeleted: false,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $unwind: "$userDetails",
+        },
+        {
+          $addFields: {
+            defaultAddressDetails: {
+              $filter: {
+                input: "$userDetails.address",
+                as: "addr",
+                cond: { $eq: ["$$addr._id", "$defaultAddress"] },
+              },
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "services",
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+
+        { $project: { "userDetails.password": 0 } },
+      ]);
+      console.log("User registered specific  service is :", result);
+      return result as getComplaintDetailsResponse[];
+    } catch (error) {
+      console.log(
+        "Error occured while fetching userDetails in the userRepository ",
+        error as Error
+      );
+      throw new Error("Errorrrrr");
     }
   }
 }

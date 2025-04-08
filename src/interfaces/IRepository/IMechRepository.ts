@@ -6,6 +6,7 @@ import {
     GetAllDevicesResponse,
     GetAllUserRegisteredServicesDTO,
     GetAllUserRegisteredServicesResponse,
+    getComplaintDetailsResponse,
     getMechanicDetailsDTO,
     getMechanicDetailsResponse,
     GetMechByIdDTO,
@@ -31,4 +32,6 @@ export interface IMechRepository{
     getAllDevices(): Promise<GetAllDevicesResponse[]>
     getMechanicDetails (data:getMechanicDetailsDTO):Promise<getMechanicDetailsResponse | null>
     getAllUserRegisteredServices(data: GetAllUserRegisteredServicesDTO): Promise<GetAllUserRegisteredServicesResponse[] | null>
+    getComplaintDetails (id:string) :Promise<getComplaintDetailsResponse[]>
+
 }

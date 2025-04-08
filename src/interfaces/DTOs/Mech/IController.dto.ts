@@ -16,3 +16,8 @@ export interface GetPreSignedUrlResponse {
     key?:string;
 
 }
+export interface GetImageUrlResponse{
+    success?:boolean;
+    message?:string;
+    url?:string;
+}
