@@ -12,6 +12,7 @@ import {
   GetMechByIdResponse,
   GetMechListDTO,
   GetMechListResponse,
+  getUpdatedWorkAssingnedResponse,
   SaveMechDTO,
   SaveMechResponse,
   UpdateNewPasswordDTO,
@@ -268,6 +269,42 @@ class MechRepository
         error as Error
       );
       throw new Error("Errorrrrr");
+    }
+  }
+
+  async updateWorkAssigned(
+    complaintId: string,
+    mechanicId: string,
+    status: string
+  ): Promise<getUpdatedWorkAssingnedResponse> {
+    try {
+      console.log("Entered in the mechRepository");
+      const mechanicIdObjectId = new mongoose.Types.ObjectId(mechanicId);
+
+      // Update document fields and push a new entry to workHistory
+      const updateData = {
+        currentMechanicId: mechanicIdObjectId,
+        $push: {
+          workHistory: {
+            mechanicId: mechanicIdObjectId,
+            status: status,
+            updatedAt: new Date(),
+          },
+        },
+      };
+
+      const result = await concernModel.findByIdAndUpdate(
+        complaintId,
+        updateData,
+        { new: true }
+      );
+
+      return result as getUpdatedWorkAssingnedResponse;
+    } catch (error) {
+      console.log(
+        "Error occurred while updating the complaint database while accessing the work by mechanic"
+      );
+      throw error;
     }
   }
 }

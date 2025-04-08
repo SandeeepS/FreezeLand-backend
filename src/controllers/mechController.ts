@@ -9,7 +9,10 @@ import {
   ForgotResentOtpResponse,
   VerifyForgotOtpMech,
 } from "../interfaces/DTOs/User/IController.dto";
-import { GetImageUrlResponse, GetPreSignedUrlResponse } from "../interfaces/DTOs/Mech/IController.dto";
+import {
+  GetImageUrlResponse,
+  GetPreSignedUrlResponse,
+} from "../interfaces/DTOs/Mech/IController.dto";
 import { compareInterface } from "../utils/comparePassword";
 import { ICreateJWT } from "../utils/generateToken";
 import { Iemail } from "../utils/email";
@@ -405,10 +408,8 @@ class mechController implements IMechController {
   ) {
     try {
       console.log(
-        "userId in the mechController in the getAllUserRegisteredService",
-        
+        "userId in the mechController in the getAllUserRegisteredService"
       );
-
       const page = 1;
       const limit = 10;
       const searchQuery = "";
@@ -416,7 +417,7 @@ class mechController implements IMechController {
         await this.mechServices.getAllUserRegisteredServices(
           page,
           limit,
-          searchQuery,
+          searchQuery
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({
@@ -439,24 +440,15 @@ class mechController implements IMechController {
     }
   }
 
-
   //function to get the specified compliant  using compliant Id
-  async getComplaintDetails(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  async getComplaintDetails(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.query;
       console.log(
         "Enterd in the getComplaintDetails function in the mechController with id",
         id
       );
-
-      const result =
-        await this.mechServices.getComplaintDetails(
-          id as string
-        );
+      const result = await this.mechServices.getComplaintDetails(id as string);
       res.status(200).json({ success: true, result });
     } catch (error) {
       next(error);
@@ -464,32 +456,51 @@ class mechController implements IMechController {
   }
 
   //getImageUrl
-   async getImageUrl(
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ): Promise<GetImageUrlResponse | void> {
-      try {
-        const { imageKey } = req.query;
-        console.log("imageKey from the frontend is ", imageKey);
-        if (typeof imageKey !== "string") {
-          return res.status(400).json({
-            success: false,
-            message: "Invalid image key",
-          }) as GetImageUrlResponse;
-        }
-  
-        const command = new GetObjectCommand({
-          Bucket: process.env.S3_BUCKET_NAME,
-          Key: imageKey,
-        });
-        const url = await getSignedUrl(S3Client, command, { expiresIn: 3600 });
-        res.status(200).json({ success: true, url });
-      } catch (error) {
-        next(error);
+  async getImageUrl(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetImageUrlResponse | void> {
+    try {
+      const { imageKey } = req.query;
+      console.log("imageKey from the frontend is ", imageKey);
+      if (typeof imageKey !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid image key",
+        }) as GetImageUrlResponse;
       }
+      const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: imageKey,
+      });
+      const url = await getSignedUrl(S3Client, command, { expiresIn: 3600 });
+      res.status(200).json({ success: true, url });
+    } catch (error) {
+      next(error);
     }
-  
+  }
+
+  //function to update the complaint database , while accepting the work by mechanic
+  async updateWorkAssigned(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { complaintId, mechanicId, status } = req.body;
+      console.log(
+        "Entered in the updateWorkAssigned function in mechController",
+        complaintId,
+        mechanicId,
+        status
+      );
+      const result = await this.mechServices.updateWorkAssigned(
+        complaintId,
+        mechanicId,
+        status
+      );
+      res.status(200).json({ success: true, result });
+    } catch (error) {
+      next(error);
+    }
+  }
 
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {

@@ -14,6 +14,7 @@ import {
   getMechanicDetailsResponse,
   GetPreSignedUrlDTO,
   GetPreSignedUrlResponse,
+  getUpdatedWorkAssingnedResponse,
   MechLoginDTO,
   MechLoginResponse,
   SaveMechDTO,
@@ -371,6 +372,18 @@ class mechService implements IMechServices {
         "Error occured while getting the specified Complaint by id in the mechServices  ",
         error as Error
       );
+      throw error;
+    }
+  }
+
+  //function to update the complaint database while mechanic accetp the work
+  async updateWorkAssigned(complaintId:string,mechanicId:string,status:string) : Promise<getUpdatedWorkAssingnedResponse>{
+    try{
+        console.log("Entered the mechservice");
+        const result = await this.mechRepository.updateWorkAssigned(complaintId,mechanicId,status);
+        return result;
+    }catch(error){
+      console.log("Error occued while updating the compliant database while mechanic accepting the work");
       throw error;
     }
   }

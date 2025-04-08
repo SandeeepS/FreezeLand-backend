@@ -32,7 +32,6 @@ mechRouter.get('/getS3SingUrlForMechCredinential',mechAuth(["mechanic"]),async(r
 mechRouter.get('/getAllUserRegisteredServices',mechAuth(["mechanic"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
 mechRouter.get('/getComplaintDetails',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getComplaintDetails(req,res,next));
 mechRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
-
-
+mechRouter.put('/updateWorkAssigned',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateWorkAssigned(req,res,next));
 
 export default mechRouter;

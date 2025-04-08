@@ -14,7 +14,7 @@ export interface Iconcern extends Document {
   status: string;
   currentMechanicId: mongoose.Types.ObjectId | null;
   acceptedAt: Date | null;
-  mechanicHistory: [
+  workHistory: [
     {
       mechanicId: mongoose.Types.ObjectId;
       status: string;
@@ -70,7 +70,7 @@ const concernSchema: Schema<Iconcern> = new Schema(
       type: Date,
       default: null,
     },
-    mechanicHistory: [
+    workHistory: [
       {
         mechanicId: {
           type: mongoose.Schema.Types.ObjectId,
