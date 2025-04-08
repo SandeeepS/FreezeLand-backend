@@ -5,6 +5,7 @@ import Cryptr from "cryptr";
 import {
   EmailExistResponse,
   EmailExitCheckDTO,
+  getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
   GetAllMechanicResponse,
   GetAllMechanicsDTO,
@@ -385,6 +386,18 @@ class mechService implements IMechServices {
     }catch(error){
       console.log("Error occued while updating the compliant database while mechanic accepting the work");
       throw error;
+    }
+  }
+
+  //function to get the all acccepted services by mechanic 
+  async getAllAcceptedServices (mechanicId : string) : Promise<getAllAcceptedServiceResponse[]> {
+    try{
+      console.log("Enterd in the mechService");
+      const result = await this.mechRepository.getAllAcceptedServices(mechanicId);
+      return result;
+    }catch(error){
+       console.log("Error occured while getting the accepted complaint details in the mechService",error);
+       throw error;
     }
   }
 }

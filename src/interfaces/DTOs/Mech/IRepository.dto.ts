@@ -190,3 +190,28 @@ export interface getUpdatedWorkAssingnedResponse{
     isBlocked: boolean;
     isDeleted: boolean;
 }
+
+export interface getAllAcceptedServiceResponse {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    image: [];
+    serviceId: mongoose.Types.ObjectId;
+    userId: mongoose.Types.ObjectId;
+    defaultAddress: mongoose.Types.ObjectId;
+    discription: string;
+    locationName: object;
+    status: string;
+    currentMechanicId: mongoose.Types.ObjectId | null;
+    acceptedAt: Date | null;
+    workHistory: [
+      {
+        mechanicId: mongoose.Types.ObjectId;
+        status: string;
+        acceptedAt: Date;
+        canceledAt: Date | null;
+        reason: string | null;
+      }
+    ];
+    isBlocked: boolean;
+    isDeleted: boolean;
+}

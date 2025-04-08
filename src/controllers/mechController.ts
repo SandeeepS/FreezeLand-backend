@@ -502,6 +502,27 @@ class mechController implements IMechController {
     }
   }
 
+  //function to access all accepted complaints by the mechanic
+  async getAllAcceptedServices(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { mechanicId } = req.query;
+      console.log(
+        "mechanic id in the getAllAcceptedServices in the mechController is ",
+        mechanicId
+      );
+      const result = await this.mechServices.getAllAcceptedServices(
+        mechanicId as string
+      );
+      res.status(200).json({ success: true, result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("Entered in the function for logout of mech");

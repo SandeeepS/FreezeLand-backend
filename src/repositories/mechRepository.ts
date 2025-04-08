@@ -2,6 +2,7 @@ import {
   AddServiceDTO,
   EmailExistResponse,
   EmailExitCheck,
+  getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
   GetAllUserRegisteredServicesDTO,
   GetAllUserRegisteredServicesResponse,
@@ -303,6 +304,30 @@ class MechRepository
     } catch (error) {
       console.log(
         "Error occurred while updating the complaint database while accessing the work by mechanic"
+      );
+      throw error;
+    }
+  }
+
+  //find all accepted complaints by mechanic
+  async getAllAcceptedServices(
+    mechanicId: string
+  ): Promise<getAllAcceptedServiceResponse[]> {
+    try {
+      console.log("entered in the mechRepository");
+
+      // Convert string ID to ObjectId if needed
+      const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
+
+      // First parameter is the filter condition
+      const result = await concernModel.find({
+        currentMechanicId: mechanicObjectId,
+      });
+
+      return result;
+    } catch (error) {
+      console.log(
+        "error occurred while getting the accepted service from the database in the mechrepository"
       );
       throw error;
     }
