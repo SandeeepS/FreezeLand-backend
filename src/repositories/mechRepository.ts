@@ -177,6 +177,10 @@ class MechRepository
         {
           $match: {
             isDeleted: false,
+            $or: [
+              { currentMechanicId: { $exists: false } },
+              { currentMechanicId: null }
+            ]
           },
         },
         {
@@ -310,19 +314,59 @@ class MechRepository
   }
 
   //find all accepted complaints by mechanic
+  // find all accepted complaints by mechanic
   async getAllAcceptedServices(
     mechanicId: string
   ): Promise<getAllAcceptedServiceResponse[]> {
     try {
       console.log("entered in the mechRepository");
-
-      // Convert string ID to ObjectId if needed
       const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            currentMechanicId: mechanicObjectId,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
 
-      // First parameter is the filter condition
-      const result = await concernModel.find({
-        currentMechanicId: mechanicObjectId,
-      });
+        {
+          $addFields: {
+            defaultAddressDetails: {
+              $filter: {
+                input: { $ifNull: ["$userDetails.address", []] },
+                as: "addr",
+                cond: {
+                  $cond: {
+                    if: { $isArray: "$defaultAddress" },
+                    then: { $in: ["$$addr._id", "$defaultAddress"] },
+                    else: { $eq: ["$$addr._id", "$defaultAddress"] },
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "services",
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+        {
+          $project: {
+            "userDetails.password": 0,
+          },
+        },
+      ]);
 
       return result;
     } catch (error) {
