@@ -19,6 +19,7 @@ import { Iemail } from "../utils/email";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
+import concernModel from "../models/concernModel";
 
 class mechController implements IMechController {
   constructor(
@@ -522,6 +523,20 @@ class mechController implements IMechController {
       next(error);
     }
   }
+
+  //funciton to update the  complaint details 
+  async updateComplaintStatus (req:Request,res:Response,next:NextFunction) {
+    try{
+      const complaintId = req.query.complaintId as string;
+      const nextStatus = req.query.nextStatus as string;
+      console.log("next status in the updateComplaintStatus is ",complaintId, nextStatus);
+      const result = await this.mechServices.updateComplaintStatus(complaintId,nextStatus);
+      res.status(200).json({success:true,result});
+    }catch(error){
+      next(error);
+    }
+  }
+
 
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {

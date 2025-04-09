@@ -16,6 +16,7 @@ import {
   getUpdatedWorkAssingnedResponse,
   SaveMechDTO,
   SaveMechResponse,
+  updateCompleteStatusResponse,
   UpdateNewPasswordDTO,
   UpdateNewPasswordResponse,
   VerifyMechanicDTO,
@@ -378,6 +379,19 @@ class MechRepository
       throw error;
     }
   }
+
+ //function to update the complaint status
+ async updateComplaintStatus(complaintId:string,nextStatus:string):Promise<updateCompleteStatusResponse | null>{
+   try{
+    console.log("Entered in the updateCompaoint Stattus in the mechREpositroy",complaintId,nextStatus);
+    const result = await concernModel.findByIdAndUpdate(complaintId,{"status":nextStatus});
+    console.log("result after updating the status is ",result);
+    return result;
+   }catch(error){
+    console.log("error occured during the updation of the status in the mechRepository ",error)
+    throw new Error()
+   }
+ }
 }
 
 export default MechRepository;

@@ -58,6 +58,7 @@ import {
   UpdateApproveResponse,
 } from "../interfaces/DTOs/Admin/IRepository.dto";
 import { IAdminRepository } from "../interfaces/IRepository/IAdminRepository";
+import concernModel from "../models/concernModel";
 
 class AdminRepository extends BaseRepository<AdminInterface & Document>
   implements IAdminRepository
@@ -153,6 +154,8 @@ class AdminRepository extends BaseRepository<AdminInterface & Document>
       throw new Error("Error occured");
     }
   }
+
+
 
   async getAllServices(
     data: GetAllServicesDTO

@@ -284,6 +284,18 @@ class mechService implements IMechServices {
     }
   }
 
+  //update the compliant Status 
+  async updateComplaintStatus(complaintId:string,nextStatus:string){
+    try{
+      console.log("Entered in the updateComplaintStatus");
+      const result = await this.mechRepository.updateComplaintStatus(complaintId,nextStatus);
+      return result;
+    }catch(error){
+       console.log("Error occured in the mechService while updaing the complaint status",error);
+       throw new Error("Erro occured in the mechservice while updating the complaint statsus");
+    }
+  }
+
   //getting all devices
   async getDevcies(): Promise<GetAllDevicesResponse[]> {
     try {

@@ -17,6 +17,7 @@ import {
     getUpdatedWorkAssingnedResponse,
     SaveMechDTO,
     SaveMechResponse,
+    updateCompleteStatusResponse,
     UpdateNewPasswordDTO,
     UpdateNewPasswordResponse,
     VerifyMechanicDTO,
@@ -37,5 +38,6 @@ export interface IMechRepository{
     getComplaintDetails (id:string) :Promise<getComplaintDetailsResponse[]> 
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string): Promise<getUpdatedWorkAssingnedResponse> 
     getAllAcceptedServices (mechanicId:string):Promise <getAllAcceptedServiceResponse[]>
+    updateComplaintStatus(complaintId:string,nextStatus:string):Promise<updateCompleteStatusResponse | null>
 
 }
