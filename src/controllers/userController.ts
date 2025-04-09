@@ -695,6 +695,30 @@ class userController implements IUserController {
     }
   }
 
+  //getting mechanic details  in the usercontroller.
+  async getMechanicDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.query;
+      console.log(
+        "id reached in the userController for getting mech details",
+        id
+      );
+      if (typeof id === "string") {
+        const result = await this.userServices.getMechanicDetails({ id });
+        res.status(OK).json({ success: true, result: result });
+      } else {
+        console.log(
+          "Id is undifined in the getMechanicDetails in userController"
+        );
+        res.status(STATUS_CODES.CONFLICT).json({ success: false });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("Entered in the function for logout");

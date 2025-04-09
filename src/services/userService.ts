@@ -38,6 +38,7 @@ import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import { ICreateJWT } from "../utils/generateToken";
 import { compareInterface } from "../utils/comparePassword";
+import { getMechanicDetailsDTO, getMechanicDetailsResponse } from "../interfaces/DTOs/Mech/IService.dto";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
@@ -323,6 +324,22 @@ class userService implements IUserServices {
       throw error;
     }
   }
+
+  //funtion to get mechanci details 
+   async getMechanicDetails(
+      data: getMechanicDetailsDTO
+    ): Promise<getMechanicDetailsResponse | null> {
+      try {
+        const { id } = data;
+        console.log("Id in the mechService is ", id);
+        const result = await this.userRepository.getMechanicDetails({ id });
+        return result;
+      } catch (error) {
+        console.log(error as Error);
+        throw error;
+      }
+    }
+  
 
   //function to getting the specified usercomplinat using id
   async getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[] >{

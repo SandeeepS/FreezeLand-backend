@@ -139,11 +139,13 @@ class AdminRepository extends BaseRepository<AdminInterface & Document>
 
   async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
-      const { page, limit, searchQuery } = data;
+      const { page, limit, searchQuery,search } = data;
+      console.log("search in the adminRepostory in getMechlIst",search)
       const result = await this.mechRepository.getMechList({
         page,
         limit,
         searchQuery,
+        search
       });
       return result as MechInterface[];
     } catch (error) {
@@ -156,9 +158,10 @@ class AdminRepository extends BaseRepository<AdminInterface & Document>
     data: GetAllServicesDTO
   ): Promise<GetAllServiceResponse[] | null> {
     try {
-      const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
+      const { page, limit, searchQuery ,search} = data;
+      const regex = new RegExp(search, "i");
       const result = await this.serviceRepository.findAll(page, limit, regex);
+      console.log("result in the getAllService in the adminRepositroy",result);
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -170,8 +173,8 @@ class AdminRepository extends BaseRepository<AdminInterface & Document>
     data: GetAllDevicesDTO
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
-      const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
+      const { page, limit, searchQuery,search } = data;
+      const regex = new RegExp(search, "i");
       const result = await this.deviceRepository.findAll(page, limit, regex);
       return result;
     } catch (error) {

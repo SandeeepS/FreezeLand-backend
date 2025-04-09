@@ -157,6 +157,7 @@ class adminService implements IAdminService {
   async getMechList(data: GetMechList): Promise<GetMechListResponse> {
     try {
       let { page, limit, searchQuery } = data;
+      const {search} = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
@@ -164,6 +165,7 @@ class adminService implements IAdminService {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log("list of mechanics is ", mechs);
       const mechsCount = await this.adminRepository.getMechCount({
@@ -184,6 +186,7 @@ class adminService implements IAdminService {
   async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
     try {
       let { page, limit, searchQuery } = data;
+      const {search} = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
@@ -191,6 +194,7 @@ class adminService implements IAdminService {
         page,
         limit,
         searchQuery,
+       search
       });
       console.log("list of services is ", services);
       const servicesCount = await this.adminRepository.getServiceCount({
@@ -211,6 +215,7 @@ class adminService implements IAdminService {
   async getDevcies(data: GetDeviceDTO): Promise<GetDeviceResponse> {
     try {
       let { page, limit, searchQuery } = data;
+      const {search}  = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
@@ -218,6 +223,7 @@ class adminService implements IAdminService {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log("list of device  is ", devices);
       const devicesCount = await this.adminRepository.getDeviceCount({

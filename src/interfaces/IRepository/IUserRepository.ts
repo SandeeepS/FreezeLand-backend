@@ -1,3 +1,4 @@
+import { getMechanicDetailsDTO, getMechanicDetailsResponse } from "../DTOs/Mech/IRepository.dto";
 import {
     AddUserAddressDTO,
     AddUserAddressResponse,
@@ -47,4 +48,5 @@ export interface IUserRepository {
     editAddress(data: EditAddressDTO): Promise<EditAddressResponse | null>;
     setDefaultAddress(data: SetUserDefaultAddressDTO): Promise<SetUserDefaultAddressResponse| null> ;
     registerService(data: RegisterServiceDTO):Promise<RegisterServiceResponse | null> ;
+    getMechanicDetails(data: getMechanicDetailsDTO): Promise<getMechanicDetailsResponse | null>
 }

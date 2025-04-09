@@ -36,6 +36,8 @@ import {
   getUserRegisteredServiceDetailsByIdResponse,
 } from "../interfaces/DTOs/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
+import { getMechanicDetailsDTO, getMechanicDetailsResponse } from "../interfaces/DTOs/Mech/IRepository.dto";
+import MechModel, { MechInterface } from "../models/mechModel";
 
 class UserRepository
   extends BaseRepository<UserInterface & Document>
@@ -43,11 +45,13 @@ class UserRepository
 {
   private concernRepository: BaseRepository<Iconcern>;
   private serviceRepository: BaseRepository<IServices>;
+  private mechanicRepository: BaseRepository<MechInterface>
 
   constructor() {
     super(userModel);
     this.concernRepository = new BaseRepository<Iconcern>(concernModel);
     this.serviceRepository = new BaseRepository<IServices>(serviceModel);
+    this.mechanicRepository = new BaseRepository<MechInterface>(MechModel);
   }
 
   async saveUser(newDetails: SaveUserDTO): Promise<SaveUserResponse | null> {
@@ -222,8 +226,6 @@ class UserRepository
     try{
       console.log("id in the getUserRegisteredServiceDetailsById",id);
       const objectId = new mongoose.Types.ObjectId(id);
-
-      // Use aggregation to get user's registered services with lookups
       const result = await concernModel.aggregate([
         {
           $match: {
@@ -330,6 +332,22 @@ class UserRepository
       throw error;
     }
   }
+
+  //funciton to find mech details 
+  async getMechanicDetails(
+      data: getMechanicDetailsDTO
+    ): Promise<getMechanicDetailsResponse | null> {
+      try {
+        const { id } = data;
+        const result = await this.mechanicRepository.findById(id);
+        return result ;
+      } catch (error) {
+        console.log(error as Error);
+        throw new Error(
+          "Error occured while getting mechanic Details in mechRepository"
+        );
+      }
+    }
 }
 
 export default UserRepository;

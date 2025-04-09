@@ -88,6 +88,7 @@ export interface GetMechListDTO {
   page: number;
   limit: number;
   searchQuery: string;
+  search:string;
 }
 
 export interface GetMechListResponse {
@@ -106,6 +107,8 @@ export interface GetAllServicesDTO {
   page: number;
   limit: number;
   searchQuery: string;
+  search:string;
+
 }
 
 export interface GetAllServiceResponse {
@@ -123,6 +126,7 @@ export interface GetAllDevicesDTO {
   page: number;
   limit: number;
   searchQuery: string;
+  search:string;
 }
 
 export interface GetAllDevicesResponse {

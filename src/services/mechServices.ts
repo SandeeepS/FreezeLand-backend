@@ -228,11 +228,12 @@ class mechService implements IMechServices {
     try {
       const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
-
+      const search = ""
       const mech = await this.mechRepository.getMechList({
         page,
         limit,
         searchQuery,
+        search
       });
       console.log("list of all mechanics is from the mechService is ", mech);
       const mechCount = await this.mechRepository.getMechCount(regex);

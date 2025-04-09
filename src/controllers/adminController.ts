@@ -91,6 +91,8 @@ class adminController implements IAdminController {
 
   async getMechList(req: Request, res: Response, next: NextFunction) {
     try {
+      const search = req.query.search as string;
+      console.log("Search from the frontend ",search);
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -100,6 +102,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log("mechsData from the admin controller is ", data);
       res.status(OK).json(data);
@@ -332,6 +335,8 @@ class adminController implements IAdminController {
       console.log(
         "reached the getAllServices funciton in the admin controller"
       );
+      
+      const search  = req.query.search as string  ;
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -341,6 +346,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log(
         "listed services from the database is in the admin controller is",
@@ -358,6 +364,7 @@ class adminController implements IAdminController {
       console.log(
         "reached the getAllDevces  funciton in the admin controller to  access the all the devices "
       );
+      const search = req.query.search as string;
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -367,6 +374,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log(
         "listed services from the database is in the admin controller is",

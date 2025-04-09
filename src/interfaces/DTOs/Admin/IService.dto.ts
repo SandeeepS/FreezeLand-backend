@@ -52,6 +52,7 @@ export interface GetMechList {
   page: number;
   limit: number;
   searchQuery: string | undefined;
+  search:string;
 }
 
 export interface GetMechListResponse {
@@ -67,6 +68,8 @@ export interface GetServicesDTO {
   page: number;
   limit: number;
   searchQuery: string | undefined;
+  search:string;
+
 }
 
 export interface GetServiceResponse {
@@ -82,6 +85,7 @@ export interface GetDeviceDTO {
   page: number;
   limit: number;
   searchQuery: string | undefined;
+  search:string;
 }
 
 export interface GetDeviceResponse {

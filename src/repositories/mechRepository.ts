@@ -105,8 +105,9 @@ class MechRepository
 
   async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
-      const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
+      const { page, limit, searchQuery,search } = data;
+      console.log("Search in the mechRepository",search);
+      const regex = new RegExp(search, "i");
       const result = await this.findAll(page, limit, regex);
       console.log("mech list is ", result);
       return result as MechInterface[];
@@ -289,6 +290,7 @@ class MechRepository
       // Update document fields and push a new entry to workHistory
       const updateData = {
         currentMechanicId: mechanicIdObjectId,
+        status:status,
         $push: {
           workHistory: {
             mechanicId: mechanicIdObjectId,

@@ -1,3 +1,4 @@
+import { getMechanicDetailsDTO, getMechanicDetailsResponse } from "../DTOs/Mech/IService.dto";
 import {
     UserSignUpDTO,
     SaveUserDTO,
@@ -45,5 +46,6 @@ export interface IUserServices {
     editAddress(data: EditAddressDTO): Promise<EditAddressResponse | null>;
     setUserDefaultAddress(data: SetUserDefaultAddressDTO): Promise<SetUserDefaultAddressResponse | null>  ;
     registerService(data: RegisterServiceDTO):Promise<RegisterServiceResponse | null>;
+    getMechanicDetails(data: getMechanicDetailsDTO): Promise<getMechanicDetailsResponse | null> 
 }
 

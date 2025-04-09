@@ -134,6 +134,7 @@ export class BaseRepository<T extends Searchable>
     page: number,
     limit: number,
     regex: RegExp | null
+    
   ): Promise<T[] | null> {
     try {
       return await this.model

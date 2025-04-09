@@ -76,6 +76,7 @@ export interface GetMechListDTO {
   page: number;
   limit: number;
   searchQuery: string;
+  search:string;
 }
 
 export interface GetMechListResponse {
@@ -214,4 +215,23 @@ export interface getAllAcceptedServiceResponse {
     ];
     isBlocked: boolean;
     isDeleted: boolean;
+}
+
+export interface getMechanicDetailsDTO {
+  id:string;
+}
+
+export interface getMechanicDetailsResponse {
+  _id:Types.ObjectId | string;
+  name: string;
+  email: string;
+  phone: number;
+  role: string;
+  photo: string ;
+  adharProof: string | null; 
+  employeeLicense: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  isVerified: boolean;
+  mechanicType: string[];
 }
