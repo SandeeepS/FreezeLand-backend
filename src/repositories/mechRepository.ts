@@ -328,6 +328,7 @@ class MechRepository
         {
           $match: {
             currentMechanicId: mechanicObjectId,
+            status: { $in: ["accepted", "pending", "onProcess"] }
           },
         },
         {
