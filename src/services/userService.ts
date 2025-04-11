@@ -1,7 +1,4 @@
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import UserRepository from "../repositories/userRepository";
-import { CreateJWT } from "../utils/generateToken";
-import Encrypt from "../utils/comparePassword";
 
 import dotenv from "dotenv";
 import Cryptr from "cryptr";
@@ -34,18 +31,30 @@ import {
   UpdateNewPasswordResponse,
   EditAddressResponse,
   SetUserDefaultAddressResponse,
+  getUserRegisteredServiceDetailsByIdResponse,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
+import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
+import { ICreateJWT } from "../utils/generateToken";
+import { compareInterface } from "../utils/comparePassword";
+import {
+  getMechanicDetailsDTO,
+  getMechanicDetailsResponse,
+} from "../interfaces/DTOs/Mech/IService.dto";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 class userService implements IUserServices {
   constructor(
-    private userRepository: UserRepository,
-    private createjwt: CreateJWT,
-    private encrypt: Encrypt
-  ) {}
+    private userRepository: IUserRepository,
+    private createjwt: ICreateJWT,
+    private encrypt: compareInterface
+  ) {
+    this.userRepository = userRepository;
+    this.createjwt = createjwt;
+    this.encrypt = encrypt;
+  }
 
   async isUserExist(
     userData: UserSignUpDTO
@@ -64,16 +73,18 @@ class userService implements IUserServices {
       console.log("Entered in user Service and the userData is ", userData);
       const { name, email, password, phone } = userData;
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
-      if (!secret_key) {
+      if (!secret_key){
         throw new Error(
           "Encrption secret key is not defined in the environment"
         );
       }
+      
       const cryptr = new Cryptr(secret_key, {
         encoding: "base64",
         pbkdf2Iterations: 10000,
         saltLength: 10,
       });
+
       const newPassword = cryptr.encrypt(password);
       const newDetails: NewDetailsDTO = {
         name: name,
@@ -81,6 +92,7 @@ class userService implements IUserServices {
         email: email,
         phone: phone,
       };
+
       console.log("new Encypted password with data is ", newDetails);
       const user = await this.userRepository.saveUser({
         name,
@@ -116,84 +128,105 @@ class userService implements IUserServices {
 
   async userLogin(userData: UserLoginDTO): Promise<UserLoginResponse> {
     try {
-      const { email } = userData;
+      const { email, password } = userData;
+      console.log("Login attempt with email:", email);
+      console.log("Password provided (length):", password?.length || 0);
+
       const user: EmailExistCheckDTO | null =
         await this.userRepository.emailExistCheck({ email });
 
-      if (user?.id) {
-        const returnUserData: ReturnUserdataDTO = {
-          _id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-          isDeleted: user.isDeleted,
-          isBlocked: user.isBlocked,
-          profile_picture: user.profile_picture,
-        };
+      console.log("User found:", !!user);
 
-        const token = this.createjwt.generateToken(user.id, user.role);
-        const refreshToken = this.createjwt.generateRefreshToken(user.id);
-        if (user && user.isBlocked) {
-          return {
-            status: UNAUTHORIZED,
-            data: {
-              success: false,
-              message: "You have been blocked by the admin !",
-              token: token,
-              data: returnUserData,
-              refresh_token: refreshToken,
-            },
-          } as const;
-        }
-        if (user?.password && userData.password) {
-          console.log("enterd password is ", userData.password);
-          const passwordMatch = await this.encrypt.compare(
-            userData.password,
-            user.password as string
-          );
-          if (passwordMatch) {
-            const token = this.createjwt.generateToken(user.id, user.role);
-            const refreshToken = this.createjwt.generateRefreshToken(user.id);
-            return {
-              status: OK,
-              data: {
-                success: true,
-                message: "Authentication Successful !",
-                data: returnUserData,
-                userId: user.id,
-                token: token,
-                refresh_token: refreshToken,
-              },
-            } as const;
-          } else {
-            return {
-              status: UNAUTHORIZED,
-              data: {
-                success: false,
-                message: "Authentication failed...",
-              },
-            } as const;
-          }
-        }
+      // If user doesn't exist
+      if (!user?.id) {
         return {
           status: UNAUTHORIZED,
           data: {
             success: false,
-            message: "Invalid email or password.",
-          },
-        } as const;
-      } else {
-        return {
-          status: UNAUTHORIZED,
-          data: {
-            success: false,
-            message: "Authentication failed...",
+            message: "Invalid email or password",
           },
         } as const;
       }
+
+      // Create user data object that might be returned
+      const returnUserData: ReturnUserdataDTO = {
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isDeleted: user.isDeleted,
+        isBlocked: user.isBlocked,
+        profile_picture: user.profile_picture,
+      };
+
+      // Check if user is blocked
+      if (user.isBlocked) {
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Your account has been blocked by the admin",
+          },
+        } as const;
+      }
+
+      // Verify password
+      console.log("User password exists:", !!user?.password);
+      console.log("Password provided:", !!password);
+
+      if (!user?.password || !password) {
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Invalid email or password",
+          },
+        } as const;
+      }
+
+      console.log("Password comparison inputs:", {
+        inputPwdLength: password?.length,
+        storedPwdLength: user.password?.length,
+      });
+
+      const passwordMatch = await this.encrypt.compare(
+        password,
+        user.password as string
+      );
+
+      console.log("Password match result:", passwordMatch);
+
+      if (!passwordMatch) {
+        return {
+          status: UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Invalid email or password",
+          },
+        } as const;
+      }
+
+      // Authentication successful
+      const token = this.createjwt.generateToken(user.id, user.role);
+      const refreshToken = this.createjwt.generateRefreshToken(user.id);
+
+      console.log("Token generated:", !!token);
+      console.log("Refresh token generated:", !!refreshToken);
+
+      return {
+        status: OK,
+        data: {
+          success: true,
+          message: "Authentication Successful!",
+          data: returnUserData,
+          userId: user.id,
+          token: token,
+          refresh_token: refreshToken,
+        },
+      } as const;
     } catch (error) {
-      console.log(error as Error);
+      console.log("Login error in service:", error);
       throw error;
     }
   }
@@ -291,21 +324,58 @@ class userService implements IUserServices {
   }
 
   //getting the user registered complaint details
-  async getAllRegisteredServices(
+  async getAllUserRegisteredServices(
     page: number,
     limit: number,
-    searchQuery: string
+    searchQuery: string,
+    userId: string
   ): Promise<unknown> {
     try {
       const data = await this.userRepository.getAllUserRegisteredServices({
         page,
         limit,
         searchQuery,
+        userId,
       });
+      console.log("data in the userSErvice ", data);
+
       return data;
     } catch (error) {
       console.log(
         "Error occured while fetching the user registerd complaint in the userSercvice ",
+        error as Error
+      );
+      throw error;
+    }
+  }
+
+  //funtion to get mechanci details
+  async getMechanicDetails(
+    data: getMechanicDetailsDTO
+  ): Promise<getMechanicDetailsResponse | null> {
+    try {
+      const { id } = data;
+      console.log("Id in the mechService is ", id);
+      const result = await this.userRepository.getMechanicDetails({ id });
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  //function to getting the specified usercomplinat using id
+  async getUserRegisteredServiceDetailsById(
+    id: string
+  ): Promise<getUserRegisteredServiceDetailsByIdResponse[]> {
+    try {
+      console.log("Enterdin the userService");
+      const result =
+        await this.userRepository.getUserRegisteredServiceDetailsById(id);
+      return result;
+    } catch (error) {
+      console.log(
+        "Error occured while getting the specified userComplaint ",
         error as Error
       );
       throw error;

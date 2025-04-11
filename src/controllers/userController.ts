@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import userService from "../services/userService";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import { generateAndSendOTP } from "../utils/generateOtp";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { compareInterface } from "../utils/comparePassword";
 
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
   STATUS_CODES;
@@ -21,9 +20,22 @@ import {
   SaveUserResponse,
 } from "../interfaces/DTOs/User/IController.dto";
 import { IUserController } from "../interfaces/IController/IUserController";
+import { IUserServices } from "../interfaces/IServices/IUserServices";
+import { ICreateJWT } from "../utils/generateToken";
+import { Iemail } from "../utils/email";
 
 class userController implements IUserController {
-  constructor(private userServices: userService) {}
+  constructor(
+    private userServices: IUserServices,
+    private encrypt: compareInterface,
+    private createjwt: ICreateJWT,
+    private email: Iemail
+  ) {
+    this.userServices = userServices;
+    this.encrypt = encrypt;
+    this.createjwt = createjwt;
+    this.email = email;
+  }
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
@@ -55,7 +67,7 @@ class userController implements IUserController {
           req.app.locals.newUser = true;
           req.app.locals.userData = req.body;
           req.app.locals.userEmail = req.body.email;
-          const otp = await generateAndSendOTP(req.body.email);
+          const otp = await this.email.generateAndSendOTP(req.body.email);
           req.app.locals.userOtp = otp;
           console.log("otp print ", req.app.locals.userOtp);
 
@@ -87,6 +99,114 @@ class userController implements IUserController {
     }
   }
 
+  async veryfyOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { otp } = req.body;
+      const isNuewUser = req.app.locals.newUser;
+      const savedUser = req.app.locals.userData;
+
+      const accessTokenMaxAge = 15 * 60 * 1000;
+      const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+
+      if (otp === Number(req.app.locals.userOtp)) {
+        console.log(typeof otp);
+        console.log(typeof req.app.locals.userOtp);
+        if (isNuewUser) {
+          const newUser = await this.userServices.saveUser(savedUser);
+          req.app.locals = {};
+          // const time = this.milliseconds(23, 30, 0);
+          res
+            .status(OK)
+            .cookie("access_token", newUser?.token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("refresh_token", newUser?.refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(newUser);
+        } else {
+          res
+            .status(OK)
+            .cookie("access_token", isNuewUser.data.token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("refresh_token", isNuewUser.data.refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json({ success: true, message: "old user verified" });
+        }
+      } else {
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Incorrect otp !" });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async forgotResentOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<ForgotResentOtpResponse | void> {
+    try {
+      const { email } = req.body;
+      req.app.locals.userEmail = email;
+      if (!email) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "please enter the email",
+        }) as ForgotResentOtpResponse;
+      }
+      const user = await this.userServices.getUserByEmail(email);
+      if (!user) {
+        return res.status(BAD_REQUEST).json({
+          success: false,
+          message: "user with email is not exist!",
+        }) as ForgotResentOtpResponse;
+      }
+      const otp = await this.email.generateAndSendOTP(email);
+      req.app.locals.resendOtp = otp;
+
+      const expirationMinutes = 1;
+      setTimeout(() => {
+        delete req.app.locals.resendOtp;
+      }, expirationMinutes * 60 * 1000);
+
+      res.status(OK).json({
+        success: true,
+        data: user,
+        message: "OTP sent for verification...",
+      } as ForgotResentOtpResponse);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async VerifyForgotOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+      const otp = req.body.otp;
+      console.log("otp from the req body is ", otp);
+      if (!otp)
+        return res.json({ success: false, message: "Please enter the otp!" });
+      if (!req.app.locals.resendOtp)
+        return res.json({ success: false, message: "Otp is expired!" });
+      if (otp === req.app.locals.resendOtp)
+        res.json({ success: true, message: "both otp are same." });
+      else res.json({ success: false, message: "Entered otp is not correct!" });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
   async userLogin(
     req: Request,
     res: Response,
@@ -94,64 +214,85 @@ class userController implements IUserController {
   ): Promise<void> {
     try {
       const { email, password }: { email: string; password: string } = req.body;
-      console.log(
-        "email and password is from the controllers for login",
-        email,
-        password
-      );
 
-      const check = LoginValidation(email, password);
-      if (check) {
-        const loginStatus = await this.userServices.userLogin({
-          email,
-          password,
-        });
-        console.log(loginStatus);
-        if (
-          loginStatus &&
-          loginStatus.data &&
-          typeof loginStatus.data == "object" &&
-          "token" in loginStatus.data
-        ) {
-          if (!loginStatus.data.success) {
-            res
-              .status(UNAUTHORIZED)
-              .json({ success: false, message: loginStatus.data.message });
-            return;
-          }
-          const access_token = loginStatus.data.token;
-          const refresh_token = loginStatus.data.refresh_token;
-          const accessTokenMaxAge = 5 * 60 * 1000;
-          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-          res
-            .status(loginStatus.status)
-            .cookie("user_access_token", access_token, {
-              maxAge: accessTokenMaxAge,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production", // Set to true in production
-              sameSite: "strict",
-            })
-            .cookie("user_refresh_token", refresh_token, {
-              maxAge: refreshTokenMaxAge,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production", // Set to true in production
-              sameSite: "strict",
-            })
-            .json(loginStatus);
-        } else {
-          res
-            .status(UNAUTHORIZED)
-            .json({ success: false, message: "Authentication error" });
-        }
-      } else {
+      // Add debug logging
+      console.log("Login attempt for email:", email);
+
+      // Validate input
+      const isValid = LoginValidation(email, password);
+      if (!isValid) {
         res.status(UNAUTHORIZED).json({
           success: false,
-          message: "Please check the email and password",
+          message: "Please provide valid email and password",
         });
+        return;
       }
+
+      // Call service
+      const loginStatus = await this.userServices.userLogin({
+        email,
+        password,
+      });
+
+      // Debug log full response structure
+      console.log(
+        "Login status in controller:",
+        JSON.stringify(loginStatus, null, 2)
+      );
+
+      // Handle unsuccessful login without correct structure
+      if (!loginStatus?.data || typeof loginStatus.data !== "object") {
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Authentication error: Invalid response structure",
+        });
+        return;
+      }
+
+      // Check for successful login by checking success flag
+      if (!loginStatus.data.success) {
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: loginStatus.data.message || "Authentication failed",
+        });
+        return;
+      }
+
+      // Check for token in the data object
+      if (!loginStatus.data.token) {
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Authentication error: Token missing",
+        });
+        return;
+      }
+
+      // Successful login - set cookies and send response
+      const accessTokenMaxAge = 5 * 60 * 1000; // 5 minutes
+      const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
+
+      res
+        .status(loginStatus.status)
+        .cookie("user_access_token", loginStatus.data.token, {
+          maxAge: accessTokenMaxAge,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        .cookie("user_refresh_token", loginStatus.data.refresh_token, {
+          maxAge: refreshTokenMaxAge,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        .json(loginStatus);
     } catch (error) {
-      console.log(error as Error);
-      next();
+      console.error("Login error:", error);
+      res.status(INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "An error occurred during login",
+      });
+      next(error); // Pass error to error handling middleware
     }
   }
 
@@ -236,114 +377,7 @@ class userController implements IUserController {
     }
   }
 
-  async veryfyOtp(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const { otp } = req.body;
-      const isNuewUser = req.app.locals.newUser;
-      const savedUser = req.app.locals.userData;
-
-      const accessTokenMaxAge = 15 * 60 * 1000;
-      const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-
-      if (otp === Number(req.app.locals.userOtp)) {
-        console.log(typeof otp);
-        console.log(typeof req.app.locals.userOtp);
-        if (isNuewUser) {
-          const newUser = await this.userServices.saveUser(savedUser);
-          req.app.locals = {};
-          // const time = this.milliseconds(23, 30, 0);
-          res
-            .status(OK)
-            .cookie("access_token", newUser?.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", newUser?.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json(newUser);
-        } else {
-          res
-            .status(OK)
-            .cookie("access_token", isNuewUser.data.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", isNuewUser.data.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json({ success: true, message: "old user verified" });
-        }
-      } else {
-        res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "Incorrect otp !" });
-      }
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  async forgotResentOtp(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<ForgotResentOtpResponse | void> {
-    try {
-      const { email } = req.body;
-      req.app.locals.userEmail = email;
-      if (!email) {
-        return res.status(BAD_REQUEST).json({
-          success: false,
-          message: "please enter the email",
-        }) as ForgotResentOtpResponse;
-      }
-      const user = await this.userServices.getUserByEmail(email);
-      if (!user) {
-        return res.status(BAD_REQUEST).json({
-          success: false,
-          message: "user with email is not exist!",
-        }) as ForgotResentOtpResponse;
-      }
-      const otp = await generateAndSendOTP(email);
-      req.app.locals.resendOtp = otp;
-
-      const expirationMinutes = 1;
-      setTimeout(() => {
-        delete req.app.locals.resendOtp;
-      }, expirationMinutes * 60 * 1000);
-
-      res.status(OK).json({
-        success: true,
-        data: user,
-        message: "OTP sent for verification...",
-      } as ForgotResentOtpResponse);
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  async VerifyForgotOtp(req: Request, res: Response, next: NextFunction) {
-    try {
-      const otp = req.body.otp;
-      console.log("otp from the req body is ", otp);
-      if (!otp)
-        return res.json({ success: false, message: "Please enter the otp!" });
-      if (!req.app.locals.resendOtp)
-        return res.json({ success: false, message: "Otp is expired!" });
-      if (otp === req.app.locals.resendOtp)
-        res.json({ success: true, message: "both otp are same." });
-      else res.json({ success: false, message: "Entered otp is not correct!" });
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
-  }
-
+  //funciton to update New password
   async updateNewPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, userId } = req.body;
@@ -366,7 +400,9 @@ class userController implements IUserController {
       const { userId } = req.query;
       if (userId) {
         console.log("userId from the getProfile in the useController", userId);
-        const currentUser = await this.userServices.getProfile({ id: userId as string });
+        const currentUser = await this.userServices.getProfile({
+          id: userId as string,
+        });
         if (!currentUser)
           res
             .status(UNAUTHORIZED)
@@ -542,7 +578,7 @@ class userController implements IUserController {
       if (result) {
         res.status(OK).json({
           success: true,
-          message: "Complaint registered successfully",
+          message: "Service  registered successfully",
         });
       } else {
         res
@@ -558,9 +594,7 @@ class userController implements IUserController {
   //getting all service which is provided by the website.
   async getAllServices(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(
-        "reached the getAllServices funciton in the admin controller"
-      );
+      console.log("reached the getAllServices funciton in the user controller");
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -583,20 +617,27 @@ class userController implements IUserController {
   }
 
   //getting all the registered complaints from the user
-  async getAllRegisteredService(
+  async getAllUserRegisteredServices(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     try {
+      const { userId } = req.query;
+      console.log(
+        "userId in the userController in the getAllUserRegisteredService",
+        userId
+      );
+
       const page = 1;
       const limit = 10;
       const searchQuery = "";
       const allRegisteredUserServices =
-        await this.userServices.getAllRegisteredServices(
+        await this.userServices.getAllUserRegisteredServices(
           page,
           limit,
-          searchQuery
+          searchQuery,
+          userId as string
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({
@@ -644,6 +685,53 @@ class userController implements IUserController {
       next(error);
     }
   }
+
+  //function to get the specified userComplaint using user Id
+  async getUserRegisteredServiceDetailsById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.query;
+      console.log(
+        "Enterd in the getUserRegisteredServiceDetailsById function in the userController with id",
+        id
+      );
+
+      const result =
+        await this.userServices.getUserRegisteredServiceDetailsById(
+          id as string
+        );
+      res.status(200).json({ success: true, result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //getting mechanic details  in the usercontroller.
+  async getMechanicDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.query;
+      console.log(
+        "id reached in the userController for getting mech details",
+        id
+      );
+      if (typeof id === "string") {
+        const result = await this.userServices.getMechanicDetails({ id });
+        res.status(OK).json({ success: true, result: result });
+      } else {
+        console.log(
+          "Id is undifined in the getMechanicDetails in userController"
+        );
+        res.status(STATUS_CODES.CONFLICT).json({ success: false });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("Entered in the function for logout");

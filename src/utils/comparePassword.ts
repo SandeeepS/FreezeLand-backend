@@ -1,6 +1,6 @@
 import Cryptr from "cryptr";
 
-interface compareInterface {
+ export interface compareInterface {
   compare(password: string, hashedPassword: string): Promise<boolean>;
   hashPassword(password: string): Promise<string>;
 }

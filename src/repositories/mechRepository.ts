@@ -2,22 +2,31 @@ import {
   AddServiceDTO,
   EmailExistResponse,
   EmailExitCheck,
+  getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
+  GetAllUserRegisteredServicesDTO,
+  GetAllUserRegisteredServicesResponse,
+  getComplaintDetailsResponse,
+  getMechanicDetailsDTO,
+  getMechanicDetailsResponse,
   GetMechByIdDTO,
   GetMechByIdResponse,
   GetMechListDTO,
   GetMechListResponse,
+  getUpdatedWorkAssingnedResponse,
   SaveMechDTO,
   SaveMechResponse,
+  updateCompleteStatusResponse,
   UpdateNewPasswordDTO,
   UpdateNewPasswordResponse,
   VerifyMechanicDTO,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
+import concernModel from "../models/concernModel";
 import deviceModel, { IDevice } from "../models/deviceModel";
 import MechModel, { MechInterface } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 class MechRepository
   extends BaseRepository<MechInterface & Document>
@@ -80,10 +89,26 @@ class MechRepository
     }
   }
 
+  async getMechanicDetails(
+    data: getMechanicDetailsDTO
+  ): Promise<getMechanicDetailsResponse | null> {
+    try {
+      const { id } = data;
+      const result = await this.findById(id);
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error(
+        "Error occured while getting mechanic Details in mechRepository"
+      );
+    }
+  }
+
   async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
-      const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
+      const { page, limit, searchQuery,search } = data;
+      console.log("Search in the mechRepository",search);
+      const regex = new RegExp(search, "i");
       const result = await this.findAll(page, limit, regex);
       console.log("mech list is ", result);
       return result as MechInterface[];
@@ -118,15 +143,15 @@ class MechRepository
     }
   }
 
-  async verifyMechanic(values:VerifyMechanicDTO){
-    try{
+  async verifyMechanic(values: VerifyMechanicDTO) {
+    try {
       console.log("entered in the mechRepository");
-      console.log("valeu sdfsdo dso",values);
+      console.log("valeu sdfsdo dso", values);
       const id = values.id;
-      console.log("id  ",id);
-      const response  = await this.update(id,values)
+      console.log("id  ", id);
+      const response = await this.update(id, values);
       return response;
-    }catch(error){
+    } catch (error) {
       console.log(error);
       throw new Error();
     }
@@ -141,6 +166,233 @@ class MechRepository
       throw new Error("Error occured");
     }
   }
+
+  //function for getting all the userRegistered services
+  async getAllUserRegisteredServices(
+    data: GetAllUserRegisteredServicesDTO
+  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+    try {
+      const { page, limit } = data;
+
+      // Use aggregation to get user's registered services with lookups
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            isDeleted: false,
+            $or: [
+              { currentMechanicId: { $exists: false } },
+              { currentMechanicId: null }
+            ]
+          },
+        },
+        {
+          $lookup: {
+            from: "users", // The users collection
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $lookup: {
+            from: "services", // The services collection
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { "userDetails.password": 0 } }, // Exclude password
+      ]);
+
+      console.log("User registered services:", result);
+      return result as GetAllUserRegisteredServicesResponse[];
+    } catch (error) {
+      console.log(
+        "Error occurred while fetching user registered services:",
+        error as Error
+      );
+      throw new Error(
+        "Error occurred while fetching user registered services."
+      );
+    }
+  }
+
+  //function to get the specified  complaint details  by id
+  async getComplaintDetails(
+    id: string
+  ): Promise<getComplaintDetailsResponse[]> {
+    try {
+      console.log("id in the getUserRegisteredServiceDetailsById", id);
+      const objectId = new mongoose.Types.ObjectId(id);
+
+      // Use aggregation to get  registered specific user complaint with id  and  lookups
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            _id: objectId,
+            isDeleted: false,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $unwind: "$userDetails",
+        },
+        {
+          $addFields: {
+            defaultAddressDetails: {
+              $filter: {
+                input: "$userDetails.address",
+                as: "addr",
+                cond: { $eq: ["$$addr._id", "$defaultAddress"] },
+              },
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "services",
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+
+        { $project: { "userDetails.password": 0 } },
+      ]);
+      console.log("User registered specific  service is :", result);
+      return result as getComplaintDetailsResponse[];
+    } catch (error) {
+      console.log(
+        "Error occured while fetching userDetails in the userRepository ",
+        error as Error
+      );
+      throw new Error("Errorrrrr");
+    }
+  }
+
+  async updateWorkAssigned(
+    complaintId: string,
+    mechanicId: string,
+    status: string
+  ): Promise<getUpdatedWorkAssingnedResponse> {
+    try {
+      console.log("Entered in the mechRepository");
+      const mechanicIdObjectId = new mongoose.Types.ObjectId(mechanicId);
+
+      // Update document fields and push a new entry to workHistory
+      const updateData = {
+        currentMechanicId: mechanicIdObjectId,
+        status:status,
+        $push: {
+          workHistory: {
+            mechanicId: mechanicIdObjectId,
+            status: status,
+            updatedAt: new Date(),
+          },
+        },
+      };
+
+      const result = await concernModel.findByIdAndUpdate(
+        complaintId,
+        updateData,
+        { new: true }
+      );
+
+      return result as getUpdatedWorkAssingnedResponse;
+    } catch (error) {
+      console.log(
+        "Error occurred while updating the complaint database while accessing the work by mechanic"
+      );
+      throw error;
+    }
+  }
+
+  //find all accepted complaints by mechanic
+  // find all accepted complaints by mechanic
+  async getAllAcceptedServices(
+    mechanicId: string
+  ): Promise<getAllAcceptedServiceResponse[]> {
+    try {
+      console.log("entered in the mechRepository");
+      const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            currentMechanicId: mechanicObjectId,
+            status: { $in: ["accepted", "pending", "onProcess"] }
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+
+        {
+          $addFields: {
+            defaultAddressDetails: {
+              $filter: {
+                input: { $ifNull: ["$userDetails.address", []] },
+                as: "addr",
+                cond: {
+                  $cond: {
+                    if: { $isArray: "$defaultAddress" },
+                    then: { $in: ["$$addr._id", "$defaultAddress"] },
+                    else: { $eq: ["$$addr._id", "$defaultAddress"] },
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "services",
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+        {
+          $project: {
+            "userDetails.password": 0,
+          },
+        },
+      ]);
+
+      return result;
+    } catch (error) {
+      console.log(
+        "error occurred while getting the accepted service from the database in the mechrepository"
+      );
+      throw error;
+    }
+  }
+
+ //function to update the complaint status
+ async updateComplaintStatus(complaintId:string,nextStatus:string):Promise<updateCompleteStatusResponse | null>{
+   try{
+    console.log("Entered in the updateCompaoint Stattus in the mechREpositroy",complaintId,nextStatus);
+    const result = await concernModel.findByIdAndUpdate(complaintId,{"status":nextStatus});
+    console.log("result after updating the status is ",result);
+    return result;
+   }catch(error){
+    console.log("error occured during the updation of the status in the mechRepository ",error)
+    throw new Error()
+   }
+ }
 }
 
 export default MechRepository;

@@ -20,22 +20,32 @@ import {
     DeleteServiceResponse,
     DeleteUserDTO,
     DeleteUserResponse,
+    EditExistServiceDTO,
+    EditExistServiceResponse,
     GetAllDevicesDTO,
     GetAllDevicesResponse,
     GetAllServiceResponse,
     GetAllServicesDTO,
     GetDeviceCountDTO,
+    GetMechanicByIdDTO,
+    GetMechanicByIdResponse,
     GetMechCountDTO,
     GetMechListDTO,
     GetMechListResponse,
     GetServiceCountDTO,
+    GetServiceDTO,
+    GetServiceResponse,
     GetUserCountDTO,
     GetUserListDTO,
     GetUserListResponse,
+    IsAdminExistDTO,
+    IsAdminExistResponse,
     IsDeviceExistDTO,
     isDeviceExistResponse,
     IsServiceExistDTO,
     IsServiceExistResponse,
+    UpdateApproveDTO,
+    UpdateApproveResponse,
   } from "../DTOs/Admin/IRepository.dto";
 
 export interface IAdminRepository{
@@ -61,7 +71,12 @@ export interface IAdminRepository{
 
     isServiceExist(data: IsServiceExistDTO): Promise<IsServiceExistResponse | null>;
     isDeviceExist(data: IsDeviceExistDTO): Promise<isDeviceExistResponse | null>;
+    isAdminExist(data: IsAdminExistDTO): Promise<IsAdminExistResponse | null>
 
     addNewServices(data: AddNewServiceDTO): Promise<AddNewServiceResponse | null>;
     addNewDevice(data: AddNewDeviceDTO): Promise<AddNewDeviceResponse | null>;
+    getService(data: GetServiceDTO): Promise<GetServiceResponse | null>
+    getMechanicById(data: GetMechanicByIdDTO): Promise<GetMechanicByIdResponse | null> 
+    editExistService(data: EditExistServiceDTO): Promise<EditExistServiceResponse | null>
+    updateApprove (data:UpdateApproveDTO) : Promise<UpdateApproveResponse | null> 
 }

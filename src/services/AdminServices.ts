@@ -1,7 +1,6 @@
-import AdminRepository from "../repositories/adminRepository";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import Encrypt from "../utils/comparePassword";
-import { CreateJWT } from "../utils/generateToken";
+import { compareInterface } from "../utils/comparePassword";
+import { ICreateJWT } from "../utils/generateToken";
 import {
   AddDeviceDTO,
   AddNewDeviceResponse,
@@ -29,6 +28,8 @@ import {
   EditExistServiceResponse,
   GetDeviceDTO,
   GetDeviceResponse,
+  GetMechanicByIdDTO,
+  GetMechanicByIdResponse,
   GetMechList,
   GetMechListResponse,
   GetPreSignedUrlDTO,
@@ -41,53 +42,66 @@ import {
   GetUserListResponse,
   isDeviceExistDTO,
   isDeviceExistResponse,
-  IsServiceExistDTO,
   IsServiceExistResponse,
+  UpdateApproveDTO,
+  UpdateApproveResponse,
 } from "../interfaces/DTOs/Admin/IService.dto";
 import { IAdminService } from "../interfaces/IServices/IAdminService";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
 import { LoginValidation } from "../utils/validator";
+import { IAdminRepository } from "../interfaces/IRepository/IAdminRepository";
 
 class adminService implements IAdminService {
   constructor(
-    private adminRepository: AdminRepository,
-    private encrypt: Encrypt,
-    private createjwt: CreateJWT
-  ) {}
+    private adminRepository: IAdminRepository,
+    private encrypt: compareInterface,
+    private createjwt: ICreateJWT
+  ) {
+    this.adminRepository = adminRepository;
+    this.encrypt = encrypt;
+    this.createjwt = createjwt;
+  }
 
   async adminLogin(data: AdminLoginDTO): Promise<AdminLoginResponse> {
     try {
       console.log("entered in the admin login");
       const { email, password } = data;
-      const check = LoginValidation(email,password);
-      if(check){
-
-    
-      const admin = await this.adminRepository.isAdminExist({ email });
-      if (admin?.id) {
-        if (admin?.password === password) {
-          console.log("passwrod from the admin side is ", admin.password);
-          const token = this.createjwt.generateToken(admin.id, admin.role);
-          const refreshToken = this.createjwt.generateRefreshToken(admin.id);
-          console.log("admin is exist", admin);
-          return {
-            status: STATUS_CODES.OK || 200,
-            data: {
-              success: true,
-              message: "Authentication Successful !",
-              data: admin,
-              adminId: admin.id,
-              token: token,
-              refresh_token: refreshToken,
-            },
-          };
+      const check = LoginValidation(email, password);
+      if (check) {
+        const admin = await this.adminRepository.isAdminExist({ email });
+        if (admin?.id) {
+          if (admin?.password === password) {
+            console.log("passwrod from the admin side is ", admin.password);
+            const token = this.createjwt.generateToken(admin.id, admin.role);
+            const refreshToken = this.createjwt.generateRefreshToken(admin.id);
+            console.log("admin is exist", admin);
+            return {
+              status: STATUS_CODES.OK || 200,
+              data: {
+                success: true,
+                message: "Authentication Successful !",
+                data: admin,
+                adminId: admin.id,
+                token: token,
+                refresh_token: refreshToken,
+              },
+            };
+          } else {
+            console.log("Incorrted password");
+            return {
+              status: STATUS_CODES.UNAUTHORIZED,
+              data: {
+                success: false,
+                message: "Incorrect password!",
+              },
+            } as const;
+          }
         } else {
-          console.log("Incorrted password");
           return {
             status: STATUS_CODES.UNAUTHORIZED,
             data: {
               success: false,
-              message: "Incorrect password!",
+              message: "Email not exist",
             },
           } as const;
         }
@@ -96,19 +110,10 @@ class adminService implements IAdminService {
           status: STATUS_CODES.UNAUTHORIZED,
           data: {
             success: false,
-            message: "Email not exist",
+            message: "Email or password is incorrect",
           },
         } as const;
       }
-    }else{
-      return {
-        status: STATUS_CODES.UNAUTHORIZED,
-        data: {
-          success: false,
-          message: "Email or password is incorrect",
-        },
-      } as const;
-    }
     } catch (error) {
       console.log("error occured while login admin");
       throw error;
@@ -152,6 +157,7 @@ class adminService implements IAdminService {
   async getMechList(data: GetMechList): Promise<GetMechListResponse> {
     try {
       let { page, limit, searchQuery } = data;
+      const {search} = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
@@ -159,6 +165,7 @@ class adminService implements IAdminService {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log("list of mechanics is ", mechs);
       const mechsCount = await this.adminRepository.getMechCount({
@@ -179,6 +186,7 @@ class adminService implements IAdminService {
   async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
     try {
       let { page, limit, searchQuery } = data;
+      const {search} = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
@@ -186,6 +194,7 @@ class adminService implements IAdminService {
         page,
         limit,
         searchQuery,
+       search
       });
       console.log("list of services is ", services);
       const servicesCount = await this.adminRepository.getServiceCount({
@@ -206,6 +215,7 @@ class adminService implements IAdminService {
   async getDevcies(data: GetDeviceDTO): Promise<GetDeviceResponse> {
     try {
       let { page, limit, searchQuery } = data;
+      const {search}  = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
@@ -213,6 +223,7 @@ class adminService implements IAdminService {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log("list of device  is ", devices);
       const devicesCount = await this.adminRepository.getDeviceCount({
@@ -245,6 +256,21 @@ class adminService implements IAdminService {
       throw new Error();
     }
   }
+
+  async getMechanicById(
+    data: GetMechanicByIdDTO
+  ): Promise<GetMechanicByIdResponse | null> {
+    try {
+      const { id } = data;
+      console.log("Reached the getMehanic in the adminservice");
+      const result = await this.adminRepository.getMechanicById({ id });
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error();
+    }
+  }
+
   async blockUser(data: BlockUserDTO): Promise<BlockUserResponse | null> {
     try {
       const { userId } = data;
@@ -338,11 +364,13 @@ class adminService implements IAdminService {
   }
 
   async isServiceExist(
-    data: IsServiceExistDTO
+    name:string
   ): Promise<IsServiceExistResponse | null> {
     try {
-      const { name } = data;
+      
+      console.log("name in the adminServie ",name)
       return await this.adminRepository.isServiceExist({ name });
+      
     } catch (error) {
       console.log(error as Error);
       throw new Error("error while checking isServiceExist or not ");
@@ -398,10 +426,28 @@ class adminService implements IAdminService {
     }
   }
 
-
-  //changing this generating presinged url code ot differtnt comon place 
-  async getPresignedUrl(data: GetPreSignedUrlDTO) {
+  async updateApprove (data:UpdateApproveDTO) : Promise<UpdateApproveResponse | null> {
     try{
+      const {id , verificationStatus } = data;
+      let modifiedVerificationStatus ;
+      if(verificationStatus == "false"){
+        modifiedVerificationStatus = true;
+      }else{
+        modifiedVerificationStatus= false;
+      }
+      if(id){
+        const result = await this.adminRepository.updateApprove({id,modifiedVerificationStatus});
+        return result;
+      }
+      return {result : false};
+    }catch(error){
+      console.log(error as Error);
+      throw new Error("Error while approving the mechanic in the AdminSerivce");
+    }
+  }
+  //changing this generating presinged url code ot differtnt comon place
+  async getPresignedUrl(data: GetPreSignedUrlDTO) {
+    try {
       const { fileName, fileType } = data;
 
       if (!fileName || !fileType) {
@@ -411,13 +457,14 @@ class adminService implements IAdminService {
         } as GetPreSignedUrlResponse;
       }
       const folderName = "ServiceImages";
-      const result = await generatePresignedUrl(fileName,fileType,folderName);
+      const result = await generatePresignedUrl(fileName, fileType, folderName);
       return result as GetPreSignedUrlResponse;
-    }catch(error){
+    } catch (error) {
       console.log(error);
-      throw new Error("error while generating the presinged url from the adminService")
+      throw new Error(
+        "error while generating the presinged url from the adminService"
+      );
     }
-   
   }
 }
 export default adminService;

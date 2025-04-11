@@ -1,9 +1,9 @@
 import userModel, { UserInterface } from "../models/userModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 import { Iconcern } from "../models/concernModel";
 import concernModel from "../models/concernModel";
-import { IServices} from "../models/serviceModel";
+import { IServices } from "../models/serviceModel";
 import serviceModel from "../models/serviceModel";
 import {
   AddUserAddressDTO,
@@ -33,29 +33,34 @@ import {
   EditAddressResponse,
   SetUserDefaultAddressResponse,
   RegisterServiceResponse,
+  getUserRegisteredServiceDetailsByIdResponse,
 } from "../interfaces/DTOs/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
+import { getMechanicDetailsDTO, getMechanicDetailsResponse } from "../interfaces/DTOs/Mech/IRepository.dto";
+import MechModel, { MechInterface } from "../models/mechModel";
 
-class UserRepository extends BaseRepository<UserInterface & Document> implements IUserRepository {
+class UserRepository
+  extends BaseRepository<UserInterface & Document>
+  implements IUserRepository
+{
   private concernRepository: BaseRepository<Iconcern>;
   private serviceRepository: BaseRepository<IServices>;
-  
+  private mechanicRepository: BaseRepository<MechInterface>
+
   constructor() {
     super(userModel);
     this.concernRepository = new BaseRepository<Iconcern>(concernModel);
     this.serviceRepository = new BaseRepository<IServices>(serviceModel);
-
+    this.mechanicRepository = new BaseRepository<MechInterface>(MechModel);
   }
 
-  async saveUser(
-    newDetails: SaveUserDTO
-  ): Promise<SaveUserResponse | null> {
+  async saveUser(newDetails: SaveUserDTO): Promise<SaveUserResponse | null> {
     return this.save(newDetails);
   }
 
-  async findEmail(data:FindEmailDTO): Promise<FindEmailResponse | null> {
+  async findEmail(data: FindEmailDTO): Promise<FindEmailResponse | null> {
     try {
-      const {email} = data;
+      const { email } = data;
       const userFound = await this.findOne({ email });
       if (userFound) {
         console.log("user email found successfully", userFound);
@@ -79,9 +84,11 @@ class UserRepository extends BaseRepository<UserInterface & Document> implements
     return this.findOne({ email: email }) as unknown as EmailExistCheckResponse;
   }
 
-  async updateNewPassword(data:UpdateNewPasswordDTO): Promise<UpdateNewPasswordResponse | null> {
+  async updateNewPassword(
+    data: UpdateNewPasswordDTO
+  ): Promise<UpdateNewPasswordResponse | null> {
     try {
-      const {userId,password} = data;
+      const { userId, password } = data;
       const user = await this.findById(userId);
       if (user) {
         user.password = password;
@@ -97,22 +104,22 @@ class UserRepository extends BaseRepository<UserInterface & Document> implements
     }
   }
 
-  async getUserById(data:GetUserByIdDTO): Promise<GetUserByIdResponse | null> {
-    try{
-      const {id} = data;
+  async getUserById(data: GetUserByIdDTO): Promise<GetUserByIdResponse | null> {
+    try {
+      const { id } = data;
       return this.findById(id);
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
-      throw new Error("error occured while getting the getUserById in the userRepsoitory ");
+      throw new Error(
+        "error occured while getting the getUserById in the userRepsoitory "
+      );
     }
   }
 
   //methods used in the admin side
-  async getUserList(
-     data:GetUserListDTO
-  ): Promise<GetUserListResponse[]> {
+  async getUserList(data: GetUserListDTO): Promise<GetUserListResponse[]> {
     try {
-      const {page,limit,searchQuery} = data;
+      const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.findAll(page, limit, regex);
       console.log("users list is ", result);
@@ -145,7 +152,7 @@ class UserRepository extends BaseRepository<UserInterface & Document> implements
       const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const result = await this.serviceRepository.findAll(page, limit, regex);
-      return result ;
+      return result;
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
@@ -165,23 +172,92 @@ class UserRepository extends BaseRepository<UserInterface & Document> implements
   }
 
   //function for getting all the userRegistered services
-  async getAllUserRegisteredServices(data: GetAllUserRegisteredServicesDTO): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+  async getAllUserRegisteredServices(
+    data: GetAllUserRegisteredServicesDTO
+  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
-      const {page,limit,searchQuery} = data;
-      const regex = new RegExp(searchQuery, "i");
+      const { page, limit, userId } = data;
+      const objectId = new mongoose.Types.ObjectId(userId);
 
-      const result = await this.concernRepository.findAll(page, limit, regex);
-      console.log(
-        "all the user registred complaints is hree sdlfsdflsdfd",
-        result
-      );
-      return result ;
+      // Use aggregation to get user's registered services with lookups
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            userId: objectId,
+            isDeleted: false,
+          },
+        },
+        {
+          $lookup: {
+            from: "users", // The users collection
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $lookup: {
+            from: "services", // The services collection
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { "userDetails.password": 0 } }, // Exclude password
+      ]);
+
+      console.log("User registered services:", result);
+      return result as GetAllUserRegisteredServicesResponse[];
     } catch (error) {
       console.log(
-        "error occured while fetching the data from the database in the userRepositry",
+        "Error occurred while fetching user registered services:",
         error as Error
       );
-      throw new Error();
+      throw new Error(
+        "Error occurred while fetching user registered services."
+      );
+    }
+  }
+
+  //function to get the specified registered usercomplaint details 
+  async getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[]>{
+    try{
+      console.log("id in the getUserRegisteredServiceDetailsById",id);
+      const objectId = new mongoose.Types.ObjectId(id);
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            _id: objectId,
+            isDeleted: false,
+          },
+        },
+        {
+          $lookup: {
+            from: "users", 
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $lookup: {
+            from: "services", 
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+        { $project: { "userDetails.password": 0 } }, 
+      ]);
+      console.log("User registered services:", result);
+      return result as getUserRegisteredServiceDetailsByIdResponse[];
+
+    }catch(error){
+      console.log("Error occured while fetching userDetails in the userRepository ",error as Error);
+      throw new Error("Errorrrrr");
+
     }
   }
 
@@ -223,7 +299,9 @@ class UserRepository extends BaseRepository<UserInterface & Document> implements
     }
   }
 
-  async setDefaultAddress(data: SetUserDefaultAddressDTO): Promise<SetUserDefaultAddressResponse| null>  {
+  async setDefaultAddress(
+    data: SetUserDefaultAddressDTO
+  ): Promise<SetUserDefaultAddressResponse | null> {
     try {
       const { userId, addressId } = data;
       console.log(
@@ -240,18 +318,36 @@ class UserRepository extends BaseRepository<UserInterface & Document> implements
     }
   }
 
-  async registerService(data: RegisterServiceDTO):Promise<RegisterServiceResponse | null> {
+  async registerService(
+    data: RegisterServiceDTO
+  ): Promise<RegisterServiceResponse | null> {
     try {
       console.log(
         "enterd in the userRepository for registering the user complaint"
       );
       const newConcern = await this.concernRepository.addConcern(data);
-      return newConcern ;
+      return newConcern;
     } catch (error) {
       console.log(error as Error);
-      throw error
+      throw error;
     }
   }
+
+  //funciton to find mech details 
+  async getMechanicDetails(
+      data: getMechanicDetailsDTO
+    ): Promise<getMechanicDetailsResponse | null> {
+      try {
+        const { id } = data;
+        const result = await this.mechanicRepository.findById(id);
+        return result ;
+      } catch (error) {
+        console.log(error as Error);
+        throw new Error(
+          "Error occured while getting mechanic Details in mechRepository"
+        );
+      }
+    }
 }
 
 export default UserRepository;

@@ -1,3 +1,4 @@
+import { getMechanicDetailsDTO, getMechanicDetailsResponse } from "../DTOs/Mech/IRepository.dto";
 import {
     AddUserAddressDTO,
     AddUserAddressResponse,
@@ -25,7 +26,8 @@ import {
     GetAllUserRegisteredServicesResponse,
     EditAddressResponse,
     SetUserDefaultAddressResponse,
-    RegisterServiceResponse
+    RegisterServiceResponse,
+    getUserRegisteredServiceDetailsByIdResponse
   } from "../DTOs/User/IRepository.dto";
 
 
@@ -40,9 +42,11 @@ export interface IUserRepository {
     getAllServices(data: GetAllServicesDTO): Promise<GetAllServiceResponse[] | null>;
     getServiceCount(data: GetServiceCountDTO): Promise<number>;
     getAllUserRegisteredServices(data: GetAllUserRegisteredServicesDTO): Promise<GetAllUserRegisteredServicesResponse[] | null>;
+    getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[]>
     editUser(data: EditUserDTO): Promise<EditUserResponse | null>;
     addAddress(data: AddUserAddressDTO): Promise<AddUserAddressResponse | null>;
     editAddress(data: EditAddressDTO): Promise<EditAddressResponse | null>;
     setDefaultAddress(data: SetUserDefaultAddressDTO): Promise<SetUserDefaultAddressResponse| null> ;
     registerService(data: RegisterServiceDTO):Promise<RegisterServiceResponse | null> ;
+    getMechanicDetails(data: getMechanicDetailsDTO): Promise<getMechanicDetailsResponse | null>
 }

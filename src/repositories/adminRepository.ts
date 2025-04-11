@@ -37,6 +37,8 @@ import {
   GetAllServiceResponse,
   GetAllServicesDTO,
   GetDeviceCountDTO,
+  GetMechanicByIdDTO,
+  GetMechanicByIdResponse,
   GetMechCountDTO,
   GetMechListDTO,
   GetMechListResponse,
@@ -52,11 +54,13 @@ import {
   isDeviceExistResponse,
   IsServiceExistDTO,
   IsServiceExistResponse,
+  UpdateApproveDTO,
+  UpdateApproveResponse,
 } from "../interfaces/DTOs/Admin/IRepository.dto";
 import { IAdminRepository } from "../interfaces/IRepository/IAdminRepository";
+import concernModel from "../models/concernModel";
 
-class AdminRepository
-  extends BaseRepository<AdminInterface & Document>
+class AdminRepository extends BaseRepository<AdminInterface & Document>
   implements IAdminRepository
 {
   private userRepository: UserRepository;
@@ -83,6 +87,22 @@ class AdminRepository
     }
   }
 
+  async updateApprove(data: UpdateApproveDTO): Promise<UpdateApproveResponse | null>  {
+      try{
+        const {id , modifiedVerificationStatus} = data;
+        const qr = {"isVerified":modifiedVerificationStatus}
+        const result = await this.mechRepository.update(id,qr)
+        if(result ){
+          return {result : true}
+        }else{
+          return {result : false}
+        }
+      }catch(error){
+        console.log(error as Error);
+        throw error;
+      }
+  }
+  
   async isAdminExist(
     data: IsAdminExistDTO
   ): Promise<IsAdminExistResponse | null> {
@@ -97,7 +117,7 @@ class AdminRepository
         console.log("admin is not exists");
         return null;
       }
-    } catch (error) {
+    } catch (error){
       console.log("error occured in the isAmdinExist in the admin repository");
       throw error;
     }
@@ -120,11 +140,13 @@ class AdminRepository
 
   async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
-      const { page, limit, searchQuery } = data;
+      const { page, limit, searchQuery,search } = data;
+      console.log("search in the adminRepostory in getMechlIst",search)
       const result = await this.mechRepository.getMechList({
         page,
         limit,
         searchQuery,
+        search
       });
       return result as MechInterface[];
     } catch (error) {
@@ -133,13 +155,16 @@ class AdminRepository
     }
   }
 
+
+
   async getAllServices(
     data: GetAllServicesDTO
   ): Promise<GetAllServiceResponse[] | null> {
     try {
-      const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
+      const { page, limit, searchQuery ,search} = data;
+      const regex = new RegExp(search, "i");
       const result = await this.serviceRepository.findAll(page, limit, regex);
+      console.log("result in the getAllService in the adminRepositroy",result);
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -151,8 +176,8 @@ class AdminRepository
     data: GetAllDevicesDTO
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
-      const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
+      const { page, limit, searchQuery,search } = data;
+      const regex = new RegExp(search, "i");
       const result = await this.deviceRepository.findAll(page, limit, regex);
       return result;
     } catch (error) {
@@ -180,6 +205,19 @@ class AdminRepository
       return result;
     } catch (error) {
       console.log(error as Error);
+      throw new Error();
+    }
+  }
+
+  async getMechanicById(
+    data: GetMechanicByIdDTO
+  ): Promise<GetMechanicByIdResponse | null>{
+    try {
+      const { id } = data;
+      const result = await this.mechRepository.findById(id);
+      return result;
+    } catch (error) {
+      console.log(error);
       throw new Error();
     }
   }
@@ -350,7 +388,8 @@ class AdminRepository
   ): Promise<IsServiceExistResponse | null> {
     try {
       const { name } = data;
-      const serviceExist = await this.serviceRepository.findOne({ name: name });
+      console.log("name in the admin Repository ",name)
+      const serviceExist = await this.serviceRepository.findOne({ name });
       if (serviceExist) {
         return serviceExist;
       }

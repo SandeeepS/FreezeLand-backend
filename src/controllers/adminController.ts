@@ -7,7 +7,14 @@ import {
   AddNewDeviceValidation,
 } from "../utils/validator";
 import { IAdminController } from "../interfaces/IController/IAdminController";
-import { GetPreSignedUrlResponse } from "../interfaces/DTOs/Admin/IController.dto";
+import {
+  GetImageUrlResponse,
+  GetPreSignedUrlResponse,
+  UpdateApproveResponse,
+} from "../interfaces/DTOs/Admin/IController.dto";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import S3Client from "../awsConfig";
 // import { storage } from "../firebase";
 // import { ref, uploadString, getDownloadURL } from "firebase/storage";
 const { OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
@@ -84,6 +91,8 @@ class adminController implements IAdminController {
 
   async getMechList(req: Request, res: Response, next: NextFunction) {
     try {
+      const search = req.query.search as string;
+      console.log("Search from the frontend ",search);
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -93,6 +102,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log("mechsData from the admin controller is ", data);
       res.status(OK).json(data);
@@ -325,6 +335,8 @@ class adminController implements IAdminController {
       console.log(
         "reached the getAllServices funciton in the admin controller"
       );
+      
+      const search  = req.query.search as string  ;
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -334,6 +346,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log(
         "listed services from the database is in the admin controller is",
@@ -351,6 +364,7 @@ class adminController implements IAdminController {
       console.log(
         "reached the getAllDevces  funciton in the admin controller to  access the all the devices "
       );
+      const search = req.query.search as string;
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -360,6 +374,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
+        search
       });
       console.log(
         "listed services from the database is in the admin controller is",
@@ -382,6 +397,18 @@ class adminController implements IAdminController {
       res.status(OK).json(result);
     } catch (error) {
       console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async getMechanicById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      console.log("id in the adminController is ", id);
+      const result = await this.adminService.getMechanicById({ id });
+      res.status(OK).json(result);
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   }
@@ -468,13 +495,13 @@ class adminController implements IAdminController {
     try {
       const { _id, values } = req.body;
       console.log("the id from the fronedn is ", _id);
-
+      console.log("vales from the frontend in the admin Controller",values)
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
         console.log("validation has no problem in the editExistingService");
         const isExist = await this.adminService.isServiceExist(values.name);
 
-        if (!isExist) {
+        if (isExist == null) {
           const editedSevice = await this.adminService.editExistingService({
             _id,
             values,
@@ -494,7 +521,7 @@ class adminController implements IAdminController {
           console.log(
             "the service which you are trying to edit is already exist in the data base "
           );
-          res.status(BAD_REQUEST).json({
+          res.status(OK).json({
             success: false,
             message: "Editing service already exist in the database ",
           });
@@ -510,6 +537,61 @@ class adminController implements IAdminController {
       }
     } catch (error) {
       console.log(error as Error);
+      next(error);
+    }
+  }
+
+  async getImageUrl(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetImageUrlResponse | void>{
+    try {
+      const { imageKey } = req.query;
+      console.log("imageKey from the frontend is ", imageKey);
+      if (typeof imageKey !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid image key",
+        }) as GetImageUrlResponse;
+      }
+
+      const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: imageKey,
+      });
+      const url = await getSignedUrl(S3Client, command, { expiresIn: 3600 });
+      res.status(200).json({ success: true, url });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateApprove(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.query.id as string;
+      const verificationStatus = req.query.verificationStatus as string;
+      console.log(typeof verificationStatus);
+      console.log(
+        "id and verification status  from the front end in the adminController is ",
+        id,
+        verificationStatus
+      );
+      if (id && verificationStatus) {
+        const result = await this.adminService.updateApprove({
+          id,
+          verificationStatus,
+        });
+        res.status(200).json({ success: true, result });
+      } else {
+        res
+          .status(304)
+          .json({
+            success: false,
+            result: "Not modifeid , id or verificationStatus is undefined",
+          });
+      }
+    } catch (error) {
       next(error);
     }
   }

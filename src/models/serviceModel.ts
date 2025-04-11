@@ -4,7 +4,8 @@ export interface IServices extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge: number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -20,9 +21,14 @@ const serviceSchema: Schema<IServices> = new Schema({
     required: false,
   },
   discription: {
-    type: String,
+    type: [String],
     required: true,
   },
+  serviceCharge: {
+    type: Number,
+    required: false,
+  },
+
   isBlocked: {
     type: Boolean,
     default: false,

@@ -146,7 +146,7 @@ export const AddNewServiceValidation = (name: string, discription: string) => {
 export const AddNewDeviceValidation = (name : string) => {
   if(name == null || name == undefined){
     console.log("name is null or undefined ");
-    return false ;
+    return false;
   }
   return true;
 }

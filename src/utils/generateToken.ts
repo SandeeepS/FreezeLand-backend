@@ -11,7 +11,14 @@ interface VerifyResult {
   message: string;
 }
 
-export class CreateJWT {
+export interface ICreateJWT {
+  generateToken(payload: string, role: string): string;
+  generateRefreshToken(payload: string): string;
+  verifyToken(token: string): VerifyResult;
+  verifyRefreshToken(token: string, res: Response): VerifyResult;
+}
+
+export class CreateJWT implements ICreateJWT {
   generateToken(payload: string, role: string): string {
     if (!payload) {
       throw new Error("Payload is required for token generation");

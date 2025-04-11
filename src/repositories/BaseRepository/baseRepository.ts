@@ -56,8 +56,6 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-
-
   async findOne(filter: Partial<T>): Promise<T | null> {
     try {
       console.log("filter is from BaseRepositoy is ", filter);
@@ -136,6 +134,7 @@ export class BaseRepository<T extends Searchable>
     page: number,
     limit: number,
     regex: RegExp | null
+    
   ): Promise<T[] | null> {
     try {
       return await this.model
@@ -156,14 +155,11 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  
-  async findAll2(
-  ): Promise<T[] | null> {
+  async findAll2(): Promise<T[] | null> {
     try {
-      return await this.model
-        .find({
-          isDeleted: false,
-        })
+      return await this.model.find({
+        isDeleted: false,
+      });
     } catch (error) {
       console.log(
         "Error while getting the user details from the baseRepository",

@@ -5,14 +5,17 @@ import userService from "../services/userService";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
 import userAuth from "../middlewares/userAuthMidd";
+import { GenerateOTP } from "../utils/generateOtp";
+import { Email } from "../utils/email";
 
 const userRouter:Router = express.Router();
-
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
-const userRepository = new UserRepository()
+const userRepository = new UserRepository();
+const generateOTP  = new GenerateOTP();
+const email = new Email(generateOTP);
 const userServices = new userService(userRepository,createjwt,encrypt);
-const controller = new userController(userServices);
+const controller = new userController(userServices,encrypt,createjwt,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
 userRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next))
@@ -28,8 +31,10 @@ userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,
 userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
 userRouter.put('/editAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 userRouter.post('/registerService',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.registerService(req,res,next));
-userRouter.get('/getAllServices',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllServices(req,res,next));//getting all service which is provided by the website
-userRouter.get('/getAllRegisteredService',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllRegisteredService(req,res,next)); //getting all compliantes registrerd by user 
-userRouter.get('/getImageUrl',userAuth(["user"]), async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
+userRouter.get('/getAllServices',async(req:Request,res:Response,next:NextFunction) =>await controller.getAllServices(req,res,next));//getting all service which is provided by the website
+userRouter.get('/getAllUserRegisteredServices',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
+userRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
+userRouter.get('/getUserRegisteredServiceDetailsById',async(req:Request,res:Response,next:NextFunction) => await controller.getUserRegisteredServiceDetailsById(req,res,next));
+userRouter.get('/getMechanicDetails',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getMechanicDetails(req,res,next));
 
 export default userRouter;

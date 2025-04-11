@@ -30,6 +30,15 @@ export interface GetUserList {
   searchQuery: string | undefined;
 }
 
+export interface UpdateApproveDTO{
+  id:string ;
+  verificationStatus: string;
+}
+
+export interface UpdateApproveResponse{
+   result : boolean;
+}
+
 export interface GetUserListResponse {
   status: STATUS_CODES;
   data: {
@@ -43,6 +52,7 @@ export interface GetMechList {
   page: number;
   limit: number;
   searchQuery: string | undefined;
+  search:string;
 }
 
 export interface GetMechListResponse {
@@ -58,6 +68,8 @@ export interface GetServicesDTO {
   page: number;
   limit: number;
   searchQuery: string | undefined;
+  search:string;
+
 }
 
 export interface GetServiceResponse {
@@ -73,6 +85,7 @@ export interface GetDeviceDTO {
   page: number;
   limit: number;
   searchQuery: string | undefined;
+  search:string;
 }
 
 export interface GetDeviceResponse {
@@ -88,14 +101,35 @@ export interface GetServiceDTO {
   id: string;
 }
 
+
 export interface GetServiceResponse2 {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
+}
+
+export interface GetMechanicByIdDTO {
+  id:string;
+}
+
+export interface GetMechanicByIdResponse{
+    _id: Types.ObjectId;
+    name: string;
+    email: string;
+    phone: number;
+    role: string;
+    mechanicType: string[];
+    photo: string;
+    adharProof: string;
+    employeeLicense: string;
+    isVerified: boolean;
+    isBlocked: boolean;
+    isDeleted: boolean;
 }
 
 export interface BlockUserDTO {
@@ -147,7 +181,8 @@ export interface BlockServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -214,7 +249,8 @@ export interface DeleteServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -231,14 +267,12 @@ export interface DeleteDeviceResponse{
 }
 
 
-export interface IsServiceExistDTO {
-  name: string;
-}
 export interface IsServiceExistResponse{
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -251,7 +285,8 @@ export interface AddNewServiceResponse {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -286,7 +321,8 @@ export interface EditExistServiceResponse{
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
-  discription: string;
+  discription: string[];
+  serviceCharge:number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;

@@ -2,8 +2,10 @@
 import {
     EmailExistResponse,
     EmailExitCheckDTO,
+    getAllAcceptedServiceResponse,
     GetAllMechanicResponse,
     GetAllMechanicsDTO,
+    getComplaintDetailsResponse,
     MechLoginDTO,
     MechLoginResponse,
     SaveMechDTO,
@@ -12,6 +14,7 @@ import {
     SignUpMechResponse,
     UpdateNewPasswordDTO,
     UpdateNewPasswordResponse,
+    VerifyMechanicDTO,
   } from "../DTOs/Mech/IService.dto";
 
 
@@ -23,5 +26,10 @@ export interface IMechServices{
     getAllMechanics(
         data: GetAllMechanicsDTO
     ): Promise<GetAllMechanicResponse | null>;
+     VerifyMechanic (values:VerifyMechanicDTO):Promise<unknown>
     updateNewPassword(data: UpdateNewPasswordDTO):Promise<UpdateNewPasswordResponse | null>;
+    getAllUserRegisteredServices(page: number, limit: number, searchQuery: string,userId:string): Promise<unknown>;
+    getComplaintDetails(id:string) :Promise<getComplaintDetailsResponse[] >
+    getAllAcceptedServices (mechanicId : string) : Promise<getAllAcceptedServiceResponse[]>
+
 }

@@ -70,15 +70,15 @@ export interface UserLoginDTO {
   password: string;
 }
 
-export interface ReturnUserdataDTO{
-  _id: string ;
+export interface ReturnUserdataDTO {
+  _id: string;
   name: string;
-  email: string ;
-  phone: number ;
-  role: string ;
-  isDeleted: boolean ;
-  isBlocked: boolean ;
-  profile_picture: string ;
+  email: string;
+  phone: number;
+  role: string;
+  isDeleted: boolean;
+  isBlocked: boolean;
+  profile_picture: string;
 }
 
 export interface NewDetailsDTO {
@@ -93,7 +93,7 @@ export interface EmailExistCheckDTO {
   name: string;
   email: string;
   phone: number;
-  password?:string;
+  password?: string;
   profile_picture: string;
   role: string;
   address: {
@@ -132,7 +132,7 @@ export interface EmailExistCheckResponse {
 }
 
 export interface GetProfileDTO {
-  id: string  
+  id: string;
 }
 
 export interface GetProfileResponse {
@@ -150,11 +150,10 @@ export interface GetServicesDTO {
   searchQuery: string | undefined;
 }
 
-export interface UpdateNewPasswordDTO{
-  password:string;
-  userId:string;
+export interface UpdateNewPasswordDTO {
+  password: string;
+  userId: string;
 }
-
 
 export interface UpdateNewPasswordResponse {
   id?: string;
@@ -186,14 +185,13 @@ export interface GetServiceResponse {
   message: string;
 }
 
-
 export interface EditUserDTO {
-  _id:string;
-  name:string;
-  phone:number;
+  _id: string;
+  name: string;
+  phone: number;
 }
 
-export interface EditUserResponse{
+export interface EditUserResponse {
   id?: string;
   name: string;
   password: string;
@@ -209,54 +207,53 @@ export interface EditUserResponse{
     district: string;
     landMark: string;
   }[];
-  defaultAddress:string;
+  defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
 
 export interface AddUserAddressDTO {
-  _id:string;
+  _id: string;
   values: AddAddress;
 }
 
-
-export interface AddUserAddressResponse{
-  _id:Types.ObjectId ;
+export interface AddUserAddressResponse {
+  _id: Types.ObjectId;
   values: AddAddress;
 }
 
-export interface EditAddressDTO{
-  _id:string;
-  addressId:string;
-  values:AddAddress;
+export interface EditAddressDTO {
+  _id: string;
+  addressId: string;
+  values: AddAddress;
 }
-export interface EditAddressResponse{
-    _id: Types.ObjectId;
+export interface EditAddressResponse {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  address: {
     name: string;
-    email: string;
     phone: number;
-    profile_picture: string;
-    address: {
-      name: string;
-      phone: number;
-      email: string;
-      state: string;
-      pin: number;
-      district: string;
-      landMark: string;
-    }[];
-    defaultAddress: string;
-    role: string;
-    isBlocked: boolean;
-    isDeleted: boolean;
+    email: string;
+    state: string;
+    pin: number;
+    district: string;
+    landMark: string;
+  }[];
+  defaultAddress: string;
+  role: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
 export interface SetUserDefaultAddressDTO {
-  userId:string;
-  addressId:string;
+  userId: string;
+  addressId: string;
 }
 
-export interface SetUserDefaultAddressResponse{
+export interface SetUserDefaultAddressResponse {
   _id: Types.ObjectId;
   name: string;
   email: string;
@@ -278,35 +275,23 @@ export interface SetUserDefaultAddressResponse{
 }
 
 export interface GetUserByEmail {
-  email:string;
+  email: string;
 }
 
-
-export interface GenerateTokenDTO{
-  payload:string | undefined;
+export interface GenerateTokenDTO {
+  payload: string | undefined;
 }
 
 export interface GenerateRefreshToken {
-  payload:string | undefined;
+  payload: string | undefined;
 }
 
 export interface RegisterServiceDTO {
-    _id: Types.ObjectId ;
-    name: string;
-    image: [];
-    service: Types.ObjectId;
-    defaultAddress: Types.ObjectId;
-    discription: string;
-    locationName: object;
-    isBlocked: boolean;
-    isDeleted: boolean;
-}
-
-export interface RegisterServiceResponse{
-  _id: Types.ObjectId ;
+  _id: Types.ObjectId;
   name: string;
   image: [];
-  service: Types.ObjectId;
+  serviceId: Types.ObjectId;
+  userId: Types.ObjectId;
   defaultAddress: Types.ObjectId;
   discription: string;
   locationName: object;
@@ -314,4 +299,30 @@ export interface RegisterServiceResponse{
   isDeleted: boolean;
 }
 
+export interface RegisterServiceResponse {
+  _id: Types.ObjectId;
+  name: string;
+  image: [];
+  serviceId: Types.ObjectId;
+  userId: Types.ObjectId;
+  defaultAddress: Types.ObjectId;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
 
+export interface getUserRegisteredServiceDetailsByIdResponse{
+  _id: string;
+  name: string;
+  image: [];
+  serviceId: string;
+  userId: string;
+  defaultAddress: string;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  userDetails: object;
+  serviceDetails: object;
+}
