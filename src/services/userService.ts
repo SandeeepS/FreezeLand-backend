@@ -73,16 +73,18 @@ class userService implements IUserServices {
       console.log("Entered in user Service and the userData is ", userData);
       const { name, email, password, phone } = userData;
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
-      if (!secret_key) {
+      if (!secret_key){
         throw new Error(
           "Encrption secret key is not defined in the environment"
         );
       }
+      
       const cryptr = new Cryptr(secret_key, {
         encoding: "base64",
         pbkdf2Iterations: 10000,
         saltLength: 10,
       });
+
       const newPassword = cryptr.encrypt(password);
       const newDetails: NewDetailsDTO = {
         name: name,
@@ -90,6 +92,7 @@ class userService implements IUserServices {
         email: email,
         phone: phone,
       };
+
       console.log("new Encypted password with data is ", newDetails);
       const user = await this.userRepository.saveUser({
         name,
@@ -135,7 +138,7 @@ class userService implements IUserServices {
       console.log("User found:", !!user);
 
       // If user doesn't exist
-      if (!user?.id){
+      if (!user?.id) {
         return {
           status: UNAUTHORIZED,
           data: {
