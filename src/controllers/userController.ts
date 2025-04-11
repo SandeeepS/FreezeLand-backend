@@ -215,6 +215,9 @@ class userController implements IUserController {
     try {
       const { email, password }: { email: string; password: string } = req.body;
 
+      // Add debug logging
+      console.log("Login attempt for email:", email);
+
       // Validate input
       const isValid = LoginValidation(email, password);
       if (!isValid) {
@@ -231,24 +234,35 @@ class userController implements IUserController {
         password,
       });
 
-      // Handle unsuccessful login without token
-      if (
-        !loginStatus?.data ||
-        typeof loginStatus.data !== "object" ||
-        !("token" in loginStatus.data)
-      ) {
+      // Debug log full response structure
+      console.log(
+        "Login status in controller:",
+        JSON.stringify(loginStatus, null, 2)
+      );
+
+      // Handle unsuccessful login without correct structure
+      if (!loginStatus?.data || typeof loginStatus.data !== "object") {
         res.status(UNAUTHORIZED).json({
           success: false,
-          message: "Authentication error",
+          message: "Authentication error: Invalid response structure",
         });
         return;
       }
 
-      // Handle unsuccessful login with token (blocked user case)
+      // Check for successful login by checking success flag
       if (!loginStatus.data.success) {
         res.status(UNAUTHORIZED).json({
           success: false,
-          message: loginStatus.data.message,
+          message: loginStatus.data.message || "Authentication failed",
+        });
+        return;
+      }
+
+      // Check for token in the data object
+      if (!loginStatus.data.token) {
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Authentication error: Token missing",
         });
         return;
       }
@@ -717,7 +731,6 @@ class userController implements IUserController {
       next(error);
     }
   }
-
 
   async logout(req: Request, res: Response, next: NextFunction) {
     try {

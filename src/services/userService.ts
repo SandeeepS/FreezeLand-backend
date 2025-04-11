@@ -38,7 +38,10 @@ import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import { ICreateJWT } from "../utils/generateToken";
 import { compareInterface } from "../utils/comparePassword";
-import { getMechanicDetailsDTO, getMechanicDetailsResponse } from "../interfaces/DTOs/Mech/IService.dto";
+import {
+  getMechanicDetailsDTO,
+  getMechanicDetailsResponse,
+} from "../interfaces/DTOs/Mech/IService.dto";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
@@ -122,12 +125,17 @@ class userService implements IUserServices {
 
   async userLogin(userData: UserLoginDTO): Promise<UserLoginResponse> {
     try {
-      const { email } = userData;
+      const { email, password } = userData;
+      console.log("Login attempt with email:", email);
+      console.log("Password provided (length):", password?.length || 0);
+
       const user: EmailExistCheckDTO | null =
         await this.userRepository.emailExistCheck({ email });
 
+      console.log("User found:", !!user);
+
       // If user doesn't exist
-      if (!user?.id) {
+      if (!user?.id){
         return {
           status: UNAUTHORIZED,
           data: {
@@ -161,7 +169,10 @@ class userService implements IUserServices {
       }
 
       // Verify password
-      if (!user?.password || !userData.password) {
+      console.log("User password exists:", !!user?.password);
+      console.log("Password provided:", !!password);
+
+      if (!user?.password || !password) {
         return {
           status: UNAUTHORIZED,
           data: {
@@ -171,10 +182,17 @@ class userService implements IUserServices {
         } as const;
       }
 
+      console.log("Password comparison inputs:", {
+        inputPwdLength: password?.length,
+        storedPwdLength: user.password?.length,
+      });
+
       const passwordMatch = await this.encrypt.compare(
-        userData.password,
+        password,
         user.password as string
       );
+
+      console.log("Password match result:", passwordMatch);
 
       if (!passwordMatch) {
         return {
@@ -190,6 +208,9 @@ class userService implements IUserServices {
       const token = this.createjwt.generateToken(user.id, user.role);
       const refreshToken = this.createjwt.generateRefreshToken(user.id);
 
+      console.log("Token generated:", !!token);
+      console.log("Refresh token generated:", !!refreshToken);
+
       return {
         status: OK,
         data: {
@@ -202,10 +223,11 @@ class userService implements IUserServices {
         },
       } as const;
     } catch (error) {
-      console.log(error as Error);
+      console.log("Login error in service:", error);
       throw error;
     }
   }
+
   async getUserByEmail(
     data: GetUserByEmail
   ): Promise<EmailExistCheckResponse | null> {
@@ -303,17 +325,16 @@ class userService implements IUserServices {
     page: number,
     limit: number,
     searchQuery: string,
-    userId:string
+    userId: string
   ): Promise<unknown> {
     try {
-
       const data = await this.userRepository.getAllUserRegisteredServices({
         page,
         limit,
         searchQuery,
-         userId
+        userId,
       });
-      console.log("data in the userSErvice ",data)
+      console.log("data in the userSErvice ", data);
 
       return data;
     } catch (error) {
@@ -325,34 +346,38 @@ class userService implements IUserServices {
     }
   }
 
-  //funtion to get mechanci details 
-   async getMechanicDetails(
-      data: getMechanicDetailsDTO
-    ): Promise<getMechanicDetailsResponse | null> {
-      try {
-        const { id } = data;
-        console.log("Id in the mechService is ", id);
-        const result = await this.userRepository.getMechanicDetails({ id });
-        return result;
-      } catch (error) {
-        console.log(error as Error);
-        throw error;
-      }
-    }
-  
-
-  //function to getting the specified usercomplinat using id
-  async getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[] >{
-    try{
-      console.log("Enterdin the userService");
-      const result = await this.userRepository.getUserRegisteredServiceDetailsById(id);
+  //funtion to get mechanci details
+  async getMechanicDetails(
+    data: getMechanicDetailsDTO
+  ): Promise<getMechanicDetailsResponse | null> {
+    try {
+      const { id } = data;
+      console.log("Id in the mechService is ", id);
+      const result = await this.userRepository.getMechanicDetails({ id });
       return result;
-    }catch(error){
-      console.log("Error occured while getting the specified userComplaint ",error as Error);
+    } catch (error) {
+      console.log(error as Error);
       throw error;
     }
   }
 
+  //function to getting the specified usercomplinat using id
+  async getUserRegisteredServiceDetailsById(
+    id: string
+  ): Promise<getUserRegisteredServiceDetailsByIdResponse[]> {
+    try {
+      console.log("Enterdin the userService");
+      const result =
+        await this.userRepository.getUserRegisteredServiceDetailsById(id);
+      return result;
+    } catch (error) {
+      console.log(
+        "Error occured while getting the specified userComplaint ",
+        error as Error
+      );
+      throw error;
+    }
+  }
 
   async updateNewPassword(
     data: UpdateNewPasswordDTO

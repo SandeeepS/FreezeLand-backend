@@ -11,6 +11,39 @@ export interface UserSignUpDTO{
       
 }
 
+export interface ReturnUserdataDTO {
+    _id: string;
+    name: string;
+    email: string;
+    phone: number;
+    role: string;
+    isDeleted: boolean;
+    isBlocked: boolean;
+    profile_picture: string;
+  }
+
+  export interface EmailExistCheckDTO {
+    id: string;
+    name: string;
+    email: string;
+    phone: number;
+    password?: string;
+    profile_picture: string;
+    role: string;
+    address: {
+      name: string;
+      phone: number;
+      email: string;
+      state: string;
+      pin: number;
+      district: string;
+      landMark: string;
+    }[];
+    defaultAddress: string;
+    isBlocked: boolean;
+    isDeleted: boolean;
+  }
+
 
 
 export interface SaveUserDTO {
