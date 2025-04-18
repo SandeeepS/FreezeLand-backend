@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import { CreateJWT } from "../utils/generateToken";
 import UserRepository from "../repositories/userRepository";
-import { UserInterface } from "../models/userModel";
+import { UserInterface } from "../interfaces/Model/IUser";
 const jwt = new CreateJWT();
 const userRepository = new UserRepository();
 dotenv.config();

@@ -7,11 +7,7 @@ import { compareInterface } from "../utils/comparePassword";
 
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
   STATUS_CODES;
-import {
-  AddressValidation,
-  LoginValidation,
-  SignUpValidation,
-} from "../utils/validator";
+import { AddressValidation, LoginValidation } from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
 import {
   EditUserDTO,
@@ -39,58 +35,78 @@ class userController implements IUserController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-  async userSignup(
+  async userSignup(req: Request, res: Response,next:NextFunction): Promise<void> {
+    try {
+      const userData = req.body;
+      console.log("userDetails from the frontend is.", userData);
+
+      const result = await this.userServices.userRegister(userData);
+      res.status(201).json({ success: true, result }); // 201 Created for successful registration
+    } catch (error) {
+      console.log(error as Error);
+
+      const err = error as Error;
+      if (err.message === "Invalid user data") {
+        res.status(400).json({ success: false, message: "Invalid user data" });
+      } else if (err.message === "Email already exists") {
+        res
+          .status(409)
+          .json({ success: false, message: "Email already exists" });
+      } else if (err.message === "Failed to generate OTP") {
+        res
+          .status(500)
+          .json({ success: false, message: "Failed to generate OTP" });
+      } else {
+        // For unexpected errors
+        res
+          .status(500)
+          .json({ success: false, message: "An unexpected error occurred" });
+      }
+    }
+  }
+
+  async verifyOtp(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      req.app.locals.userData = req.body;
-      console.log("userData is ilsgfhsdlgs", req.app.locals.userData);
-      const { email, name, phone, password, cpassword } = req.body;
-      console.log(
-        "userDetials from the signup Form is",
-        email,
-        name,
-        phone,
-        password,
-        cpassword
-      );
-      console.log(typeof phone);
-      const check = SignUpValidation(name, phone, email, password, cpassword);
-      if (check) {
-        console.log("user details are validated from the backend and it is ok");
-        const newUser = await this.userServices.isUserExist(
-          req.app.locals.userData
-        );
-        if (!newUser) {
-          req.app.locals.newUser = true;
-          req.app.locals.userData = req.body;
-          req.app.locals.userEmail = req.body.email;
-          const otp = await this.email.generateAndSendOTP(req.body.email);
-          req.app.locals.userOtp = otp;
-          console.log("otp print ", req.app.locals.userOtp);
+      const { id, otp } = req.body;
+      console.log(" id and otp in the userController is ", id, otp);
 
-          const expirationMinutes = 1;
-          setTimeout(() => {
-            delete req.app.locals.userOtp;
-          }, expirationMinutes * 60 * 1000);
+      const result = await this.userServices.verifyOTP(id, otp);
 
-          res.status(OK).json({
-            userId: null,
+      if (result.success) {
+        // Define cookie lifetimes
+        const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
+
+        // Set cookies and send response
+        res
+          .status(OK)
+          .cookie("access_token", result.token, {
+            maxAge: accessTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Set to true in production
+            sameSite: "strict",
+          })
+          .cookie("refresh_token", result.refresh_token, {
+            maxAge: refreshTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Set to true in production
+            sameSite: "strict",
+          })
+          .json({
             success: true,
-            message: "OTP sent for verification...",
+            message: result.message,
+            userId: result.userId,
+            data: result.data,
           });
-        } else {
-          res
-            .status(BAD_REQUEST)
-            .json({ success: false, message: "The email is already in use!" });
-        }
       } else {
-        console.log("user details validation from the backend is failed");
-        res.status(UNAUTHORIZED).json({
+        // Handle failed verification
+        res.status(BAD_REQUEST).json({
           success: false,
-          message: "Please enter  valid user  details !!",
+          message: result.message || "Verification failed",
         });
       }
     } catch (error) {
@@ -99,51 +115,17 @@ class userController implements IUserController {
     }
   }
 
-  async veryfyOtp(
+  //getting the tempuserDAta from the backend for veriy the otp
+  async getTempUserData(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const { otp } = req.body;
-      const isNuewUser = req.app.locals.newUser;
-      const savedUser = req.app.locals.userData;
-
-      const accessTokenMaxAge = 15 * 60 * 1000;
-      const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-
-      if (otp === Number(req.app.locals.userOtp)) {
-        console.log(typeof otp);
-        console.log(typeof req.app.locals.userOtp);
-        if (isNuewUser) {
-          const newUser = await this.userServices.saveUser(savedUser);
-          req.app.locals = {};
-          // const time = this.milliseconds(23, 30, 0);
-          res
-            .status(OK)
-            .cookie("access_token", newUser?.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", newUser?.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json(newUser);
-        } else {
-          res
-            .status(OK)
-            .cookie("access_token", isNuewUser.data.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", isNuewUser.data.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json({ success: true, message: "old user verified" });
-        }
-      } else {
-        res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "Incorrect otp !" });
-      }
+      const { id } = req.query;
+      console.log("id of the tempUserData is ", id);
+      const result = await this.userServices.getTempUserData(id as string);
+      res.status(200).json({ success: true, result });
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -288,11 +270,14 @@ class userController implements IUserController {
         .json(loginStatus);
     } catch (error) {
       console.error("Login error:", error);
-      res.status(INTERNAL_SERVER_ERROR).json({
-        success: false,
+      // res.status(INTERNAL_SERVER_ERROR).json({
+      //   success: false,
+      //   message: "An error occurred during login",
+      // });
+      next({
+        statusCode: 500,
         message: "An error occurred during login",
       });
-      next(error); // Pass error to error handling middleware
     }
   }
 

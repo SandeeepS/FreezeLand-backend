@@ -14,14 +14,15 @@ const createjwt = new CreateJWT();
 const userRepository = new UserRepository();
 const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
-const userServices = new userService(userRepository,createjwt,encrypt);
+const userServices = new userService(userRepository,createjwt,encrypt,email);
 const controller = new userController(userServices,encrypt,createjwt,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
 userRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next))
 userRouter.post('/google-login', async (req: Request, res: Response, next: NextFunction) => await controller.googleLogin(req, res, next));
 userRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => await controller.logout(req, res,next));
-userRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.veryfyOtp(req,res,next));
+userRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.verifyOtp(req,res,next));
+userRouter.get('/getTempUserData',async(req:Request,res:Response,next:NextFunction) => await controller.getTempUserData(req,res,next));
 userRouter.post('/forgot-password', async (req: Request, res: Response,next:NextFunction) => await controller.forgotResentOtp(req, res,next));
 userRouter.post('/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await controller.VerifyForgotOtp(req, res,next));
 userRouter.put('/update-newpassword',userAuth(["user"]),async(req: Request, res: Response,next:NextFunction) => await controller.updateNewPassword(req, res,next));

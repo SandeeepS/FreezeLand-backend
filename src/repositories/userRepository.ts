@@ -1,10 +1,11 @@
-import userModel, { UserInterface } from "../models/userModel";
+import userModel, { TempUser } from "../models/userModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
 import { Iconcern } from "../models/concernModel";
 import concernModel from "../models/concernModel";
 import { IServices } from "../models/serviceModel";
 import serviceModel from "../models/serviceModel";
+
 import {
   AddUserAddressDTO,
   AddUserAddressResponse,
@@ -36,8 +37,13 @@ import {
   getUserRegisteredServiceDetailsByIdResponse,
 } from "../interfaces/DTOs/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
-import { getMechanicDetailsDTO, getMechanicDetailsResponse } from "../interfaces/DTOs/Mech/IRepository.dto";
+import {
+  getMechanicDetailsDTO,
+  getMechanicDetailsResponse,
+} from "../interfaces/DTOs/Mech/IRepository.dto";
 import MechModel, { MechInterface } from "../models/mechModel";
+import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
+import { SingUpDTO } from "../interfaces/DTOs/User/IService.dto";
 
 class UserRepository
   extends BaseRepository<UserInterface & Document>
@@ -45,7 +51,7 @@ class UserRepository
 {
   private concernRepository: BaseRepository<Iconcern>;
   private serviceRepository: BaseRepository<IServices>;
-  private mechanicRepository: BaseRepository<MechInterface>
+  private mechanicRepository: BaseRepository<MechInterface>;
 
   constructor() {
     super(userModel);
@@ -57,6 +63,52 @@ class UserRepository
   async saveUser(newDetails: SaveUserDTO): Promise<SaveUserResponse | null> {
     return this.save(newDetails);
   }
+
+  //creating temperory userDta
+  async createTempUserData(tempUserDetails: {
+    otp: string;
+    userData: SingUpDTO;
+  }): Promise<ITempUser | null> {
+    try {
+      console.log("entered in the userRepository in userRepository");
+
+      // Create the TempUser object with properly structured data
+      const createdTempUser = new TempUser({
+        otp: tempUserDetails.otp,
+        userData: tempUserDetails.userData,
+      });
+
+      const savedUser = await createdTempUser.save();
+      return savedUser;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  //function to get tempUserDAta from the data base
+  async getTempUserData(id: string): Promise<ITempUser | null> {
+    try {
+      const result = await TempUser.findById(id);
+      console.log("accessed the tempUserData in the userRepository", result);
+
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  //function to verify otp
+  // async verifyOTP(otp:string) :Promise<boolean> {
+  //   try{
+  //     console.log("otp in the userRepository is ",otp);
+
+  //   }catch(error){
+  //     console.log(error as Error);
+  //     throw error;
+  //   }
+  // }
 
   async findEmail(data: FindEmailDTO): Promise<FindEmailResponse | null> {
     try {
@@ -221,10 +273,12 @@ class UserRepository
     }
   }
 
-  //function to get the specified registered usercomplaint details 
-  async getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[]>{
-    try{
-      console.log("id in the getUserRegisteredServiceDetailsById",id);
+  //function to get the specified registered usercomplaint details
+  async getUserRegisteredServiceDetailsById(
+    id: string
+  ): Promise<getUserRegisteredServiceDetailsByIdResponse[]> {
+    try {
+      console.log("id in the getUserRegisteredServiceDetailsById", id);
       const objectId = new mongoose.Types.ObjectId(id);
       const result = await concernModel.aggregate([
         {
@@ -235,7 +289,7 @@ class UserRepository
         },
         {
           $lookup: {
-            from: "users", 
+            from: "users",
             localField: "userId",
             foreignField: "_id",
             as: "userDetails",
@@ -243,21 +297,22 @@ class UserRepository
         },
         {
           $lookup: {
-            from: "services", 
+            from: "services",
             localField: "serviceId",
             foreignField: "_id",
             as: "serviceDetails",
           },
         },
-        { $project: { "userDetails.password": 0 } }, 
+        { $project: { "userDetails.password": 0 } },
       ]);
       console.log("User registered services:", result);
       return result as getUserRegisteredServiceDetailsByIdResponse[];
-
-    }catch(error){
-      console.log("Error occured while fetching userDetails in the userRepository ",error as Error);
+    } catch (error) {
+      console.log(
+        "Error occured while fetching userDetails in the userRepository ",
+        error as Error
+      );
       throw new Error("Errorrrrr");
-
     }
   }
 
@@ -333,21 +388,21 @@ class UserRepository
     }
   }
 
-  //funciton to find mech details 
+  //funciton to find mech details
   async getMechanicDetails(
-      data: getMechanicDetailsDTO
-    ): Promise<getMechanicDetailsResponse | null> {
-      try {
-        const { id } = data;
-        const result = await this.mechanicRepository.findById(id);
-        return result ;
-      } catch (error) {
-        console.log(error as Error);
-        throw new Error(
-          "Error occured while getting mechanic Details in mechRepository"
-        );
-      }
+    data: getMechanicDetailsDTO
+  ): Promise<getMechanicDetailsResponse | null> {
+    try {
+      const { id } = data;
+      const result = await this.mechanicRepository.findById(id);
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error(
+        "Error occured while getting mechanic Details in mechRepository"
+      );
     }
+  }
 }
 
 export default UserRepository;

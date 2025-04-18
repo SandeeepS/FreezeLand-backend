@@ -24,11 +24,15 @@ import {
     UpdateNewPasswordResponse,
     EditAddressResponse,
     SetUserDefaultAddressResponse,
-    getUserRegisteredServiceDetailsByIdResponse
+    getUserRegisteredServiceDetailsByIdResponse,
+    SingUpDTO,
+    verifyOTPResponse,
   } from "../DTOs/User/IService.dto";
+import { ITempUser } from "../Model/IUser";
 
 
 export interface IUserServices {
+    userRegister(userData: SingUpDTO):Promise<Partial<ITempUser> | null>   ;
     isUserExist(userData: UserSignUpDTO): Promise<EmailExistCheckResponse | null>;
     saveUser(userData: SaveUserDTO): Promise<SaveUserResponse>;
     userLogin(userData: UserLoginDTO): Promise<UserLoginResponse>;
@@ -47,5 +51,6 @@ export interface IUserServices {
     setUserDefaultAddress(data: SetUserDefaultAddressDTO): Promise<SetUserDefaultAddressResponse | null>  ;
     registerService(data: RegisterServiceDTO):Promise<RegisterServiceResponse | null>;
     getMechanicDetails(data: getMechanicDetailsDTO): Promise<getMechanicDetailsResponse | null> 
-}
+    getTempUserData(id:string ) : Promise<ITempUser | null> 
+ verifyOTP(id: string,otp: string): Promise<verifyOTPResponse>}
 

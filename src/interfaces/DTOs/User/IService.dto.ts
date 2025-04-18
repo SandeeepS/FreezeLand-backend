@@ -1,9 +1,18 @@
-import { UserInterface } from "../../../models/userModel";
+
 import Iuser from "../../entityInterface/Iuser";
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
 import Service from "../../entityInterface/Iservices";
 import { Types } from "mongoose";
+import { ITempUser } from "../../Model/IUser";
+
+export interface SingUpDTO{
+  name:string;
+  phone:number;
+  email:string;
+  password:string;
+  cpassword:string;
+}
 
 export interface UserSignUpDTO {
   name: string;
@@ -23,16 +32,10 @@ export interface UserSignUpDTO {
   defaultAddress: string;
 }
 
-export interface UserSignUpResponse {
-  status: number;
-  data: {
-    success: boolean;
-    message: string;
-    data?: UserInterface;
-    userId?: string;
-    token?: string;
-    refresh_token?: string;
-  };
+export interface UserSignUpResponse extends Document {
+  userData:Partial<ITempUser>;
+  otp:string;
+  createdAt:Date;
 }
 
 export interface UserLoginResponse {
@@ -142,6 +145,15 @@ export interface GetProfileResponse {
     message: string;
     data?: Iuser;
   };
+}
+
+export interface verifyOTPResponse{
+  success: boolean;
+  message: string;
+  userId?: string;
+  token?: string;
+  data?: object;
+  refresh_token?: string;
 }
 
 export interface GetServicesDTO {

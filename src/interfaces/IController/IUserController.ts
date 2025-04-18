@@ -8,7 +8,7 @@ export interface IUserController{
     userSignup(req: Request, res: Response, next: NextFunction): Promise<void>;
     userLogin(req: Request, res: Response, next: NextFunction): Promise<void>;
     googleLogin(req: Request, res: Response, next: NextFunction): Promise<void>;
-    veryfyOtp(req: Request, res: Response, next: NextFunction): Promise<void>;
+    verifyOtp(req: Request, res: Response, next: NextFunction): Promise<void>;
     forgotResentOtp(req: Request, res: Response, next: NextFunction): Promise<ForgotResentOtpResponse | void>;
     VerifyForgotOtp(req: Request, res: Response, next: NextFunction): Promise<unknown>;
     updateNewPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
@@ -31,4 +31,5 @@ export interface IUserController{
     // Utility Methods
     getImageUrl(req: Request, res: Response, next: NextFunction): Promise<GetImageUrlResponse | void>;
     logout(req: Request, res: Response, next: NextFunction): Promise<void>;
+
 }
