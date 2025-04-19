@@ -35,7 +35,11 @@ class userController implements IUserController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-  async userSignup(req: Request, res: Response,next:NextFunction): Promise<void> {
+  async userSignup(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const userData = req.body;
       console.log("userDetails from the frontend is.", userData);
@@ -64,7 +68,6 @@ class userController implements IUserController {
       }
     }
   }
-
   async verifyOtp(
     req: Request,
     res: Response,
@@ -74,26 +77,31 @@ class userController implements IUserController {
       const { id, otp } = req.body;
       console.log(" id and otp in the userController is ", id, otp);
 
+      if (!id || !otp) {
+        res.status(400).json({
+          success: false,
+          message: "ID and OTP are required",
+        });
+      }
+
       const result = await this.userServices.verifyOTP(id, otp);
 
       if (result.success) {
-        // Define cookie lifetimes
         const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
         const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
 
-        // Set cookies and send response
         res
-          .status(OK)
+          .status(200) // 200 OK for successful verification
           .cookie("access_token", result.token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Set to true in production
+            secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
           })
           .cookie("refresh_token", result.refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Set to true in production
+            secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
           })
           .json({
@@ -103,18 +111,57 @@ class userController implements IUserController {
             data: result.data,
           });
       } else {
-        // Handle failed verification
-        res.status(BAD_REQUEST).json({
-          success: false,
-          message: result.message || "Verification failed",
-        });
+        // Handle different failure scenarios with appropriate status codes
+        switch (result.message) {
+          case "Temporary user data not found":
+            res.status(404).json({
+              success: false,
+              message: result.message,
+            });
+            break;
+          case "Invalid OTP":
+            res.status(401).json({
+              success: false,
+              message: result.message,
+            });
+            break;
+          case "User data not found":
+            res.status(404).json({
+              success: false,
+              message: result.message,
+            });
+            break;
+          case "User creation failed or role not defined":
+            res.status(500).json({
+              success: false,
+              message: result.message,
+            });
+            break;
+          default:
+            res.status(400).json({
+              success: false,
+              message: result.message || "Verification failed",
+            });
+        }
       }
     } catch (error) {
       console.log(error as Error);
-      next(error);
+      if (
+        (error as Error).message ===
+        "Encryption secret key is not defined in the environment"
+      ) {
+        res.status(500).json({
+          success: false,
+          message: "Server configuration error",
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "An unexpected error occurred during verification",
+        });
+      }
     }
   }
-
   //getting the tempuserDAta from the backend for veriy the otp
   async getTempUserData(
     req: Request,
