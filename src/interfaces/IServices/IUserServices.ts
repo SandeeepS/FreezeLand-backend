@@ -27,6 +27,8 @@ import {
     getUserRegisteredServiceDetailsByIdResponse,
     SingUpDTO,
     verifyOTPResponse,
+    GetServiceDTO,
+    GetServiceResponse2,
   } from "../DTOs/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
@@ -52,5 +54,7 @@ export interface IUserServices {
     registerService(data: RegisterServiceDTO):Promise<RegisterServiceResponse | null>;
     getMechanicDetails(data: getMechanicDetailsDTO): Promise<getMechanicDetailsResponse | null> 
     getTempUserData(id:string ) : Promise<ITempUser | null> 
- verifyOTP(id: string,otp: string): Promise<verifyOTPResponse>}
+    verifyOTP(id: string,otp: string): Promise<verifyOTPResponse>
+    getService(data: GetServiceDTO): Promise<GetServiceResponse2 | null>
+}
 

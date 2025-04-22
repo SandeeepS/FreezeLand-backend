@@ -3,8 +3,8 @@ import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
 import { Iconcern } from "../models/concernModel";
 import concernModel from "../models/concernModel";
-import { IServices } from "../models/serviceModel";
 import serviceModel from "../models/serviceModel";
+import { IServices } from "../interfaces/Model/IService";
 
 import {
   AddUserAddressDTO,

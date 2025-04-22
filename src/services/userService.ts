@@ -34,6 +34,8 @@ import {
   getUserRegisteredServiceDetailsByIdResponse,
   SingUpDTO,
   verifyOTPResponse,
+  GetServiceDTO,
+  GetServiceResponse2,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -47,17 +49,20 @@ import {
 import { SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
+import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 class userService implements IUserServices {
   constructor(
     private userRepository: IUserRepository,
+    private serviceRepository: IServiceRepository,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
     private email: Iemail
   ) {
     this.userRepository = userRepository;
+    this.serviceRepository = serviceRepository;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
     this.email = email;
@@ -99,7 +104,7 @@ class userService implements IUserServices {
       return savedTempUser;
     } catch (error) {
       console.log(error);
-      throw error; 
+      throw error;
     }
   }
 
@@ -159,14 +164,14 @@ class userService implements IUserServices {
             console.log("token is ", token);
             console.log("refresh", refresh_token);
             const newData = {
-              name:user.name,
-              email:user.email,
-              _id:user._id
-            }
+              name: user.name,
+              email: user.email,
+              _id: user._id,
+            };
             return {
               success: true,
               message: "Success",
-              userId: userId, 
+              userId: userId,
               token: token,
               data: newData,
               refresh_token,
@@ -497,6 +502,23 @@ class userService implements IUserServices {
         error as Error
       );
       throw error;
+    }
+  }
+
+  //getting the service Deatils from the service repositroy
+  async getService(data: GetServiceDTO): Promise<GetServiceResponse2 | null> {
+    try {
+      const { id } = data;
+      console.log("reached the getService in the userService");
+      const result = await this.serviceRepository.getService({ id });
+      if (result) {
+        return result;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error();
     }
   }
 

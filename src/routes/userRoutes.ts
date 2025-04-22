@@ -7,14 +7,16 @@ import { CreateJWT } from "../utils/generateToken";
 import userAuth from "../middlewares/userAuthMidd";
 import { GenerateOTP } from "../utils/generateOtp";
 import { Email } from "../utils/email";
+import ServiceRepository from "../repositories/serviceRepository";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const userRepository = new UserRepository();
+const serviceRepository = new ServiceRepository();
 const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
-const userServices = new userService(userRepository,createjwt,encrypt,email);
+const userServices = new userService(userRepository,serviceRepository,createjwt,encrypt,email);
 const controller = new userController(userServices,encrypt,createjwt,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
@@ -37,5 +39,7 @@ userRouter.get('/getAllUserRegisteredServices',userAuth(["user"]),  async(req:Re
 userRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 userRouter.get('/getUserRegisteredServiceDetailsById',async(req:Request,res:Response,next:NextFunction) => await controller.getUserRegisteredServiceDetailsById(req,res,next));
 userRouter.get('/getMechanicDetails',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getMechanicDetails(req,res,next));
+userRouter.get('/getService/:id',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => controller.getService(req,res,next));
+
 
 export default userRouter;

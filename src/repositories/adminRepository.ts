@@ -2,11 +2,12 @@ import { AdminInterface } from "../models/adminModel";
 import AdminModel from "../models/adminModel";
 import { Document } from "mongoose";
 import { BaseRepository } from "./BaseRepository/baseRepository";
-import serviceModel, { IServices } from "../models/serviceModel";
+import serviceModel from "../models/serviceModel";
 import { MechInterface } from "../models/mechModel";
 import UserRepository from "./userRepository";
 import MechRepository from "./mechRepository";
 import deviceModel, { IDevice } from "../models/deviceModel";
+import { IServices } from "../interfaces/Model/IService";
 import {
   AddNewDeviceDTO,
   AddNewDeviceResponse,

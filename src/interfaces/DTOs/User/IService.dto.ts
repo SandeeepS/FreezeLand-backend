@@ -68,6 +68,22 @@ export interface SaveUserResponse {
   refresh_token?: string | undefined;
 }
 
+export interface GetServiceDTO {
+  id: string;
+}
+
+
+export interface GetServiceResponse2 {
+  id?: Types.ObjectId;
+  name: string;
+  imageKey: string;
+  discription: string[];
+  serviceCharge:number;
+  createdAt: Date;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
 export interface UserLoginDTO {
   email: string;
   password: string;

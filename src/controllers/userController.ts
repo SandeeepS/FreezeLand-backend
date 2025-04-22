@@ -764,6 +764,21 @@ class userController implements IUserController {
     }
   }
 
+  //function to get the service details for user complaint reginstration 
+  async getService(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllServices funciton in the user controller"
+      );
+      const id = req.params.id;
+      const result = await this.userServices.getService({ id });
+      res.status(OK).json(result);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("Entered in the function for logout");
