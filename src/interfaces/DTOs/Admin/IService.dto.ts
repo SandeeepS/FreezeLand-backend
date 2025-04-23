@@ -341,3 +341,15 @@ export interface GetPreSignedUrlResponse {
   key?:string;
 
 }
+
+export interface GetMechByIdResponse {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  password: string;
+  phone: number;
+  role: string;
+  isVerified: boolean;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}

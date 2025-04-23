@@ -136,6 +136,8 @@ class UserRepository
     return this.findOne({ email: email }) as unknown as EmailExistCheckResponse;
   }
 
+
+
   async updateNewPassword(
     data: UpdateNewPasswordDTO
   ): Promise<UpdateNewPasswordResponse | null> {
@@ -403,6 +405,8 @@ class UserRepository
       );
     }
   }
+
+  
 }
 
 export default UserRepository;
