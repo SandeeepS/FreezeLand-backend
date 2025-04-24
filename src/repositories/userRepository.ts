@@ -330,7 +330,7 @@ class UserRepository
 
   async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
     try {
-      const qr = { name: data.name, phone: data.phone };
+      const qr = { name: data.name, phone: data.phone , profile_picture:data.imageKey };
       const editedUser = await this.update(data._id, qr);
       return editedUser;
     } catch (error) {

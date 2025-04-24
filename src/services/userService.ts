@@ -584,8 +584,8 @@ class userService implements IUserServices {
 
   async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
     try {
-      const { _id, name, phone } = data;
-      return this.userRepository.editUser({ _id, name, phone });
+      const { _id, name, phone,imageKey } = data;
+      return this.userRepository.editUser({ _id, name, phone ,imageKey});
     } catch (error) {
       console.log(error as Error);
       throw error;

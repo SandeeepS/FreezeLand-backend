@@ -459,7 +459,7 @@ class adminService implements IAdminService {
   //changing this generating presinged url code ot differtnt comon place
   async getPresignedUrl(data: GetPreSignedUrlDTO) {
     try {
-      const { fileName, fileType } = data;
+      const { fileName, fileType ,folderName} = data;
 
       if (!fileName || !fileType) {
         return {
@@ -467,7 +467,6 @@ class adminService implements IAdminService {
           message: "File name and type are required",
         } as GetPreSignedUrlResponse;
       }
-      const folderName = "ServiceImages";
       const result = await generatePresignedUrl(fileName, fileType, folderName);
       return result as GetPreSignedUrlResponse;
     } catch (error) {

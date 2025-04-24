@@ -331,6 +331,7 @@ export interface EditExistServiceResponse{
 export interface GetPreSignedUrlDTO{
   fileName:string;
   fileType:string;
+  folderName:string;
 }
 
 export interface GetPreSignedUrlResponse {

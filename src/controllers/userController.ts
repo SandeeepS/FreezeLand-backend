@@ -455,13 +455,14 @@ class userController implements IUserController {
   async editUser(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
-      const { _id, name, phone }: EditUserDTO = req.body;
+      const { _id, name, phone , imageKey}: EditUserDTO = req.body;
       const check = EditUserDetailsValidator(name, phone);
       if (check) {
         const editedUser = await this.userServices.editUser({
           _id,
           name,
           phone,
+          imageKey
         });
         console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
         if (editedUser) {
