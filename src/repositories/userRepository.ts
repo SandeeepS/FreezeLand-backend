@@ -42,7 +42,7 @@ import {
   getMechanicDetailsResponse,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import MechModel, { MechInterface } from "../models/mechModel";
-import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
+import { Address, ITempUser, UserInterface } from "../interfaces/Model/IUser";
 import { SingUpDTO } from "../interfaces/DTOs/User/IService.dto";
 
 class UserRepository
@@ -136,8 +136,6 @@ class UserRepository
     return this.findOne({ email: email }) as unknown as EmailExistCheckResponse;
   }
 
-
-
   async updateNewPassword(
     data: UpdateNewPasswordDTO
   ): Promise<UpdateNewPasswordResponse | null> {
@@ -157,15 +155,27 @@ class UserRepository
       throw error;
     }
   }
-
+  // In UserRepository.ts
   async getUserById(data: GetUserByIdDTO): Promise<GetUserByIdResponse | null> {
     try {
       const { id } = data;
-      return this.findById(id);
+      const user = await this.findById(id);
+      if (!user) {
+        return null;
+      }
+      console.log("userDeatisl mmmmm ", user);
+      const defaultAddressDetails = user.address?.find(
+        (addr) => addr._id.toString() === user.defaultAddress?.toString()
+      );
+
+      return {
+        ...user.toObject(),
+        defaultAddressDetails,
+      };
     } catch (error) {
       console.log(error as Error);
       throw new Error(
-        "error occured while getting the getUserById in the userRepsoitory "
+        "Error occurred while getting the user by ID in the userRepository"
       );
     }
   }
@@ -405,8 +415,6 @@ class UserRepository
       );
     }
   }
-
-  
 }
 
 export default UserRepository;

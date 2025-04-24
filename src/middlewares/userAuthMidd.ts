@@ -48,7 +48,7 @@ const userAuth = (allowedRoles: string[]) => {
             message: "User is blocked by admin!",
           });
         }
-        req.user = user as UserInterface;
+        req.user = user || undefined;
 
         // Check user role
         if (user != null && !allowedRoles.includes(user.role)) {

@@ -2,7 +2,7 @@ import { AddAddress } from "../../commonInterfaces/AddAddress";
 import { Types } from "mongoose";
 import Iuser from "../../entityInterface/Iuser";
 import { IServices } from "../../../models/serviceModel";
-import { UserInterface } from "../../Model/IUser";
+import { Address, UserInterface } from "../../Model/IUser";
 
 export interface SaveUserDTO {
   name: string;
@@ -145,6 +145,7 @@ export interface GetUserByIdResponse {
   profile_picture: string;
   role: string;
   address: {
+    _id:string;
     name: string;
     phone: number;
     email: string;
@@ -230,7 +231,7 @@ export interface GetAllServiceResponse {
 
 export interface AddUserAddressDTO {
   _id: string;
-  values: AddAddress;
+  values: Address;
 }
 
 export interface AddUserAddressResponse {

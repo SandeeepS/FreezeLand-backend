@@ -4,7 +4,7 @@ import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
 import Service from "../../entityInterface/Iservices";
 import { Types } from "mongoose";
-import { ITempUser } from "../../Model/IUser";
+import { Address, ITempUser } from "../../Model/IUser";
 
 export interface SingUpDTO{
   name:string;
@@ -242,7 +242,7 @@ export interface EditUserResponse {
 
 export interface AddUserAddressDTO {
   _id: string;
-  values: AddAddress;
+  values: Address;
 }
 
 export interface AddUserAddressResponse {
