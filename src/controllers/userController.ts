@@ -600,6 +600,7 @@ class userController implements IUserController {
     }
   }
 
+  //function to register the service 
   async registerService(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
