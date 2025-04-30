@@ -7,7 +7,11 @@ import { compareInterface } from "../utils/comparePassword";
 
 const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
   STATUS_CODES;
-import { AddressValidation, LoginValidation } from "../utils/validator";
+import {
+  AddressValidation,
+  LoginValidation,
+  SignUpValidation,
+} from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
 import {
   EditUserDTO,
@@ -41,138 +45,105 @@ class userController implements IUserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userData = req.body;
-      console.log("userDetails from the frontend is.", userData);
+      req.app.locals.userData = req.body;
+      console.log("userData is ilsgfhsdlgs", req.app.locals.userData);
+      const { email, name, phone, password, cpassword } = req.body;
+      console.log(
+        "userDetials from the signup Form is",
+        email,
+        name,
+        phone,
+        password,
+        cpassword
+      );
+      console.log(typeof phone);
+      const check = SignUpValidation(name, phone, email, password, cpassword);
+      if (check) {
+        console.log("user details are validated from the backend and it is ok");
+        const newUser = await this.userServices.isUserExist(
+          req.app.locals.userData
+        );
+        if (!newUser) {
+          req.app.locals.newUser = true;
+          req.app.locals.userData = req.body;
+          req.app.locals.userEmail = req.body.email;
+          const otp = await this.email.generateAndSendOTP(req.body.email);
+          req.app.locals.userOtp = otp;
+          console.log("otp print ", req.app.locals.userOtp);
 
-      const result = await this.userServices.userRegister(userData);
-      res.status(201).json({ success: true, result }); // 201 Created for successful registration
-    } catch (error) {
-      console.log(error as Error);
+          const expirationMinutes = 1;
+          setTimeout(() => {
+            delete req.app.locals.userOtp;
+          }, expirationMinutes * 60 * 1000);
 
-      const err = error as Error;
-      if (err.message === "Invalid user data") {
-        res.status(400).json({ success: false, message: "Invalid user data" });
-      } else if (err.message === "Email already exists") {
-        res
-          .status(409)
-          .json({ success: false, message: "Email already exists" });
-      } else if (err.message === "Failed to generate OTP") {
-        res
-          .status(500)
-          .json({ success: false, message: "Failed to generate OTP" });
-      } else {
-        // For unexpected errors
-        res
-          .status(500)
-          .json({ success: false, message: "An unexpected error occurred" });
-      }
-    }
-  }
-  async verifyOtp(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const { id, otp } = req.body;
-      console.log(" id and otp in the userController is ", id, otp);
-
-      if (!id || !otp) {
-        res.status(400).json({
-          success: false,
-          message: "ID and OTP are required",
-        });
-      }
-
-      const result = await this.userServices.verifyOTP(id, otp);
-
-      if (result.success) {
-        const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
-
-        res
-          .status(200) // 200 OK for successful verification
-          .cookie("access_token", result.token, {
-            maxAge: accessTokenMaxAge,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-          })
-          .cookie("refresh_token", result.refresh_token, {
-            maxAge: refreshTokenMaxAge,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-          })
-          .json({
+          res.status(OK).json({
+            userId: null,
             success: true,
-            message: result.message,
-            userId: result.userId,
-            data: result.data,
+            message: "OTP sent for verification...",
           });
-      } else {
-        // Handle different failure scenarios with appropriate status codes
-        switch (result.message) {
-          case "Temporary user data not found":
-            res.status(404).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "Invalid OTP":
-            res.status(401).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "User data not found":
-            res.status(404).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "User creation failed or role not defined":
-            res.status(500).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          default:
-            res.status(400).json({
-              success: false,
-              message: result.message || "Verification failed",
-            });
+        } else {
+          res
+            .status(BAD_REQUEST)
+            .json({ success: false, message: "The email is already in use!" });
         }
+      } else {
+        console.log("user details validation from the backend is failed");
+        res.status(UNAUTHORIZED).json({
+          success: false,
+          message: "Please enter  valid user  details !!",
+        });
       }
     } catch (error) {
       console.log(error as Error);
-      if (
-        (error as Error).message ===
-        "Encryption secret key is not defined in the environment"
-      ) {
-        res.status(500).json({
-          success: false,
-          message: "Server configuration error",
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          message: "An unexpected error occurred during verification",
-        });
-      }
+      next(error);
     }
   }
-  //getting the tempuserDAta from the backend for veriy the otp
-  async getTempUserData(
+
+  async veryfyOtp(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const { id } = req.query;
-      console.log("id of the tempUserData is ", id);
-      const result = await this.userServices.getTempUserData(id as string);
-      res.status(200).json({ success: true, result });
+      const { otp } = req.body;
+      const isNuewUser = req.app.locals.newUser;
+      const savedUser = req.app.locals.userData;
+
+      const accessTokenMaxAge = 15 * 60 * 1000;
+      const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+
+      if (otp === Number(req.app.locals.userOtp)) {
+        console.log(typeof otp);
+        console.log(typeof req.app.locals.userOtp);
+        if (isNuewUser) {
+          const newUser = await this.userServices.saveUser(savedUser);
+          req.app.locals = {};
+          // const time = this.milliseconds(23, 30, 0);
+          res
+            .status(OK)
+            .cookie("access_token", newUser?.token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("refresh_token", newUser?.refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json(newUser);
+        } else {
+          res
+            .status(OK)
+            .cookie("access_token", isNuewUser.data.token, {
+              maxAge: accessTokenMaxAge,
+            })
+            .cookie("refresh_token", isNuewUser.data.refresh_token, {
+              maxAge: refreshTokenMaxAge,
+            })
+            .json({ success: true, message: "old user verified" });
+        }
+      } else {
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Incorrect otp !" });
+      }
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -317,14 +288,11 @@ class userController implements IUserController {
         .json(loginStatus);
     } catch (error) {
       console.error("Login error:", error);
-      // res.status(INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: "An error occurred during login",
-      // });
-      next({
-        statusCode: 500,
+      res.status(INTERNAL_SERVER_ERROR).json({
+        success: false,
         message: "An error occurred during login",
       });
+      next(error); // Pass error to error handling middleware
     }
   }
 
@@ -455,14 +423,13 @@ class userController implements IUserController {
   async editUser(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
-      const { _id, name, phone , imageKey}: EditUserDTO = req.body;
+      const { _id, name, phone }: EditUserDTO = req.body;
       const check = EditUserDetailsValidator(name, phone);
       if (check) {
         const editedUser = await this.userServices.editUser({
           _id,
           name,
           phone,
-          imageKey
         });
         console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
         if (editedUser) {
@@ -600,7 +567,6 @@ class userController implements IUserController {
     }
   }
 
-  //function to register the service 
   async registerService(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
@@ -760,21 +726,6 @@ class userController implements IUserController {
         );
         res.status(STATUS_CODES.CONFLICT).json({ success: false });
       }
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  //function to get the service details for user complaint reginstration 
-  async getService(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log(
-        "reached the getAllServices funciton in the user controller"
-      );
-      const id = req.params.id;
-      const result = await this.userServices.getService({ id });
-      res.status(OK).json(result);
     } catch (error) {
       console.log(error as Error);
       next(error);

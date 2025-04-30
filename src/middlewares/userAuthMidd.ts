@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import { CreateJWT } from "../utils/generateToken";
 import UserRepository from "../repositories/userRepository";
-import { UserInterface } from "../interfaces/Model/IUser";
+import { UserInterface } from "../models/userModel";
 const jwt = new CreateJWT();
 const userRepository = new UserRepository();
 dotenv.config();
@@ -48,7 +48,7 @@ const userAuth = (allowedRoles: string[]) => {
             message: "User is blocked by admin!",
           });
         }
-        req.user = user || undefined;
+        req.user = user as UserInterface;
 
         // Check user role
         if (user != null && !allowedRoles.includes(user.role)) {

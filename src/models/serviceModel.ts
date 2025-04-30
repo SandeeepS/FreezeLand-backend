@@ -1,5 +1,15 @@
-import mongoose, { Schema, Model } from "mongoose";
-import { IServices } from "../interfaces/Model/IService";
+import mongoose, { Schema, Document, Model } from "mongoose";
+
+export interface IServices extends Document {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  imageKey: string;
+  discription: string[];
+  serviceCharge: number;
+  createdAt: Date;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
 
 const serviceSchema: Schema<IServices> = new Schema({
   name: {

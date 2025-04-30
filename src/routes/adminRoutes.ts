@@ -5,20 +5,12 @@ import AdminRepository from "../repositories/adminRepository";
 import Encrypt from "../utils/comparePassword";
 import { CreateJWT } from "../utils/generateToken";
 import adminAuth from "../middlewares/adminAuthMidd";
-import UserRepository from "../repositories/userRepository";
-import MechRepository from "../repositories/mechRepository";
-import ServiceRepository from "../repositories/serviceRepository";
-import DeviceRepository from "../repositories/deviceRepository";
 
 const adminRouter = express.Router();
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT()
 const adminReopsitory = new AdminRepository();
-const userRepository = new UserRepository();
-const mechRepository = new MechRepository();
-const serviceRepository = new ServiceRepository();
-const deviceRepository = new DeviceRepository();
-const adminService: AdminService = new AdminService(adminReopsitory,userRepository,mechRepository,serviceRepository,deviceRepository, encrypt, createjwt);
+const adminService: AdminService = new AdminService(adminReopsitory, encrypt, createjwt);
 const controller = new adminController(adminService);
 
 adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => controller.adminLogin(req, res,next));
@@ -43,5 +35,6 @@ adminRouter.put('/deleteDevice/:deviceId',adminAuth(["admin"]),async(req:Request
 adminRouter.put('/editExistService',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.editExistingService(req,res,next));
 adminRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 adminRouter.put('/updateApprove',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.updateApprove(req,res,next))
+
 
 export default adminRouter;
