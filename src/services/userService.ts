@@ -146,7 +146,7 @@ class userService implements IUserServices {
             saltLength: 10,
           });
 
-          const newPassword = cryptr.encrypt(password);
+          const newPassword = cryptr.encrypt(password as string);
           const newDetails: NewDetailsDTO = {
             name: name as string,
             password: newPassword as string,
