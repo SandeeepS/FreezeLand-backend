@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Model } from "mongoose";
+import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
 
 const AddressSchema = new Schema({
   name: { type: String, require: true },
@@ -10,27 +11,7 @@ const AddressSchema = new Schema({
   landMark: { type: String, require: true },
 });
 
-export interface UserInterface extends Document {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  password: string;
-  email: string;
-  phone: number;
-  profile_picture: string;
-  address: {
-    name: string;
-    phone: number;
-    email: string;
-    state: string;
-    pin: number;
-    district: string;
-    landMark: string;
-  }[];
-  defaultAddress: string;
-  role: string;
-  isBlocked: boolean;
-  isDeleted: boolean;
-}
+
 
 const userSchema: Schema<UserInterface> = new Schema({
   name: {
@@ -83,8 +64,29 @@ const userSchema: Schema<UserInterface> = new Schema({
   },
 });
 
+
+const TempUserShcema : Schema <ITempUser> = new Schema({
+  userData:{
+    type:Object,
+    required:true,
+  },
+  otp:{
+    type:String,
+    required:true,
+  },
+  createdAt:{
+    type:Date,
+    default:Date.now,
+    expires:900 
+  }
+},
+{
+  timestamps:true,
+})
+
 const userModel: Model<UserInterface> = mongoose.model<UserInterface>(
   "User",
   userSchema
 );
+export const TempUser = mongoose.model<ITempUser>("TempUserData",TempUserShcema)
 export default userModel;

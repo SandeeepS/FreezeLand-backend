@@ -196,14 +196,16 @@ class adminController implements IAdminController {
     next: NextFunction
   ): Promise<GetPreSignedUrlResponse | void> {
     try {
-      const { fileName, fileType } = req.query as {
+      const { fileName, fileType , folderName } = req.query as {
         fileName: string;
         fileType: string;
+        folderName:string;
       };
       console.log("file from the front end is ", fileName, fileType);
       const result = await this.adminService.getPresignedUrl({
         fileName,
         fileType,
+        folderName
       });
       console.log("presinged Url is from teh adminController is ", result);
       if (result.success === false) {

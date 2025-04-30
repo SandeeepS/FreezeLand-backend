@@ -331,6 +331,7 @@ export interface EditExistServiceResponse{
 export interface GetPreSignedUrlDTO{
   fileName:string;
   fileType:string;
+  folderName:string;
 }
 
 export interface GetPreSignedUrlResponse {
@@ -340,4 +341,16 @@ export interface GetPreSignedUrlResponse {
   imageName?:string;
   key?:string;
 
+}
+
+export interface GetMechByIdResponse {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  password: string;
+  phone: number;
+  role: string;
+  isVerified: boolean;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }

@@ -2,13 +2,38 @@ import { AddAddress } from "../../commonInterfaces/AddAddress";
 import { Types } from "mongoose";
 import Iuser from "../../entityInterface/Iuser";
 import { IServices } from "../../../models/serviceModel";
+import { Address, UserInterface } from "../../Model/IUser";
 
 export interface SaveUserDTO {
   name: string;
   password: string;
   email: string;
   phone?: number;
+}
 
+export interface createTempUserDataDTO {
+  name: string;
+  phone: string;
+  password: string;
+  cpassword: string;
+  email: string;
+  otp: string;
+}
+
+export interface UserSignUpResponse extends Document {
+  userData:Partial<UserInterface>;
+  otp:string;
+  createdAt:Date;
+  _id:Types.ObjectId;
+}
+
+export interface createTempUserDataDTOResponse {
+  name: string;
+  phone: string;
+  password: string;
+  cpassword: string;
+  email: string;
+  otp: string;
 }
 
 export interface SaveUserResponse {
@@ -120,6 +145,7 @@ export interface GetUserByIdResponse {
   profile_picture: string;
   role: string;
   address: {
+    _id:string;
     name: string;
     phone: number;
     email: string;
@@ -163,6 +189,7 @@ export interface EditUserDTO {
   _id: string;
   name: string;
   phone: number;
+  imageKey:string;
 }
 
 export interface EditUserResponse {
@@ -197,7 +224,7 @@ export interface GetAllServiceResponse {
   name: string;
   imageKey: string;
   discription: string[];
-  serviceCharge:number;
+  serviceCharge: number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -205,7 +232,7 @@ export interface GetAllServiceResponse {
 
 export interface AddUserAddressDTO {
   _id: string;
-  values: AddAddress;
+  values: Address;
 }
 
 export interface AddUserAddressResponse {
@@ -225,12 +252,12 @@ export interface EditAddressDTO {
   values: AddAddress;
 }
 
-export interface EditAddressResponse{
+export interface EditAddressResponse {
   _id: Types.ObjectId;
   name: string;
   email: string;
   phone: number;
-  role:string;
+  role: string;
   profile_picture: string;
   address: {
     name: string;
@@ -251,13 +278,13 @@ export interface SetUserDefaultAddressDTO {
   addressId: string;
 }
 
-export interface SetUserDefaultAddressResponse{
+export interface SetUserDefaultAddressResponse {
   _id: Types.ObjectId;
   name: string;
   email: string;
   phone: number;
   profile_picture: string;
-  role:string;
+  role: string;
   address: {
     name: string;
     phone: number;
@@ -272,11 +299,11 @@ export interface SetUserDefaultAddressResponse{
   isDeleted: boolean;
 }
 export interface RegisterServiceDTO {
-  _id: Types.ObjectId ;
+  _id: Types.ObjectId;
   name: string;
   image: [];
   serviceId: Types.ObjectId;
-  userId:Types.ObjectId;
+  userId: Types.ObjectId;
   defaultAddress: Types.ObjectId;
   discription: string;
   locationName: object;
@@ -284,12 +311,12 @@ export interface RegisterServiceDTO {
   isDeleted: boolean;
 }
 
-export interface RegisterServiceResponse{
-  _id: Types.ObjectId ;
+export interface RegisterServiceResponse {
+  _id: Types.ObjectId;
   name: string;
   image: [];
   serviceId: Types.ObjectId;
-  userId:Types.ObjectId;
+  userId: Types.ObjectId;
   defaultAddress: Types.ObjectId;
   discription: string;
   locationName: object;
@@ -305,35 +332,35 @@ export interface GetAllUserRegisteredServicesDTO {
   page: number;
   limit: number;
   searchQuery: string;
-  userId:string;
+  userId: string;
 }
 
 export interface GetAllUserRegisteredServicesResponse {
-  _id: Types.ObjectId ;
+  _id: Types.ObjectId;
   name: string;
   image: [];
   serviceId: Types.ObjectId;
-  userId:Types.ObjectId;
+  userId: Types.ObjectId;
   defaultAddress: Types.ObjectId;
   discription: string;
   locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
-  userDetails:Iuser;
-  serviceDetails:IServices;
+  userDetails: Iuser;
+  serviceDetails: IServices;
 }
 
 export interface getUserRegisteredServiceDetailsByIdResponse {
-  _id: string ;
+  _id: string;
   name: string;
   image: [];
   serviceId: string;
-  userId:string;
+  userId: string;
   defaultAddress: string;
   discription: string;
   locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
-  userDetails:Iuser;
-  serviceDetails:IServices;
+  userDetails: Iuser;
+  serviceDetails: IServices;
 }

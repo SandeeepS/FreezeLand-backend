@@ -7,7 +7,7 @@ interface Deletable {
   isDeleted: boolean;
 }
 
-interface Searchable extends Deletable {
+interface Searchable extends Deletable{
   name?: string;
   email?: string;
 }
