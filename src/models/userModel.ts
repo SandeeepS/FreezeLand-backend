@@ -64,7 +64,7 @@ const userSchema: Schema<UserInterface> = new Schema({
   },
 });
 
-
+//tempSchema
 const TempUserShcema : Schema <ITempUser> = new Schema({
   userData:{
     type:Object,
