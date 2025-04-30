@@ -12,7 +12,7 @@ const AddressSchema = new Schema({
 });
 
 
-
+//userSchema
 const userSchema: Schema<UserInterface> = new Schema({
   name: {
     type: String,
