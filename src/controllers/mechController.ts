@@ -118,21 +118,30 @@ class mechController implements IMechController {
           req.app.locals = {};
           res
             .status(OK)
-            .cookie("access_token", newMech?.data.token, {
+            .cookie("mech_access_token", newMech?.data.token, {
               maxAge: accessTokenMaxAge,
             })
-            .cookie("refresh_token", newMech?.data.refresh_token, {
+            .cookie("mech_refresh_token", newMech?.data.refresh_token, {
               maxAge: refreshTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "strict",
             })
             .json(newMech);
         } else {
           res
             .status(OK)
-            .cookie("access_token", isNuewMech.data.token, {
+            .cookie("mech_access_token", isNuewMech.data.token, {
               maxAge: accessTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "strict",
             })
-            .cookie("refresh_token", isNuewMech.data.refresh_token, {
+            .cookie("mech_refresh_token", isNuewMech.data.refresh_token, {
               maxAge: refreshTokenMaxAge,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "strict",
             })
             .json({ success: true, message: "old user verified" });
         }
