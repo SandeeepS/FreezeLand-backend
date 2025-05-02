@@ -41,9 +41,10 @@ import {
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
-import MechModel, { MechInterface } from "../models/mechModel";
+import MechModel from "../models/mechModel";
 import { Address, ITempUser, UserInterface } from "../interfaces/Model/IUser";
 import { SingUpDTO } from "../interfaces/DTOs/User/IService.dto";
+import { MechInterface } from "../interfaces/Model/IMech";
 
 class UserRepository
   extends BaseRepository<UserInterface & Document>

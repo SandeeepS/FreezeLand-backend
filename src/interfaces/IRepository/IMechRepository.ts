@@ -15,6 +15,7 @@ import {
     GetMechListDTO,
     GetMechListResponse,
     getUpdatedWorkAssingnedResponse,
+    MechRegistrationData,
     SaveMechDTO,
     SaveMechResponse,
     updateCompleteStatusResponse,
@@ -22,6 +23,7 @@ import {
     UpdateNewPasswordResponse,
     VerifyMechanicDTO,
   } from "../DTOs/Mech/IRepository.dto";
+import { ITempMech } from "../Model/IMech";
 
 export interface IMechRepository{
     saveMechanic(mechData: SaveMechDTO): Promise<SaveMechResponse | null>;
@@ -39,5 +41,7 @@ export interface IMechRepository{
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string): Promise<getUpdatedWorkAssingnedResponse> 
     getAllAcceptedServices (mechanicId:string):Promise <getAllAcceptedServiceResponse[]>
     updateComplaintStatus(complaintId:string,nextStatus:string):Promise<updateCompleteStatusResponse | null>
+    createTempMechData(tempMechDetails: {otp: string;mechData: MechRegistrationData;}): Promise<ITempMech>
+    getTempMechData(id:string):Promise<ITempMech | null>
 
 }

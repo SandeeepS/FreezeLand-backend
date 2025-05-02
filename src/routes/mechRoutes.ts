@@ -14,7 +14,7 @@ const mechRouter:Router = express.Router();
 const mechRepository = new MechRepository();
 const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
-const mechServices = new mechService(mechRepository,createjwt,encrypt);
+const mechServices = new mechService(mechRepository,createjwt,encrypt,email);
 const controller = new mechController(mechServices,encrypt,createjwt,email);
 
 mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next));

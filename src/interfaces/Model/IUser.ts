@@ -11,7 +11,6 @@ export interface Address {
   landMark: string;
 }
 
-
 export interface UserInterface extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
@@ -25,7 +24,6 @@ export interface UserInterface extends Document {
   isBlocked: boolean;
   isDeleted: boolean;
 }
-
 
 export interface ITempUser extends Document{
     userData : Partial<UserInterface>;
