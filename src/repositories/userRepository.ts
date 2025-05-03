@@ -160,6 +160,7 @@ class UserRepository
   async getUserById(data: GetUserByIdDTO): Promise<GetUserByIdResponse | null> {
     try {
       const { id } = data;
+      console.log("user id is in userRepository",id);
       const user = await this.findById(id);
       if (!user) {
         return null;

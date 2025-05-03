@@ -50,6 +50,7 @@ import { SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
+import { ILoginResponse } from "../interfaces/entityInterface/ILoginResponse";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
@@ -166,7 +167,7 @@ class userService implements IUserServices {
             const newData = {
               name: user.name,
               email: user.email,
-              _id: user._id,
+              id: user._id,
             };
             return {
               success: true,
@@ -285,9 +286,6 @@ class userService implements IUserServices {
   async userLogin(userData: UserLoginDTO): Promise<UserLoginResponse> {
     try {
       const { email, password } = userData;
-      console.log("Login attempt with email:", email);
-      console.log("Password provided (length):", password?.length || 0);
-
       const user: EmailExistCheckDTO | null =
         await this.userRepository.emailExistCheck({ email });
 
@@ -304,16 +302,12 @@ class userService implements IUserServices {
         } as const;
       }
 
-      // Create user data object that might be returned
-      const returnUserData: ReturnUserdataDTO = {
-        _id: user.id,
+      // Create user data object to return the nessesary data.
+      const returnUserData: ILoginResponse = {
+        id: user.id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
-        role: user.role,
-        isDeleted: user.isDeleted,
-        isBlocked: user.isBlocked,
-        profile_picture: user.profile_picture,
+        role:user.role,
       };
 
       // Check if user is blocked
@@ -327,10 +321,6 @@ class userService implements IUserServices {
         } as const;
       }
 
-      // Verify password
-      console.log("User password exists:", !!user?.password);
-      console.log("Password provided:", !!password);
-
       if (!user?.password || !password) {
         return {
           status: UNAUTHORIZED,
@@ -340,19 +330,10 @@ class userService implements IUserServices {
           },
         } as const;
       }
-
-      console.log("Password comparison inputs:", {
-        inputPwdLength: password?.length,
-        storedPwdLength: user.password?.length,
-      });
-
       const passwordMatch = await this.encrypt.compare(
         password,
         user.password as string
       );
-
-      console.log("Password match result:", passwordMatch);
-
       if (!passwordMatch) {
         return {
           status: UNAUTHORIZED,
@@ -584,8 +565,8 @@ class userService implements IUserServices {
 
   async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
     try {
-      const { _id, name, phone,imageKey } = data;
-      return this.userRepository.editUser({ _id, name, phone ,imageKey});
+      const { _id, name, phone, imageKey } = data;
+      return this.userRepository.editUser({ _id, name, phone, imageKey });
     } catch (error) {
       console.log(error as Error);
       throw error;

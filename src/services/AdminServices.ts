@@ -89,17 +89,27 @@ class adminService implements IAdminService {
             const token = this.createjwt.generateToken(admin.id, admin.role);
             const refreshToken = this.createjwt.generateRefreshToken(admin.id);
             console.log("admin is exist", admin);
+
+            const filteredAdminData = {
+              id:admin.id,
+              name:admin.name,
+              email:admin.email,
+              role:admin.role
+            }
+
             return {
               status: STATUS_CODES.OK || 200,
               data: {
                 success: true,
                 message: "Authentication Successful !",
-                data: admin,
+                data: filteredAdminData,
                 adminId: admin.id,
                 token: token,
                 refresh_token: refreshToken,
               },
             };
+
+
           } else {
             console.log("Incorrted password");
             return {

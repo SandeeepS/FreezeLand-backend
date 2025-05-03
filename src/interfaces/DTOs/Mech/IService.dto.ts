@@ -4,6 +4,7 @@ import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import mongoose, { Types } from "mongoose";
 import Iuser from "../../entityInterface/Iuser";
 import { IServices } from "../../Model/IService";
+import { ILoginResponse } from "../../entityInterface/ILoginResponse";
 
 export interface MechRegistrationData {
   name: string;
@@ -97,7 +98,7 @@ export interface MechLoginResponse {
   data: {
     success: boolean;
     message: string;
-    data?: Mech;
+    data?: ILoginResponse;
     mechId?: string;
     token?: string;
     refresh_token?: string;

@@ -5,6 +5,7 @@ import { AddAddress } from "../../commonInterfaces/AddAddress";
 import Service from "../../entityInterface/Iservices";
 import { Types } from "mongoose";
 import { Address, ITempUser } from "../../Model/IUser";
+import { ILoginResponse } from "../../entityInterface/ILoginResponse";
 
 export interface SingUpDTO{
   name:string;
@@ -43,7 +44,7 @@ export interface UserLoginResponse {
   data: {
     success: boolean;
     message: string;
-    data?: Iuser;
+    data?: ILoginResponse;
     userId?: string;
     token?: string;
     refresh_token?: string;

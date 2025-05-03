@@ -23,8 +23,9 @@ class ServiceRepository
   async getService(data: GetServiceDTO): Promise<GetServiceResponse | null> {
     try {
       const { id } = data;
-      console.log("entered in the getService in the ServiceRepository ");
+      console.log("entered in the getService in the ServiceRepository and id ",id);
       const result = await this.findById(id);
+      console.log("service details is ",result);
       return result;
     } catch (error) {
       console.log(error as Error);

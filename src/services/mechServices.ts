@@ -259,8 +259,8 @@ class mechService implements IMechServices {
       if (mech?.id) {
         const token = this.createjwt.generateToken(mech.id, mech.role);
         const refresh_token = this.createjwt.generateRefreshToken(mech.id);
-        console.log("token is ", token);
-        console.log("refresh", refresh_token);
+        
+   
         return {
           status: OK,
           data: {
@@ -292,34 +292,41 @@ class mechService implements IMechServices {
     try {
       const { email, password } = data;
       const mech = await this.mechRepository.emailExistCheck({ email });
-
+      console.log("accessed mechanic details from the mechService , in the mechLogin function is ",mech);
       if (mech && mech.isBlocked) {
         return {
           status: UNAUTHORIZED,
           data: {
             success: false,
-            message: "You have been blocked by the mech !",
-            data: mech,
+            message: "You have been blocked by the mech!",
+            
           },
         } as const;
       }
-      if (mech?.password && password) {
-        console.log("enterd password is ", password);
+      if (mech?.password && password){
         const passwordMatch = await this.encrypt.compare(
           password,
           mech.password as string
         );
         if (passwordMatch) {
           const mechId = mech._id.toString();
-
           const token = this.createjwt.generateToken(mechId, mech.role);
           const refreshToken = this.createjwt.generateRefreshToken(mechId);
+
+          const filteredMech = {
+            id:mech._id.toString(),
+            name:mech.name,
+            email:mech.email,
+            role:mech.role,
+          }
+  
+          
           return {
             status: OK,
             data: {
               success: true,
               message: "Authentication Successful !",
-              data: mech,
+              data: filteredMech,
               mechId: mechId,
               token: token,
               refresh_token: refreshToken,

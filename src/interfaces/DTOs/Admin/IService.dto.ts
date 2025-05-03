@@ -1,10 +1,10 @@
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
-import { IServices } from "../../../models/serviceModel";
 import Device from "../../entityInterface/Idevice";
 import Mech from "../../entityInterface/Imech";
 import User from "../../entityInterface/Iuser";
 import Service from "../../entityInterface/Iservices";
 import {  Types } from "mongoose";
+import { IServices } from "../../Model/IService";
 
 export interface AdminLoginDTO {
   email: string;
