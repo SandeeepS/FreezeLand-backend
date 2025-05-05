@@ -23,6 +23,13 @@ export interface Iconcern extends Document {
       reason: string | null;
     }
   ];
+  workDetails: [
+    {
+      description: string;
+      cost: number;
+      addedAt: Date;
+    }
+  ];
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -92,6 +99,22 @@ const concernSchema: Schema<Iconcern> = new Schema(
         reason: {
           type: String,
           default: null,
+        },
+      },
+    ],
+    workDetails: [
+      {
+        description: {
+          type: String,
+          required: true,
+        },
+        cost: {
+          type: Number,
+          required: true,
+        },
+        addedAt: {
+          type: Date,
+          default: Date.now,
         },
       },
     ],
