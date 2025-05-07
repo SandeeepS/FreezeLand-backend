@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import mechRoutes from "./routes/mechRoutes";
+import chatRouters from "./routes/chatRoutes";
 import logger from "./utils/logger";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
@@ -72,6 +73,7 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/mech", mechRoutes);
+app.use("/api/chat",chatRouters);
 
 server.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);

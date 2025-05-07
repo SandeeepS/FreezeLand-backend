@@ -1,18 +1,14 @@
 // messageModel.ts
 import mongoose, { Schema, Document, Model } from "mongoose";
-
-export interface IMessage extends Document {
-  room: mongoose.Types.ObjectId;
-  content: string;
-  sender: mongoose.Types.ObjectId;
-  timestamp: Date;
-}
+import { IMessage } from "../interfaces/Model/IChat";
 
 const MessageSchema: Schema = new Schema({
-  room: { type: mongoose.Types.ObjectId, required: true, index: true },
-  content: { type: String, required: true },
-  sender: { type: mongoose.Types.ObjectId, required: true },
-  timestamp: { type: Date, default: Date.now },
+  roomId: { type: mongoose.Types.ObjectId, required: true, index: true },
+  message: { type: String, required: true },
+  senderId: { type: mongoose.Types.ObjectId, required: true },
+  sendAt: { type: Date, default: Date.now },
+  senderType:{type:String},
+  isDeleted:{type:Boolean,default:false}
 });
 
 const messageModel: Model<IMessage> = mongoose.model<IMessage>(

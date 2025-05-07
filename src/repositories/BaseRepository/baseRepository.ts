@@ -47,6 +47,16 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
+  async find(query: Partial<T>): Promise<T[] | null> {
+    try {
+      const messages = await this.model.find(query);
+      return messages as T[]; 
+    } catch (error) {
+      console.log("Error in base repository find method", error as Error);
+      throw error;
+    }
+  }
+
   async findById(id: string): Promise<T | null> {
     try {
       return (await this.model.findById(id)) as T;
