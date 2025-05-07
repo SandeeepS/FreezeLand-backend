@@ -552,17 +552,19 @@ class mechController implements IMechController {
   //function to update the complaint database , while accepting the work by mechanic
   async updateWorkAssigned(req: Request, res: Response, next: NextFunction) {
     try {
-      const { complaintId, mechanicId, status } = req.body;
+      const { complaintId, mechanicId, status,roomId } = req.body;
       console.log(
         "Entered in the updateWorkAssigned function in mechController",
         complaintId,
         mechanicId,
-        status
+        status,
+        roomId
       );
       const result = await this.mechServices.updateWorkAssigned(
         complaintId,
         mechanicId,
-        status
+        status,
+        roomId
       );
       res.status(200).json({ success: true, result });
     } catch (error) {
@@ -631,6 +633,20 @@ class mechController implements IMechController {
     } catch (err) {
       console.log(err);
       next(err);
+    }
+  }
+
+  async createRoom(req:Request,res:Response,next:NextFunction) {
+    try{
+      const {userId,mechId} = req.body;
+      console.log("entered in the createRoom in the mechControler")
+      console.log(`user id is ${userId} and mechId is ${mechId}`);
+      const result = await this.mechServices.createRoom({userId,mechId});
+      console.log("result fo createRoom in controller is",this.createRoom);
+      res.status(200).json({success:true,result});
+    }catch(error){
+      console.log(error);
+      next(error);
     }
   }
 }

@@ -29,6 +29,7 @@ export default function configureSocket(httpServer: HttpServer): Server {
     
     socket.on("send_message", (data: MessageData) => {
       io.to(data.room).emit("receive_message", data);
+      console.log("message from the frontend is",data);
       logger.info(`Message sent in room ${data.room}`);
     });
     

@@ -92,13 +92,13 @@ class userController implements IUserController {
 
         res
           .status(200) // 200 OK for successful verification
-          .cookie("access_token", result.token, {
+          .cookie("user_access_token", result.token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
           })
-          .cookie("refresh_token", result.refresh_token, {
+          .cookie("user_refresh_token", result.refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",

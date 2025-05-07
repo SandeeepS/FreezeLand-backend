@@ -1,7 +1,7 @@
-import mongoose, { Types ,Document } from "mongoose";
+import mongoose, { Types, Document } from "mongoose";
 
 export interface Address {
-  _id: Types.ObjectId; 
+  _id: Types.ObjectId;
   name: string;
   phone: number;
   email: string;
@@ -18,17 +18,16 @@ export interface UserInterface extends Document {
   email: string;
   phone: number;
   profile_picture: string;
-  address: Address[]; 
+  address: Address[];
   defaultAddress: string;
   role: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
 
-export interface ITempUser extends Document{
-    userData : Partial<UserInterface>;
-    otp:string;
-    createdAt:Date;
-    _id: Types.ObjectId
+export interface ITempUser extends Document {
+  userData: Partial<UserInterface>;
+  otp: string;
+  createdAt: Date;
+  _id: Types.ObjectId;
 }
-

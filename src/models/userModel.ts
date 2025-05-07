@@ -53,6 +53,8 @@ const userSchema: Schema<UserInterface> = new Schema({
     required: true,
   },
 
+
+
   isBlocked: {
     type: Boolean,
     default: false,

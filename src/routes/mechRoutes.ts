@@ -7,14 +7,16 @@ import mechService from '../services/mechServices';
 import mechAuth from '../middlewares/mechAuthMidd';
 import { Email } from '../utils/email';
 import { GenerateOTP } from '../utils/generateOtp';
+import RoomRepository from '../repositories/roomRepository';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const mechRouter:Router = express.Router();
 const mechRepository = new MechRepository();
+const roomRepository = new RoomRepository();
 const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
-const mechServices = new mechService(mechRepository,createjwt,encrypt,email);
+const mechServices = new mechService(mechRepository,roomRepository,createjwt,encrypt,email);
 const controller = new mechController(mechServices,encrypt,createjwt,email);
 
 mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next));
@@ -22,6 +24,7 @@ mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => a
 mechRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.veryfyMechOtp(req,res,next));
 mechRouter.post('/forgot-password',async(req:Request,res:Response,next:NextFunction) => await controller.forgotResentOtpMech(req,res,next));
 mechRouter.post('/verify-forgot-otp',async(req:Request,res:Response,next:NextFunction) => await controller.VerifyForgotOtpMech(req,res,next));
+mechRouter.post("/createRoom",async(req:Request,res:Response,next:NextFunction) => await controller.createRoom(req,res,next));
 mechRouter.put('/update-newpassword',async(req:Request,res:Response,next:NextFunction) => await controller.updateNewPasswordMech(req,res,next));
 mechRouter.get('/getAllMechanics',async(req:Request,res:Response,next:NextFunction) => await controller.getAllMechanics(req,res,next));
 mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllDevices(req,res,next));
@@ -35,5 +38,6 @@ mechRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction)
 mechRouter.put('/updateWorkAssigned',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateWorkAssigned(req,res,next));
 mechRouter.get('/getAllAcceptedServices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllAcceptedServices(req,res,next));
 mechRouter.put('/updateComplaintStatus',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateComplaintStatus(req,res,next));
+
 
 export default mechRouter;

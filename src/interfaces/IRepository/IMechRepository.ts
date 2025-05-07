@@ -38,7 +38,7 @@ export interface IMechRepository{
     getMechanicDetails (data:getMechanicDetailsDTO):Promise<getMechanicDetailsResponse|null> 
     getAllUserRegisteredServices(data: GetAllUserRegisteredServicesDTO): Promise<GetAllUserRegisteredServicesResponse[]|null> 
     getComplaintDetails (id:string) :Promise<getComplaintDetailsResponse[]> 
-    updateWorkAssigned(complaintId: string,mechanicId: string,status: string): Promise<getUpdatedWorkAssingnedResponse> 
+    updateWorkAssigned(complaintId: string,mechanicId: string,status: string,roomId:string): Promise<getUpdatedWorkAssingnedResponse> 
     getAllAcceptedServices (mechanicId:string):Promise <getAllAcceptedServiceResponse[]>
     updateComplaintStatus(complaintId:string,nextStatus:string):Promise<updateCompleteStatusResponse | null>
     createTempMechData(tempMechDetails: {otp: string;mechData: MechRegistrationData;}): Promise<ITempMech>

@@ -315,7 +315,8 @@ class MechRepository
   async updateWorkAssigned(
     complaintId: string,
     mechanicId: string,
-    status: string
+    status: string,
+    roomId:string,
   ): Promise<getUpdatedWorkAssingnedResponse> {
     try {
       console.log("Entered in the mechRepository");
@@ -332,6 +333,7 @@ class MechRepository
             updatedAt: new Date(),
           },
         },
+        chatId:roomId
       };
 
       const result = await concernModel.findByIdAndUpdate(

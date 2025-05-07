@@ -30,6 +30,7 @@ export interface Iconcern extends Document {
       addedAt: Date;
     }
   ];
+  chatId?: mongoose.Types.ObjectId; //here the chat id referes to the room id .
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -118,6 +119,10 @@ const concernSchema: Schema<Iconcern> = new Schema(
         },
       },
     ],
+    chatId:{
+      type: mongoose.Types.ObjectId,
+      required:false,
+    },
     isBlocked: {
       type: Boolean,
       default: false,

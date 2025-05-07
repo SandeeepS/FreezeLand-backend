@@ -16,6 +16,8 @@ import {
   GetPreSignedUrlDTO,
   GetPreSignedUrlResponse,
   getUpdatedWorkAssingnedResponse,
+  ICreateRoomData,
+  ICreateRoomResponse,
   MechLoginDTO,
   MechLoginResponse,
   MechRegistrationData,
@@ -35,16 +37,19 @@ import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech } from "../interfaces/Model/IMech";
 import { SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
+import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
 
 const { OK, UNAUTHORIZED } = STATUS_CODES;
 class mechService implements IMechServices {
   constructor(
     private mechRepository: IMechRepository,
+    private roomRepository: IRoomRepository,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
     private email: Iemail
   ) {
     this.mechRepository = mechRepository;
+    this.roomRepository = roomRepository;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
     this.email = email;
@@ -259,8 +264,7 @@ class mechService implements IMechServices {
       if (mech?.id) {
         const token = this.createjwt.generateToken(mech.id, mech.role);
         const refresh_token = this.createjwt.generateRefreshToken(mech.id);
-        
-   
+
         return {
           status: OK,
           data: {
@@ -292,18 +296,20 @@ class mechService implements IMechServices {
     try {
       const { email, password } = data;
       const mech = await this.mechRepository.emailExistCheck({ email });
-      console.log("accessed mechanic details from the mechService , in the mechLogin function is ",mech);
+      console.log(
+        "accessed mechanic details from the mechService , in the mechLogin function is ",
+        mech
+      );
       if (mech && mech.isBlocked) {
         return {
           status: UNAUTHORIZED,
           data: {
             success: false,
             message: "You have been blocked by the mech!",
-            
           },
         } as const;
       }
-      if (mech?.password && password){
+      if (mech?.password && password) {
         const passwordMatch = await this.encrypt.compare(
           password,
           mech.password as string
@@ -314,13 +320,12 @@ class mechService implements IMechServices {
           const refreshToken = this.createjwt.generateRefreshToken(mechId);
 
           const filteredMech = {
-            id:mech._id.toString(),
-            name:mech.name,
-            email:mech.email,
-            role:mech.role,
-          }
-  
-          
+            id: mech._id.toString(),
+            name: mech.name,
+            email: mech.email,
+            role: mech.role,
+          };
+
           return {
             status: OK,
             data: {
@@ -548,14 +553,16 @@ class mechService implements IMechServices {
   async updateWorkAssigned(
     complaintId: string,
     mechanicId: string,
-    status: string
+    status: string,
+    roomId: string
   ): Promise<getUpdatedWorkAssingnedResponse> {
     try {
       console.log("Entered the mechservice");
       const result = await this.mechRepository.updateWorkAssigned(
         complaintId,
         mechanicId,
-        status
+        status,
+        roomId
       );
       return result;
     } catch (error) {
@@ -581,6 +588,18 @@ class mechService implements IMechServices {
         "Error occured while getting the accepted complaint details in the mechService",
         error
       );
+      throw error;
+    }
+  }
+
+  //funciton to create room for chat
+  async createRoom(data: ICreateRoomData): Promise<ICreateRoomResponse> {
+    try {
+      const { userId, mechId } = data;
+      const result = await this.roomRepository.createRoom({ userId, mechId });
+      return result;
+    } catch (error) {
+      console.log("Error occured in the createRoom in the MechService", error);
       throw error;
     }
   }

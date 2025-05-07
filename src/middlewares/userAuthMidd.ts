@@ -16,8 +16,8 @@ const userAuth = (allowedRoles: string[]) => {
       console.log("access token and refresh token are", token, refresh_token);
 
       if (!refresh_token) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+        res.clearCookie('user_access_token');
+        res.clearCookie('user_refresh_token');
         return res.status(401).json({
           success: false,
           message: "Token expired or not available. Please log in again.",
@@ -36,7 +36,7 @@ const userAuth = (allowedRoles: string[]) => {
           });
         }
         const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
-        res.cookie("access_token", newAccessToken, { maxAge: accessTokenMaxAge });
+        res.cookie("user_access_token", newAccessToken, { maxAge: accessTokenMaxAge });
         decoded = jwt.verifyToken(newAccessToken);
       }
 

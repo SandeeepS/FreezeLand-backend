@@ -291,3 +291,12 @@ export interface getMechanicDetailsResponse {
   isVerified: boolean;
   mechanicType: string[];
 }
+
+export interface ICreateRoomData {
+  userId:string;
+  mechId:string;
+}
+
+export interface ICreateRoomResponse{
+  id:string;
+}

@@ -268,3 +268,4 @@ export interface updateCompleteStatusResponse {
   isBlocked: boolean;
   isDeleted: boolean;
 }
+
