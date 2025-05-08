@@ -18,6 +18,7 @@ import {
   getUpdatedWorkAssingnedResponse,
   ICreateRoomData,
   ICreateRoomResponse,
+  IUpdateWorkDetails,
   MechLoginDTO,
   MechLoginResponse,
   MechRegistrationData,
@@ -38,17 +39,21 @@ import { ITempMech } from "../interfaces/Model/IMech";
 import { SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
 import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
+import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
+import { updateCompleteStatusResponse } from "../interfaces/DTOs/Mech/IRepository.dto";
 
 const { OK, UNAUTHORIZED } = STATUS_CODES;
 class mechService implements IMechServices {
   constructor(
     private mechRepository: IMechRepository,
+    private concernRepository:IConcernRepository,
     private roomRepository: IRoomRepository,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
     private email: Iemail
   ) {
     this.mechRepository = mechRepository;
+    this.concernRepository = concernRepository;
     this.roomRepository = roomRepository;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
@@ -414,7 +419,7 @@ class mechService implements IMechServices {
     }
   }
 
-  async getS3SingUrlForMechCredinential(data: GetPreSignedUrlDTO) {
+  async getS3SingUrlForMechCredinential(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> {
     try {
       const { fileName, fileType, name } = data;
 
@@ -436,7 +441,7 @@ class mechService implements IMechServices {
   }
 
   //update the compliant Status
-  async updateComplaintStatus(complaintId: string, nextStatus: string) {
+  async updateComplaintStatus(complaintId: string, nextStatus: string):Promise<updateCompleteStatusResponse | null> {
     try {
       console.log("Entered in the updateComplaintStatus");
       const result = await this.mechRepository.updateComplaintStatus(
@@ -601,6 +606,20 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log("Error occured in the createRoom in the MechService", error);
       throw error;
+    }
+  }
+
+  //function to update the work details 
+  async updateWorkDetails(data : IUpdateWorkDetails ) :Promise<unknown> {
+    try{
+      const {complaintId , workDetails} = data;
+      console.log("complaintId and wrokDetails in the mechService is ",complaintId , workDetails);
+      const result = await this.concernRepository.updateWorkDetails({complaintId,workDetails});
+      return result;
+    }catch(error){
+      console.log("error occured in the mechService while updating the work details while fixing  the complaint ");
+      throw error
+
     }
   }
 }

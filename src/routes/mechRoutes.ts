@@ -8,18 +8,20 @@ import mechAuth from '../middlewares/mechAuthMidd';
 import { Email } from '../utils/email';
 import { GenerateOTP } from '../utils/generateOtp';
 import RoomRepository from '../repositories/roomRepository';
+import ConcernRepository from '../repositories/concernRepository';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const mechRouter:Router = express.Router();
 const mechRepository = new MechRepository();
 const roomRepository = new RoomRepository();
+const concernRepository = new ConcernRepository();
 const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
-const mechServices = new mechService(mechRepository,roomRepository,createjwt,encrypt,email);
+const mechServices = new mechService(mechRepository,concernRepository,roomRepository,createjwt,encrypt,email);
 const controller = new mechController(mechServices,encrypt,createjwt,email);
 
-mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next));
+mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next)); 
 mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await controller.mechSignup(req,res,next));
 mechRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.veryfyMechOtp(req,res,next));
 mechRouter.post('/forgot-password',async(req:Request,res:Response,next:NextFunction) => await controller.forgotResentOtpMech(req,res,next));
@@ -38,6 +40,7 @@ mechRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction)
 mechRouter.put('/updateWorkAssigned',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateWorkAssigned(req,res,next));
 mechRouter.get('/getAllAcceptedServices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllAcceptedServices(req,res,next));
 mechRouter.put('/updateComplaintStatus',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateComplaintStatus(req,res,next));
+mechRouter.post('/updateWorkDetails',async(req:Request,res:Response,next:NextFunction) => await controller.updateWorkDetails(req,res,next));
 
 
 export default mechRouter;

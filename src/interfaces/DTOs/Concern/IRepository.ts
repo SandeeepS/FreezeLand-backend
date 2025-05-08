@@ -13,3 +13,9 @@ export interface getComplaintDetailsResponse {
     serviceDetails: object;
     detaultAddressDetails:object;
   }
+
+  export interface IUpdateWorkDetails{
+    complaintId:string;
+    workDetails:object;
+  }
+  

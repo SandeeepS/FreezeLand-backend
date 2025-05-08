@@ -26,7 +26,7 @@ export interface Iconcern extends Document {
   workDetails: [
     {
       description: string;
-      cost: number;
+      amount: number;
       addedAt: Date;
     }
   ];
@@ -109,7 +109,7 @@ const concernSchema: Schema<Iconcern> = new Schema(
           type: String,
           required: true,
         },
-        cost: {
+        amount: {
           type: Number,
           required: true,
         },

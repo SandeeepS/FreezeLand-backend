@@ -20,10 +20,11 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
 import concernModel from "../models/concernModel";
+import { IMechServices } from "../interfaces/IServices/IMechServices";
 
 class mechController implements IMechController {
   constructor(
-    private mechServices: mechService,
+    private mechServices: IMechServices,
     private encrypt: compareInterface,
     private createdjwt: ICreateJWT,
     private email: Iemail
@@ -475,6 +476,7 @@ class mechController implements IMechController {
     next: NextFunction
   ) {
     try {
+      const { id } = req.body;
       console.log(
         "userId in the mechController in the getAllUserRegisteredService"
       );
@@ -485,7 +487,8 @@ class mechController implements IMechController {
         await this.mechServices.getAllUserRegisteredServices(
           page,
           limit,
-          searchQuery
+          searchQuery,
+          id
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({
@@ -552,7 +555,7 @@ class mechController implements IMechController {
   //function to update the complaint database , while accepting the work by mechanic
   async updateWorkAssigned(req: Request, res: Response, next: NextFunction) {
     try {
-      const { complaintId, mechanicId, status,roomId } = req.body;
+      const { complaintId, mechanicId, status, roomId } = req.body;
       console.log(
         "Entered in the updateWorkAssigned function in mechController",
         complaintId,
@@ -613,6 +616,29 @@ class mechController implements IMechController {
     }
   }
 
+  //function to update the workdetails to the concern database
+  async updateWorkDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "entered in the updateworkerDetails function in the mechController"
+      );
+      const { complaintId, workDetails } = req.body;
+      console.log(
+        `complaint id is - ${complaintId} and workdetails is - ${[...workDetails]}`
+      );
+      const result = await this.mechServices.updateWorkDetails({
+        complaintId,
+        workDetails,
+      });
+      res.status(200).json({ success: true, result });
+    } catch (error) {
+      console.log(
+        "Error occured in the mechController while updating Wroker Details"
+      );
+      next(error);
+    }
+  }
+
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("Entered in the function for logout of mech");
@@ -636,15 +662,15 @@ class mechController implements IMechController {
     }
   }
 
-  async createRoom(req:Request,res:Response,next:NextFunction) {
-    try{
-      const {userId,mechId} = req.body;
-      console.log("entered in the createRoom in the mechControler")
+  async createRoom(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, mechId } = req.body;
+      console.log("entered in the createRoom in the mechControler");
       console.log(`user id is ${userId} and mechId is ${mechId}`);
-      const result = await this.mechServices.createRoom({userId,mechId});
-      console.log("result fo createRoom in controller is",this.createRoom);
-      res.status(200).json({success:true,result});
-    }catch(error){
+      const result = await this.mechServices.createRoom({ userId, mechId });
+      console.log("result fo createRoom in controller is", this.createRoom);
+      res.status(200).json({ success: true, result });
+    } catch (error) {
       console.log(error);
       next(error);
     }
