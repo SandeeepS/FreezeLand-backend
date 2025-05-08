@@ -1,5 +1,4 @@
 //model for handling the user compliant
-
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface Iconcern extends Document {
