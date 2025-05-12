@@ -236,6 +236,33 @@ class userController implements IUserController {
     }
   }
 
+  //funciton to craete Stript session
+  async createStripeSession(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { data} = req.body;
+      console.log("data reached in the usercontroller while creating stripe session ", data);
+      const session = await this.userServices.createStripeSession(
+     data
+      );
+      if (session) {
+        res.status(OK).json({ success: true, session });
+      } else {
+        res.status(BAD_REQUEST).json({
+          success: false,
+          message: "Session creation failed",
+        });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  } 
+
+
   async userLogin(
     req: Request,
     res: Response,
@@ -775,6 +802,23 @@ class userController implements IUserController {
       const id = req.params.id;
       const result = await this.userServices.getService({ id });
       res.status(OK).json(result);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  //function to get the success payment
+  async successPayment(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { sessionId } = req.query;
+      console.log("sessionId from the frontend is ", sessionId);
+      const result = await this.userServices.successPayment(sessionId as string);
+      res.status(OK).json({ success: true, result });
     } catch (error) {
       console.log(error as Error);
       next(error);

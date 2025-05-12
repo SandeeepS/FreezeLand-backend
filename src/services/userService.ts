@@ -36,6 +36,7 @@ import {
   verifyOTPResponse,
   GetServiceDTO,
   GetServiceResponse2,
+  IPaymentData
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -51,6 +52,7 @@ import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { ILoginResponse } from "../interfaces/entityInterface/ILoginResponse";
+import IPaymentServices, { IOrderService } from "../interfaces/IServices/IOrderService";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
@@ -58,12 +60,14 @@ class userService implements IUserServices {
   constructor(
     private userRepository: IUserRepository,
     private serviceRepository: IServiceRepository,
+    private orderService:IOrderService,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
     private email: Iemail
   ) {
     this.userRepository = userRepository;
     this.serviceRepository = serviceRepository;
+    this.orderService = orderService;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
     this.email = email;
@@ -632,6 +636,31 @@ class userService implements IUserServices {
       );
     }
   }
+
+  //funciton to create stripe session
+async createStripeSession(data:IPaymentData):Promise<unknown>{
+  try{
+     const result = await this.orderService.createStripeSession(data);
+      console.log("result in the userService for creating stripe session",result);
+      return result;
+  }catch(error){
+    console.log("error occured while creating the stripe session in the userService",error);
+    throw error;
+  }
 }
+
+async successPayment(data:string):Promise<unknown>{
+  try{
+    const result = await this.orderService.successPayment(data);
+    console.log("result in the userService for success payment",result);
+    return result;
+  }catch(error){
+    console.log("error occured while creating the stripe session in the userService",error);
+    throw error;
+  }
+}
+}
+
+
 
 export default userService;

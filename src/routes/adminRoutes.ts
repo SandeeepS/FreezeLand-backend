@@ -44,4 +44,5 @@ adminRouter.put('/editExistService',adminAuth(["admin"]),async(req:Request,res:R
 adminRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 adminRouter.put('/updateApprove',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.updateApprove(req,res,next))
 
+
 export default adminRouter;

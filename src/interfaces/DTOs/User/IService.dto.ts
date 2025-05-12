@@ -329,6 +329,14 @@ export interface RegisterServiceDTO {
   isDeleted: boolean;
 }
 
+export interface IPaymentData {
+  complaintId: string;
+  status: string;
+  mechanicId: string;
+  amount: number;
+  serviceId: string;
+}
+
 export interface RegisterServiceResponse {
   _id: Types.ObjectId;
   name: string;

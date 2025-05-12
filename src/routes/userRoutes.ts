@@ -8,15 +8,18 @@ import userAuth from "../middlewares/userAuthMidd";
 import { GenerateOTP } from "../utils/generateOtp";
 import { Email } from "../utils/email";
 import ServiceRepository from "../repositories/serviceRepository";
+import OrderServices from "../services/orderServices";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const userRepository = new UserRepository();
 const serviceRepository = new ServiceRepository();
+const orderService = new OrderServices();
 const generateOTP  = new GenerateOTP();
+
 const email = new Email(generateOTP);
-const userServices = new userService(userRepository,serviceRepository,createjwt,encrypt,email);
+const userServices = new userService(userRepository,serviceRepository,orderService,createjwt,encrypt,email);
 const controller = new userController(userServices,encrypt,createjwt,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
@@ -27,6 +30,7 @@ userRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) 
 userRouter.get('/getTempUserData',async(req:Request,res:Response,next:NextFunction) => await controller.getTempUserData(req,res,next));
 userRouter.post('/forgot-password', async (req: Request, res: Response,next:NextFunction) => await controller.forgotResentOtp(req, res,next));
 userRouter.post('/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await controller.VerifyForgotOtp(req, res,next));
+userRouter.post('/handlePayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.createStripeSession(req,res,next));
 userRouter.put('/update-newpassword',userAuth(["user"]),async(req: Request, res: Response,next:NextFunction) => await controller.updateNewPassword(req, res,next));
 userRouter.get('/profile',userAuth(["user"]),async (req: Request, res: Response,next:NextFunction) => await controller.getProfile(req, res,next));
 userRouter.put('/editUser',userAuth(["user"]),async (req:Request,res:Response,next:NextFunction) => await controller.editUser(req,res,next));
@@ -40,5 +44,5 @@ userRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction)
 userRouter.get('/getUserRegisteredServiceDetailsById',async(req:Request,res:Response,next:NextFunction) => await controller.getUserRegisteredServiceDetailsById(req,res,next));
 userRouter.get('/getMechanicDetails',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getMechanicDetails(req,res,next));
 userRouter.get('/getService/:id',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => controller.getService(req,res,next));
-
+userRouter.get('/successPayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.successPayment(req,res,next));
 export default userRouter;

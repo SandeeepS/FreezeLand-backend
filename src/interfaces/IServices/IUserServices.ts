@@ -29,6 +29,7 @@ import {
     verifyOTPResponse,
     GetServiceDTO,
     GetServiceResponse2,
+    IPaymentData,
   } from "../DTOs/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
@@ -56,5 +57,7 @@ export interface IUserServices {
     getTempUserData(id:string ) : Promise<ITempUser | null> 
     verifyOTP(id: string,otp: string): Promise<verifyOTPResponse>
     getService(data: GetServiceDTO): Promise<GetServiceResponse2 | null>
+    createStripeSession(data:IPaymentData):Promise<unknown>
+    successPayment(data:string):Promise<unknown>
 }
 
