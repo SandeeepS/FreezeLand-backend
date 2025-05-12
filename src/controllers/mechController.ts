@@ -20,10 +20,11 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
 import concernModel from "../models/concernModel";
+import { IMechServices } from "../interfaces/IServices/IMechServices";
 
 class mechController implements IMechController {
   constructor(
-    private mechServices: mechService,
+    private mechServices: IMechServices,
     private encrypt: compareInterface,
     private createdjwt: ICreateJWT,
     private email: Iemail
@@ -41,57 +42,83 @@ class mechController implements IMechController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
+    // try {
+    //   console.log("req body is ", req.body);
+    //   req.app.locals.mechData = req.body;
+    //   const { name, email, phone, password, cpassword } = req.body;
+    //   console.log(
+    //     "mechanic details from the req body in the mechSignup in mech Controller ",
+    //     name,
+    //     email,
+    //     phone,
+    //     password,
+    //     cpassword
+    //   );
+    //   const check = SignUpValidation(name, phone, email, password, cpassword);
+    //   if (check) {
+    //     const newMechanic = await this.mechServices.signupMech(
+    //       req.app.locals.mechData
+    //     );
+
+    //     if (!newMechanic) {
+    //       req.app.locals.newMechanic = true;
+    //       req.app.locals.mechData = req.body;
+    //       req.app.locals.mechEmail = req.body.email;
+
+    //       const otp = await this.email.generateAndSendOTP(email);
+    //       req.app.locals.mechOtp = otp;
+
+    //       const expirationMinutes = 1;
+    //       setTimeout(() => {
+    //         delete req.app.locals.mechOtp;
+    //       }, expirationMinutes * 60 * 1000);
+
+    //       res.status(OK).json({
+    //         mechId: null,
+    //         success: true,
+    //         message: "OTP sent for verification...",
+    //       });
+    //     } else {
+    //       res
+    //         .status(BAD_REQUEST)
+    //         .json({ success: false, message: "The email is already in use!" });
+    //     }
+    //   } else {
+    //     console.log("mechanic details validation from the backend is failed");
+    //     res.status(UNAUTHORIZED).json({
+    //       success: false,
+    //       message: "Please enter  valid mechanic  details !!",
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.log(error as Error);
+    //   next(error);
+    // }
+
+    //////////////////////new implimented code is below
     try {
-      console.log("req body is ", req.body);
-      req.app.locals.mechData = req.body;
-      const { name, email, phone, password, cpassword } = req.body;
-      console.log(
-        "mechanic details from the req body in the mechSignup in mech Controller ",
-        name,
-        email,
-        phone,
-        password,
-        cpassword
-      );
-      const check = SignUpValidation(name, phone, email, password, cpassword);
-      if (check) {
-        const newMechanic = await this.mechServices.signupMech(
-          req.app.locals.mechData
-        );
-
-        if (!newMechanic) {
-          req.app.locals.newMechanic = true;
-          req.app.locals.mechData = req.body;
-          req.app.locals.mechEmail = req.body.email;
-
-          const otp = await this.email.generateAndSendOTP(email);
-          req.app.locals.mechOtp = otp;
-
-          const expirationMinutes = 1;
-          setTimeout(() => {
-            delete req.app.locals.mechOtp;
-          }, expirationMinutes * 60 * 1000);
-
-          res.status(OK).json({
-            mechId: null,
-            success: true,
-            message: "OTP sent for verification...",
-          });
-        } else {
-          res
-            .status(BAD_REQUEST)
-            .json({ success: false, message: "The email is already in use!" });
-        }
-      } else {
-        console.log("mechanic details validation from the backend is failed");
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "Please enter  valid mechanic  details !!",
-        });
-      }
+      const mechData = req.body;
+      console.log("Details from the mechSignuppage (frontend) is ", mechData);
+      const result = await this.mechServices.mechRegistration(mechData);
+      res.status(201).json({ success: true, result });
     } catch (error) {
       console.log(error as Error);
-      next(error);
+      const err = error as Error;
+      if (err.message === "Invalid mech data") {
+        res.status(400).json({ success: false, message: "Invalid mech data" });
+      } else if (err.message === "Email already exists") {
+        res
+          .status(409)
+          .json({ success: false, message: "Email already exists" });
+      } else if (err.message === "Failed to generate OTP") {
+        res
+          .status(500)
+          .json({ success: false, message: "Failed to generate OTP" });
+      } else {
+        res
+          .status(500)
+          .json({ success: false, message: "An unexpected error occurred" });
+      }
     }
   }
 
@@ -101,49 +128,90 @@ class mechController implements IMechController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { otp } = req.body;
-      const isNuewMech = req.app.locals.newMechanic;
-      console.log("new Mechanic is ", isNuewMech);
-      const savedMech = req.app.locals.mechData;
+      const { id, otp } = req.body;
+      console.log("id and otp in the userController is ", id, otp);
+      if (!id || !otp) {
+        res.status(400).json({
+          success: false,
+          message: "Id and otp are required",
+        });
+      }
 
-      const accessTokenMaxAge = 5 * 60 * 1000;
-      const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+      const result = await this.mechServices.verifyOTP(id, otp);
+      if (result.success) {
+        const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
 
-      if (otp === Number(req.app.locals.mechOtp)) {
-        console.log("cehcking the type ", typeof otp);
-        console.log(typeof req.app.locals.mechOtp);
-
-        if (isNuewMech) {
-          const newMech = await this.mechServices.saveMech(savedMech);
-          req.app.locals = {};
-          res
-            .status(OK)
-            .cookie("access_token", newMech?.data.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", newMech?.data.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json(newMech);
-        } else {
-          res
-            .status(OK)
-            .cookie("access_token", isNuewMech.data.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", isNuewMech.data.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json({ success: true, message: "old user verified" });
-        }
-      } else {
         res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "Incorrect otp !" });
+          .status(200)
+          .cookie("mech_access_token", result.access_token, {
+            maxAge: accessTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+          })
+          .cookie("mech_refresh_token", result.refresh_token, {
+            maxAge: refreshTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+          })
+          .json({
+            success: true,
+            message: result.message,
+            mechId: result.mechId,
+            data: result.data,
+          });
+      } else {
+        // Handle different failure scenarios with appropriate status codes
+        switch (result.message) {
+          case "Temporary mech data not found":
+            res.status(404).json({
+              success: false,
+              message: result.message,
+            });
+            break;
+          case "Invalid OTP":
+            res.status(401).json({
+              success: false,
+              message: result.message,
+            });
+            break;
+          case "Mech data not found":
+            res.status(404).json({
+              success: false,
+              message: result.message,
+            });
+            break;
+          case "Mechanic creation failed or role not defined":
+            res.status(500).json({
+              success: false,
+              message: result.message,
+            });
+            break;
+          default:
+            res.status(400).json({
+              success: false,
+              message: result.message || "Verification failed",
+            });
+        }
       }
     } catch (error) {
       console.log(error as Error);
-      next(error);
+      if (
+        (error as Error).message ===
+        "Encryption secret key is not defined in the environment"
+      ) {
+        res.status(500).json({
+          success: false,
+          message: "Server configuration error",
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "An unexpected error occurred during verification",
+        });
+      }
     }
   }
 
@@ -408,6 +476,7 @@ class mechController implements IMechController {
     next: NextFunction
   ) {
     try {
+      const { id } = req.body;
       console.log(
         "userId in the mechController in the getAllUserRegisteredService"
       );
@@ -418,7 +487,8 @@ class mechController implements IMechController {
         await this.mechServices.getAllUserRegisteredServices(
           page,
           limit,
-          searchQuery
+          searchQuery,
+          id
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({
@@ -485,17 +555,19 @@ class mechController implements IMechController {
   //function to update the complaint database , while accepting the work by mechanic
   async updateWorkAssigned(req: Request, res: Response, next: NextFunction) {
     try {
-      const { complaintId, mechanicId, status } = req.body;
+      const { complaintId, mechanicId, status, roomId } = req.body;
       console.log(
         "Entered in the updateWorkAssigned function in mechController",
         complaintId,
         mechanicId,
-        status
+        status,
+        roomId
       );
       const result = await this.mechServices.updateWorkAssigned(
         complaintId,
         mechanicId,
-        status
+        status,
+        roomId
       );
       res.status(200).json({ success: true, result });
     } catch (error) {
@@ -524,19 +596,48 @@ class mechController implements IMechController {
     }
   }
 
-  //funciton to update the  complaint details 
-  async updateComplaintStatus (req:Request,res:Response,next:NextFunction) {
-    try{
+  //funciton to update the  complaint details
+  async updateComplaintStatus(req: Request, res: Response, next: NextFunction) {
+    try {
       const complaintId = req.query.complaintId as string;
       const nextStatus = req.query.nextStatus as string;
-      console.log("next status in the updateComplaintStatus is ",complaintId, nextStatus);
-      const result = await this.mechServices.updateComplaintStatus(complaintId,nextStatus);
-      res.status(200).json({success:true,result});
-    }catch(error){
+      console.log(
+        "next status in the updateComplaintStatus is ",
+        complaintId,
+        nextStatus
+      );
+      const result = await this.mechServices.updateComplaintStatus(
+        complaintId,
+        nextStatus
+      );
+      res.status(200).json({ success: true, result });
+    } catch (error) {
       next(error);
     }
   }
 
+  //function to update the workdetails to the concern database
+  async updateWorkDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "entered in the updateworkerDetails function in the mechController"
+      );
+      const { complaintId, workDetails } = req.body;
+      console.log(
+        `complaint id is - ${complaintId} and workdetails is - ${[...workDetails]}`
+      );
+      const result = await this.mechServices.updateWorkDetails({
+        complaintId,
+        workDetails,
+      });
+      res.status(200).json({ success: true, result });
+    } catch (error) {
+      console.log(
+        "Error occured in the mechController while updating Wroker Details"
+      );
+      next(error);
+    }
+  }
 
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
@@ -558,6 +659,20 @@ class mechController implements IMechController {
     } catch (err) {
       console.log(err);
       next(err);
+    }
+  }
+
+  async createRoom(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, mechId } = req.body;
+      console.log("entered in the createRoom in the mechControler");
+      console.log(`user id is ${userId} and mechId is ${mechId}`);
+      const result = await this.mechServices.createRoom({ userId, mechId });
+      console.log("result fo createRoom in controller is", this.createRoom);
+      res.status(200).json({ success: true, result });
+    } catch (error) {
+      console.log(error);
+      next(error);
     }
   }
 }

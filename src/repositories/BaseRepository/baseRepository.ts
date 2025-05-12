@@ -7,7 +7,7 @@ interface Deletable {
   isDeleted: boolean;
 }
 
-interface Searchable extends Deletable {
+interface Searchable extends Deletable{
   name?: string;
   email?: string;
 }
@@ -43,6 +43,16 @@ export class BaseRepository<T extends Searchable>
       return newItem as T;
     } catch (error) {
       console.log("Error in BaseRepository save:", error as Error);
+      throw error;
+    }
+  }
+
+  async find(query: Partial<T>): Promise<T[] | null> {
+    try {
+      const messages = await this.model.find(query);
+      return messages as T[]; 
+    } catch (error) {
+      console.log("Error in base repository find method", error as Error);
       throw error;
     }
   }

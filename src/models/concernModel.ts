@@ -1,5 +1,4 @@
 //model for handling the user compliant
-
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface Iconcern extends Document {
@@ -23,6 +22,14 @@ export interface Iconcern extends Document {
       reason: string | null;
     }
   ];
+  workDetails: [
+    {
+      description: string;
+      amount: number;
+      addedAt: Date;
+    }
+  ];
+  chatId?: mongoose.Types.ObjectId; //here the chat id referes to the room id .
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -95,6 +102,26 @@ const concernSchema: Schema<Iconcern> = new Schema(
         },
       },
     ],
+    workDetails: [
+      {
+        description: {
+          type: String,
+          required: true,
+        },
+        amount: {
+          type: Number,
+          required: true,
+        },
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    chatId:{
+      type: mongoose.Types.ObjectId,
+      required:false,
+    },
     isBlocked: {
       type: Boolean,
       default: false,

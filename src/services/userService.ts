@@ -32,6 +32,10 @@ import {
   EditAddressResponse,
   SetUserDefaultAddressResponse,
   getUserRegisteredServiceDetailsByIdResponse,
+  SingUpDTO,
+  verifyOTPResponse,
+  GetServiceDTO,
+  GetServiceResponse2,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -42,18 +46,160 @@ import {
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
 } from "../interfaces/DTOs/Mech/IService.dto";
+import { SignUpValidation } from "../utils/validator";
+import { Iemail } from "../utils/email";
+import { ITempUser } from "../interfaces/Model/IUser";
+import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
+import { ILoginResponse } from "../interfaces/entityInterface/ILoginResponse";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 class userService implements IUserServices {
   constructor(
     private userRepository: IUserRepository,
+    private serviceRepository: IServiceRepository,
     private createjwt: ICreateJWT,
-    private encrypt: compareInterface
+    private encrypt: compareInterface,
+    private email: Iemail
   ) {
     this.userRepository = userRepository;
+    this.serviceRepository = serviceRepository;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
+    this.email = email;
+  }
+
+  //signup for user
+
+  // UserService.ts
+  async userRegister(userData: SingUpDTO): Promise<Partial<ITempUser> | null> {
+    try {
+      const { email, name, phone, password, cpassword } = userData;
+      const isValid = SignUpValidation(
+        name,
+        phone.toString(),
+        email,
+        password,
+        cpassword
+      );
+
+      if (!isValid) {
+        throw new Error("Invalid user data");
+      }
+
+      const userExists = await this.userRepository.emailExistCheck({ email });
+      if (userExists) {
+        throw new Error("Email already exists");
+      }
+
+      const otp = await this.email.generateAndSendOTP(email);
+      if (!otp) {
+        throw new Error("Failed to generate OTP");
+      }
+
+      const tempUserDetails = { otp, userData };
+      const savedTempUser = await this.userRepository.createTempUserData(
+        tempUserDetails
+      );
+
+      return savedTempUser;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  //function to verify otp
+  async verifyOTP(id: string, otp: string): Promise<verifyOTPResponse> {
+    try {
+      console.log(
+        "Entered in the verifyOpt function in the userService",
+        id,
+        otp
+      );
+      const getTempUserData = await this.userRepository.getTempUserData(id);
+
+      if (!getTempUserData) {
+        return {
+          success: false,
+          message: "Temporary user data not found",
+        };
+      }
+
+      const userData = getTempUserData.userData;
+      console.log("userData from the getTemuserData", userData);
+      const storedOtp = getTempUserData.otp;
+
+      if (otp.toString() === storedOtp) {
+        console.log("otp verified");
+        if (userData) {
+          const { name, email, password, phone } = userData;
+          const secret_key: string | undefined = process.env.CRYPTR_SECRET;
+          if (!secret_key) {
+            throw new Error(
+              "Encryption secret key is not defined in the environment"
+            );
+          }
+
+          const cryptr = new Cryptr(secret_key, {
+            encoding: "base64",
+            pbkdf2Iterations: 10000,
+            saltLength: 10,
+          });
+
+          const newPassword = cryptr.encrypt(password as string);
+          const newDetails: NewDetailsDTO = {
+            name: name as string,
+            password: newPassword as string,
+            email: email as string,
+            phone: Number(phone),
+          };
+
+          console.log("new Encrypted password with data is ", newDetails);
+          const user = await this.userRepository.saveUser(newDetails);
+
+          if (user && user.role) {
+            const userId = user._id.toString();
+            const token = this.createjwt.generateToken(userId, user.role);
+            const refresh_token = this.createjwt.generateRefreshToken(userId);
+            console.log("token is ", token);
+            console.log("refresh", refresh_token);
+            const newData = {
+              name: user.name,
+              email: user.email,
+              id: user._id,
+            };
+            return {
+              success: true,
+              message: "Success",
+              userId: userId,
+              token: token,
+              data: newData,
+              refresh_token,
+            };
+          } else {
+            return {
+              success: false,
+              message: "User creation failed or role not defined",
+            };
+          }
+        } else {
+          return {
+            success: false,
+            message: "User data not found",
+          };
+        }
+      } else {
+        console.log("otp is not verified");
+        return {
+          success: false,
+          message: "Invalid OTP",
+        };
+      }
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
   }
 
   async isUserExist(
@@ -73,12 +219,12 @@ class userService implements IUserServices {
       console.log("Entered in user Service and the userData is ", userData);
       const { name, email, password, phone } = userData;
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
-      if (!secret_key){
+      if (!secret_key) {
         throw new Error(
           "Encrption secret key is not defined in the environment"
         );
       }
-      
+
       const cryptr = new Cryptr(secret_key, {
         encoding: "base64",
         pbkdf2Iterations: 10000,
@@ -126,12 +272,20 @@ class userService implements IUserServices {
     }
   }
 
+  //getting the tempUser details from the database for otp verification
+  async getTempUserData(id: string): Promise<ITempUser | null> {
+    try {
+      const result = await this.userRepository.getTempUserData(id);
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
   async userLogin(userData: UserLoginDTO): Promise<UserLoginResponse> {
     try {
       const { email, password } = userData;
-      console.log("Login attempt with email:", email);
-      console.log("Password provided (length):", password?.length || 0);
-
       const user: EmailExistCheckDTO | null =
         await this.userRepository.emailExistCheck({ email });
 
@@ -140,7 +294,7 @@ class userService implements IUserServices {
       // If user doesn't exist
       if (!user?.id) {
         return {
-          status: UNAUTHORIZED,
+          status: OK,
           data: {
             success: false,
             message: "Invalid email or password",
@@ -148,16 +302,12 @@ class userService implements IUserServices {
         } as const;
       }
 
-      // Create user data object that might be returned
-      const returnUserData: ReturnUserdataDTO = {
-        _id: user.id,
+      // Create user data object to return the nessesary data.
+      const returnUserData: ILoginResponse = {
+        id: user.id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
         role: user.role,
-        isDeleted: user.isDeleted,
-        isBlocked: user.isBlocked,
-        profile_picture: user.profile_picture,
       };
 
       // Check if user is blocked
@@ -171,10 +321,6 @@ class userService implements IUserServices {
         } as const;
       }
 
-      // Verify password
-      console.log("User password exists:", !!user?.password);
-      console.log("Password provided:", !!password);
-
       if (!user?.password || !password) {
         return {
           status: UNAUTHORIZED,
@@ -184,19 +330,10 @@ class userService implements IUserServices {
           },
         } as const;
       }
-
-      console.log("Password comparison inputs:", {
-        inputPwdLength: password?.length,
-        storedPwdLength: user.password?.length,
-      });
-
       const passwordMatch = await this.encrypt.compare(
         password,
         user.password as string
       );
-
-      console.log("Password match result:", passwordMatch);
-
       if (!passwordMatch) {
         return {
           status: UNAUTHORIZED,
@@ -262,7 +399,7 @@ class userService implements IUserServices {
     try {
       const { id } = data;
       console.log("idddddddddddddddddddddd", id);
-      if (!id)
+      if (!id) {
         return {
           status: UNAUTHORIZED,
           data: {
@@ -270,7 +407,9 @@ class userService implements IUserServices {
             message: "User ID is missing",
           },
         } as const;
-      const user = await this.userRepository.getUserById({ id: data.id });
+      }
+
+      const user = await this.userRepository.getUserById({ id });
       if (!user) {
         return {
           status: NOT_FOUND,
@@ -349,6 +488,23 @@ class userService implements IUserServices {
     }
   }
 
+  //getting the service Deatils from the service repositroy
+  async getService(data: GetServiceDTO): Promise<GetServiceResponse2 | null> {
+    try {
+      const { id } = data;
+      console.log("reached the getService in the userService");
+      const result = await this.serviceRepository.getService({ id });
+      if (result) {
+        return result;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error();
+    }
+  }
+
   //funtion to get mechanci details
   async getMechanicDetails(
     data: getMechanicDetailsDTO
@@ -411,8 +567,8 @@ class userService implements IUserServices {
 
   async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
     try {
-      const { _id, name, phone } = data;
-      return this.userRepository.editUser({ _id, name, phone });
+      const { _id, name, phone, imageKey } = data;
+      return this.userRepository.editUser({ _id, name, phone, imageKey });
     } catch (error) {
       console.log(error as Error);
       throw error;

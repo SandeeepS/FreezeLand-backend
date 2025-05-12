@@ -14,6 +14,7 @@ import {
   GetMechListDTO,
   GetMechListResponse,
   getUpdatedWorkAssingnedResponse,
+  MechRegistrationData,
   SaveMechDTO,
   SaveMechResponse,
   updateCompleteStatusResponse,
@@ -22,9 +23,10 @@ import {
   VerifyMechanicDTO,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
+import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 import concernModel from "../models/concernModel";
 import deviceModel, { IDevice } from "../models/deviceModel";
-import MechModel, { MechInterface } from "../models/mechModel";
+import MechModel, {  TempMech } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
 
@@ -37,6 +39,37 @@ class MechRepository
   constructor() {
     super(MechModel);
     this.deviceRepository = new BaseRepository<IDevice>(deviceModel);
+  }
+
+  async createTempMechData(tempMechDetails: {
+    otp: string;
+    mechData: MechRegistrationData;
+  }): Promise<ITempMech> {
+    try {
+      console.log("enterd in the createTempMech funciton in the mechRepository");
+      const createdTempMech = new TempMech({
+        otp: tempMechDetails.otp,
+        mechData: tempMechDetails.mechData,
+      });
+      console.log("createdTempMech is = ",createdTempMech);
+      const savedMech = await createdTempMech.save();
+      return savedMech;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  //function to get tempMech data 
+  async getTempMechData(id:string):Promise<ITempMech | null> {
+    try{
+      const result = await TempMech.findById(id);
+      console.log("accessed the tempMechData in the mechRepository ",result);
+      return result;
+    }catch(error){
+      console.log(error as Error);
+      throw error;
+    }
   }
 
   async saveMechanic(mechData: SaveMechDTO): Promise<SaveMechResponse | null> {
@@ -106,8 +139,8 @@ class MechRepository
 
   async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
-      const { page, limit, searchQuery,search } = data;
-      console.log("Search in the mechRepository",search);
+      const { page, limit, searchQuery, search } = data;
+      console.log("Search in the mechRepository", search);
       const regex = new RegExp(search, "i");
       const result = await this.findAll(page, limit, regex);
       console.log("mech list is ", result);
@@ -181,8 +214,8 @@ class MechRepository
             isDeleted: false,
             $or: [
               { currentMechanicId: { $exists: false } },
-              { currentMechanicId: null }
-            ]
+              { currentMechanicId: null },
+            ],
           },
         },
         {
@@ -282,7 +315,8 @@ class MechRepository
   async updateWorkAssigned(
     complaintId: string,
     mechanicId: string,
-    status: string
+    status: string,
+    roomId:string,
   ): Promise<getUpdatedWorkAssingnedResponse> {
     try {
       console.log("Entered in the mechRepository");
@@ -291,7 +325,7 @@ class MechRepository
       // Update document fields and push a new entry to workHistory
       const updateData = {
         currentMechanicId: mechanicIdObjectId,
-        status:status,
+        status: status,
         $push: {
           workHistory: {
             mechanicId: mechanicIdObjectId,
@@ -299,6 +333,7 @@ class MechRepository
             updatedAt: new Date(),
           },
         },
+        chatId:roomId
       };
 
       const result = await concernModel.findByIdAndUpdate(
@@ -328,7 +363,7 @@ class MechRepository
         {
           $match: {
             currentMechanicId: mechanicObjectId,
-            status: { $in: ["accepted", "pending", "onProcess"] }
+            status: { $in: ["accepted", "pending", "onProcess"] },
           },
         },
         {
@@ -381,18 +416,30 @@ class MechRepository
     }
   }
 
- //function to update the complaint status
- async updateComplaintStatus(complaintId:string,nextStatus:string):Promise<updateCompleteStatusResponse | null>{
-   try{
-    console.log("Entered in the updateCompaoint Stattus in the mechREpositroy",complaintId,nextStatus);
-    const result = await concernModel.findByIdAndUpdate(complaintId,{"status":nextStatus});
-    console.log("result after updating the status is ",result);
-    return result;
-   }catch(error){
-    console.log("error occured during the updation of the status in the mechRepository ",error)
-    throw new Error()
-   }
- }
+  //function to update the complaint status
+  async updateComplaintStatus(
+    complaintId: string,
+    nextStatus: string
+  ): Promise<updateCompleteStatusResponse | null> {
+    try {
+      console.log(
+        "Entered in the updateCompaoint Stattus in the mechREpositroy",
+        complaintId,
+        nextStatus
+      );
+      const result = await concernModel.findByIdAndUpdate(complaintId, {
+        status: nextStatus,
+      });
+      console.log("result after updating the status is ", result);
+      return result;
+    } catch (error) {
+      console.log(
+        "error occured during the updation of the status in the mechRepository ",
+        error
+      );
+      throw new Error();
+    }
+  }
 }
 
 export default MechRepository;

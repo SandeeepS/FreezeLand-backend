@@ -29,7 +29,7 @@ import {
   GetDeviceDTO,
   GetDeviceResponse,
   GetMechanicByIdDTO,
-  GetMechanicByIdResponse,
+  GetMechByIdResponse,
   GetMechList,
   GetMechListResponse,
   GetPreSignedUrlDTO,
@@ -50,18 +50,32 @@ import { IAdminService } from "../interfaces/IServices/IAdminService";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
 import { LoginValidation } from "../utils/validator";
 import { IAdminRepository } from "../interfaces/IRepository/IAdminRepository";
+import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
+import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
+import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
+import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
 
 class adminService implements IAdminService {
   constructor(
     private adminRepository: IAdminRepository,
+    private userRepository: IUserRepository,
+    private mechRepository: IMechRepository,
+    private serviceRepository: IServiceRepository,
+    private deviceRepository: IDeviceRepository,
     private encrypt: compareInterface,
     private createjwt: ICreateJWT
   ) {
     this.adminRepository = adminRepository;
+    this.userRepository = userRepository;
+    this.mechRepository = mechRepository;
+    this.serviceRepository = serviceRepository;
+    this.deviceRepository = deviceRepository;
+
     this.encrypt = encrypt;
     this.createjwt = createjwt;
   }
 
+  //function for admin login
   async adminLogin(data: AdminLoginDTO): Promise<AdminLoginResponse> {
     try {
       console.log("entered in the admin login");
@@ -75,17 +89,27 @@ class adminService implements IAdminService {
             const token = this.createjwt.generateToken(admin.id, admin.role);
             const refreshToken = this.createjwt.generateRefreshToken(admin.id);
             console.log("admin is exist", admin);
+
+            const filteredAdminData = {
+              id:admin.id,
+              name:admin.name,
+              email:admin.email,
+              role:admin.role
+            }
+
             return {
               status: STATUS_CODES.OK || 200,
               data: {
                 success: true,
                 message: "Authentication Successful !",
-                data: admin,
+                data: filteredAdminData,
                 adminId: admin.id,
                 token: token,
                 refresh_token: refreshToken,
               },
             };
+
+
           } else {
             console.log("Incorrted password");
             return {
@@ -126,16 +150,14 @@ class adminService implements IAdminService {
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const users = await this.adminRepository.getUserList({
+      const users = await this.userRepository.getUserList({
         page,
         limit,
         searchQuery,
       });
       if (users) {
-        const usersCount = await this.adminRepository.getUserCount({
-          searchQuery,
-        });
-
+        const searchRegex = new RegExp(searchQuery, "i");
+        const usersCount = await this.userRepository.getUserCount(searchRegex);
         return {
           status: STATUS_CODES.OK,
           data: { users, usersCount },
@@ -157,21 +179,19 @@ class adminService implements IAdminService {
   async getMechList(data: GetMechList): Promise<GetMechListResponse> {
     try {
       let { page, limit, searchQuery } = data;
-      const {search} = data;
+      const { search } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const mechs = await this.adminRepository.getMechList({
+      const mechs = await this.mechRepository.getMechList({
         page,
         limit,
         searchQuery,
-        search
+        search,
       });
       console.log("list of mechanics is ", mechs);
-      const mechsCount = await this.adminRepository.getMechCount({
-        searchQuery,
-      });
-
+      const searchRegex = new RegExp(searchQuery, "i");
+      const mechsCount = await this.mechRepository.getMechCount(searchRegex);
       return {
         status: STATUS_CODES.OK,
         data: { mechs, mechsCount },
@@ -186,18 +206,18 @@ class adminService implements IAdminService {
   async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
     try {
       let { page, limit, searchQuery } = data;
-      const {search} = data;
+      const { search } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const services = await this.adminRepository.getAllServices({
+      const services = await this.serviceRepository.getAllServices({
         page,
         limit,
         searchQuery,
-       search
+        search,
       });
       console.log("list of services is ", services);
-      const servicesCount = await this.adminRepository.getServiceCount({
+      const servicesCount = await this.serviceRepository.getServiceCount({
         searchQuery,
       });
 
@@ -215,18 +235,18 @@ class adminService implements IAdminService {
   async getDevcies(data: GetDeviceDTO): Promise<GetDeviceResponse> {
     try {
       let { page, limit, searchQuery } = data;
-      const {search}  = data;
+      const { search } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const devices = await this.adminRepository.getAllDevices({
+      const devices = await this.deviceRepository.getAllDevices({
         page,
         limit,
         searchQuery,
-        search
+        search,
       });
       console.log("list of device  is ", devices);
-      const devicesCount = await this.adminRepository.getDeviceCount({
+      const devicesCount = await this.deviceRepository.getDeviceCount({
         searchQuery,
       });
 
@@ -245,7 +265,7 @@ class adminService implements IAdminService {
     try {
       const { id } = data;
       console.log("reached the getService in the adminService");
-      const result = await this.adminRepository.getService({ id });
+      const result = await this.serviceRepository.getService({ id });
       if (result) {
         return result;
       } else {
@@ -259,11 +279,11 @@ class adminService implements IAdminService {
 
   async getMechanicById(
     data: GetMechanicByIdDTO
-  ): Promise<GetMechanicByIdResponse | null> {
+  ): Promise<GetMechByIdResponse | null> {
     try {
       const { id } = data;
       console.log("Reached the getMehanic in the adminservice");
-      const result = await this.adminRepository.getMechanicById({ id });
+      const result = await this.mechRepository.getMechById({ id });
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -363,14 +383,10 @@ class adminService implements IAdminService {
     }
   }
 
-  async isServiceExist(
-    name:string
-  ): Promise<IsServiceExistResponse | null> {
+  async isServiceExist(name: string): Promise<IsServiceExistResponse | null> {
     try {
-      
-      console.log("name in the adminServie ",name)
+      console.log("name in the adminServie ", name);
       return await this.adminRepository.isServiceExist({ name });
-      
     } catch (error) {
       console.log(error as Error);
       throw new Error("error while checking isServiceExist or not ");
@@ -426,21 +442,26 @@ class adminService implements IAdminService {
     }
   }
 
-  async updateApprove (data:UpdateApproveDTO) : Promise<UpdateApproveResponse | null> {
-    try{
-      const {id , verificationStatus } = data;
-      let modifiedVerificationStatus ;
-      if(verificationStatus == "false"){
+  async updateApprove(
+    data: UpdateApproveDTO
+  ): Promise<UpdateApproveResponse | null> {
+    try {
+      const { id, verificationStatus } = data;
+      let modifiedVerificationStatus;
+      if (verificationStatus == "false") {
         modifiedVerificationStatus = true;
-      }else{
-        modifiedVerificationStatus= false;
+      } else {
+        modifiedVerificationStatus = false;
       }
-      if(id){
-        const result = await this.adminRepository.updateApprove({id,modifiedVerificationStatus});
+      if (id) {
+        const result = await this.adminRepository.updateApprove({
+          id,
+          modifiedVerificationStatus,
+        });
         return result;
       }
-      return {result : false};
-    }catch(error){
+      return { result: false };
+    } catch (error) {
       console.log(error as Error);
       throw new Error("Error while approving the mechanic in the AdminSerivce");
     }
@@ -448,7 +469,7 @@ class adminService implements IAdminService {
   //changing this generating presinged url code ot differtnt comon place
   async getPresignedUrl(data: GetPreSignedUrlDTO) {
     try {
-      const { fileName, fileType } = data;
+      const { fileName, fileType ,folderName} = data;
 
       if (!fileName || !fileType) {
         return {
@@ -456,7 +477,6 @@ class adminService implements IAdminService {
           message: "File name and type are required",
         } as GetPreSignedUrlResponse;
       }
-      const folderName = "ServiceImages";
       const result = await generatePresignedUrl(fileName, fileType, folderName);
       return result as GetPreSignedUrlResponse;
     } catch (error) {

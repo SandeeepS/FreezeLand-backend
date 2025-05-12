@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from "express";
+import http from "http";
 import errorHandlerMiddleware from "./middlewares/errorHandler";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -6,14 +7,19 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import mechRoutes from "./routes/mechRoutes";
+import chatRouters from "./routes/chatRoutes";
 import logger from "./utils/logger";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import configureSocket from "./config.ts/socket";
 
 dotenv.config();
 const morganFormat = ":method :url :status :response-time ms";
 const app: Express = express();
-const PORT: string | number = process.env.PORT || 3000;
+const PORT: string | number = process.env.PORT || 5000;
+
+
+const server = http.createServer(app);
 
 app.use(
   cors({
@@ -54,6 +60,12 @@ const uri: string =
   }
 })();
 
+// Initialize Socket.io
+const io = configureSocket(server);
+
+// Exporting io
+export { io };
+
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).send("Server is running");
 });
@@ -61,7 +73,8 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/mech", mechRoutes);
+app.use("/api/chat",chatRouters);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
 });

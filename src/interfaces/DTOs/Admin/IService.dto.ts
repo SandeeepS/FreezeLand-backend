@@ -1,10 +1,10 @@
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
-import { IServices } from "../../../models/serviceModel";
 import Device from "../../entityInterface/Idevice";
 import Mech from "../../entityInterface/Imech";
 import User from "../../entityInterface/Iuser";
 import Service from "../../entityInterface/Iservices";
 import {  Types } from "mongoose";
+import { IServices } from "../../Model/IService";
 
 export interface AdminLoginDTO {
   email: string;
@@ -331,6 +331,7 @@ export interface EditExistServiceResponse{
 export interface GetPreSignedUrlDTO{
   fileName:string;
   fileType:string;
+  folderName:string;
 }
 
 export interface GetPreSignedUrlResponse {
@@ -340,4 +341,16 @@ export interface GetPreSignedUrlResponse {
   imageName?:string;
   key?:string;
 
+}
+
+export interface GetMechByIdResponse {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  password: string;
+  phone: number;
+  role: string;
+  isVerified: boolean;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }

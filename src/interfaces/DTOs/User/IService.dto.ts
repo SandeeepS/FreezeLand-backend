@@ -1,9 +1,19 @@
-import { UserInterface } from "../../../models/userModel";
+
 import Iuser from "../../entityInterface/Iuser";
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
 import Service from "../../entityInterface/Iservices";
 import { Types } from "mongoose";
+import { Address, ITempUser } from "../../Model/IUser";
+import { ILoginResponse } from "../../entityInterface/ILoginResponse";
+
+export interface SingUpDTO{
+  name:string;
+  phone:number;
+  email:string;
+  password:string;
+  cpassword:string;
+}
 
 export interface UserSignUpDTO {
   name: string;
@@ -23,16 +33,10 @@ export interface UserSignUpDTO {
   defaultAddress: string;
 }
 
-export interface UserSignUpResponse {
-  status: number;
-  data: {
-    success: boolean;
-    message: string;
-    data?: UserInterface;
-    userId?: string;
-    token?: string;
-    refresh_token?: string;
-  };
+export interface UserSignUpResponse extends Document {
+  userData:Partial<ITempUser>;
+  otp:string;
+  createdAt:Date;
 }
 
 export interface UserLoginResponse {
@@ -40,7 +44,7 @@ export interface UserLoginResponse {
   data: {
     success: boolean;
     message: string;
-    data?: Iuser;
+    data?: ILoginResponse;
     userId?: string;
     token?: string;
     refresh_token?: string;
@@ -63,6 +67,22 @@ export interface SaveUserResponse {
   data?: Iuser;
   token?: string | undefined;
   refresh_token?: string | undefined;
+}
+
+export interface GetServiceDTO {
+  id: string;
+}
+
+
+export interface GetServiceResponse2 {
+  id?: Types.ObjectId;
+  name: string;
+  imageKey: string;
+  discription: string[];
+  serviceCharge:number;
+  createdAt: Date;
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
 export interface UserLoginDTO {
@@ -144,6 +164,15 @@ export interface GetProfileResponse {
   };
 }
 
+export interface verifyOTPResponse{
+  success: boolean;
+  message: string;
+  userId?: string;
+  token?: string;
+  data?: object;
+  refresh_token?: string;
+}
+
 export interface GetServicesDTO {
   page: number;
   limit: number;
@@ -189,6 +218,7 @@ export interface EditUserDTO {
   _id: string;
   name: string;
   phone: number;
+  imageKey:string;
 }
 
 export interface EditUserResponse {
@@ -214,7 +244,7 @@ export interface EditUserResponse {
 
 export interface AddUserAddressDTO {
   _id: string;
-  values: AddAddress;
+  values: Address;
 }
 
 export interface AddUserAddressResponse {

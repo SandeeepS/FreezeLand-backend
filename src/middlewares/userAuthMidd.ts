@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import { CreateJWT } from "../utils/generateToken";
 import UserRepository from "../repositories/userRepository";
-import { UserInterface } from "../models/userModel";
+import { UserInterface } from "../interfaces/Model/IUser";
 const jwt = new CreateJWT();
 const userRepository = new UserRepository();
 dotenv.config();
@@ -16,8 +16,8 @@ const userAuth = (allowedRoles: string[]) => {
       console.log("access token and refresh token are", token, refresh_token);
 
       if (!refresh_token) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+        res.clearCookie('user_access_token');
+        res.clearCookie('user_refresh_token');
         return res.status(401).json({
           success: false,
           message: "Token expired or not available. Please log in again.",
@@ -36,7 +36,7 @@ const userAuth = (allowedRoles: string[]) => {
           });
         }
         const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
-        res.cookie("access_token", newAccessToken, { maxAge: accessTokenMaxAge });
+        res.cookie("user_access_token", newAccessToken, { maxAge: accessTokenMaxAge });
         decoded = jwt.verifyToken(newAccessToken);
       }
 
@@ -48,7 +48,7 @@ const userAuth = (allowedRoles: string[]) => {
             message: "User is blocked by admin!",
           });
         }
-        req.user = user as UserInterface;
+        req.user = user || undefined;
 
         // Check user role
         if (user != null && !allowedRoles.includes(user.role)) {

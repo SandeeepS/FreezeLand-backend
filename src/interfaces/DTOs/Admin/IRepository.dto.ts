@@ -1,5 +1,5 @@
 import { ObjectId, Types } from "mongoose";
-import { IServices } from "../../../models/serviceModel";
+import { IServices } from "../../Model/IService";
 
 export interface GetAdminByIdDTO {
   id: string;

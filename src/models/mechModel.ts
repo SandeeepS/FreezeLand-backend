@@ -1,20 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
-
-export interface MechInterface extends Document {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  email: string;
-  password: string;
-  phone: number;
-  role: string;
-  mechanicType: string[];
-  photo: string;
-  adharProof: string;
-  employeeLicense: string;
-  isVerified: boolean;
-  isBlocked: boolean;
-  isDeleted: boolean;
-}
+import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 
 const mechSchema: Schema<MechInterface> = new Schema({
   name: {
@@ -72,8 +57,34 @@ const mechSchema: Schema<MechInterface> = new Schema({
   },
 });
 
+const TempMechSchema: Schema<ITempMech> = new Schema(
+  {
+    mechData: {
+      type: Object,
+      required: true,
+    },
+    otp: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      expires: 900,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const MechModel: Model<MechInterface> = mongoose.model<MechInterface>(
   "Mech",
   mechSchema
+);
+
+export const TempMech = mongoose.model<ITempMech>(
+  "TempMechData",
+  TempMechSchema
 );
 export default MechModel;

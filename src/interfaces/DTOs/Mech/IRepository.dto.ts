@@ -1,6 +1,14 @@
 import  mongoose, { Types } from "mongoose";
 import Iuser from "../../entityInterface/Iuser";
-import { IServices } from "../../../models/serviceModel";
+import { IServices } from "../../Model/IService";
+
+export interface MechRegistrationData {
+  name: string;
+  phone: number;
+  email: string;
+  password: string;
+  cpassword: string;
+}
 
 export interface EmailExitCheck {
   email: string;
@@ -260,3 +268,4 @@ export interface updateCompleteStatusResponse {
   isBlocked: boolean;
   isDeleted: boolean;
 }
+
