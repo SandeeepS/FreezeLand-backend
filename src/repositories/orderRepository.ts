@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import {
+  IAllOrderDataResponse,
   IOrderData,
   IOrderDataResponse,
 } from "../interfaces/DTOs/Order/IRepository";
@@ -12,14 +13,16 @@ class OrderRepository
   extends BaseRepository<IOrder & Document>
   implements IOrderRepository
 {
-
   constructor() {
     super(orderModel);
   }
 
   async createOrder(orderData: IOrderData): Promise<IOrderDataResponse | null> {
     try {
-        console.log("entered in the create order method in the order repository",orderData);
+      console.log(
+        "entered in the create order method in the order repository",
+        orderData
+      );
       const {
         orderId,
         userId,
@@ -43,8 +46,8 @@ class OrderRepository
         paymentStatus: paymentStatus,
       };
       const savedOrder = await this.save(dataToSave);
-        console.log("saved order from the database is ", savedOrder);
-      if (savedOrder){
+      console.log("saved order from the database is ", savedOrder);
+      if (savedOrder) {
         return {
           status: "SUCCESS",
           message: "Order created successfully",
@@ -57,8 +60,26 @@ class OrderRepository
           data: null,
         };
       }
-    } catch (error){
+    } catch (error) {
       console.error("Error in repository while creating order:", error);
+      throw error;
+    }
+  }
+
+  //function to get all complaints
+  async getAllComplaints(
+    page: number,
+    limit: number,
+    searchQuery: string,
+    search: string
+  ): Promise<IAllOrderDataResponse[] | null> {
+    try {
+      const regex = new RegExp(search, "i");
+      const result = await this.findAll(page, limit, regex );
+      console.log("all complaint list is  in the orderrepository", result);
+      return result;
+    } catch (error) {
+      console.error("Error fetching complaints:", error);
       throw error;
     }
   }

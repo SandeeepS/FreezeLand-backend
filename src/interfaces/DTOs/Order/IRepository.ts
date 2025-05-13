@@ -17,3 +17,15 @@ export interface IOrderDataResponse {
   message: string;
   data: IOrderData | null;
 }
+
+export interface IAllOrderDataResponse {
+  orderId: string;
+  mechanicId: mongoose.Types.ObjectId | string;
+  complaintId: mongoose.Types.ObjectId | string;
+  userId: mongoose.Types.ObjectId | string;
+  serviceId: mongoose.Types.ObjectId  ;
+  amount: number;
+  paymentStatus: boolean;
+  isDeleted: boolean;
+  timestamp: Date;
+}

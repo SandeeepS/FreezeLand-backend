@@ -92,7 +92,7 @@ class adminController implements IAdminController {
   async getMechList(req: Request, res: Response, next: NextFunction) {
     try {
       const search = req.query.search as string;
-      console.log("Search from the frontend ",search);
+      console.log("Search from the frontend ", search);
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -102,7 +102,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
-        search
+        search,
       });
       console.log("mechsData from the admin controller is ", data);
       res.status(OK).json(data);
@@ -196,16 +196,16 @@ class adminController implements IAdminController {
     next: NextFunction
   ): Promise<GetPreSignedUrlResponse | void> {
     try {
-      const { fileName, fileType , folderName } = req.query as {
+      const { fileName, fileType, folderName } = req.query as {
         fileName: string;
         fileType: string;
-        folderName:string;
+        folderName: string;
       };
       console.log("file from the front end is ", fileName, fileType);
       const result = await this.adminService.getPresignedUrl({
         fileName,
         fileType,
-        folderName
+        folderName,
       });
       console.log("presinged Url is from teh adminController is ", result);
       if (result.success === false) {
@@ -337,8 +337,8 @@ class adminController implements IAdminController {
       console.log(
         "reached the getAllServices funciton in the admin controller"
       );
-      
-      const search  = req.query.search as string  ;
+
+      const search = req.query.search as string;
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
@@ -348,7 +348,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
-        search
+        search,
       });
       console.log(
         "listed services from the database is in the admin controller is",
@@ -376,7 +376,7 @@ class adminController implements IAdminController {
         page,
         limit,
         searchQuery,
-        search
+        search,
       });
       console.log(
         "listed services from the database is in the admin controller is",
@@ -497,7 +497,7 @@ class adminController implements IAdminController {
     try {
       const { _id, values } = req.body;
       console.log("the id from the fronedn is ", _id);
-      console.log("vales from the frontend in the admin Controller",values)
+      console.log("vales from the frontend in the admin Controller", values);
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
         console.log("validation has no problem in the editExistingService");
@@ -547,7 +547,7 @@ class adminController implements IAdminController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<GetImageUrlResponse | void>{
+  ): Promise<GetImageUrlResponse | void> {
     try {
       const { imageKey } = req.query;
       console.log("imageKey from the frontend is ", imageKey);
@@ -586,14 +586,41 @@ class adminController implements IAdminController {
         });
         res.status(200).json({ success: true, result });
       } else {
-        res
-          .status(304)
-          .json({
-            success: false,
-            result: "Not modifeid , id or verificationStatus is undefined",
-          });
+        res.status(304).json({
+          success: false,
+          result: "Not modifeid , id or verificationStatus is undefined",
+        });
       }
     } catch (error) {
+      next(error);
+    }
+  }
+
+  //funciton to get all the complaints
+  async getAllComplaints(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getAllComplaints funciton in the admin controller"
+      );
+      const search = req.query.search as string;
+      const page = parseInt(req.query.page as string);
+      const limit = parseInt(req.query.limit as string);
+      const searchQuery = req.query.searchQuery as string;
+      console.log(" page is ", page);
+      console.log("limit is ", limit);
+      const data = await this.adminService.getAllComplaints(
+        page,
+        limit,
+        searchQuery,
+        search
+      );
+      console.log(
+        "listed services from the database is in the admin controller is",
+        data
+      );
+      res.status(OK).json(data);
+    } catch (error) {
+      console.log(error as Error);
       next(error);
     }
   }

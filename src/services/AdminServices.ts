@@ -54,6 +54,8 @@ import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
+import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
+import IOrderService from "../interfaces/IServices/IOrderService";
 
 class adminService implements IAdminService {
   constructor(
@@ -62,6 +64,7 @@ class adminService implements IAdminService {
     private mechRepository: IMechRepository,
     private serviceRepository: IServiceRepository,
     private deviceRepository: IDeviceRepository,
+    private orderService:IOrderService,
     private encrypt: compareInterface,
     private createjwt: ICreateJWT
   ) {
@@ -70,6 +73,7 @@ class adminService implements IAdminService {
     this.mechRepository = mechRepository;
     this.serviceRepository = serviceRepository;
     this.deviceRepository = deviceRepository;
+    this.orderService = orderService;
 
     this.encrypt = encrypt;
     this.createjwt = createjwt;
@@ -484,6 +488,30 @@ class adminService implements IAdminService {
       throw new Error(
         "error while generating the presinged url from the adminService"
       );
+    }
+  }
+
+  //function to get the all complaints
+  async getAllComplaints(page:number,limit:number, searchQuery:string,search:string): Promise<any> {
+    try {
+      console.log("reached the getAllComplaints in the adminService");
+      const complaints = await this.orderService.getAllComplaints(page,limit, searchQuery,search);
+      if (complaints) {
+        return {
+          status: STATUS_CODES.OK,
+          data: { complaints },
+          message: "success",
+        };
+      } else {
+        return {
+          status: STATUS_CODES.NOT_FOUND,
+          data: { complaints: [] },
+          message: "No complaints found",
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error occured.");
     }
   }
 }

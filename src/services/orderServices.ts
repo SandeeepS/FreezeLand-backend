@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import IOrderService from "../interfaces/IServices/IOrderService";
 import { IPaymentData } from "../interfaces/DTOs/User/IService.dto";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
+import { IAllOrderDataResponse } from "../interfaces/DTOs/Order/IService";
 const frontendBaseUrl = process.env.FRONTEND_BASE_URL as string;
 const stripeKey = process.env.STRIPE_SECRET_KEY as string;
 const stripe = new Stripe(stripeKey);
@@ -113,6 +114,17 @@ class OrderServices implements IOrderService {
         message: "transaction failed",
         // data: session.metadata,
       };
+    }
+  }
+
+  async getAllComplaints(page:number,limit:number,searchQuery:string,search:string): Promise<IAllOrderDataResponse[] | null> {
+    try {
+      console.log("entered in the get all complaints method in the order service");
+      const response = await this.orderRepository.getAllComplaints(page,limit,searchQuery,search);
+      return response;
+    } catch (error) {
+      console.error("Error fetching complaints:", error);
+      throw error;
     }
   }
 }
