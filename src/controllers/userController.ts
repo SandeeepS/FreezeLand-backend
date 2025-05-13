@@ -243,11 +243,12 @@ class userController implements IUserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { data} = req.body;
-      console.log("data reached in the usercontroller while creating stripe session ", data);
-      const session = await this.userServices.createStripeSession(
-     data
+      const { data } = req.body;
+      console.log(
+        "data reached in the usercontroller while creating stripe session ",
+        data
       );
+      const session = await this.userServices.createStripeSession(data);
       if (session) {
         res.status(OK).json({ success: true, session });
       } else {
@@ -260,8 +261,7 @@ class userController implements IUserController {
       console.log(error as Error);
       next(error);
     }
-  } 
-
+  }
 
   async userLogin(
     req: Request,
@@ -482,14 +482,14 @@ class userController implements IUserController {
   async editUser(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
-      const { _id, name, phone , imageKey}: EditUserDTO = req.body;
+      const { _id, name, phone, imageKey }: EditUserDTO = req.body;
       const check = EditUserDetailsValidator(name, phone);
       if (check) {
         const editedUser = await this.userServices.editUser({
           _id,
           name,
           phone,
-          imageKey
+          imageKey,
         });
         console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
         if (editedUser) {
@@ -627,7 +627,7 @@ class userController implements IUserController {
     }
   }
 
-  //function to register the service 
+  //function to register the service
   async registerService(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
@@ -793,12 +793,10 @@ class userController implements IUserController {
     }
   }
 
-  //function to get the service details for user complaint reginstration 
+  //function to get the service details for user complaint reginstration
   async getService(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(
-        "reached the getAllServices funciton in the user controller"
-      );
+      console.log("reached the getAllServices funciton in the user controller");
       const id = req.params.id;
       const result = await this.userServices.getService({ id });
       res.status(OK).json(result);
@@ -816,8 +814,12 @@ class userController implements IUserController {
   ): Promise<void> {
     try {
       const { sessionId } = req.query;
+      console.log("entered in the successPayment function in the userController");
       console.log("sessionId from the frontend is ", sessionId);
-      const result = await this.userServices.successPayment(sessionId as string);
+      const result = await this.userServices.successPayment(
+        sessionId as string
+      );
+      console.log("result from the successPayment in the userController");
       res.status(OK).json({ success: true, result });
     } catch (error) {
       console.log(error as Error);

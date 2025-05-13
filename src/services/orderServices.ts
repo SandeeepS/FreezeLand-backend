@@ -1,11 +1,26 @@
 import Stripe from "stripe";
 import IOrderService from "../interfaces/IServices/IOrderService";
 import { IPaymentData } from "../interfaces/DTOs/User/IService.dto";
+import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 const frontendBaseUrl = process.env.FRONTEND_BASE_URL as string;
 const stripeKey = process.env.STRIPE_SECRET_KEY as string;
 const stripe = new Stripe(stripeKey);
+
+export interface OrderEventData {
+  orderId: string;
+  amount: number;
+  complaintId: string;
+  mechanicId: string;
+  serviceId: string;
+  userId: string;
+  paymentStatus: boolean;
+  timestamp: Date;
+}
+
 class OrderServices implements IOrderService {
-  constructor() {}
+  constructor(private orderRepository: IOrderRepository) {
+    this.orderRepository = orderRepository;
+  }
 
   async createStripeSession(orderData: IPaymentData): Promise<unknown> {
     try {
@@ -51,56 +66,46 @@ class OrderServices implements IOrderService {
   }
 
   async successPayment(sessionId: string): Promise<unknown> {
+    console.log("entered in the successPayment  order service in the backend ");
     console.log(sessionId, "this is session 1");
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     try {
       console.log(session, "this is session");
 
-      // if (session.payment_status === "paid" && session.metadata?.price) {
-      //   const purchasedAmount = parseInt(session.metadata?.price);
-      //   const { tutorId, courseId, userId } = session.metadata;
-      //   // const transactionId = generateTransactionId(tutorId, courseId, userId);
-      //   const shareForTutor = (purchasedAmount * 0.95).toFixed(2);
-      //   const shareForAdmin = purchasedAmount - parseInt(shareForTutor);
-      //   const adminShare = shareForAdmin.toString();
-      //   const tutorShare = shareForTutor.toString();
-      //   console.log(tutorShare, adminShare, "///////////////////////");
-      //   // Make a request to the Order Service to create the order
-      //   const event: OrderEventData = {
-      //     userId: session.metadata?.userId, // Example of extra value
-      //     courseId: session.metadata?.courseId, // Another example
-      //     tutorId: session.metadata?.tutorId,
-      //     thumbnail: session.metadata?.thumbnail,
-      //     title: session.metadata?.title,
-      //     price: session.metadata?.price,
-      //     adminShare,
-      //     tutorShare,
-      //     transactionId,
-      //     paymentStatus: true,
-      //     timestamp: new Date(),
-      //     status: "SUCCESS",
-      //   };
+      if (session.payment_status == "paid" && session.metadata?.amount) {
+        const purchasedAmount = parseInt(session.metadata?.amount);
+        const { amount, complaintId, mechanicId, serviceId, status } =
+          session.metadata;
 
-      //   console.log("firtsfirtstfirst");
-      //   // const response = await kafkaConfig.handlePaymentTransaction(event);
-      //   if (response.status === "SUCCESS") {
-      //     console.log("triggered success");
-      //     return {
-      //       success: true,
-      //       data: session.metadata,
-      //       message: "Payment successful",
-      //     };
-      //   } else {
-      //     console.log("triggered fail");
-      //     return {
-      //       success: false,
-      //       message: "transaction failed",
-      //       data: session.metadata,
-      //     };
-      //   }
-      return {
-        success: true,
-      };
+        //create a shre here in the future for admin adn mechanic.
+        // Make a request to the Order Service to create the order
+
+        const order: OrderEventData = {
+          orderId: session.id,
+          userId: session.metadata?.userId,
+          amount: purchasedAmount,
+          complaintId: complaintId,
+          mechanicId: mechanicId,
+          serviceId: serviceId,
+          paymentStatus: true,
+          timestamp: new Date(),
+        };
+
+        console.log("firtsfirtstfirst");
+
+        const response = await this.orderRepository.createOrder(order);
+        if (response?.status === "SUCCESS") {
+          console.log("triggered success");
+          return {
+            response,
+          };
+        } else {
+          console.log("triggered fail");
+          return {
+            response,
+          };
+        }
+      }
     } catch (error: any) {
       console.error("Payment processing failed:", error);
       return {

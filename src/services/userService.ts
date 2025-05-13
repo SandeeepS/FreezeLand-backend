@@ -651,6 +651,7 @@ async createStripeSession(data:IPaymentData):Promise<unknown>{
 
 async successPayment(data:string):Promise<unknown>{
   try{
+    console.log("entered in the successPayment  user service in the backend ");
     const result = await this.orderService.successPayment(data);
     console.log("result in the userService for success payment",result);
     return result;

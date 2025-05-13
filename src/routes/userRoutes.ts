@@ -9,13 +9,15 @@ import { GenerateOTP } from "../utils/generateOtp";
 import { Email } from "../utils/email";
 import ServiceRepository from "../repositories/serviceRepository";
 import OrderServices from "../services/orderServices";
+import OrderRepository from "../repositories/orderRepository";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const userRepository = new UserRepository();
 const serviceRepository = new ServiceRepository();
-const orderService = new OrderServices();
+const orderRepository = new OrderRepository();
+const orderService = new OrderServices(orderRepository);
 const generateOTP  = new GenerateOTP();
 
 const email = new Email(generateOTP);
