@@ -603,6 +603,7 @@ class adminController implements IAdminController {
         "reached the getAllComplaints funciton in the admin controller"
       );
       const search = req.query.search as string;
+      console.log("Search from the frontend in adminController ", search);
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string;

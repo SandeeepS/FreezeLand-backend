@@ -4,6 +4,7 @@ import concernModel, { Iconcern } from "../models/concernModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import {
   getComplaintDetailsResponse,
+  IAllComplaintDataResponse,
   IUpdateWorkDetails,
 } from "../interfaces/DTOs/Concern/IRepository";
 
@@ -90,6 +91,27 @@ class ConcernRepository
         error as Error
       );
       throw new Error("Errorrrrr");
+    }
+  }
+
+
+    //function to get all complaints
+  async getAllComplaints(
+    page: number,
+    limit: number,
+    searchQuery: string,
+    search: string
+  ): Promise<IAllComplaintDataResponse[] | null> {
+    try {
+      console.log("entered in the get all complaints method in the concern repository");
+      console.log("search in the order repository", search);
+      const regex = new RegExp(search, "i");
+      const result = await this.findAll(page, limit, regex );
+      console.log("all complaint list is  in the concern Repository", result);
+      return result ;
+    } catch (error){
+      console.error("Error fetching complaints:",error);
+      throw error;
     }
   }
 }

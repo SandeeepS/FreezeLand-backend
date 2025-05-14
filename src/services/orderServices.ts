@@ -117,16 +117,7 @@ class OrderServices implements IOrderService {
     }
   }
 
-  async getAllComplaints(page:number,limit:number,searchQuery:string,search:string): Promise<IAllOrderDataResponse[] | null> {
-    try {
-      console.log("entered in the get all complaints method in the order service");
-      const response = await this.orderRepository.getAllComplaints(page,limit,searchQuery,search);
-      return response;
-    } catch (error) {
-      console.error("Error fetching complaints:", error);
-      throw error;
-    }
-  }
+
 }
 
 export default OrderServices;

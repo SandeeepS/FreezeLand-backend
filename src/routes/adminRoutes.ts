@@ -11,6 +11,8 @@ import ServiceRepository from "../repositories/serviceRepository";
 import DeviceRepository from "../repositories/deviceRepository";
 import OrderServices from "../services/orderServices";
 import OrderRepository from "../repositories/orderRepository";
+import ConcernService from "../services/concernService";
+import ConcernRepository from "../repositories/concernRepository";
 
 const adminRouter = express.Router();
 const encrypt = new Encrypt();
@@ -21,8 +23,10 @@ const mechRepository = new MechRepository();
 const serviceRepository = new ServiceRepository();
 const deviceRepository = new DeviceRepository();
 const orderRepository = new OrderRepository()
+const concernRepository = new ConcernRepository();
 const orderService = new OrderServices(orderRepository);
-const adminService: AdminService = new AdminService(adminReopsitory,userRepository,mechRepository,serviceRepository,deviceRepository,orderService, encrypt, createjwt);
+const concernService = new ConcernService(concernRepository);
+const adminService: AdminService = new AdminService(adminReopsitory,userRepository,mechRepository,serviceRepository,deviceRepository,orderService,concernService, encrypt, createjwt);
 const controller = new adminController(adminService);
 
 adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => controller.adminLogin(req, res,next));
@@ -48,6 +52,5 @@ adminRouter.put('/editExistService',adminAuth(["admin"]),async(req:Request,res:R
 adminRouter.get('/getImageUrl', async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 adminRouter.put('/updateApprove',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.updateApprove(req,res,next))
 adminRouter.get('/getAllComplaints',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllComplaints(req,res,next));
-
 
 export default adminRouter;

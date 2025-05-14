@@ -56,6 +56,7 @@ import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository
 import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 import IOrderService from "../interfaces/IServices/IOrderService";
+import IConcernService from "../interfaces/IServices/IConcernService";
 
 class adminService implements IAdminService {
   constructor(
@@ -65,6 +66,7 @@ class adminService implements IAdminService {
     private serviceRepository: IServiceRepository,
     private deviceRepository: IDeviceRepository,
     private orderService:IOrderService,
+    private concernService:IConcernService,
     private encrypt: compareInterface,
     private createjwt: ICreateJWT
   ) {
@@ -74,6 +76,7 @@ class adminService implements IAdminService {
     this.serviceRepository = serviceRepository;
     this.deviceRepository = deviceRepository;
     this.orderService = orderService;
+    this.concernService = concernService;
 
     this.encrypt = encrypt;
     this.createjwt = createjwt;
@@ -495,7 +498,8 @@ class adminService implements IAdminService {
   async getAllComplaints(page:number,limit:number, searchQuery:string,search:string): Promise<any> {
     try {
       console.log("reached the getAllComplaints in the adminService");
-      const complaints = await this.orderService.getAllComplaints(page,limit, searchQuery,search);
+      console.log("Search in the admin service is ", search);
+      const complaints = await this.concernService.getAllComplaints(page,limit, searchQuery,search);
       if (complaints) {
         return {
           status: STATUS_CODES.OK,
