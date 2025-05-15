@@ -42,7 +42,7 @@ export interface IMechServices{
     VerifyMechanic (values:VerifyMechanicDTO):Promise<unknown>
     updateNewPassword(data: UpdateNewPasswordDTO):Promise<UpdateNewPasswordResponse | null>;
     getAllUserRegisteredServices(page: number, limit: number, searchQuery: string,userId:string): Promise<unknown>;
-    getComplaintDetails(id:string) :Promise<getComplaintDetailsResponse[] >
+    getComplaintDetails(id:string) :Promise<getComplaintDetailsResponse[] | null >
     getAllAcceptedServices (mechanicId : string) : Promise<getAllAcceptedServiceResponse[]>
     updateWorkDetails(data : IUpdateWorkDetails ) :Promise<unknown>
     getDevcies(): Promise<GetAllDevicesResponse[]>

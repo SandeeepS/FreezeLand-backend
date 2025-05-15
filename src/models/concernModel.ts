@@ -77,6 +77,7 @@ const concernSchema: Schema<Iconcern> = new Schema(
         "accepted",
         "onProcess",
         "completed",
+        "cancelled",
         "canceled_by_user",
         "canceled_by_mechanic",
         "pending_reassignment",

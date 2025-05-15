@@ -1,3 +1,4 @@
+import { GetAllUserRegisteredServicesResponse } from "../interfaces/DTOs/Concern/IRepository";
 import { getComplaintDetailsResponse, IAllComplaintDataResponse } from "../interfaces/DTOs/Concern/IService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IConcernService from "../interfaces/IServices/IConcernService";
@@ -60,6 +61,30 @@ class ConcernService implements IConcernService {
       throw error;
     }
   }
+
+    async getAllUserRegisteredServices(
+      page: number,
+      limit: number,
+      searchQuery: string
+    ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+      try {
+        const data = await this.concernRepositroy.getAllUserRegisteredServices({
+          page,
+          limit,
+          searchQuery,
+        });
+        console.log("data in the mechService ", data);
+  
+        return data;
+      } catch (error) {
+        console.log(
+          "Error occured while fetching the user registerd complaint in the mechService ",
+          error as Error
+        );
+        throw error;
+      }
+    }
+  
 }
 
 export default ConcernService;

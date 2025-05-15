@@ -4,8 +4,7 @@ import {
   EmailExitCheck,
   getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
-  GetAllUserRegisteredServicesDTO,
-  GetAllUserRegisteredServicesResponse,
+
   getComplaintDetailsResponse,
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
@@ -200,57 +199,7 @@ class MechRepository
     }
   }
 
-  //function for getting all the userRegistered services
-  async getAllUserRegisteredServices(
-    data: GetAllUserRegisteredServicesDTO
-  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
-    try {
-      const { page, limit } = data;
-      
-      // Use aggregation to get user's registered services with lookups
-      const result = await concernModel.aggregate([
-        {
-          $match: {
-            isDeleted: false,
-            $or: [
-              { currentMechanicId: { $exists: false } },
-              { currentMechanicId: null },
-            ],
-          },
-        },
-        {
-          $lookup: {
-            from: "users", // The users collection
-            localField: "userId",
-            foreignField: "_id",
-            as: "userDetails",
-          },
-        },
-        {
-          $lookup: {
-            from: "services", // The services collection
-            localField: "serviceId",
-            foreignField: "_id",
-            as: "serviceDetails",
-          },
-        },
-        { $skip: (page - 1) * limit },
-        { $limit: limit },
-        { $project: { "userDetails.password": 0 } }, // Exclude password
-      ]);
 
-      console.log("User registered services:", result);
-      return result as GetAllUserRegisteredServicesResponse[];
-    } catch (error){
-      console.log(
-        "Error occurred while fetching user registered services:",
-        error as Error
-      );
-      throw new Error(
-        "Error occurred while fetching user registered services."
-      );
-    }
-  }
 
   //function to get the specified  complaint details  by id
   async getComplaintDetails(

@@ -41,13 +41,15 @@ import { Iemail } from "../utils/email";
 import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import { updateCompleteStatusResponse } from "../interfaces/DTOs/Mech/IRepository.dto";
+import IConcernService from "../interfaces/IServices/IConcernService";
 
 const { OK, UNAUTHORIZED } = STATUS_CODES;
 class mechService implements IMechServices {
   constructor(
     private mechRepository: IMechRepository,
-    private concernRepository:IConcernRepository,
+    private concernRepository: IConcernRepository,
     private roomRepository: IRoomRepository,
+    private concernService: IConcernService,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
     private email: Iemail
@@ -55,6 +57,7 @@ class mechService implements IMechServices {
     this.mechRepository = mechRepository;
     this.concernRepository = concernRepository;
     this.roomRepository = roomRepository;
+    this.concernService = concernService;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
     this.email = email;
@@ -419,7 +422,9 @@ class mechService implements IMechServices {
     }
   }
 
-  async getS3SingUrlForMechCredinential(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> {
+  async getS3SingUrlForMechCredinential(
+    data: GetPreSignedUrlDTO
+  ): Promise<GetPreSignedUrlResponse> {
     try {
       const { fileName, fileType, name } = data;
 
@@ -441,7 +446,10 @@ class mechService implements IMechServices {
   }
 
   //update the compliant Status
-  async updateComplaintStatus(complaintId: string, nextStatus: string):Promise<updateCompleteStatusResponse | null> {
+  async updateComplaintStatus(
+    complaintId: string,
+    nextStatus: string
+  ): Promise<updateCompleteStatusResponse | null> {
     try {
       console.log("Entered in the updateComplaintStatus");
       const result = await this.mechRepository.updateComplaintStatus(
@@ -520,11 +528,11 @@ class mechService implements IMechServices {
     searchQuery: string
   ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
-      const data = await this.mechRepository.getAllUserRegisteredServices({
+      const data = await this.concernService.getAllUserRegisteredServices(
         page,
         limit,
-        searchQuery,
-      });
+        searchQuery
+      );
       console.log("data in the mechService ", data);
 
       return data;
@@ -537,13 +545,13 @@ class mechService implements IMechServices {
     }
   }
 
-  //function to getting the specified complinat using id
+  //function to getting the specified complinat using id 
   async getComplaintDetails(
     id: string
-  ): Promise<getComplaintDetailsResponse[]> {
+  ): Promise<getComplaintDetailsResponse[] | null>  {
     try {
       console.log("Enterdin the mechService");
-      const result = await this.mechRepository.getComplaintDetails(id);
+      const result = await this.concernService.getComplaintById(id);
       return result;
     } catch (error) {
       console.log(
@@ -609,17 +617,25 @@ class mechService implements IMechServices {
     }
   }
 
-  //function to update the work details 
-  async updateWorkDetails(data : IUpdateWorkDetails ) :Promise<unknown> {
-    try{
-      const {complaintId , workDetails} = data;
-      console.log("complaintId and wrokDetails in the mechService is ",complaintId , workDetails);
-      const result = await this.concernRepository.updateWorkDetails({complaintId,workDetails});
+  //function to update the work details
+  async updateWorkDetails(data: IUpdateWorkDetails): Promise<unknown> {
+    try {
+      const { complaintId, workDetails } = data;
+      console.log(
+        "complaintId and wrokDetails in the mechService is ",
+        complaintId,
+        workDetails
+      );
+      const result = await this.concernRepository.updateWorkDetails({
+        complaintId,
+        workDetails,
+      });
       return result;
-    }catch(error){
-      console.log("error occured in the mechService while updating the work details while fixing  the complaint ");
-      throw error
-
+    } catch (error) {
+      console.log(
+        "error occured in the mechService while updating the work details while fixing  the complaint "
+      );
+      throw error;
     }
   }
 }

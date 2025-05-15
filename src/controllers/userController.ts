@@ -691,7 +691,7 @@ class userController implements IUserController {
       );
 
       const page = 1;
-      const limit = 10;
+      const limit = 25;
       const searchQuery = "";
       const allRegisteredUserServices =
         await this.userServices.getAllUserRegisteredServices(

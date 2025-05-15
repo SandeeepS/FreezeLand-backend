@@ -3,6 +3,8 @@ import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import concernModel, { Iconcern } from "../models/concernModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import {
+  GetAllUserRegisteredServicesDTO,
+  GetAllUserRegisteredServicesResponse,
   getComplaintDetailsResponse,
   IAllComplaintDataResponse,
   IUpdateWorkDetails,
@@ -135,7 +137,7 @@ class ConcernRepository
       const now = new Date();
 
       if (userRole === "user") {
-        complaint.status = "canceled_by_user";
+        complaint.status = "cancelled";
         complaint.userCancellation = {
           canceledAt: now,
           reason,
@@ -146,7 +148,7 @@ class ConcernRepository
           const lastEntry =
             complaint.workHistory[complaint.workHistory.length - 1];
           if (lastEntry.status !== "completed") {
-            lastEntry.status = "canceled";
+            lastEntry.status = "cancelled";
             lastEntry.acceptedAt = lastEntry.acceptedAt || now;
             lastEntry.canceledAt = now;
             lastEntry.reason = reason;
@@ -156,7 +158,7 @@ class ConcernRepository
       } else if (userRole === "mechanic") {
         if (!mechanicId) throw new Error("Mechanic ID required");
 
-        complaint.status = "canceled_by_mechanic";
+        complaint.status = "pending";
         complaint.needsReassignment = true;
         complaint.currentMechanicId = null;
 
@@ -166,7 +168,7 @@ class ConcernRepository
           .find((entry) => entry.mechanicId.toString() === mechanicId.toString());
 
         if (lastEntry) {
-          lastEntry.status = "canceled";
+          lastEntry.status = "cancelled";
           lastEntry.acceptedAt = lastEntry.acceptedAt
           lastEntry.canceledAt = now;
           lastEntry.reason = reason;
@@ -175,7 +177,7 @@ class ConcernRepository
           // If no workHistory exists, add a new one
           complaint.workHistory.push({
             mechanicId: new mongoose.Types.ObjectId(mechanicId),
-            status: "canceled",
+            status: "cancelled",
             acceptedAt: now,
             canceledAt: now,
             reason,
@@ -193,6 +195,59 @@ class ConcernRepository
       throw error;
     }
   }
+
+
+    //function for getting all the userRegistered services 
+    async getAllUserRegisteredServices(
+      data: GetAllUserRegisteredServicesDTO
+    ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+      try {
+        const { page, limit } = data;
+        
+        // Use aggregation to get user's registered services with lookups
+        const result = await concernModel.aggregate([
+          {
+            $match: {
+              isDeleted: false,
+              $or: [
+                { currentMechanicId: { $exists: false } },
+                { currentMechanicId: null },
+              ],
+            },
+          },
+          {
+            $lookup: {
+              from: "users", 
+              localField: "userId",
+              foreignField: "_id",
+              as: "userDetails",
+            },
+          },
+          {
+            $lookup: {
+              from: "services", 
+              localField: "serviceId",
+              foreignField: "_id",
+              as: "serviceDetails",
+            },
+          },
+          { $skip: (page - 1) * limit },
+          { $limit: limit },
+          { $project: { "userDetails.password": 0 } },
+        ]);
+  
+        console.log("User registered services:", result);
+        return result as GetAllUserRegisteredServicesResponse[];
+      } catch (error){
+        console.log(
+          "Error occurred while fetching user registered services:",
+          error as Error
+        );
+        throw new Error(
+          "Error occurred while fetching user registered services."
+        );
+      }
+    }
 }
 
 export default ConcernRepository;

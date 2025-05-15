@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import Iuser from "../../entityInterface/Iuser";
+import { IServices } from "../../Model/IService";
 
 export interface IAllComplaintDataResponse {
   _id: mongoose.Types.ObjectId;
@@ -48,4 +50,20 @@ export interface getComplaintDetailsResponse {
     serviceDetails: object;
     detaultAddressDetails:object;
   }
+
+
+  export interface GetAllUserRegisteredServicesResponse {
+  _id: string;
+  name: string;
+  image: [];
+  serviceId: string;
+  userId: string;
+  defaultAddress: string;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  userDetails: Iuser;
+  serviceDetails: IServices;
+}
 
