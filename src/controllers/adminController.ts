@@ -626,6 +626,47 @@ class adminController implements IAdminController {
     }
   }
 
+  //funciton to get the complaint by id
+  async getComplaintById(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "reached the getComplaintById funciton in the admin controller"
+      );
+      const id = req.params.id;
+      const result = await this.adminService.getComplaintById(id);
+      res.status(OK).json(result);
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+  //function to cancel the complaint
+  async cancelComplaint(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { complaintId, userRole ,reason} = req.body;
+      console.log(
+        "entered in the cancelcomplaint in the admin controller",
+        complaintId,
+        userRole,
+        reason
+      );
+      const result = await this.adminService.cancelComplaint(
+        complaintId,
+        userRole,
+        reason
+      );
+      if (result != null) {
+        res.status(OK).json({ message: "success", result });
+      } else {
+        res.status(OK).json({ message: "failed to cancel complaitn" });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
       res

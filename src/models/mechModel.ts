@@ -26,26 +26,32 @@ const mechSchema: Schema<MechInterface> = new Schema({
     default: "mechanic",
     required: true,
   },
+
   mechanicType: {
     type: [String],
     required: false,
   },
+
   photo: {
     type: String,
     required: false,
   },
+
   adharProof: {
     type: String,
     required: false,
   },
+
   employeeLicense: {
     type: String,
     required: false,
   },
+
   isVerified: {
     type: Boolean,
     default: false,
   },
+
   isBlocked: {
     type: Boolean,
     default: false,

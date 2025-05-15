@@ -206,7 +206,7 @@ class MechRepository
   ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
       const { page, limit } = data;
-
+      
       // Use aggregation to get user's registered services with lookups
       const result = await concernModel.aggregate([
         {
@@ -241,7 +241,7 @@ class MechRepository
 
       console.log("User registered services:", result);
       return result as GetAllUserRegisteredServicesResponse[];
-    } catch (error) {
+    } catch (error){
       console.log(
         "Error occurred while fetching user registered services:",
         error as Error

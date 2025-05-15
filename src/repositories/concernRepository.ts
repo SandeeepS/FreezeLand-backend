@@ -94,8 +94,7 @@ class ConcernRepository
     }
   }
 
-
-    //function to get all complaints
+  //function to get all complaints
   async getAllComplaints(
     page: number,
     limit: number,
@@ -103,14 +102,94 @@ class ConcernRepository
     search: string
   ): Promise<IAllComplaintDataResponse[] | null> {
     try {
-      console.log("entered in the get all complaints method in the concern repository");
+      console.log(
+        "entered in the get all complaints method in the concern repository"
+      );
       console.log("search in the order repository", search);
       const regex = new RegExp(search, "i");
-      const result = await this.findAll(page, limit, regex );
+      const result = await this.findAll(page, limit, regex);
       console.log("all complaint list is  in the concern Repository", result);
-      return result ;
-    } catch (error){
-      console.error("Error fetching complaints:",error);
+      return result;
+    } catch (error) {
+      console.error("Error fetching complaints:", error);
+      throw error;
+    }
+  }
+
+  //funciton to cancel complaints
+  // In your concernRepository
+  async cancelComplaint(
+    complaintId: string,
+    userRole: string,
+    reason: string,
+  ): Promise<unknown> {
+    try {
+      console.log("Entered cancelComplaint in concernRepository");
+
+      const complaint = await concernModel.findById(complaintId);
+      const mechanicId = complaint?.currentMechanicId;
+      if (!complaint) {
+        throw new Error("Complaint not found");
+      }
+
+      const now = new Date();
+
+      if (userRole === "user") {
+        complaint.status = "canceled_by_user";
+        complaint.userCancellation = {
+          canceledAt: now,
+          reason,
+        };
+
+        // Update the most recent work history item, if any
+        if (complaint.workHistory.length > 0) {
+          const lastEntry =
+            complaint.workHistory[complaint.workHistory.length - 1];
+          if (lastEntry.status !== "completed") {
+            lastEntry.status = "canceled";
+            lastEntry.acceptedAt = lastEntry.acceptedAt || now;
+            lastEntry.canceledAt = now;
+            lastEntry.reason = reason;
+            lastEntry.canceledBy = "user";
+          }
+        }
+      } else if (userRole === "mechanic") {
+        if (!mechanicId) throw new Error("Mechanic ID required");
+
+        complaint.status = "canceled_by_mechanic";
+        complaint.needsReassignment = true;
+        complaint.currentMechanicId = null;
+
+        // Updating the most recent work history item by the same mechanic
+        const lastEntry = [...complaint.workHistory]
+          .reverse()
+          .find((entry) => entry.mechanicId.toString() === mechanicId.toString());
+
+        if (lastEntry) {
+          lastEntry.status = "canceled";
+          lastEntry.acceptedAt = lastEntry.acceptedAt
+          lastEntry.canceledAt = now;
+          lastEntry.reason = reason;
+          lastEntry.canceledBy = "mechanic";
+        } else {
+          // If no workHistory exists, add a new one
+          complaint.workHistory.push({
+            mechanicId: new mongoose.Types.ObjectId(mechanicId),
+            status: "canceled",
+            acceptedAt: now,
+            canceledAt: now,
+            reason,
+            canceledBy: "mechanic",
+          });
+        }
+      } else {
+        throw new Error("Invalid user role");
+      }
+
+      const updatedComplaint = await complaint.save();
+      return updatedComplaint;
+    } catch (error) {
+      console.error("Error occurred while cancelling complaint:", error);
       throw error;
     }
   }

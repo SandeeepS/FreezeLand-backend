@@ -1,4 +1,3 @@
-//model for handling the user compliant
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface Iconcern extends Document {
@@ -12,16 +11,23 @@ export interface Iconcern extends Document {
   locationName: object;
   status: string;
   currentMechanicId: mongoose.Types.ObjectId | null;
-  acceptedAt: Date | null;
+  acceptedAt: Date;
   workHistory: [
     {
       mechanicId: mongoose.Types.ObjectId;
       status: string;
       acceptedAt: Date;
-      canceledAt: Date | null;
-      reason: string | null;
+      canceledAt: Date;
+      reason: string;
+      canceledBy: string;
     }
   ];
+
+  userCancellation: {
+    canceledAt: Date;
+    reason: string;
+  };
+  needsReassignment: boolean;
   workDetails: [
     {
       description: string;
@@ -29,7 +35,7 @@ export interface Iconcern extends Document {
       addedAt: Date;
     }
   ];
-  chatId?: mongoose.Types.ObjectId; //here the chat id referes to the room id .
+  chatId?: mongoose.Types.ObjectId;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -66,16 +72,23 @@ const concernSchema: Schema<Iconcern> = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "completed", "canceled"],
+      enum: [
+        "pending",
+        "accepted",
+        "onProcess",
+        "completed",
+        "canceled_by_user",
+        "canceled_by_mechanic",
+        "pending_reassignment",
+      ],
       default: "pending",
     },
     currentMechanicId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       default: null,
     },
     acceptedAt: {
       type: Date,
-      default: null,
     },
     workHistory: [
       {
@@ -90,7 +103,7 @@ const concernSchema: Schema<Iconcern> = new Schema(
         },
         acceptedAt: {
           type: Date,
-          required: true,
+          required: false,
         },
         canceledAt: {
           type: Date,
@@ -100,8 +113,27 @@ const concernSchema: Schema<Iconcern> = new Schema(
           type: String,
           default: null,
         },
+        canceledBy: {
+          type: String,
+          enum: ["user", "mechanic", null],
+          default: null,
+        },
       },
     ],
+    userCancellation: {
+      canceledAt: {
+        type: Date,
+        default: null,
+      },
+      reason: {
+        type: String,
+        default: null,
+      },
+    },
+    needsReassignment: {
+      type: Boolean,
+      default: false,
+    },
     workDetails: [
       {
         description: {
@@ -118,9 +150,9 @@ const concernSchema: Schema<Iconcern> = new Schema(
         },
       },
     ],
-    chatId:{
+    chatId: {
       type: mongoose.Types.ObjectId,
-      required:false,
+      required: false,
     },
     isBlocked: {
       type: Boolean,
@@ -135,6 +167,7 @@ const concernSchema: Schema<Iconcern> = new Schema(
     timestamps: true,
   }
 );
+
 const concernModel: Model<Iconcern> = mongoose.model<Iconcern>(
   "Concerns",
   concernSchema

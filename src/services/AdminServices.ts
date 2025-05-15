@@ -518,5 +518,42 @@ class adminService implements IAdminService {
       throw new Error("Error occured.");
     }
   }
+
+
+  //function to get the complaint by id
+  async getComplaintById(id:string): Promise<any> {
+    try {
+      console.log("reached the getComplaintById in the adminService");
+      const complaint = await this.concernService.getComplaintById(id);
+      if (complaint) {
+        return {
+          status: STATUS_CODES.OK,
+          data: { complaint },
+          message: "success",
+        };
+      } else {
+        return {
+          status: STATUS_CODES.NOT_FOUND,
+          data: { complaint: [] },
+          message: "No complaints found",
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error occured.");
+    }
+  }
+
+  //function to cancel the complaint by admin 
+  async cancelComplaint(complaintId:string,userRole:string,reason:string):Promise<unknown>{
+    try{
+      console.log("reached in the cancel complaint function in the admin service",complaintId,userRole);
+      const result = await this.concernService.cancelComplaint(complaintId,userRole,reason);
+      return result;
+    }catch(error){
+      console.log(error as Error);
+      throw new Error("error ocured in the cancel complaint");
+    }
+  }
 }
 export default adminService;

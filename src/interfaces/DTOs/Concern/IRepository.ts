@@ -43,6 +43,7 @@ export interface getComplaintDetailsResponse {
         reason: string | null;
       }
     ];
+
     workDetails: [
       {
         description: string;
