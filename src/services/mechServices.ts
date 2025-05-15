@@ -7,6 +7,7 @@ import {
   EmailExitCheckDTO,
   getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
+  GetAllMechanicCompletedServicesResponse,
   GetAllMechanicResponse,
   GetAllMechanicsDTO,
   GetAllUserRegisteredServicesResponse,
@@ -635,6 +636,18 @@ class mechService implements IMechServices {
       console.log(
         "error occured in the mechService while updating the work details while fixing  the complaint "
       );
+      throw error;
+    }
+  }
+
+  //function to getAllCompleted complaint by mechanic 
+  async getAllCompletedServices (mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null> {
+    try{
+      console.log("Entered in the getAllCompliantService funtion in the mechService");
+      const result = await this.concernService.getAllCompletedServiceByMechanic(mechanicId);
+      return result;
+    }catch(error){
+      console.log("error in mechService",error);
       throw error;
     }
   }

@@ -67,3 +67,5 @@ export interface getComplaintDetailsResponse {
   serviceDetails: IServices;
 }
 
+
+

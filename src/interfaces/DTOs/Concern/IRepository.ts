@@ -46,6 +46,21 @@ export interface GetAllUserRegisteredServicesResponse {
 }
 
 
+export interface GetAllMechanicCompletedServicesResponse {
+  _id: string ;
+  name: string;
+  image: [];
+  serviceId: string;
+  userId:string;
+  defaultAddress: string;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  userDetails:Iuser;
+  serviceDetails:IServices;
+}
+
   export interface IAllComplaintDataResponse {
     _id: mongoose.Types.ObjectId;
     name: string;

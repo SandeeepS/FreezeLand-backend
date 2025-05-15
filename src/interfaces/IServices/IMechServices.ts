@@ -4,6 +4,7 @@ import {
     EmailExitCheckDTO,
     getAllAcceptedServiceResponse,
     GetAllDevicesResponse,
+    GetAllMechanicCompletedServicesResponse,
     GetAllMechanicResponse,
     GetAllMechanicsDTO,
     getComplaintDetailsResponse,
@@ -51,5 +52,6 @@ export interface IMechServices{
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string,roomId: string): Promise<getUpdatedWorkAssingnedResponse> 
     updateComplaintStatus(complaintId: string, nextStatus: string):Promise<updateCompleteStatusResponse | null>   
     createRoom(data: ICreateRoomData): Promise<ICreateRoomResponse> 
+     getAllCompletedServices (mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null>
 
 }

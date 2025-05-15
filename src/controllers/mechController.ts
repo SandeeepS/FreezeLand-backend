@@ -639,6 +639,21 @@ class mechController implements IMechController {
     }
   }
 
+  //function to get all completed service for the mech service histroy listing 
+  async getAllCompletedServices(req:Request,res:Response,next:NextFunction) {
+    try{
+      console.log("Entered in the getAllCompleted Services");
+      const {mechanicId} = req.body;
+      console.log("mechanic id is",mechanicId);
+      const result = await this.mechServices.getAllCompletedServices(mechanicId);
+      res.status(OK).json({success:true,result})
+      
+    }catch(error){
+      console.log("Error occured in the mechanic controller while getting the completed complaints by mechic ",error);
+      next(error);
+    }
+  }
+
   async mechLogout(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("Entered in the function for logout of mech");

@@ -3,6 +3,7 @@ import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import concernModel, { Iconcern } from "../models/concernModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import {
+  GetAllMechanicCompletedServicesResponse,
   GetAllUserRegisteredServicesDTO,
   GetAllUserRegisteredServicesResponse,
   getComplaintDetailsResponse,
@@ -123,7 +124,7 @@ class ConcernRepository
   async cancelComplaint(
     complaintId: string,
     userRole: string,
-    reason: string,
+    reason: string
   ): Promise<unknown> {
     try {
       console.log("Entered cancelComplaint in concernRepository");
@@ -165,11 +166,13 @@ class ConcernRepository
         // Updating the most recent work history item by the same mechanic
         const lastEntry = [...complaint.workHistory]
           .reverse()
-          .find((entry) => entry.mechanicId.toString() === mechanicId.toString());
+          .find(
+            (entry) => entry.mechanicId.toString() === mechanicId.toString()
+          );
 
         if (lastEntry) {
           lastEntry.status = "cancelled";
-          lastEntry.acceptedAt = lastEntry.acceptedAt
+          lastEntry.acceptedAt = lastEntry.acceptedAt;
           lastEntry.canceledAt = now;
           lastEntry.reason = reason;
           lastEntry.canceledBy = "mechanic";
@@ -196,58 +199,104 @@ class ConcernRepository
     }
   }
 
+  //function for getting all the userRegistered services
+  async getAllUserRegisteredServices(
+    data: GetAllUserRegisteredServicesDTO
+  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+    try {
+      const { page, limit } = data;
 
-    //function for getting all the userRegistered services 
-    async getAllUserRegisteredServices(
-      data: GetAllUserRegisteredServicesDTO
-    ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
-      try {
-        const { page, limit } = data;
-        
-        // Use aggregation to get user's registered services with lookups
-        const result = await concernModel.aggregate([
-          {
-            $match: {
-              isDeleted: false,
-              $or: [
-                { currentMechanicId: { $exists: false } },
-                { currentMechanicId: null },
-              ],
-            },
+      // Use aggregation to get user's registered services with lookups
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            isDeleted: false,
+            $or: [
+              { currentMechanicId: { $exists: false } },
+              { currentMechanicId: null },
+            ],
           },
-          {
-            $lookup: {
-              from: "users", 
-              localField: "userId",
-              foreignField: "_id",
-              as: "userDetails",
-            },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
           },
-          {
-            $lookup: {
-              from: "services", 
-              localField: "serviceId",
-              foreignField: "_id",
-              as: "serviceDetails",
-            },
+        },
+        {
+          $lookup: {
+            from: "services",
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
           },
-          { $skip: (page - 1) * limit },
-          { $limit: limit },
-          { $project: { "userDetails.password": 0 } },
-        ]);
-  
-        console.log("User registered services:", result);
-        return result as GetAllUserRegisteredServicesResponse[];
-      } catch (error){
-        console.log(
-          "Error occurred while fetching user registered services:",
-          error as Error
-        );
-        throw new Error(
-          "Error occurred while fetching user registered services."
-        );
-      }
+        },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { "userDetails.password": 0 } },
+      ]);
+
+      console.log("User registered services:", result);
+      return result as GetAllUserRegisteredServicesResponse[];
+    } catch (error) {
+      console.log(
+        "Error occurred while fetching user registered services:",
+        error as Error
+      );
+      throw new Error(
+        "Error occurred while fetching user registered services."
+      );
     }
+  }
+
+  //function to get the completed complait details by mechanic id
+  async getAllCompletedServiceByMechanic(
+    mechanicId: string
+  ): Promise<GetAllMechanicCompletedServicesResponse[] | null> {
+    try {
+      console.log("Entered in the concern repository", mechanicId);
+
+      // Use aggregation to get user's registered services with lookups
+      const result = await concernModel.aggregate([
+        {
+          $match: {
+            isDeleted: false,
+            currentMechanicId: mechanicId,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $lookup: {
+            from: "services",
+            localField: "serviceId",
+            foreignField: "_id",
+            as: "serviceDetails",
+          },
+        },
+        // { $skip: (page - 1) * limit },
+        // { $limit: limit },
+        { $project: { "userDetails.password": 0 } },
+      ]);
+
+      console.log("User registered services:", result);
+
+      return result;
+    } catch (errror) {
+      console.log("error occured in the ");
+      throw new Error(
+        "Error occured in the concernRepository while getting the completed mechanic service"
+      );
+    }
+  }
 }
 
 export default ConcernRepository;

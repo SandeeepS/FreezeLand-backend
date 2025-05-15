@@ -1,4 +1,4 @@
-import { GetAllUserRegisteredServicesResponse } from "../interfaces/DTOs/Concern/IRepository";
+import { GetAllMechanicCompletedServicesResponse, GetAllUserRegisteredServicesResponse } from "../interfaces/DTOs/Concern/IRepository";
 import { getComplaintDetailsResponse, IAllComplaintDataResponse } from "../interfaces/DTOs/Concern/IService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IConcernService from "../interfaces/IServices/IConcernService";
@@ -81,6 +81,19 @@ class ConcernService implements IConcernService {
           "Error occured while fetching the user registerd complaint in the mechService ",
           error as Error
         );
+        throw error;
+      }
+    }
+
+
+    //function to get completed service/complait completed by mechanic
+    async getAllCompletedServiceByMechanic(mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null>{
+      try{
+        console.log("Entered in the concern Service",mechanicId);
+        const result = await this.concernRepositroy.getAllCompletedServiceByMechanic(mechanicId);
+        return result;
+      }catch(error){
+        console.log("Error occured while getting the  ")
         throw error;
       }
     }
