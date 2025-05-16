@@ -68,4 +68,18 @@ export interface getComplaintDetailsResponse {
 }
 
 
+export interface UpdatedcomplaintWithOrderIdResponse {
+   _id:  mongoose.Types.ObjectId ;
+  name: string;
+  image: [];
+  serviceId:  mongoose.Types.ObjectId  ;
+  userId: mongoose.Types.ObjectId ;
+  defaultAddress:  mongoose.Types.ObjectId ;
+  discription: string;
+  locationName: object;
+  isBlocked: boolean;
+  isDeleted: boolean;
+
+
+}
 

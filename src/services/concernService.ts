@@ -1,5 +1,5 @@
 import { GetAllMechanicCompletedServicesResponse, GetAllUserRegisteredServicesResponse } from "../interfaces/DTOs/Concern/IRepository";
-import { getComplaintDetailsResponse, IAllComplaintDataResponse } from "../interfaces/DTOs/Concern/IService";
+import { getComplaintDetailsResponse, IAllComplaintDataResponse, UpdatedcomplaintWithOrderIdResponse } from "../interfaces/DTOs/Concern/IService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IConcernService from "../interfaces/IServices/IConcernService";
 
@@ -97,6 +97,18 @@ class ConcernService implements IConcernService {
         throw error;
       }
     }
+
+      //function to update the orderid in the concern data base after payment optoin 
+      async updateConcernWithOrderId(complaintId:string, orderId:string):Promise<UpdatedcomplaintWithOrderIdResponse | null>{
+        try{
+          console.log("Entered in the updatedConcernOrderId");
+           const result = await this.concernRepositroy.updateConcernWithOrderId(complaintId,orderId);
+          return result;
+        }catch(error){
+          console.log("Error occured in the updateconcernWithOrderId in concernRepository",error);
+          throw error;
+        }
+      }
   
 }
 

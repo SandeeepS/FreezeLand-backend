@@ -10,6 +10,8 @@ import { Email } from "../utils/email";
 import ServiceRepository from "../repositories/serviceRepository";
 import OrderServices from "../services/orderServices";
 import OrderRepository from "../repositories/orderRepository";
+import ConcernService from "../services/concernService";
+import ConcernRepository from "../repositories/concernRepository";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
@@ -17,11 +19,13 @@ const createjwt = new CreateJWT();
 const userRepository = new UserRepository();
 const serviceRepository = new ServiceRepository();
 const orderRepository = new OrderRepository();
+const concernRepository = new ConcernRepository();
 const orderService = new OrderServices(orderRepository);
+const concernService = new ConcernService(concernRepository);
 const generateOTP  = new GenerateOTP();
 
 const email = new Email(generateOTP);
-const userServices = new userService(userRepository,serviceRepository,orderService,createjwt,encrypt,email);
+const userServices = new userService(userRepository,serviceRepository,concernService,orderService,createjwt,encrypt,email);
 const controller = new userController(userServices,encrypt,createjwt,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));

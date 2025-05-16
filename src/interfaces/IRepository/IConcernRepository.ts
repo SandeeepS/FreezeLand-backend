@@ -1,4 +1,4 @@
-import { GetAllMechanicCompletedServicesResponse, GetAllUserRegisteredServicesDTO, GetAllUserRegisteredServicesResponse, getComplaintDetailsResponse, IAllComplaintDataResponse, IUpdateWorkDetails } from "../DTOs/Concern/IRepository";
+import { GetAllMechanicCompletedServicesResponse, GetAllUserRegisteredServicesDTO, GetAllUserRegisteredServicesResponse, getComplaintDetailsResponse, IAllComplaintDataResponse, IUpdateWorkDetails, UpdatedcomplaintWithOrderIdResponse } from "../DTOs/Concern/IRepository";
 
 export interface IConcernRepository {
     getComplaintDetails(id: string): Promise<getComplaintDetailsResponse[]>
@@ -7,6 +7,7 @@ export interface IConcernRepository {
     cancelComplaint(complaintId: string,userRole:string,reason: string): Promise<unknown>
     getAllUserRegisteredServices(data: GetAllUserRegisteredServicesDTO): Promise<GetAllUserRegisteredServicesResponse[]|null> 
     getAllCompletedServiceByMechanic(mechanicId: string): Promise<GetAllMechanicCompletedServicesResponse[] | null> 
+    updateConcernWithOrderId(complaintId:string, orderId:string):Promise<UpdatedcomplaintWithOrderIdResponse | null>
     
 }
 

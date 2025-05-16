@@ -9,6 +9,7 @@ import {
   getComplaintDetailsResponse,
   IAllComplaintDataResponse,
   IUpdateWorkDetails,
+  UpdatedcomplaintWithOrderIdResponse,
 } from "../interfaces/DTOs/Concern/IRepository";
 
 class ConcernRepository
@@ -295,6 +296,20 @@ class ConcernRepository
       throw new Error(
         "Error occured in the concernRepository while getting the completed mechanic service"
       );
+    }
+  }
+
+  //function to update the orderid in the concern data base after payment optoin 
+  async updateConcernWithOrderId(complaintId:string, orderId:string):Promise<UpdatedcomplaintWithOrderIdResponse | null>{
+    try{
+      console.log("Entered in the updatedConcernOrderId");
+      const objectIdObject = new mongoose.Types.ObjectId(complaintId);
+      const qr = {orderId:objectIdObject};
+      const result = await this.update(complaintId,qr)
+      return result;
+    }catch(error){
+      console.log("Error occured in the updateconcernWithOrderId in concernRepository",error);
+      throw error;
     }
   }
 }

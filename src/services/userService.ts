@@ -36,7 +36,7 @@ import {
   verifyOTPResponse,
   GetServiceDTO,
   GetServiceResponse2,
-  IPaymentData
+  IPaymentData,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -52,7 +52,11 @@ import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { ILoginResponse } from "../interfaces/entityInterface/ILoginResponse";
-import IPaymentServices, { IOrderService } from "../interfaces/IServices/IOrderService";
+import IPaymentServices, {
+  IOrderService,
+} from "../interfaces/IServices/IOrderService";
+import IConcernService from "../interfaces/IServices/IConcernService";
+import { response } from "express";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
@@ -60,13 +64,15 @@ class userService implements IUserServices {
   constructor(
     private userRepository: IUserRepository,
     private serviceRepository: IServiceRepository,
-    private orderService:IOrderService,
+    private concernService: IConcernService,
+    private orderService: IOrderService,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
     private email: Iemail
   ) {
     this.userRepository = userRepository;
     this.serviceRepository = serviceRepository;
+    this.concernService = concernService;
     this.orderService = orderService;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
@@ -638,30 +644,64 @@ class userService implements IUserServices {
   }
 
   //funciton to create stripe session
-async createStripeSession(data:IPaymentData):Promise<unknown>{
-  try{
-     const result = await this.orderService.createStripeSession(data);
-      console.log("result in the userService for creating stripe session",result);
+  async createStripeSession(data: IPaymentData): Promise<unknown> {
+    try {
+      const result = await this.orderService.createStripeSession(data);
+      console.log(
+        "result in the userService for creating stripe session",
+        result
+      );
       return result;
-  }catch(error){
-    console.log("error occured while creating the stripe session in the userService",error);
-    throw error;
+    } catch (error) {
+      console.log(
+        "error occured while creating the stripe session in the userService",
+        error
+      );
+      throw error;
+    }
+  }
+
+  async successPayment(data: string): Promise<unknown>{
+    try {
+      console.log(
+        "entered in the successPayment  user service in the backend "
+      );
+      const result = await this.orderService.successPayment(data);
+      console.log("result in the userService for success payment", result);
+      console.log("wnat to update the concern model about the payment ");
+      if (
+        result &&
+        typeof result === "object" &&
+        "response" in result &&
+        (result as any).response &&
+        (result as any).response.status === "SUCCESS"
+      ) {
+        const orderId = (result as any).response.data._id;
+        const complaintId = (result as any).response.data.complaintId;
+        const updatedTheOrderDeatilsInConcenrDataBase =
+          await this.concernService.updateConcernWithOrderId(
+            complaintId,
+            orderId
+          );
+        console.log(
+          "updated concern details after payment in the userService is ",
+          updatedTheOrderDeatilsInConcenrDataBase
+        );
+        return result;
+      } else {
+        return {
+          success: false,
+          response: null,
+        };
+      }
+    } catch (error) {
+      console.log(
+        "error occured while creating the stripe session in the userService",
+        error
+      );
+      throw error;
+    }
   }
 }
-
-async successPayment(data:string):Promise<unknown>{
-  try{
-    console.log("entered in the successPayment  user service in the backend ");
-    const result = await this.orderService.successPayment(data);
-    console.log("result in the userService for success payment",result);
-    return result;
-  }catch(error){
-    console.log("error occured while creating the stripe session in the userService",error);
-    throw error;
-  }
-}
-}
-
-
 
 export default userService;
