@@ -30,6 +30,8 @@ import {
     GetServiceDTO,
     GetServiceResponse2,
     IPaymentData,
+    IupdateUserLocation,
+    IupdateUserLocationResponse,
   } from "../DTOs/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
@@ -59,5 +61,6 @@ export interface IUserServices {
     getService(data: GetServiceDTO): Promise<GetServiceResponse2 | null>
     createStripeSession(data:IPaymentData):Promise<unknown>
     successPayment(data:string):Promise<unknown>
+    updateUserLocation(data : IupdateUserLocation):Promise<IupdateUserLocationResponse | null>
 }
 

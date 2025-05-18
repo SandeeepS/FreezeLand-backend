@@ -3,7 +3,7 @@ import Iuser from "../../entityInterface/Iuser";
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
 import Service from "../../entityInterface/Iservices";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { Address, ITempUser } from "../../Model/IUser";
 import { ILoginResponse } from "../../entityInterface/ILoginResponse";
 
@@ -327,6 +327,46 @@ export interface RegisterServiceDTO {
   locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
+}
+
+export interface ILocationData{
+    type: {
+    type: string;
+    enum: string[];
+    default: string;
+  };
+  coordinates: number[]; 
+  city: string;
+  state: string;
+}
+export interface IupdateUserLocation{
+  userId:string;
+  locationData:ILocationData
+}
+
+export interface IupdateUserLocationResponse{
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    password: string;
+    email: string;
+    phone: number;
+    profile_picture: string;
+    locationData: {
+      type: {
+        type: string;
+        enum: string[];
+        default: string;
+      };
+      coordinates: number[]; // [longitude, latitude]
+      city: string;
+      state: string;
+    };
+    address: Address[];
+    defaultAddress: string;
+    role: string;
+  
+    isBlocked: boolean;
+    isDeleted: boolean;
 }
 
 export interface IPaymentData {

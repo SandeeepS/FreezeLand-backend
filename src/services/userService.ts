@@ -37,6 +37,8 @@ import {
   GetServiceDTO,
   GetServiceResponse2,
   IPaymentData,
+  IupdateUserLocation,
+  IupdateUserLocationResponse,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -420,6 +422,7 @@ class userService implements IUserServices {
       }
 
       const user = await this.userRepository.getUserById({ id });
+      console.log("User detail in the userService from the getUserByid",user);
       if (!user) {
         return {
           status: NOT_FOUND,
@@ -699,6 +702,20 @@ class userService implements IUserServices {
         "error occured while creating the stripe session in the userService",
         error
       );
+      throw error;
+    }
+  }
+
+
+  //function to update the location after singup 
+  async updateUserLocation(data : IupdateUserLocation):Promise<IupdateUserLocationResponse | null>{
+    try{
+      const {userId,locationData} = data;
+      console.log("Enterd in the updateUserLocation in the userService",locationData);
+      const result = await this.userRepository.updateUserLocation({userId, locationData});
+      return result;
+    }catch(error){
+      console.log("Error occured in the updateUserLocation function in user service ",error);
       throw error;
     }
   }

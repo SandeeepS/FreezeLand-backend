@@ -35,6 +35,8 @@ import {
   SetUserDefaultAddressResponse,
   RegisterServiceResponse,
   getUserRegisteredServiceDetailsByIdResponse,
+  IupdateUserLocation,
+  IupdateUserLocationResponse,
 } from "../interfaces/DTOs/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import {
@@ -169,7 +171,7 @@ class UserRepository
       const defaultAddressDetails = user.address?.find(
         (addr) => addr._id.toString() === user.defaultAddress?.toString()
       );
-
+      console.log("default address from the userRepository",defaultAddressDetails);
       return {
         ...user.toObject(),
         defaultAddressDetails,
@@ -336,6 +338,21 @@ class UserRepository
       const editedUser = await this.update(data._id, qr);
       return editedUser;
     } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  // //function to updateUserLocation for user
+
+  async updateUserLocation(data:IupdateUserLocation):Promise<IupdateUserLocationResponse | null> {
+    try{
+        const {userId,locationData} = data;
+        console.log("Enterd in the updateUserLocation in the usreRepository ",userId,locationData);
+        const qr = {locationData:locationData}
+        const editedUserData = await this.update(userId,qr)
+        return editedUserData;
+    }catch(error){
       console.log(error as Error);
       throw error;
     }

@@ -51,4 +51,6 @@ userRouter.get('/getUserRegisteredServiceDetailsById',async(req:Request,res:Resp
 userRouter.get('/getMechanicDetails',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getMechanicDetails(req,res,next));
 userRouter.get('/getService/:id',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => controller.getService(req,res,next));
 userRouter.get('/successPayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.successPayment(req,res,next));
+userRouter.post('/updateUserLocation',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateUserLocation(req,res,next));
+
 export default userRouter;

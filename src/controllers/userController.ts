@@ -652,6 +652,27 @@ class userController implements IUserController {
     }
   }
 
+  //function to update the userLocation after singup and again login
+  async updateUserLocation(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId, locationData } = req.body;
+      console.log(
+        "Entered in the updateUserLocation in the userController is ",
+        userId,
+        locationData
+      );
+      const response = await this.userServices.updateUserLocation({
+        userId,
+        locationData,
+      });
+
+      res.status(OK).json({ message: "Success", response });
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   //getting all service which is provided by the website.
   async getAllServices(req: Request, res: Response, next: NextFunction) {
     try {
@@ -814,7 +835,9 @@ class userController implements IUserController {
   ): Promise<void> {
     try {
       const { sessionId } = req.query;
-      console.log("entered in the successPayment function in the userController");
+      console.log(
+        "entered in the successPayment function in the userController"
+      );
       console.log("sessionId from the frontend is ", sessionId);
       const result = await this.userServices.successPayment(
         sessionId as string

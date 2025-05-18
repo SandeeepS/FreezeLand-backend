@@ -18,9 +18,20 @@ export interface UserInterface extends Document {
   email: string;
   phone: number;
   profile_picture: string;
+  locationData: {
+    type: {
+      type: string;
+      enum: string[];
+      default: string;
+    };
+    coordinates: number[]; // [longitude, latitude]
+    city: string;
+    state: string;
+  };
   address: Address[];
   defaultAddress: string;
   role: string;
+
   isBlocked: boolean;
   isDeleted: boolean;
 }

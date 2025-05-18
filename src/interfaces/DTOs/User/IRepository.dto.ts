@@ -1,5 +1,5 @@
 import { AddAddress } from "../../commonInterfaces/AddAddress";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import Iuser from "../../entityInterface/Iuser";
 import { Address, UserInterface } from "../../Model/IUser";
 import { IServices } from "../../Model/IService";
@@ -349,6 +349,49 @@ export interface GetAllUserRegisteredServicesResponse {
   userDetails: Iuser;
   serviceDetails: IServices;
 }
+
+
+export interface IupdateUserLocationResponse {
+    _id: mongoose.Types.ObjectId;
+    name: string;
+    password: string;
+    email: string;
+    phone: number;
+    profile_picture: string;
+    locationData: {
+      type: {
+        type: string;
+        enum: string[];
+        default: string;
+      };
+      coordinates: number[];
+      city: string;
+      state: string;
+    };
+    address: Address[];
+    defaultAddress: string;
+    role: string;
+  
+    isBlocked: boolean;
+    isDeleted: boolean;
+}
+
+
+export interface ILocationData{
+    type: {
+    type: string;
+    enum: string[];
+    default: string;
+  };
+  coordinates: number[]; 
+  city: string;
+  state: string;
+}
+export interface IupdateUserLocation{
+  userId:string;
+  locationData:ILocationData
+}
+
 
 export interface getUserRegisteredServiceDetailsByIdResponse {
   _id: string;

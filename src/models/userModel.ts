@@ -11,6 +11,27 @@ const AddressSchema = new Schema({
   landMark: { type: String, require: true },
 });
 
+const LocationDataSchema = new Schema({
+  type: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+  },
+  coordinates: {
+    type: [Number], // [longitude, latitude]
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+  state: {
+    type: String,
+    required: true,
+  },
+});
 
 //userSchema
 const userSchema: Schema<UserInterface> = new Schema({
@@ -53,7 +74,7 @@ const userSchema: Schema<UserInterface> = new Schema({
     required: true,
   },
 
-
+  locationData: LocationDataSchema,
 
   isBlocked: {
     type: Boolean,
@@ -67,28 +88,33 @@ const userSchema: Schema<UserInterface> = new Schema({
 });
 
 //tempSchema
-const TempUserShcema : Schema <ITempUser> = new Schema({
-  userData:{
-    type:Object,
-    required:true,
+const TempUserShcema: Schema<ITempUser> = new Schema(
+  {
+    userData: {
+      type: Object,
+      required: true,
+    },
+    otp: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      expires: 900,
+    },
   },
-  otp:{
-    type:String,
-    required:true,
-  },
-  createdAt:{
-    type:Date,
-    default:Date.now,
-    expires:900 
+  {
+    timestamps: true,
   }
-},
-{
-  timestamps:true,
-})
+);
 
 const userModel: Model<UserInterface> = mongoose.model<UserInterface>(
   "User",
   userSchema
 );
-export const TempUser = mongoose.model<ITempUser>("TempUserData",TempUserShcema)
+export const TempUser = mongoose.model<ITempUser>(
+  "TempUserData",
+  TempUserShcema
+);
 export default userModel;
