@@ -19,7 +19,9 @@ import {
   getUpdatedWorkAssingnedResponse,
   ICreateRoomData,
   ICreateRoomResponse,
+  IupdateingMechanicDetailsResponse,
   IUpdateWorkDetails,
+  IUpdatingMechanicDetails,
   MechLoginDTO,
   MechLoginResponse,
   MechRegistrationData,
@@ -648,6 +650,19 @@ class mechService implements IMechServices {
       return result;
     }catch(error){
       console.log("error in mechService",error);
+      throw error;
+    }
+  }
+
+  //function to edit the mechanic profile
+  async editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> {
+    try{
+      const {mechId,values} = mechaicDetails
+      console.log("Values reached in the mechService in the backend while eding the mechanic",mechaicDetails);
+      const result = await this.mechRepository.editMechanic({mechId,values});
+      return result;
+    }catch(error) {
+      console.log(error as Error);
       throw error;
     }
   }

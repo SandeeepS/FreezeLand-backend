@@ -15,7 +15,9 @@ import {
     getUpdatedWorkAssingnedResponse,
     ICreateRoomData,
     ICreateRoomResponse,
+    IupdateingMechanicDetailsResponse,
     IUpdateWorkDetails,
+    IUpdatingMechanicDetails,
     MechLoginDTO,
     MechLoginResponse,
     MechRegistrationData,
@@ -53,5 +55,6 @@ export interface IMechServices{
     updateComplaintStatus(complaintId: string, nextStatus: string):Promise<updateCompleteStatusResponse | null>   
     createRoom(data: ICreateRoomData): Promise<ICreateRoomResponse> 
     getAllCompletedServices (mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null>
+     editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> 
 }
 

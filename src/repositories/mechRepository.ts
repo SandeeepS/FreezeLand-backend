@@ -13,6 +13,8 @@ import {
   GetMechListDTO,
   GetMechListResponse,
   getUpdatedWorkAssingnedResponse,
+  IupdateingMechanicDetailsResponse,
+  IUpdatingMechanicDetails,
   MechRegistrationData,
   SaveMechDTO,
   SaveMechResponse,
@@ -389,6 +391,22 @@ class MechRepository
       throw new Error();
     }
   }
+
+
+  //function to update the mechanic Details
+   async editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> {
+     try{
+       const {mechId,values} = mechaicDetails
+       console.log("Values reached in the mechService in the backend while eding the mechanic",mechaicDetails);
+       const phoneNumber = Number(values.phone);
+       const qr = {name:values.name,phone:phoneNumber,photo:values.photo};
+       const result = await this.update(mechId,qr);
+       return result;
+     }catch(error) {
+       console.log(error as Error);
+       throw error;
+     }
+   }
 }
 
 export default MechRepository;

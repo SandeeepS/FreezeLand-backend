@@ -14,6 +14,8 @@ import {
     GetMechListDTO,
     GetMechListResponse,
     getUpdatedWorkAssingnedResponse,
+    IupdateingMechanicDetailsResponse,
+    IUpdatingMechanicDetails,
     MechRegistrationData,
     SaveMechDTO,
     SaveMechResponse,
@@ -41,5 +43,6 @@ export interface IMechRepository{
     updateComplaintStatus(complaintId:string,nextStatus:string):Promise<updateCompleteStatusResponse | null>
     createTempMechData(tempMechDetails: {otp: string;mechData: MechRegistrationData;}): Promise<ITempMech>
     getTempMechData(id:string):Promise<ITempMech | null>
+    editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null>
 
 }

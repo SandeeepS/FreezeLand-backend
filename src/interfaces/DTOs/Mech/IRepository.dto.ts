@@ -157,6 +157,34 @@ export interface getComplaintDetailsResponse {
   detaultAddressDetails:object;
 }
 
+
+export interface IUpdatingMechanicDetails {
+  mechId: string;
+  values: {
+    name: string;
+    phone: string;
+    photo: string;
+  };
+}
+
+export interface IupdateingMechanicDetailsResponse{
+    _id: Types.ObjectId | string;
+  name: string;
+  email: string;
+  phone: number;
+  role: string;
+  photo: string;
+  adharProof: string | null;
+  employeeLicense: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  isVerified: boolean;
+  mechanicType: string[];
+}
+
+
+
+
 export interface getUpdatedWorkAssingnedResponse{
     _id: mongoose.Types.ObjectId;
     name: string;

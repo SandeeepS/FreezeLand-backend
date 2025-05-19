@@ -616,6 +616,20 @@ class mechController implements IMechController {
     }
   }
 
+  //function to update the mechnanic profile
+  async editMechanic(req:Request,res:Response,next:NextFunction){
+    try{
+      const {mechId,values} = req.body;
+       console.log("Entered in the mechController to update the mechanic profile details",mechId,values);
+       const result = await this.mechServices.editMechanic({mechId,values});
+       res.status(OK).json({success:true,result});
+
+    }catch(error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
   //function to update the workdetails to the concern database
   async updateWorkDetails(req: Request, res: Response, next: NextFunction) {
     try {

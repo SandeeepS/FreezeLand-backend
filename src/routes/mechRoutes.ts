@@ -44,5 +44,6 @@ mechRouter.get('/getAllAcceptedServices',mechAuth(["mechanic"]),async(req:Reques
 mechRouter.put('/updateComplaintStatus',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateComplaintStatus(req,res,next));
 mechRouter.post('/updateWorkDetails',async(req:Request,res:Response,next:NextFunction) => await controller.updateWorkDetails(req,res,next));
 mechRouter.get('/getAllCompletedServices',async(req:Request,res:Response,next:NextFunction) => await controller.getAllCompletedServices(req,res,next));
+mechRouter.put('/editMechanic',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.editMechanic(req,res,next));
 
 export default mechRouter;

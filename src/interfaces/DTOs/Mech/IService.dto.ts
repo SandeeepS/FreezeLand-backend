@@ -28,7 +28,7 @@ export interface NewDetailsDTO {
   phone: number;
 }
 
-export interface verifyOTPResponse{
+export interface verifyOTPResponse {
   success: boolean;
   message: string;
   mechId?: string;
@@ -293,17 +293,41 @@ export interface getMechanicDetailsResponse {
 }
 
 export interface ICreateRoomData {
-  userId:string;
-  mechId:string;
+  userId: string;
+  mechId: string;
 }
 
-export interface ICreateRoomResponse{
-  id:string;
+export interface ICreateRoomResponse {
+  id: string;
 }
 
-export interface IUpdateWorkDetails{
-  complaintId:string;
-  workDetails:object;
+export interface IUpdateWorkDetails {
+  complaintId: string;
+  workDetails: object;
+}
+
+export interface IUpdatingMechanicDetails {
+  mechId: string;
+  values: {
+    name: string;
+    phone: string;
+    photo: string;
+  };
+}
+
+export interface IupdateingMechanicDetailsResponse{
+    _id: Types.ObjectId | string;
+  name: string;
+  email: string;
+  phone: number;
+  role: string;
+  photo: string;
+  adharProof: string | null;
+  employeeLicense: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  isVerified: boolean;
+  mechanicType: string[];
 }
 
 export interface updateCompleteStatusResponse {
@@ -331,19 +355,17 @@ export interface updateCompleteStatusResponse {
   isDeleted: boolean;
 }
 
-
 export interface GetAllMechanicCompletedServicesResponse {
-  _id: string ;
+  _id: string;
   name: string;
   image: [];
   serviceId: string;
-  userId:string;
+  userId: string;
   defaultAddress: string;
   discription: string;
   locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
-  userDetails:Iuser;
-  serviceDetails:IServices;
+  userDetails: Iuser;
+  serviceDetails: IServices;
 }
-
