@@ -3,7 +3,11 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 
 import mechService from "../services/mechServices";
 const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
-import { LoginValidation, SignUpValidation } from "../utils/validator";
+import {
+  AddressValidation,
+  LoginValidation,
+  SignUpValidation,
+} from "../utils/validator";
 import { IMechController } from "../interfaces/IController/IMechController";
 import {
   ForgotResentOtpResponse,
@@ -617,18 +621,112 @@ class mechController implements IMechController {
   }
 
   //function to update the mechnanic profile
-  async editMechanic(req:Request,res:Response,next:NextFunction){
-    try{
-      const {mechId,values} = req.body;
-       console.log("Entered in the mechController to update the mechanic profile details",mechId,values);
-       const result = await this.mechServices.editMechanic({mechId,values});
-       res.status(OK).json({success:true,result});
-
-    }catch(error){
+  async editMechanic(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { mechId, values } = req.body;
+      console.log(
+        "Entered in the mechController to update the mechanic profile details",
+        mechId,
+        values
+      );
+      const result = await this.mechServices.editMechanic({ mechId, values });
+      res.status(OK).json({ success: true, result });
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
   }
+
+  //function to add address
+  async addAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "enterd in the addAddress fucniton in the backend mechController"
+      );
+      const { values, _id } = req.body;
+      console.log("id from the mechController while adding address is", _id);
+      const check = AddressValidation(
+        values.name,
+        values.phone,
+        values.email,
+        values.state,
+        values.pin,
+        values.district,
+        values.landMark
+      );
+      if (check) {
+        const addedAddress = await this.mechServices.AddUserAddress({
+          _id,
+          values,
+        });
+        if (addedAddress) {
+          res.status(OK).json({
+            success: true,
+            message: "mechanic address added successfully",
+          });
+        } else {
+          res
+            .status(BAD_REQUEST)
+            .json({ success: false, message: "Mechanic Address addingh failed" });
+        }
+      } else {
+        console.log(
+          "address validation failed form the addAddress in the mechController"
+        );
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Address validation failed " });
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
+
+  //editing mechanic address
+    async editAddress(req: Request, res: Response, next: NextFunction) {
+      try {
+        console.log("entered in teh mechanic Controller for editing the address");
+        const { values, _id, addressId } = req.body;
+        const check = AddressValidation(
+          values.name,
+          values.phone,
+          values.email,
+          values.state,
+          values.pin,
+          values.district,
+          values.landMark
+        );
+        if (check) {
+          console.log("address validation done ");
+          const editedAddress = await this.mechServices.editAddress({
+            _id,
+            addressId,
+            values,
+          });
+          if (editedAddress) {
+            res.status(OK).json({
+              success: true,
+              message: "Address edited  added successfully",
+            });
+          } else {
+            res
+              .status(BAD_REQUEST)
+              .json({ success: false, message: "Address editing  failed" });
+          }
+        } else {
+          console.log("address validation failed while editing the address");
+          res.status(BAD_REQUEST).json({
+            success: false,
+            message: "address validation fialed while editing the address",
+          });
+        }
+      } catch (error) {
+        console.log(error as Error);
+        next(error);
+      }
+    }
 
   //function to update the workdetails to the concern database
   async updateWorkDetails(req: Request, res: Response, next: NextFunction) {
@@ -638,7 +736,9 @@ class mechController implements IMechController {
       );
       const { complaintId, workDetails } = req.body;
       console.log(
-        `complaint id is - ${complaintId} and workdetails is - ${[...workDetails]}`
+        `complaint id is - ${complaintId} and workdetails is - ${[
+          ...workDetails,
+        ]}`
       );
       const result = await this.mechServices.updateWorkDetails({
         complaintId,
@@ -653,17 +753,25 @@ class mechController implements IMechController {
     }
   }
 
-  //function to get all completed service for the mech service histroy listing 
-  async getAllCompletedServices(req:Request,res:Response,next:NextFunction) {
-    try{
+  //function to get all completed service for the mech service histroy listing
+  async getAllCompletedServices(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
       console.log("Entered in the getAllCompleted Services");
-      const {mechanicId} = req.body;
-      console.log("mechanic id is",mechanicId);
-      const result = await this.mechServices.getAllCompletedServices(mechanicId);
-      res.status(OK).json({success:true,result})
-      
-    }catch(error){
-      console.log("Error occured in the mechanic controller while getting the completed complaints by mechic ",error);
+      const { mechanicId } = req.body;
+      console.log("mechanic id is", mechanicId);
+      const result = await this.mechServices.getAllCompletedServices(
+        mechanicId
+      );
+      res.status(OK).json({ success: true, result });
+    } catch (error) {
+      console.log(
+        "Error occured in the mechanic controller while getting the completed complaints by mechic ",
+        error
+      );
       next(error);
     }
   }

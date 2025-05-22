@@ -1,4 +1,5 @@
 
+import { IAddMechAddressResponse } from "../DTOs/Mech/IRepository.dto";
 import {
     EmailExistResponse,
     EmailExitCheckDTO,
@@ -13,8 +14,11 @@ import {
     GetPreSignedUrlDTO,
     GetPreSignedUrlResponse,
     getUpdatedWorkAssingnedResponse,
+    IAddMechAddress,
     ICreateRoomData,
     ICreateRoomResponse,
+    IEditAddress,
+    IEditAddressResponse,
     IupdateingMechanicDetailsResponse,
     IUpdateWorkDetails,
     IUpdatingMechanicDetails,
@@ -55,6 +59,8 @@ export interface IMechServices{
     updateComplaintStatus(complaintId: string, nextStatus: string):Promise<updateCompleteStatusResponse | null>   
     createRoom(data: ICreateRoomData): Promise<ICreateRoomResponse> 
     getAllCompletedServices (mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null>
-     editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> 
+    editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> 
+    AddUserAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null> 
+    editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> 
 }
 

@@ -13,6 +13,10 @@ import {
   GetMechListDTO,
   GetMechListResponse,
   getUpdatedWorkAssingnedResponse,
+  IAddMechAddress,
+  IAddMechAddressResponse,
+  IEditAddress,
+  IEditAddressResponse,
   IupdateingMechanicDetailsResponse,
   IUpdatingMechanicDetails,
   MechRegistrationData,
@@ -407,6 +411,35 @@ class MechRepository
        throw error;
      }
    }
+
+   //adding mechanic address
+     async addAddress(
+       data: IAddMechAddress
+     ): Promise<IAddMechAddressResponse | null> {
+       try {
+         const { _id, values } = data;
+         console.log("id from the mechRepository while add addresss is ", _id);
+         console.log("new address from the mechRepository is ", values);
+         const qr = { address: [values] };
+         const addedAddress = await this.updateAddress(_id, qr);
+         return addedAddress ;
+       } catch (error) {
+         console.log(error as Error);
+         throw error;
+       }
+     }
+
+     //editing the mechanic address
+       async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
+         try {
+           const { _id, addressId, values } = data;
+           const editedAddress = await this.editExistAddress(_id, addressId, values);
+           return editedAddress;
+         } catch (error) {
+           console.log(error as Error);
+           throw error;
+         }
+       }
 }
 
 export default MechRepository;

@@ -1,6 +1,38 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 
+const AddressSchema = new Schema({
+  name: { type: String, require: true },
+  phone: { type: Number, require: true },
+  email: { type: String, require: true },
+  state: { type: String, require: true },
+  pin: { type: Number, require: true },
+  district: { type: String, require: true },
+  landMark: { type: String, require: true },
+});
+
+const LocationDataSchema = new Schema({
+  type: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+  },
+  coordinates: {
+    type: [Number], // [longitude, latitude]
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+  state: {
+    type: String,
+    required: true,
+  },
+});
+
 const mechSchema: Schema<MechInterface> = new Schema({
   name: {
     type: String,
@@ -26,6 +58,12 @@ const mechSchema: Schema<MechInterface> = new Schema({
     default: "mechanic",
     required: true,
   },
+  
+  address: {
+    type: [AddressSchema],
+    required: false,
+  },
+
 
   mechanicType: {
     type: [String],
@@ -46,6 +84,7 @@ const mechSchema: Schema<MechInterface> = new Schema({
     type: String,
     required: false,
   },
+  locationData: LocationDataSchema,
 
   isVerified: {
     type: Boolean,

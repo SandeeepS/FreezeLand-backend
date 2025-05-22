@@ -189,7 +189,7 @@ export interface EditUserDTO {
   _id: string;
   name: string;
   phone: number;
-  imageKey:string;
+  profile_picture:string;
 }
 
 export interface EditUserResponse {

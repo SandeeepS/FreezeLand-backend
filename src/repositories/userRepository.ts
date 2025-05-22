@@ -334,7 +334,8 @@ class UserRepository
 
   async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
     try {
-      const qr = { name: data.name, phone: data.phone , profile_picture:data.imageKey };
+      console.log("data for editing userDetails is ",data);
+      const qr = { name: data.name, phone: data.phone , profile_picture:data.profile_picture };
       const editedUser = await this.update(data._id, qr);
       return editedUser;
     } catch (error) {

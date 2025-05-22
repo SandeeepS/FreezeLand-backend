@@ -17,8 +17,12 @@ import {
   GetPreSignedUrlDTO,
   GetPreSignedUrlResponse,
   getUpdatedWorkAssingnedResponse,
+  IAddMechAddress,
+  IAddMechAddressResponse,
   ICreateRoomData,
   ICreateRoomResponse,
+  IEditAddress,
+  IEditAddressResponse,
   IupdateingMechanicDetailsResponse,
   IUpdateWorkDetails,
   IUpdatingMechanicDetails,
@@ -45,6 +49,7 @@ import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import { updateCompleteStatusResponse } from "../interfaces/DTOs/Mech/IRepository.dto";
 import IConcernService from "../interfaces/IServices/IConcernService";
+import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 
 const { OK, UNAUTHORIZED } = STATUS_CODES;
 class mechService implements IMechServices {
@@ -666,6 +671,36 @@ class mechService implements IMechServices {
       throw error;
     }
   }
+
+  //function to add the address for the user 
+   async AddUserAddress(
+      data: IAddMechAddress
+    ): Promise<IAddMechAddressResponse | null> {
+      try {
+        const { _id, values } = data;
+        console.log("id from the addMechAddress in the mech service is ", _id);
+        const address = await this.mechRepository.addAddress({ _id, values });
+        if (address) {
+           return address;
+        } else {
+          return null;
+        }
+      } catch (error) {
+        console.log(error as Error);
+        throw new Error("Error while AddMechAddress in mechService ");
+      }
+    }
+
+    //editing the mechanic address
+      async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
+        try {
+          const { _id, addressId, values } = data;
+          return await this.mechRepository.editAddress({ _id, addressId, values });
+        } catch (error) {
+          console.log(error as Error);
+          throw new Error("Error while editAddress in mechService ");
+        }
+      }
 }
 
 export default mechService;

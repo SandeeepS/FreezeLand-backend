@@ -14,6 +14,10 @@ import {
     GetMechListDTO,
     GetMechListResponse,
     getUpdatedWorkAssingnedResponse,
+    IAddMechAddress,
+    IAddMechAddressResponse,
+    IEditAddress,
+    IEditAddressResponse,
     IupdateingMechanicDetailsResponse,
     IUpdatingMechanicDetails,
     MechRegistrationData,
@@ -44,5 +48,6 @@ export interface IMechRepository{
     createTempMechData(tempMechDetails: {otp: string;mechData: MechRegistrationData;}): Promise<ITempMech>
     getTempMechData(id:string):Promise<ITempMech | null>
     editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null>
-
+    addAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null>
+     editAddress(data: IEditAddress): Promise<IEditAddressResponse | null>
 }
