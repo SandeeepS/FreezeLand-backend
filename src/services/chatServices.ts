@@ -16,21 +16,18 @@ class ChatServices implements IChatServices {
     this.concernRepository = concernRepository;
   }
 
-
-  //function to get the existing messagaes 
-  async getMessagesByRoomId(roomId:string):Promise<unknown>{
-    try{
-        console.log("Enterd in the getMessageByRoomId",roomId);
-        const result = await this.chatRepository.getMessagesByRoomId(roomId);
-        return result;
-    }catch(error){
-        console.log(error as Error);
-        throw error;
+  //function to get the existing messagaes
+  async getMessagesByRoomId(roomId: string): Promise<unknown> {
+    try {
+      console.log("Enterd in the getMessageByRoomId", roomId);
+      const result = await this.chatRepository.getMessagesByRoomId(roomId);
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
     }
   }
 
-
-  //function to create message 
   async createMessage(
     messageData: MessageData
   ): Promise<MessageDataResponse | null> {
@@ -52,7 +49,7 @@ class ChatServices implements IChatServices {
   //function to getting the specified complinat using id
   async getComplaintDetails(
     id: string
-  ): Promise<getComplaintDetailsResponse[]> {
+  ): Promise<getComplaintDetailsResponse[]>{
     try {
       console.log("Enterdin the mechService");
       const result = await this.concernRepository.getComplaintDetails(id);
