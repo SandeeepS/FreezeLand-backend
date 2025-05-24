@@ -93,11 +93,11 @@ class adminService implements IAdminService {
             console.log("admin is exist", admin);
 
             const filteredAdminData = {
-              id:admin.id,
-              name:admin.name,
-              email:admin.email,
-              role:admin.role
-            }
+              id: admin.id,
+              name: admin.name,
+              email: admin.email,
+              role: admin.role,
+            };
 
             return {
               status: STATUS_CODES.OK || 200,
@@ -110,8 +110,6 @@ class adminService implements IAdminService {
                 refresh_token: refreshToken,
               },
             };
-
-
           } else {
             console.log("Incorrted password");
             return {
@@ -141,7 +139,7 @@ class adminService implements IAdminService {
         } as const;
       }
     } catch (error) {
-      console.log("error occured while login admin");
+      console.log("error occured while login admin", error);
       throw error;
     }
   }
@@ -173,8 +171,8 @@ class adminService implements IAdminService {
         };
       }
     } catch (error) {
-      console.log(error);
-      throw new Error("Error occured.");
+      console.log("Error occured while gettin the userList", error);
+      throw error;
     }
   }
 
@@ -200,8 +198,8 @@ class adminService implements IAdminService {
         message: "success",
       };
     } catch (error) {
-      console.log(error);
-      throw new Error("Error occured.");
+      console.log("Error occured getmechList,in the adminService", error);
+      throw error;
     }
   }
 
@@ -229,8 +227,8 @@ class adminService implements IAdminService {
         message: "success",
       };
     } catch (error) {
-      console.log(error);
-      throw new Error("Error occured.");
+      console.log("error occured in the getService", error);
+      throw error;
     }
   }
 
@@ -251,15 +249,14 @@ class adminService implements IAdminService {
       const devicesCount = await this.deviceRepository.getDeviceCount({
         searchQuery,
       });
-
       return {
         status: STATUS_CODES.OK,
         data: { devices, devicesCount },
         message: "success",
       };
     } catch (error) {
-      console.log(error);
-      throw new Error("Error occured.");
+      console.log("Error occured in the getDevice", error);
+      throw error;
     }
   }
 
@@ -274,8 +271,8 @@ class adminService implements IAdminService {
         return null;
       }
     } catch (error) {
-      console.log(error as Error);
-      throw new Error();
+      console.log("Error occured in teh getService", error);
+      throw error;
     }
   }
 
@@ -288,8 +285,11 @@ class adminService implements IAdminService {
       const result = await this.mechRepository.getMechById({ id });
       return result;
     } catch (error) {
-      console.log(error as Error);
-      throw new Error();
+      console.log(
+        "Error occured in the getMechanicById, in the adminservice",
+        error
+      );
+      throw error;
     }
   }
 
@@ -298,8 +298,8 @@ class adminService implements IAdminService {
       const { userId } = data;
       return await this.adminRepository.blockUser({ userId });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error occured while blocking user in AdminService ");
+      console.log("Error while blocking the user in the adminService ", error);
+      throw error;
     }
   }
 
@@ -308,10 +308,8 @@ class adminService implements IAdminService {
       const { mechId } = data;
       return await this.adminRepository.blockMech({ mechId });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error(
-        "Error occured while blocking the mechanic from the AdminService"
-      );
+      console.log("Error occured in the blockMech", error);
+      throw error;
     }
   }
 
@@ -322,10 +320,8 @@ class adminService implements IAdminService {
       const { _id } = data;
       return await this.adminRepository.BlockService({ _id });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error(
-        "Error occured while blocking the service from the adminService"
-      );
+      console.log("Error occured while blocking in the adminService", error);
+      throw error;
     }
   }
 
@@ -334,8 +330,11 @@ class adminService implements IAdminService {
       const { _id } = data;
       return await this.adminRepository.BlockDevice({ _id });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("error while blocking the device from the adminService");
+      console.log(
+        "error while blocking the device from the adminService",
+        error
+      );
+      throw error;
     }
   }
 
@@ -344,8 +343,11 @@ class adminService implements IAdminService {
       const { userId } = data;
       return await this.adminRepository.deleteUser({ userId });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error occured while deleting the user");
+      console.log(
+        "Error occured while deleting the user in the admin service",
+        error
+      );
+      throw error;
     }
   }
 
@@ -354,10 +356,11 @@ class adminService implements IAdminService {
       const { mechId } = data;
       return await this.adminRepository.deleteMech({ mechId });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error(
-        "Error while deleting the mechanic from the adminService "
+      console.log(
+        "Error while deleting the mechanic from the adminService ",
+        error
       );
+      throw error;
     }
   }
 
@@ -368,8 +371,11 @@ class adminService implements IAdminService {
       const { serviceId } = data;
       return await this.adminRepository.deleteService({ serviceId });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while deleting a service from the admin Services");
+      console.log(
+        "Error while deleting a service from the admin Services",
+        error
+      );
+      throw error;
     }
   }
 
@@ -380,8 +386,8 @@ class adminService implements IAdminService {
       const { deviceId } = data;
       return await this.adminRepository.deleteDevice({ deviceId });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while deleteDevice from the adminService");
+      console.log("Error while deleteDevice from the adminService");
+      throw error;
     }
   }
 
@@ -390,8 +396,11 @@ class adminService implements IAdminService {
       console.log("name in the adminServie ", name);
       return await this.adminRepository.isServiceExist({ name });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("error while checking isServiceExist or not ");
+      console.log(
+        "error while checking isServiceExist or not  in the adminService",
+        error
+      );
+      throw error;
     }
   }
 
@@ -401,8 +410,11 @@ class adminService implements IAdminService {
       console.log("values from the service is ", values);
       return await this.adminRepository.addNewServices({ values });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while adding new Services in the adminService ");
+      console.log(
+        "Error while adding new Services in the adminService ",
+        error
+      );
+      throw error;
     }
   }
 
@@ -412,8 +424,8 @@ class adminService implements IAdminService {
       const { name } = data;
       return await this.adminRepository.addNewDevice({ name });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while adding new Device form the adminService");
+      console.log("Error while adding new Device form the adminService", error);
+      throw error;
     }
   }
 
@@ -425,10 +437,11 @@ class adminService implements IAdminService {
       const { name } = data;
       return await this.adminRepository.isDeviceExist({ name });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error(
-        "error while checking the isDeviceExist in the adminService"
+      console.log(
+        "error while checking the isDeviceExist in the adminService",
+        error
       );
+      throw error;
     }
   }
 
@@ -439,8 +452,8 @@ class adminService implements IAdminService {
       const { _id, values } = data;
       return await this.adminRepository.editExistService({ _id, values });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("error while editExistingService in AdminService");
+      console.log("error while editExistingService in AdminService", error);
+      throw error;
     }
   }
 
@@ -464,15 +477,18 @@ class adminService implements IAdminService {
       }
       return { result: false };
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while approving the mechanic in the AdminSerivce");
+      console.log(
+        "Error while approving the mechanic in the AdminSerivce",
+        error
+      );
+      throw error;
     }
   }
+
   //changing this generating presinged url code ot differtnt comon place
   async getPresignedUrl(data: GetPreSignedUrlDTO) {
     try {
-      const { fileName, fileType ,folderName} = data;
-
+      const { fileName, fileType, folderName } = data;
       if (!fileName || !fileType) {
         return {
           success: false,
@@ -482,19 +498,27 @@ class adminService implements IAdminService {
       const result = await generatePresignedUrl(fileName, fileType, folderName);
       return result as GetPreSignedUrlResponse;
     } catch (error) {
-      console.log(error);
-      throw new Error(
-        "error while generating the presinged url from the adminService"
-      );
+      console.log("Error in the getPresignedUrl in the admin Service", error);
+      throw error;
     }
   }
 
   //function to get the all complaints
-  async getAllComplaints(page:number,limit:number, searchQuery:string,search:string): Promise<any> {
+  async getAllComplaints(
+    page: number,
+    limit: number,
+    searchQuery: string,
+    search: string
+  ): Promise<any> {
     try {
       console.log("reached the getAllComplaints in the adminService");
       console.log("Search in the admin service is ", search);
-      const complaints = await this.concernRepository.getAllComplaints(page,limit, searchQuery,search);
+      const complaints = await this.concernRepository.getAllComplaints(
+        page,
+        limit,
+        searchQuery,
+        search
+      );
       if (complaints) {
         return {
           status: STATUS_CODES.OK,
@@ -509,14 +533,16 @@ class adminService implements IAdminService {
         };
       }
     } catch (error) {
-      console.log(error);
-      throw new Error("Error occured.");
+      console.log(
+        "Error occured while getting all complaint in the admin service",
+        error
+      );
+      throw error;
     }
   }
 
-
   //function to get the complaint by id
-  async getComplaintById(id:string): Promise<any> {
+  async getComplaintById(id: string): Promise<any> {
     try {
       console.log("reached the getComplaintById in the adminService");
       const complaint = await this.concernRepository.getComplaintDetails(id);
@@ -534,20 +560,35 @@ class adminService implements IAdminService {
         };
       }
     } catch (error) {
-      console.log(error);
-      throw new Error("Error occured.");
+      console.log("Error occured in the getCompliantById", error);
+      throw error;
     }
   }
 
-  //function to cancel the complaint by admin 
-  async cancelComplaint(complaintId:string,userRole:string,reason:string):Promise<unknown>{
-    try{
-      console.log("reached in the cancel complaint function in the admin service",complaintId,userRole);
-      const result = await this.concernRepository.cancelComplaint(complaintId,userRole,reason);
+  //function to cancel the complaint by admin
+  async cancelComplaint(
+    complaintId: string,
+    userRole: string,
+    reason: string
+  ): Promise<unknown> {
+    try {
+      console.log(
+        "reached in the cancel complaint function in the admin service",
+        complaintId,
+        userRole
+      );
+      const result = await this.concernRepository.cancelComplaint(
+        complaintId,
+        userRole,
+        reason
+      );
       return result;
-    }catch(error){
-      console.log(error as Error);
-      throw new Error("error ocured in the cancel complaint");
+    } catch (error) {
+      console.log(
+        "error ocured in the cancel complaint in the adminService",
+        error
+      );
+      throw error;
     }
   }
 }
