@@ -101,7 +101,10 @@ class mechService implements IMechServices {
       );
       return savedTempMech;
     } catch (error) {
-      console.log("Error occured in the mechRegistration in the mechService ",error);
+      console.log(
+        "Error occured in the mechRegistration in the mechService ",
+        error
+      );
       throw error;
     }
   }
@@ -195,12 +198,13 @@ class mechService implements IMechServices {
         };
       }
     } catch (error) {
-      console.log("Error occured in the verifyOTP function in the mechServie",error);
+      console.log(
+        "Error occured in the verifyOTP function in the mechServie",
+        error
+      );
       throw error;
     }
   }
-
-
 
   async signupMech(
     mechData: SignUpMechDTO
@@ -209,7 +213,10 @@ class mechService implements IMechServices {
       const { email } = mechData;
       return await this.mechRepository.emailExistCheck({ email });
     } catch (error) {
-      console.log("Error occured in the singup function in the mechService ",error);
+      console.log(
+        "Error occured in the singup function in the mechService ",
+        error
+      );
       throw error;
     }
   }
@@ -265,7 +272,7 @@ class mechService implements IMechServices {
         };
       }
     } catch (error) {
-      console.log("Error occured in the saveMech in the mechServie",error);
+      console.log("Error occured in the saveMech in the mechServie", error);
       throw error;
     }
   }
@@ -334,7 +341,7 @@ class mechService implements IMechServices {
         } as const;
       }
     } catch (error) {
-      console.log("Error occured in the mechLogin in the mechServie",error);
+      console.log("Error occured in the mechLogin in the mechServie", error);
       throw error;
     }
   }
@@ -346,7 +353,7 @@ class mechService implements IMechServices {
       const { email } = data;
       return this.mechRepository.emailExistCheck({ email });
     } catch (error) {
-      console.log("Error occured in the getUserByEmail",error);
+      console.log("Error occured in the getUserByEmail", error);
       throw error;
     }
   }
@@ -372,7 +379,10 @@ class mechService implements IMechServices {
         message: "success",
       };
     } catch (error) {
-      console.log("Error occured in the getAllmechanic in the mechServie",error);
+      console.log(
+        "Error occured in the getAllmechanic in the mechServie",
+        error
+      );
       throw error;
     }
   }
@@ -383,8 +393,11 @@ class mechService implements IMechServices {
       const response = await this.mechRepository.verifyMechanic(values);
       return response;
     } catch (error) {
-      console.log("Error occured in the verifyMechanci in the mechServie",error);
-      throw error
+      console.log(
+        "Error occured in the verifyMechanci in the mechServie",
+        error
+      );
+      throw error;
     }
   }
 
@@ -404,8 +417,11 @@ class mechService implements IMechServices {
       const result = await generatePresignedUrl(fileName, fileType, folderName);
       return result as GetPreSignedUrlResponse;
     } catch (error) {
-      console.log("error occured in the getS3SignURlforMechCredinentaial in the mechServie",error);
-      throw error
+      console.log(
+        "error occured in the getS3SignURlforMechCredinentaial in the mechServie",
+        error
+      );
+      throw error;
     }
   }
 
@@ -426,7 +442,7 @@ class mechService implements IMechServices {
         "Error occured in the mechService while updaing the complaint status",
         error
       );
-      throw error
+      throw error;
     }
   }
 
@@ -437,7 +453,7 @@ class mechService implements IMechServices {
       console.log("list of device  is ", devices);
       return devices as GetAllDevicesResponse[];
     } catch (error) {
-      console.log("Error occured at getDevice in the mechServie",error);
+      console.log("Error occured at getDevice in the mechServie", error);
       throw error;
     }
   }
@@ -465,7 +481,10 @@ class mechService implements IMechServices {
         mechId,
       });
     } catch (error) {
-      console.log("Error occured in the updatePassword in the mechService",error);
+      console.log(
+        "Error occured in the updatePassword in the mechService",
+        error
+      );
       throw error;
     }
   }
@@ -479,7 +498,10 @@ class mechService implements IMechServices {
       const result = await this.mechRepository.getMechanicDetails({ id });
       return result;
     } catch (error) {
-      console.log(error as Error);
+      console.log(
+        "Error occured in the getMechanicDetails in the mechService",
+        error
+      );
       throw error;
     }
   }
@@ -501,7 +523,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured while fetching the user registerd complaint in the mechService ",
-        error as Error
+        error
       );
       throw error;
     }
@@ -518,7 +540,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured while getting the specified Complaint by id in the mechServices  ",
-        error as Error
+        error
       );
       throw error;
     }
@@ -609,12 +631,16 @@ class mechService implements IMechServices {
       console.log(
         "Entered in the getAllCompliantService funtion in the mechService"
       );
-      const result = await this.concernRepository.getAllCompletedServiceByMechanic(
-        mechanicId
-      );
+      const result =
+        await this.concernRepository.getAllCompletedServiceByMechanic(
+          mechanicId
+        );
       return result;
     } catch (error) {
-      console.log("error in mechService", error);
+      console.log(
+        "error in getAllCompletedServices in the  mechService",
+        error
+      );
       throw error;
     }
   }
@@ -632,7 +658,7 @@ class mechService implements IMechServices {
       const result = await this.mechRepository.editMechanic({ mechId, values });
       return result;
     } catch (error) {
-      console.log(error as Error);
+      console.log("Erro occured in the editMechanic ", error);
       throw error;
     }
   }
@@ -651,7 +677,7 @@ class mechService implements IMechServices {
         return null;
       }
     } catch (error) {
-      console.log("Error in AddUserAddress in mechService",error);
+      console.log("Error in AddUserAddress in mechService", error);
       throw error;
     }
   }
@@ -662,7 +688,7 @@ class mechService implements IMechServices {
       const { _id, addressId, values } = data;
       return await this.mechRepository.editAddress({ _id, addressId, values });
     } catch (error) {
-      console.log("error in ediAddress in the mechService ",error);
+      console.log("error in ediAddress in the mechService ", error);
       throw error;
     }
   }
