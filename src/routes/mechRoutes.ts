@@ -9,7 +9,6 @@ import { Email } from '../utils/email';
 import { GenerateOTP } from '../utils/generateOtp';
 import RoomRepository from '../repositories/roomRepository';
 import ConcernRepository from '../repositories/concernRepository';
-import ConcernService from '../services/concernService';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
@@ -17,10 +16,9 @@ const mechRouter:Router = express.Router();
 const mechRepository = new MechRepository();
 const roomRepository = new RoomRepository();
 const concernRepository = new ConcernRepository();
-const concernService = new ConcernService(concernRepository);
 const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
-const mechServices = new mechService(mechRepository,concernRepository,roomRepository,concernService,createjwt,encrypt,email);
+const mechServices = new mechService(mechRepository,concernRepository,roomRepository,createjwt,encrypt,email);
 const controller = new mechController(mechServices,encrypt,createjwt,email);
 
 mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next)); 

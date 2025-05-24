@@ -57,7 +57,6 @@ class mechService implements IMechServices {
     private mechRepository: IMechRepository,
     private concernRepository: IConcernRepository,
     private roomRepository: IRoomRepository,
-    private concernService: IConcernService,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
     private email: Iemail
@@ -65,7 +64,6 @@ class mechService implements IMechServices {
     this.mechRepository = mechRepository;
     this.concernRepository = concernRepository;
     this.roomRepository = roomRepository;
-    this.concernService = concernService;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
     this.email = email;
@@ -536,11 +534,11 @@ class mechService implements IMechServices {
     searchQuery: string
   ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
-      const data = await this.concernService.getAllUserRegisteredServices(
+      const data = await this.concernRepository.getAllUserRegisteredServices({
         page,
         limit,
-        searchQuery
-      );
+        searchQuery,
+      });
       console.log("data in the mechService ", data);
 
       return data;
@@ -553,13 +551,13 @@ class mechService implements IMechServices {
     }
   }
 
-  //function to getting the specified complinat using id 
+  //function to getting the specified complinat using id
   async getComplaintDetails(
     id: string
-  ): Promise<getComplaintDetailsResponse[] | null>  {
+  ): Promise<getComplaintDetailsResponse[] | null> {
     try {
       console.log("Enterdin the mechService");
-      const result = await this.concernService.getComplaintById(id);
+      const result = await this.concernRepository.getComplaintDetails(id);
       return result;
     } catch (error) {
       console.log(
@@ -647,60 +645,71 @@ class mechService implements IMechServices {
     }
   }
 
-  //function to getAllCompleted complaint by mechanic 
-  async getAllCompletedServices (mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null> {
-    try{
-      console.log("Entered in the getAllCompliantService funtion in the mechService");
-      const result = await this.concernService.getAllCompletedServiceByMechanic(mechanicId);
+  //function to getAllCompleted complaint by mechanic
+  async getAllCompletedServices(
+    mechanicId: string
+  ): Promise<GetAllMechanicCompletedServicesResponse[] | null> {
+    try {
+      console.log(
+        "Entered in the getAllCompliantService funtion in the mechService"
+      );
+      const result = await this.concernRepository.getAllCompletedServiceByMechanic(
+        mechanicId
+      );
       return result;
-    }catch(error){
-      console.log("error in mechService",error);
+    } catch (error) {
+      console.log("error in mechService", error);
       throw error;
     }
   }
 
   //function to edit the mechanic profile
-  async editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> {
-    try{
-      const {mechId,values} = mechaicDetails
-      console.log("Values reached in the mechService in the backend while eding the mechanic",mechaicDetails);
-      const result = await this.mechRepository.editMechanic({mechId,values});
+  async editMechanic(
+    mechaicDetails: IUpdatingMechanicDetails
+  ): Promise<IupdateingMechanicDetailsResponse | null> {
+    try {
+      const { mechId, values } = mechaicDetails;
+      console.log(
+        "Values reached in the mechService in the backend while eding the mechanic",
+        mechaicDetails
+      );
+      const result = await this.mechRepository.editMechanic({ mechId, values });
       return result;
-    }catch(error) {
+    } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
 
-  //function to add the address for the user 
-   async AddUserAddress(
-      data: IAddMechAddress
-    ): Promise<IAddMechAddressResponse | null> {
-      try {
-        const { _id, values } = data;
-        console.log("id from the addMechAddress in the mech service is ", _id);
-        const address = await this.mechRepository.addAddress({ _id, values });
-        if (address) {
-           return address;
-        } else {
-          return null;
-        }
-      } catch (error) {
-        console.log(error as Error);
-        throw new Error("Error while AddMechAddress in mechService ");
+  //function to add the address for the user
+  async AddUserAddress(
+    data: IAddMechAddress
+  ): Promise<IAddMechAddressResponse | null> {
+    try {
+      const { _id, values } = data;
+      console.log("id from the addMechAddress in the mech service is ", _id);
+      const address = await this.mechRepository.addAddress({ _id, values });
+      if (address) {
+        return address;
+      } else {
+        return null;
       }
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error while AddMechAddress in mechService ");
     }
+  }
 
-    //editing the mechanic address
-      async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
-        try {
-          const { _id, addressId, values } = data;
-          return await this.mechRepository.editAddress({ _id, addressId, values });
-        } catch (error) {
-          console.log(error as Error);
-          throw new Error("Error while editAddress in mechService ");
-        }
-      }
+  //editing the mechanic address
+  async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
+    try {
+      const { _id, addressId, values } = data;
+      return await this.mechRepository.editAddress({ _id, addressId, values });
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error while editAddress in mechService ");
+    }
+  }
 }
 
 export default mechService;

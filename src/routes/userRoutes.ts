@@ -25,7 +25,7 @@ const concernService = new ConcernService(concernRepository);
 const generateOTP  = new GenerateOTP();
 
 const email = new Email(generateOTP);
-const userServices = new userService(userRepository,serviceRepository,concernService,orderService,createjwt,encrypt,email);
+const userServices = new userService(userRepository,serviceRepository,concernRepository,orderRepository,orderService,createjwt,encrypt,email);
 const controller = new userController(userServices,encrypt,createjwt,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));

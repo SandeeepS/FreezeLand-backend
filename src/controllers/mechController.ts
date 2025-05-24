@@ -41,65 +41,13 @@ class mechController implements IMechController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
+
+  //function for singup the mechanic 
   async mechSignup(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    // try {
-    //   console.log("req body is ", req.body);
-    //   req.app.locals.mechData = req.body;
-    //   const { name, email, phone, password, cpassword } = req.body;
-    //   console.log(
-    //     "mechanic details from the req body in the mechSignup in mech Controller ",
-    //     name,
-    //     email,
-    //     phone,
-    //     password,
-    //     cpassword
-    //   );
-    //   const check = SignUpValidation(name, phone, email, password, cpassword);
-    //   if (check) {
-    //     const newMechanic = await this.mechServices.signupMech(
-    //       req.app.locals.mechData
-    //     );
-
-    //     if (!newMechanic) {
-    //       req.app.locals.newMechanic = true;
-    //       req.app.locals.mechData = req.body;
-    //       req.app.locals.mechEmail = req.body.email;
-
-    //       const otp = await this.email.generateAndSendOTP(email);
-    //       req.app.locals.mechOtp = otp;
-
-    //       const expirationMinutes = 1;
-    //       setTimeout(() => {
-    //         delete req.app.locals.mechOtp;
-    //       }, expirationMinutes * 60 * 1000);
-
-    //       res.status(OK).json({
-    //         mechId: null,
-    //         success: true,
-    //         message: "OTP sent for verification...",
-    //       });
-    //     } else {
-    //       res
-    //         .status(BAD_REQUEST)
-    //         .json({ success: false, message: "The email is already in use!" });
-    //     }
-    //   } else {
-    //     console.log("mechanic details validation from the backend is failed");
-    //     res.status(UNAUTHORIZED).json({
-    //       success: false,
-    //       message: "Please enter  valid mechanic  details !!",
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.log(error as Error);
-    //   next(error);
-    // }
-
-    //////////////////////new implimented code is below
     try {
       const mechData = req.body;
       console.log("Details from the mechSignuppage (frontend) is ", mechData);
@@ -126,6 +74,8 @@ class mechController implements IMechController {
     }
   }
 
+
+  //funciton for verifying the mechanic
   async veryfyMechOtp(
     req: Request,
     res: Response,
@@ -219,6 +169,7 @@ class mechController implements IMechController {
     }
   }
 
+  //for login of mechanic 
   async mechLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password }: { email: string; password: string } = req.body;
@@ -275,6 +226,7 @@ class mechController implements IMechController {
     }
   }
 
+  //for forgot reset otp mechanic
   async forgotResentOtpMech(
     req: Request,
     res: Response,
@@ -667,7 +619,10 @@ class mechController implements IMechController {
         } else {
           res
             .status(BAD_REQUEST)
-            .json({ success: false, message: "Mechanic Address addingh failed" });
+            .json({
+              success: false,
+              message: "Mechanic Address addingh failed",
+            });
         }
       } else {
         console.log(
@@ -683,50 +638,49 @@ class mechController implements IMechController {
     }
   }
 
-
   //editing mechanic address
-    async editAddress(req: Request, res: Response, next: NextFunction) {
-      try {
-        console.log("entered in teh mechanic Controller for editing the address");
-        const { values, _id, addressId } = req.body;
-        const check = AddressValidation(
-          values.name,
-          values.phone,
-          values.email,
-          values.state,
-          values.pin,
-          values.district,
-          values.landMark
-        );
-        if (check) {
-          console.log("address validation done ");
-          const editedAddress = await this.mechServices.editAddress({
-            _id,
-            addressId,
-            values,
+  async editAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("entered in teh mechanic Controller for editing the address");
+      const { values, _id, addressId } = req.body;
+      const check = AddressValidation(
+        values.name,
+        values.phone,
+        values.email,
+        values.state,
+        values.pin,
+        values.district,
+        values.landMark
+      );
+      if (check) {
+        console.log("address validation done ");
+        const editedAddress = await this.mechServices.editAddress({
+          _id,
+          addressId,
+          values,
+        });
+        if (editedAddress) {
+          res.status(OK).json({
+            success: true,
+            message: "Address edited  added successfully",
           });
-          if (editedAddress) {
-            res.status(OK).json({
-              success: true,
-              message: "Address edited  added successfully",
-            });
-          } else {
-            res
-              .status(BAD_REQUEST)
-              .json({ success: false, message: "Address editing  failed" });
-          }
         } else {
-          console.log("address validation failed while editing the address");
-          res.status(BAD_REQUEST).json({
-            success: false,
-            message: "address validation fialed while editing the address",
-          });
+          res
+            .status(BAD_REQUEST)
+            .json({ success: false, message: "Address editing  failed" });
         }
-      } catch (error) {
-        console.log(error as Error);
-        next(error);
+      } else {
+        console.log("address validation failed while editing the address");
+        res.status(BAD_REQUEST).json({
+          success: false,
+          message: "address validation fialed while editing the address",
+        });
       }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
     }
+  }
 
   //function to update the workdetails to the concern database
   async updateWorkDetails(req: Request, res: Response, next: NextFunction) {

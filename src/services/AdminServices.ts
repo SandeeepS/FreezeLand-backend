@@ -54,9 +54,6 @@ import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
-import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
-import IOrderService from "../interfaces/IServices/IOrderService";
-import IConcernService from "../interfaces/IServices/IConcernService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 
 class adminService implements IAdminService {
@@ -76,7 +73,6 @@ class adminService implements IAdminService {
     this.serviceRepository = serviceRepository;
     this.deviceRepository = deviceRepository;
     this.concernRepository = concernRepository;
-
     this.encrypt = encrypt;
     this.createjwt = createjwt;
   }

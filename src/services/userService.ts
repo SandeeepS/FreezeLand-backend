@@ -54,11 +54,13 @@ import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { ILoginResponse } from "../interfaces/entityInterface/ILoginResponse";
-import IPaymentServices, {
+import IPaymentServices,{
   IOrderService,
 } from "../interfaces/IServices/IOrderService";
 import IConcernService from "../interfaces/IServices/IConcernService";
 import { response } from "express";
+import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
+import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
@@ -66,7 +68,8 @@ class userService implements IUserServices {
   constructor(
     private userRepository: IUserRepository,
     private serviceRepository: IServiceRepository,
-    private concernService: IConcernService,
+    private concernRepository: IConcernRepository,
+    private orderRepository : IOrderRepository,
     private orderService: IOrderService,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
@@ -74,7 +77,8 @@ class userService implements IUserServices {
   ) {
     this.userRepository = userRepository;
     this.serviceRepository = serviceRepository;
-    this.concernService = concernService;
+    this.concernRepository = concernRepository;
+    this.orderRepository = orderRepository;
     this.orderService = orderService;
     this.createjwt = createjwt;
     this.encrypt = encrypt;
@@ -613,7 +617,7 @@ class userService implements IUserServices {
     try {
       const { _id, addressId, values } = data;
       return await this.userRepository.editAddress({ _id, addressId, values });
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       throw new Error("Error while editAddress in userService ");
     }
@@ -682,7 +686,7 @@ class userService implements IUserServices {
         const orderId = (result as any).response.data._id;
         const complaintId = (result as any).response.data.complaintId;
         const updatedTheOrderDeatilsInConcenrDataBase =
-          await this.concernService.updateConcernWithOrderId(
+          await this.concernRepository.updateConcernWithOrderId(
             complaintId,
             orderId
           );
