@@ -54,7 +54,7 @@ import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { ILoginResponse } from "../interfaces/entityInterface/ILoginResponse";
-import IPaymentServices,{
+import IPaymentServices, {
   IOrderService,
 } from "../interfaces/IServices/IOrderService";
 import IConcernService from "../interfaces/IServices/IConcernService";
@@ -69,7 +69,7 @@ class userService implements IUserServices {
     private userRepository: IUserRepository,
     private serviceRepository: IServiceRepository,
     private concernRepository: IConcernRepository,
-    private orderRepository : IOrderRepository,
+    private orderRepository: IOrderRepository,
     private orderService: IOrderService,
     private createjwt: ICreateJWT,
     private encrypt: compareInterface,
@@ -120,7 +120,7 @@ class userService implements IUserServices {
 
       return savedTempUser;
     } catch (error) {
-      console.log(error);
+      console.log("Error in userRegister in the userService", error);
       throw error;
     }
   }
@@ -213,7 +213,7 @@ class userService implements IUserServices {
         };
       }
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error in verify OTP", error);
       throw error;
     }
   }
@@ -225,7 +225,7 @@ class userService implements IUserServices {
       const { email } = userData;
       return await this.userRepository.emailExistCheck({ email });
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the isUserExist in the userService", error);
       throw error;
     }
   }
@@ -283,7 +283,7 @@ class userService implements IUserServices {
         };
       }
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the saveUser in the userService", error);
       throw error;
     }
   }
@@ -294,7 +294,10 @@ class userService implements IUserServices {
       const result = await this.userRepository.getTempUserData(id);
       return result;
     } catch (error) {
-      console.log(error as Error);
+      console.log(
+        "Error occured in the getTempUserData in the userService",
+        error
+      );
       throw error;
     }
   }
@@ -361,8 +364,8 @@ class userService implements IUserServices {
       }
 
       // Authentication successful
-      const token = this.createjwt.generateToken(user.id, user.role);
-      const refreshToken = this.createjwt.generateRefreshToken(user.id);
+      const token = await this.createjwt.generateToken(user.id, user.role);
+      const refreshToken = await this.createjwt.generateRefreshToken(user.id);
 
       console.log("Token generated:", !!token);
       console.log("Refresh token generated:", !!refreshToken);
@@ -392,23 +395,57 @@ class userService implements IUserServices {
       console.log("email from the userSercice ", email);
       return this.userRepository.emailExistCheck({ email });
     } catch (error) {
-      console.log("error occured while getUserEmail in the userService");
+      console.log("error occured while getUserEmail in the userService", error);
       throw error;
     }
   }
 
-  generateToken(data: GenerateTokenDTO, role: string): string | undefined {
+  //function to generateToken
+  async generateToken(data: GenerateTokenDTO, role: string): Promise<string> {
     const { payload } = data;
-    if (payload) return this.createjwt.generateToken(payload, role);
+
+    if (!payload) {
+      throw new Error("Payload is required for token generation");
+    }
+
+    try {
+      const token = this.createjwt.generateToken(payload, role);
+      if (!token) {
+        throw new Error("Failed to generate JWT token");
+      }
+      return token;
+    } catch (error) {
+      console.log("Error generating token in the userService ", error);
+      throw error;
+    }
   }
 
-  generateRefreshToken(data: GenerateRefreshToken): string | undefined {
+  async generateRefreshToken(data: GenerateRefreshToken): Promise<string> {
     const { payload } = data;
-    if (payload) return this.createjwt.generateRefreshToken(payload);
+
+    if (!payload) {
+      throw new Error("Payload is required for refresh token generation");
+    }
+
+    try {
+      const refreshToken = this.createjwt.generateRefreshToken(payload);
+      if (!refreshToken) {
+        throw new Error("Failed to generate refresh token");
+      }
+      return refreshToken;
+    } catch (error) {
+      console.log("Error generating refresh token in the userService", error);
+      throw error;
+    }
   }
 
   async hashPassword(password: string) {
-    return await this.encrypt.hashPassword(password);
+    try {
+      return await this.encrypt.hashPassword(password);
+    } catch (error) {
+      console.log("Error ocured in the haspassword in the userService", error);
+      throw error;
+    }
   }
 
   async getProfile(data: GetProfileDTO): Promise<GetProfileResponse> {
@@ -426,7 +463,7 @@ class userService implements IUserServices {
       }
 
       const user = await this.userRepository.getUserById({ id });
-      console.log("User detail in the userService from the getUserByid",user);
+      console.log("User detail in the userService from the getUserByid", user);
       if (!user) {
         return {
           status: NOT_FOUND,
@@ -446,8 +483,8 @@ class userService implements IUserServices {
         },
       } as const;
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while getting the user Profile ");
+      console.log("Error occured in the getProfile in userService",error);
+      throw error;
     }
   }
 
@@ -474,8 +511,8 @@ class userService implements IUserServices {
         message: "success",
       };
     } catch (error) {
-      console.log(error);
-      throw new Error("Error occured.");
+      console.log("Error occured in the getService in the useService",error);
+      throw error;
     }
   }
 
@@ -499,7 +536,7 @@ class userService implements IUserServices {
     } catch (error) {
       console.log(
         "Error occured while fetching the user registerd complaint in the userSercvice ",
-        error as Error
+        error 
       );
       throw error;
     }
@@ -517,8 +554,8 @@ class userService implements IUserServices {
         return null;
       }
     } catch (error) {
-      console.log(error as Error);
-      throw new Error();
+      console.log("Error while getService in the userService",error);
+      throw error;
     }
   }
 
@@ -532,7 +569,7 @@ class userService implements IUserServices {
       const result = await this.userRepository.getMechanicDetails({ id });
       return result;
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error in getMechanicDetails ",error);
       throw error;
     }
   }
@@ -549,7 +586,7 @@ class userService implements IUserServices {
     } catch (error) {
       console.log(
         "Error occured while getting the specified userComplaint ",
-        error as Error
+        error
       );
       throw error;
     }
@@ -577,7 +614,7 @@ class userService implements IUserServices {
         userId,
       });
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the updateNewPassword in the userService",error);
       throw error;
     }
   }
@@ -585,9 +622,14 @@ class userService implements IUserServices {
   async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
     try {
       const { _id, name, phone, profile_picture } = data;
-      return this.userRepository.editUser({ _id, name, phone, profile_picture });
+      return this.userRepository.editUser({
+        _id,
+        name,
+        phone,
+        profile_picture,
+      });
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the editUser",error);
       throw error;
     }
   }
@@ -608,8 +650,8 @@ class userService implements IUserServices {
         return null;
       }
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while AddUserAddress in userService ");
+      console.log("error occured AddUserAddress in the userService");
+      throw error;
     }
   }
 
@@ -617,9 +659,9 @@ class userService implements IUserServices {
     try {
       const { _id, addressId, values } = data;
       return await this.userRepository.editAddress({ _id, addressId, values });
-    } catch (error){
-      console.log(error as Error);
-      throw new Error("Error while editAddress in userService ");
+    } catch (error) {
+      console.log("Error occured in the editAddress in the useService",error)
+      throw error;
     }
   }
 
@@ -631,8 +673,8 @@ class userService implements IUserServices {
       console.log("entered in the userService ");
       return await this.userRepository.setDefaultAddress({ userId, addressId });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("error while setUserDefaultAddress in userService");
+      console.log("Error occured in the setUserDefaultAddress in the userService",error);
+      throw error;
     }
   }
 
@@ -643,10 +685,8 @@ class userService implements IUserServices {
       console.log("entered in the userService for register Service");
       return await this.userRepository.registerService(data);
     } catch (error) {
-      console.log(error as Error);
-      throw new Error(
-        "Error while Registering user compliantes in userService"
-      );
+      console.log("Error occured in the registerService in the userService",error);
+      throw error
     }
   }
 
@@ -668,7 +708,7 @@ class userService implements IUserServices {
     }
   }
 
-  async successPayment(data: string): Promise<unknown>{
+  async successPayment(data: string): Promise<unknown> {
     try {
       console.log(
         "entered in the successPayment  user service in the backend "
@@ -710,16 +750,26 @@ class userService implements IUserServices {
     }
   }
 
-
-  //function to update the location after singup 
-  async updateUserLocation(data : IupdateUserLocation):Promise<IupdateUserLocationResponse | null>{
-    try{
-      const {userId,locationData} = data;
-      console.log("Enterd in the updateUserLocation in the userService",locationData);
-      const result = await this.userRepository.updateUserLocation({userId, locationData});
+  //function to update the location after singup
+  async updateUserLocation(
+    data: IupdateUserLocation
+  ): Promise<IupdateUserLocationResponse | null> {
+    try {
+      const { userId, locationData } = data;
+      console.log(
+        "Enterd in the updateUserLocation in the userService",
+        locationData
+      );
+      const result = await this.userRepository.updateUserLocation({
+        userId,
+        locationData,
+      });
       return result;
-    }catch(error){
-      console.log("Error occured in the updateUserLocation function in user service ",error);
+    } catch (error) {
+      console.log(
+        "Error occured in the updateUserLocation function in user service ",
+        error
+      );
       throw error;
     }
   }

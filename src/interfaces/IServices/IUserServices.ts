@@ -32,6 +32,7 @@ import {
     IPaymentData,
     IupdateUserLocation,
     IupdateUserLocationResponse,
+    GenerateRefreshToken,
   } from "../DTOs/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
@@ -42,8 +43,8 @@ export interface IUserServices {
     saveUser(userData: SaveUserDTO): Promise<SaveUserResponse>;
     userLogin(userData: UserLoginDTO): Promise<UserLoginResponse>;
     getUserByEmail(data: GetUserByEmail): Promise<EmailExistCheckResponse | null>;
-    generateToken(data: GenerateTokenDTO, role: string): string | undefined;
-    generateRefreshToken(data: GenerateTokenDTO): string | undefined;
+    generateToken(data: GenerateTokenDTO, role: string): Promise<string>   
+    generateRefreshToken(data: GenerateRefreshToken): Promise<string>   
     hashPassword(password: string): Promise<string>;
     getProfile(data: GetProfileDTO): Promise<GetProfileResponse>;
     getServices(data: GetServicesDTO): Promise<GetServiceResponse | null>;

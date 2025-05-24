@@ -374,11 +374,11 @@ class userController implements IUserController {
           });
           // throw new Error('user has been blocked by admin...');
         } else {
-          const token = this.userServices.generateToken(
+          const token = await this.userServices.generateToken(
             { payload: user.id },
             user.role
           );
-          const refreshToken = this.userServices.generateRefreshToken({
+          const refreshToken = await this.userServices.generateRefreshToken({
             payload: user.id,
           });
           const data = {
