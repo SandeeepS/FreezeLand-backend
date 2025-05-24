@@ -24,9 +24,7 @@ const serviceRepository = new ServiceRepository();
 const deviceRepository = new DeviceRepository();
 const orderRepository = new OrderRepository()
 const concernRepository = new ConcernRepository();
-const orderService = new OrderServices(orderRepository);
-const concernService = new ConcernService(concernRepository);
-const adminService: AdminService = new AdminService(adminReopsitory,userRepository,mechRepository,serviceRepository,deviceRepository,orderService,concernService, encrypt, createjwt);
+const adminService: AdminService = new AdminService(adminReopsitory,userRepository,mechRepository,serviceRepository,deviceRepository,concernRepository, encrypt, createjwt);
 const controller = new adminController(adminService);
 
 adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => controller.adminLogin(req, res,next));

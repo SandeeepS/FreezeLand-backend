@@ -1,5 +1,12 @@
-import { GetAllMechanicCompletedServicesResponse, GetAllUserRegisteredServicesResponse } from "../interfaces/DTOs/Concern/IRepository";
-import { getComplaintDetailsResponse, IAllComplaintDataResponse, UpdatedcomplaintWithOrderIdResponse } from "../interfaces/DTOs/Concern/IService";
+import {
+  GetAllMechanicCompletedServicesResponse,
+  GetAllUserRegisteredServicesResponse,
+} from "../interfaces/DTOs/Concern/IRepository";
+import {
+  getComplaintDetailsResponse,
+  IAllComplaintDataResponse,
+  UpdatedcomplaintWithOrderIdResponse,
+} from "../interfaces/DTOs/Concern/IService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IConcernService from "../interfaces/IServices/IConcernService";
 
@@ -50,66 +57,86 @@ class ConcernService implements IConcernService {
     }
   }
 
-  //function to cancel the complaint 
-  async cancelComplaint(complaintId: string,userRole : string,reason:string) :Promise<unknown>{
+  //function to cancel the complaint
+  async cancelComplaint(
+    complaintId: string,
+    userRole: string,
+    reason: string
+  ): Promise<unknown> {
     try {
       console.log("Entered in the cancelComplaint in the concern service");
-      const result = await this.concernRepositroy.cancelComplaint(complaintId,userRole,reason);
+      const result = await this.concernRepositroy.cancelComplaint(
+        complaintId,
+        userRole,
+        reason
+      );
       return result;
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
 
-    async getAllUserRegisteredServices(
-      page: number,
-      limit: number,
-      searchQuery: string
-    ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
-      try {
-        const data = await this.concernRepositroy.getAllUserRegisteredServices({
-          page,
-          limit,
-          searchQuery,
-        });
-        console.log("data in the mechService ", data);
-  
-        return data;
-      } catch (error) {
-        console.log(
-          "Error occured while fetching the user registerd complaint in the mechService ",
-          error as Error
+  async getAllUserRegisteredServices(
+    page: number,
+    limit: number,
+    searchQuery: string
+  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+    try {
+      const data = await this.concernRepositroy.getAllUserRegisteredServices({
+        page,
+        limit,
+        searchQuery,
+      });
+      console.log("data in the mechService ", data);
+
+      return data;
+    } catch (error) {
+      console.log(
+        "Error occured while fetching the user registerd complaint in the mechService ",
+        error as Error
+      );
+      throw error;
+    }
+  }
+
+  //function to get completed service/complait completed by mechanic
+  async getAllCompletedServiceByMechanic(
+    mechanicId: string
+  ): Promise<GetAllMechanicCompletedServicesResponse[] | null> {
+    try {
+      console.log("Entered in the concern Service", mechanicId);
+      const result =
+        await this.concernRepositroy.getAllCompletedServiceByMechanic(
+          mechanicId
         );
-        throw error;
-      }
+      return result;
+    } catch (error) {
+      console.log("Error occured while getting the  ");
+      throw error;
     }
+  }
 
-
-    //function to get completed service/complait completed by mechanic
-    async getAllCompletedServiceByMechanic(mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null>{
-      try{
-        console.log("Entered in the concern Service",mechanicId);
-        const result = await this.concernRepositroy.getAllCompletedServiceByMechanic(mechanicId);
-        return result;
-      }catch(error){
-        console.log("Error occured while getting the  ")
-        throw error;
-      }
+  //function to update the orderid in the concern data base after payment optoin
+  async updateConcernWithOrderId(
+    complaintId: string,
+    orderId: string
+  ): Promise<UpdatedcomplaintWithOrderIdResponse | null> {
+    try {
+      console.log("Entered in the updatedConcernOrderId");
+      const result = await this.concernRepositroy.updateConcernWithOrderId(
+        complaintId,
+        orderId
+      );
+      return result;
+    } catch (error) {
+      console.log(
+        "Error occured in the updateconcernWithOrderId in concernRepository",
+        error
+      );
+      throw error;
     }
-
-      //function to update the orderid in the concern data base after payment optoin 
-      async updateConcernWithOrderId(complaintId:string, orderId:string):Promise<UpdatedcomplaintWithOrderIdResponse | null>{
-        try{
-          console.log("Entered in the updatedConcernOrderId");
-           const result = await this.concernRepositroy.updateConcernWithOrderId(complaintId,orderId);
-          return result;
-        }catch(error){
-          console.log("Error occured in the updateconcernWithOrderId in concernRepository",error);
-          throw error;
-        }
-      }
-  
+  }
 }
 
 export default ConcernService;

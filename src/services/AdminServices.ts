@@ -57,6 +57,7 @@ import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 import IOrderService from "../interfaces/IServices/IOrderService";
 import IConcernService from "../interfaces/IServices/IConcernService";
+import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 
 class adminService implements IAdminService {
   constructor(
@@ -65,8 +66,7 @@ class adminService implements IAdminService {
     private mechRepository: IMechRepository,
     private serviceRepository: IServiceRepository,
     private deviceRepository: IDeviceRepository,
-    private orderService:IOrderService,
-    private concernService:IConcernService,
+    private concernRepository: IConcernRepository,
     private encrypt: compareInterface,
     private createjwt: ICreateJWT
   ) {
@@ -75,8 +75,7 @@ class adminService implements IAdminService {
     this.mechRepository = mechRepository;
     this.serviceRepository = serviceRepository;
     this.deviceRepository = deviceRepository;
-    this.orderService = orderService;
-    this.concernService = concernService;
+    this.concernRepository = concernRepository;
 
     this.encrypt = encrypt;
     this.createjwt = createjwt;
@@ -499,7 +498,7 @@ class adminService implements IAdminService {
     try {
       console.log("reached the getAllComplaints in the adminService");
       console.log("Search in the admin service is ", search);
-      const complaints = await this.concernService.getAllComplaints(page,limit, searchQuery,search);
+      const complaints = await this.concernRepository.getAllComplaints(page,limit, searchQuery,search);
       if (complaints) {
         return {
           status: STATUS_CODES.OK,
@@ -524,7 +523,7 @@ class adminService implements IAdminService {
   async getComplaintById(id:string): Promise<any> {
     try {
       console.log("reached the getComplaintById in the adminService");
-      const complaint = await this.concernService.getComplaintById(id);
+      const complaint = await this.concernRepository.getComplaintDetails(id);
       if (complaint) {
         return {
           status: STATUS_CODES.OK,
@@ -548,7 +547,7 @@ class adminService implements IAdminService {
   async cancelComplaint(complaintId:string,userRole:string,reason:string):Promise<unknown>{
     try{
       console.log("reached in the cancel complaint function in the admin service",complaintId,userRole);
-      const result = await this.concernService.cancelComplaint(complaintId,userRole,reason);
+      const result = await this.concernRepository.cancelComplaint(complaintId,userRole,reason);
       return result;
     }catch(error){
       console.log(error as Error);
