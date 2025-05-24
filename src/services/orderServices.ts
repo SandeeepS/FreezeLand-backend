@@ -19,7 +19,7 @@ export interface OrderEventData {
 }
 
 class OrderServices implements IOrderService {
-  constructor(private orderRepository: IOrderRepository) {
+  constructor(private orderRepository: IOrderRepository){
     this.orderRepository = orderRepository;
   }
 

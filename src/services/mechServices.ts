@@ -101,7 +101,7 @@ class mechService implements IMechServices {
       );
       return savedTempMech;
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the mechRegistration in the mechService ",error);
       throw error;
     }
   }
@@ -195,48 +195,12 @@ class mechService implements IMechServices {
         };
       }
     } catch (error) {
-      console.log(error);
+      console.log("Error occured in the verifyOTP function in the mechServie",error);
       throw error;
     }
   }
 
-  // async signupMech(mechData: MechInterface): Promise<any> {
-  //   try {
-  //     console.log("Entered in mechanic Service");
-  //     const {name,email,password,phone} = mechData;
-  //     const secret_key:string | undefined = process.env.CRYPTR_SECRET
-  //     if(!secret_key){
-  //       throw new Error("Encrption secret key is not defined in the environment");
-  //     }
 
-  //     const cryptr = new Cryptr(secret_key,{ encoding: 'base64', pbkdf2Iterations: 10000, saltLength: 10 });
-  //     const newPassword = cryptr.encrypt(password);
-  //     const newDetails: Partial<MechInterface> = {
-  //              name:name,
-  //              password:newPassword,
-  //              email:email,
-  //              phone:phone
-  //     }
-  //     const mechanic = await this.mechRepository.saveMechanic(newDetails);
-
-  //     if (mechanic) {
-  //       console.log("mechanic is registered ");
-  //       return {
-  //         status: OK,
-  //         data: {
-  //           success: true,
-  //           message: "mechanic is successfully registered ",
-  //           data: mechanic,
-  //         },
-  //       };
-  //     } else {
-  //       console.log("mechanic is not registered");
-
-  //     }
-  //   } catch (error) {
-  //     console.log(error as Error);
-  //   }
-  // }
 
   async signupMech(
     mechData: SignUpMechDTO
@@ -245,7 +209,7 @@ class mechService implements IMechServices {
       const { email } = mechData;
       return await this.mechRepository.emailExistCheck({ email });
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the singup function in the mechService ",error);
       throw error;
     }
   }
@@ -301,7 +265,7 @@ class mechService implements IMechServices {
         };
       }
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the saveMech in the mechServie",error);
       throw error;
     }
   }
@@ -370,7 +334,7 @@ class mechService implements IMechServices {
         } as const;
       }
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the mechLogin in the mechServie",error);
       throw error;
     }
   }
@@ -382,7 +346,7 @@ class mechService implements IMechServices {
       const { email } = data;
       return this.mechRepository.emailExistCheck({ email });
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the getUserByEmail",error);
       throw error;
     }
   }
@@ -408,10 +372,8 @@ class mechService implements IMechServices {
         message: "success",
       };
     } catch (error) {
-      console.log(error as Error);
-      throw new Error(
-        "Error occured while getting registered mechanic in the mechService "
-      );
+      console.log("Error occured in the getAllmechanic in the mechServie",error);
+      throw error;
     }
   }
 
@@ -421,10 +383,8 @@ class mechService implements IMechServices {
       const response = await this.mechRepository.verifyMechanic(values);
       return response;
     } catch (error) {
-      console.log(error);
-      throw new Error(
-        "Erorr occured while vefirication fo the Mechanic from the mechService.tsx"
-      );
+      console.log("Error occured in the verifyMechanci in the mechServie",error);
+      throw error
     }
   }
 
@@ -444,10 +404,8 @@ class mechService implements IMechServices {
       const result = await generatePresignedUrl(fileName, fileType, folderName);
       return result as GetPreSignedUrlResponse;
     } catch (error) {
-      console.log(error);
-      throw new Error(
-        "error while generating the presinged url from the adminService"
-      );
+      console.log("error occured in the getS3SignURlforMechCredinentaial in the mechServie",error);
+      throw error
     }
   }
 
@@ -468,9 +426,7 @@ class mechService implements IMechServices {
         "Error occured in the mechService while updaing the complaint status",
         error
       );
-      throw new Error(
-        "Erro occured in the mechservice while updating the complaint statsus"
-      );
+      throw error
     }
   }
 
@@ -481,8 +437,8 @@ class mechService implements IMechServices {
       console.log("list of device  is ", devices);
       return devices as GetAllDevicesResponse[];
     } catch (error) {
-      console.log(error);
-      throw new Error("Error occured.");
+      console.log("Error occured at getDevice in the mechServie",error);
+      throw error;
     }
   }
 
@@ -509,7 +465,7 @@ class mechService implements IMechServices {
         mechId,
       });
     } catch (error) {
-      console.log(error as Error);
+      console.log("Error occured in the updatePassword in the mechService",error);
       throw error;
     }
   }
@@ -695,8 +651,8 @@ class mechService implements IMechServices {
         return null;
       }
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while AddMechAddress in mechService ");
+      console.log("Error in AddUserAddress in mechService",error);
+      throw error;
     }
   }
 
@@ -706,8 +662,8 @@ class mechService implements IMechServices {
       const { _id, addressId, values } = data;
       return await this.mechRepository.editAddress({ _id, addressId, values });
     } catch (error) {
-      console.log(error as Error);
-      throw new Error("Error while editAddress in mechService ");
+      console.log("error in ediAddress in the mechService ",error);
+      throw error;
     }
   }
 }
