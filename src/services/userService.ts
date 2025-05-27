@@ -39,6 +39,7 @@ import {
   IPaymentData,
   IupdateUserLocation,
   IupdateUserLocationResponse,
+  IResendOTPData,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -121,6 +122,31 @@ class userService implements IUserServices {
       return savedTempUser;
     } catch (error) {
       console.log("Error in userRegister in the userService", error);
+      throw error;
+    }
+  }
+
+  async resendOTP(data: IResendOTPData): Promise<Partial<ITempUser> | null> {
+    try {
+      const { tempUserId } = data;
+      console.log("TempUserId isssssssss",tempUserId);
+      const tempUserData = await this.userRepository.getTempUserData(
+        tempUserId
+      );
+      console.log("tempUserData in the resendOTP in the userService",tempUserData);
+      const userEmail = tempUserData?.userData.email;
+      const otp = await this.email.generateAndSendOTP(userEmail as string);
+      if (!otp) {
+        throw new Error("Failed to generate OTP");
+      }
+
+      const updatedTempUserData = await this.userRepository.updateTempUserData({
+        tempUserId,
+        otp,
+      });
+      return updatedTempUserData;
+    } catch (error) {
+      console.log("Errror occured while resendOTP in the userService", error);
       throw error;
     }
   }

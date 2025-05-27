@@ -30,6 +30,7 @@ import {
     getUserRegisteredServiceDetailsByIdResponse,
     IupdateUserLocation,
     IupdateUserLocationResponse,
+    IUpdateTempDataWithOTP,
     
   } from "../DTOs/User/IRepository.dto";
 import { ITempUser } from "../Model/IUser";
@@ -56,4 +57,5 @@ export interface IUserRepository {
     createTempUserData(data: Partial<ITempUser>): Promise<Partial<ITempUser | null>>
     getTempUserData(id:string):Promise<ITempUser | null>
     updateUserLocation(data:IupdateUserLocation):Promise<IupdateUserLocationResponse | null>
+    updateTempUserData(data: IUpdateTempDataWithOTP): Promise<ITempUser | null> 
 }

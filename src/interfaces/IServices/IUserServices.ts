@@ -33,6 +33,7 @@ import {
     IupdateUserLocation,
     IupdateUserLocationResponse,
     GenerateRefreshToken,
+    IResendOTPData,
   } from "../DTOs/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
@@ -63,5 +64,6 @@ export interface IUserServices {
     createStripeSession(data:IPaymentData):Promise<unknown>
     successPayment(data:string):Promise<unknown>
     updateUserLocation(data : IupdateUserLocation):Promise<IupdateUserLocationResponse | null>
+    resendOTP(data: IResendOTPData): Promise<Partial<ITempUser> | null> 
 }
 

@@ -37,6 +37,7 @@ import {
   getUserRegisteredServiceDetailsByIdResponse,
   IupdateUserLocation,
   IupdateUserLocationResponse,
+  IUpdateTempDataWithOTP,
 } from "../interfaces/DTOs/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import {
@@ -102,6 +103,23 @@ class UserRepository
     }
   }
 
+  async updateTempUserData(
+    data: IUpdateTempDataWithOTP
+  ): Promise<ITempUser | null> {
+    try {
+      const { tempUserId, otp } = data;
+      const result = await TempUser.findByIdAndUpdate(tempUserId, { otp: otp });
+      console.log("Updated tempUserData in the userTempUserData in the userRepository",result);
+      return result;
+    } catch (error) {
+      console.log(
+        "Error occured while udating the tempUserData while storing the new otp in the updateTempUserData , userRepository",
+        error
+      );
+      throw error;
+    }
+  }
+
   //function to verify otp
   // async verifyOTP(otp:string) :Promise<boolean> {
   //   try{
@@ -162,7 +180,7 @@ class UserRepository
   async getUserById(data: GetUserByIdDTO): Promise<GetUserByIdResponse | null> {
     try {
       const { id } = data;
-      console.log("user id is in userRepository",id);
+      console.log("user id is in userRepository", id);
       const user = await this.findById(id);
       if (!user) {
         return null;
@@ -171,7 +189,10 @@ class UserRepository
       const defaultAddressDetails = user.address?.find(
         (addr) => addr._id.toString() === user.defaultAddress?.toString()
       );
-      console.log("default address from the userRepository",defaultAddressDetails);
+      console.log(
+        "default address from the userRepository",
+        defaultAddressDetails
+      );
       return {
         ...user.toObject(),
         defaultAddressDetails,
@@ -334,8 +355,12 @@ class UserRepository
 
   async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
     try {
-      console.log("data for editing userDetails is ",data);
-      const qr = { name: data.name, phone: data.phone , profile_picture:data.profile_picture };
+      console.log("data for editing userDetails is ", data);
+      const qr = {
+        name: data.name,
+        phone: data.phone,
+        profile_picture: data.profile_picture,
+      };
       const editedUser = await this.update(data._id, qr);
       return editedUser;
     } catch (error) {
@@ -346,14 +371,20 @@ class UserRepository
 
   // //function to updateUserLocation for user
 
-  async updateUserLocation(data:IupdateUserLocation):Promise<IupdateUserLocationResponse | null> {
-    try{
-        const {userId,locationData} = data;
-        console.log("Enterd in the updateUserLocation in the usreRepository ",userId,locationData);
-        const qr = {locationData:locationData}
-        const editedUserData = await this.update(userId,qr)
-        return editedUserData;
-    }catch(error){
+  async updateUserLocation(
+    data: IupdateUserLocation
+  ): Promise<IupdateUserLocationResponse | null> {
+    try {
+      const { userId, locationData } = data;
+      console.log(
+        "Enterd in the updateUserLocation in the usreRepository ",
+        userId,
+        locationData
+      );
+      const qr = { locationData: locationData };
+      const editedUserData = await this.update(userId, qr);
+      return editedUserData;
+    } catch (error) {
       console.log(error as Error);
       throw error;
     }
@@ -435,8 +466,6 @@ class UserRepository
       );
     }
   }
-
- 
 }
 
 export default UserRepository;

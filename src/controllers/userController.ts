@@ -111,38 +111,10 @@ class userController implements IUserController {
             data: result.data,
           });
       } else {
-        // Handle different failure scenarios with appropriate status codes
-        switch (result.message) {
-          case "Temporary user data not found":
-            res.status(404).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "Invalid OTP":
-            res.status(401).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "User data not found":
-            res.status(404).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "User creation failed or role not defined":
-            res.status(500).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          default:
-            res.status(400).json({
-              success: false,
-              message: result.message || "Verification failed",
-            });
-        }
+        res.status(200).json({
+          success: false,
+          message: result.message,
+        });
       }
     } catch (error) {
       console.log(error as Error);
@@ -162,6 +134,44 @@ class userController implements IUserController {
       }
     }
   }
+
+  //function for resend OTP
+  async resendOTP(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { tempUserId } = req.body;
+      console.log(
+        "TempUserId in the resend OTP in the ressend otp function in the userController",
+        tempUserId
+      );
+      const response = await this.userServices.resendOTP({ tempUserId });
+      if (response) {
+        res.status(200).json({
+          success: true,
+          message: "OTP resended Successfully ,\n Check your Mail",
+          data: response,
+        });
+      } else {
+        res.status(200).json({
+          success: false,
+          message: "OTP resend is failed!!",
+        });
+      }
+    } catch (error) {
+      console.log(
+        "Error occured in the resendOTP in the userController",
+        error
+      );
+      res.status(500).json({
+        success: false,
+        message: "An Error occured while resending OTP",
+      });
+    }
+  }
+
   //getting the tempuserDAta from the backend for veriy the otp
   async getTempUserData(
     req: Request,

@@ -62,6 +62,11 @@ export interface FindEmailDTO {
   email: string;
 }
 
+export interface IUpdateTempDataWithOTP {
+  tempUserId:string;
+  otp:string;
+}
+
 export interface FindEmailResponse {
   _id: Types.ObjectId;
   name: string;

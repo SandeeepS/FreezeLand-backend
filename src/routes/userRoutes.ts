@@ -36,6 +36,7 @@ userRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) 
 userRouter.get('/getTempUserData',async(req:Request,res:Response,next:NextFunction) => await controller.getTempUserData(req,res,next));
 userRouter.post('/forgot-password', async (req: Request, res: Response,next:NextFunction) => await controller.forgotResentOtp(req, res,next));
 userRouter.post('/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await controller.VerifyForgotOtp(req, res,next));
+userRouter.post('/resend-otp',async(req:Request,res:Response,next:NextFunction) => await controller.resendOTP(req,res,next));
 userRouter.post('/handlePayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.createStripeSession(req,res,next));
 userRouter.put('/update-newpassword',userAuth(["user"]),async(req: Request, res: Response,next:NextFunction) => await controller.updateNewPassword(req, res,next));
 userRouter.get('/profile',userAuth(["user"]),async (req: Request, res: Response,next:NextFunction) => await controller.getProfile(req, res,next));

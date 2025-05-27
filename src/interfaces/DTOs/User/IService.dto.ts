@@ -39,6 +39,13 @@ export interface UserSignUpResponse extends Document {
   createdAt:Date;
 }
 
+export interface IResendOTPData {
+  tempUserId:string
+}
+
+export interface IResendOTPResponse {
+  
+}
 export interface UserLoginResponse {
   status: number;
   data: {
