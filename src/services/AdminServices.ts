@@ -88,7 +88,7 @@ class adminService implements IAdminService {
         if (admin?.id) {
           if (admin?.password === password) {
             console.log("passwrod from the admin side is ", admin.password);
-            const token = this.createjwt.generateToken(admin.id, admin.role);
+            const token = this.createjwt.generateAccessToken(admin.id, admin.role);
             const refreshToken = this.createjwt.generateRefreshToken(admin.id);
             console.log("admin is exist", admin);
 

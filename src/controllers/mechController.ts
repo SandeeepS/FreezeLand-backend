@@ -41,8 +41,7 @@ class mechController implements IMechController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-
-  //function for singup the mechanic 
+  //function for singup the mechanic
   async mechSignup(
     req: Request,
     res: Response,
@@ -73,7 +72,6 @@ class mechController implements IMechController {
       }
     }
   }
-
 
   //funciton for verifying the mechanic
   async veryfyMechOtp(
@@ -169,7 +167,7 @@ class mechController implements IMechController {
     }
   }
 
-  //for login of mechanic 
+  //for login of mechanic
   async mechLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password }: { email: string; password: string } = req.body;
@@ -194,8 +192,8 @@ class mechController implements IMechController {
           }
           const access_token = loginStatus.data.token;
           const refresh_token = loginStatus.data.refresh_token;
-          const accessTokenMaxAge = 5 * 60 * 1000;
-          const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+          const accessTokenMaxAge = 5 * 60 * 1000; //15 min
+          const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
           res
             .status(loginStatus.status)
             .cookie("mech_access_token", access_token, {
@@ -617,12 +615,10 @@ class mechController implements IMechController {
             message: "mechanic address added successfully",
           });
         } else {
-          res
-            .status(BAD_REQUEST)
-            .json({
-              success: false,
-              message: "Mechanic Address addingh failed",
-            });
+          res.status(BAD_REQUEST).json({
+            success: false,
+            message: "Mechanic Address addingh failed",
+          });
         }
       } else {
         console.log(

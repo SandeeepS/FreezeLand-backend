@@ -100,7 +100,7 @@ const refreshAdminAccessToken = async (refreshToken: string, res: Response) => {
     const decoded = jwt.verifyRefreshToken(refreshToken, res);
 
     if (decoded.success && decoded.decoded) {
-      const newAccessToken = jwt.generateToken(
+      const newAccessToken = jwt.generateAccessToken(
         decoded.decoded.data,
         decoded.decoded.role
       );

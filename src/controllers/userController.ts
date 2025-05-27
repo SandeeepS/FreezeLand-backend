@@ -271,8 +271,7 @@ class userController implements IUserController {
     try {
       const { email, password }: { email: string; password: string } = req.body;
 
-      // Add debug logging
-      console.log("Login attempt for email:", email);
+
 
       // Validate input
       const isValid = LoginValidation(email, password);

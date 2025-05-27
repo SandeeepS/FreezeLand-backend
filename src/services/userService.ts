@@ -176,7 +176,7 @@ class userService implements IUserServices {
 
           if (user && user.role) {
             const userId = user._id.toString();
-            const token = this.createjwt.generateToken(userId, user.role);
+            const token = this.createjwt.generateAccessToken(userId, user.role);
             const refresh_token = this.createjwt.generateRefreshToken(userId);
             console.log("token is ", token);
             console.log("refresh", refresh_token);
@@ -264,7 +264,7 @@ class userService implements IUserServices {
       });
       if (user && user?.role) {
         const userId = user._id.toString();
-        const token = this.createjwt.generateToken(userId, user.role);
+        const token = this.createjwt.generateAccessToken(userId, user.role);
         const refresh_token = this.createjwt.generateRefreshToken(userId);
         console.log("token is ", token);
         console.log("refresh", refresh_token);
@@ -308,7 +308,7 @@ class userService implements IUserServices {
       const user: EmailExistCheckDTO | null =
         await this.userRepository.emailExistCheck({ email });
 
-      console.log("User found:", !!user);
+      console.log("User found message from the userService:",user);
 
       // If user doesn't exist
       if (!user?.id) {
@@ -364,7 +364,7 @@ class userService implements IUserServices {
       }
 
       // Authentication successful
-      const token = await this.createjwt.generateToken(user.id, user.role);
+      const token = await this.createjwt.generateAccessToken(user.id, user.role);
       const refreshToken = await this.createjwt.generateRefreshToken(user.id);
 
       console.log("Token generated:", !!token);
@@ -409,7 +409,7 @@ class userService implements IUserServices {
     }
 
     try {
-      const token = this.createjwt.generateToken(payload, role);
+      const token = this.createjwt.generateAccessToken(payload, role);
       if (!token) {
         throw new Error("Failed to generate JWT token");
       }

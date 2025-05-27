@@ -12,14 +12,14 @@ interface VerifyResult {
 }
 
 export interface ICreateJWT {
-  generateToken(payload: string, role: string): string;
+  generateAccessToken(payload: string, role: string): string;
   generateRefreshToken(payload: string): string;
   verifyToken(token: string): VerifyResult;
   verifyRefreshToken(token: string, res: Response): VerifyResult;
 }
 
 export class CreateJWT implements ICreateJWT {
-  generateToken(payload: string, role: string): string {
+  generateAccessToken(payload: string, role: string): string {
     if (!payload) {
       throw new Error("Payload is required for token generation");
     }
@@ -53,8 +53,8 @@ export class CreateJWT implements ICreateJWT {
       const decoded = jwt.verify(token, secret) as JwtPayload;
       return { success: true, decoded, message: "verified" };
     } catch (error) {
-      console.error("Error while verifying JWT token:", error);
-      return { success: false, message: "Token Expired!" };
+      console.error("Error while verifying access JWT token:", error);
+      return { success: false, message: "Access Token Expired!" };
     }
   }
   verifyRefreshToken(token: string, res: Response): VerifyResult {

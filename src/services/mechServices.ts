@@ -156,7 +156,7 @@ class mechService implements IMechServices {
           const mech = await this.mechRepository.saveMechanic(newDetails);
           if (mech && mech.role) {
             const mechId = mech.id?.toString();
-            const access_token = this.createjwt.generateToken(
+            const access_token = this.createjwt.generateAccessToken(
               mechId as string,
               mech.role
             );
@@ -247,7 +247,7 @@ class mechService implements IMechServices {
       console.log("new Encypted password with data is ", newDetails);
       const mech = await this.mechRepository.saveMechanic(newDetails);
       if (mech?.id) {
-        const token = this.createjwt.generateToken(mech.id, mech.role);
+        const token = this.createjwt.generateAccessToken(mech.id, mech.role);
         const refresh_token = this.createjwt.generateRefreshToken(mech.id);
 
         return {
@@ -301,7 +301,7 @@ class mechService implements IMechServices {
         );
         if (passwordMatch) {
           const mechId = mech._id.toString();
-          const token = this.createjwt.generateToken(mechId, mech.role);
+          const token = this.createjwt.generateAccessToken(mechId, mech.role);
           const refreshToken = this.createjwt.generateRefreshToken(mechId);
 
           const filteredMech = {

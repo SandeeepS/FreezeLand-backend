@@ -37,15 +37,18 @@ class adminController implements IAdminController {
       });
 
       if (loginStatus.data.success === false) {
-        res
-          .status(OK)
-          .json({ success: false, message: loginStatus.data.message });
+        res.status(OK).json({
+          data: {
+            success: false,
+            message: loginStatus.data.message,
+          },
+        });
         return;
       } else {
         const access_token = loginStatus.data.token;
         const refresh_token = loginStatus.data.refresh_token;
-        const accessTokenMaxAge = 5 * 60 * 1000;
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
+        const accessTokenMaxAge = 5 * 60 * 1000; //15 min
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
         console.log("respose is going to send to the frontend");
         res
           .status(loginStatus.status)
@@ -644,7 +647,7 @@ class adminController implements IAdminController {
   //function to cancel the complaint
   async cancelComplaint(req: Request, res: Response, next: NextFunction) {
     try {
-      const { complaintId, userRole ,reason} = req.body;
+      const { complaintId, userRole, reason } = req.body;
       console.log(
         "entered in the cancelcomplaint in the admin controller",
         complaintId,

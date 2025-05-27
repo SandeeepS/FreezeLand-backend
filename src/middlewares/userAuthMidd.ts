@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { CreateJWT } from "../utils/generateToken";
 import UserRepository from "../repositories/userRepository";
 import { UserInterface } from "../interfaces/Model/IUser";
+
 const jwt = new CreateJWT();
 const userRepository = new UserRepository();
 dotenv.config();
@@ -11,76 +12,172 @@ const userAuth = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       console.log("entered in the userAuth");
-      const token = req.cookies.user_access_token;
-      const refresh_token = req.cookies.user_refresh_token;
-      console.log("access token and refresh token are", token, refresh_token);
+      const accessToken = req.cookies.user_access_token;
+      const refreshToken = req.cookies.user_refresh_token;
+      console.log(
+        "access token and refresh token are",
+        accessToken,
+        refreshToken
+      );
 
-      if (!refresh_token) {
-        res.clearCookie('user_access_token');
-        res.clearCookie('user_refresh_token');
+      //  checking  refresh token exists and is valid
+      if (!refreshToken) {
+        clearAuthCookies(res);
         return res.status(401).json({
           success: false,
-          message: "Token expired or not available. Please log in again.",
+          message: "No refresh token found. Please log in again.",
         });
       }
 
-      let decoded = jwt.verifyToken(token);
+      // Verify refresh token validity
+      const refreshTokenVerification = jwt.verifyRefreshToken(
+        refreshToken,
+        res
+      );
+      if (!refreshTokenVerification.success) {
+        clearAuthCookies(res);
+        return res.status(401).json({
+          success: false,
+          message: "Invalid or expired refresh token. Please log in again.",
+        });
+      }
 
-      if (!token || !decoded.success) {
+      let finalAccessToken = accessToken;
+      let accessTokenDecoded = null;
+
+      // Try to verify existing access token
+      if (accessToken) {
+        const accessTokenVerification = jwt.verifyToken(accessToken);
+        if (
+          accessTokenVerification.success &&
+          accessTokenVerification.decoded
+        ) {
+          accessTokenDecoded = accessTokenVerification.decoded;
+        }
+      }
+      console.log("Access token Decoded data is******", accessTokenDecoded);
+      // If access token is invalid/expired, generate new one using refresh token
+      if (!accessTokenDecoded) {
         console.log("Access token expired or invalid, generating a new one");
-        const newAccessToken = await refreshAccessToken(refresh_token, res);
-        if (!newAccessToken) {
+
+        if (!refreshTokenVerification.decoded) {
+          clearAuthCookies(res);
           return res.status(401).json({
             success: false,
-            message: "Failed to refresh access token. Please log in again.",
+            message: "Invalid refresh token data. Please log in again.",
           });
         }
-        const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
-        res.cookie("user_access_token", newAccessToken, { maxAge: accessTokenMaxAge });
-        decoded = jwt.verifyToken(newAccessToken);
-      }
 
-      if (decoded.success && decoded.decoded) {
-        const user = await userRepository.getUserById(decoded.decoded.data.toString());
-        if (user?.isBlocked) {
-          return res.status(403).json({
+        // Generate new access token
+        finalAccessToken = jwt.generateAccessToken(
+          refreshTokenVerification.decoded.data,
+          refreshTokenVerification.decoded.role
+        );
+
+        if (!finalAccessToken) {
+          clearAuthCookies(res);
+          return res.status(500).json({
             success: false,
-            message: "User is blocked by admin!",
+            message: "Failed to generate access token. Please log in again.",
           });
         }
-        req.user = user || undefined;
 
-        // Check user role
-        if (user != null && !allowedRoles.includes(user.role)) {
-          return res.status(403).json({ message: "Forbidden" });
+        // Set new access token cookie
+        const accessTokenMaxAge = 5 * 60 * 1000; // 5 minutes
+        res.cookie("user_access_token", finalAccessToken, {
+          maxAge: accessTokenMaxAge,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict", // for CSRF protection
+        });
+
+        // Verifying  the newly generated access token
+        const newTokenVerification = jwt.verifyToken(finalAccessToken);
+        if (!newTokenVerification.success || !newTokenVerification.decoded) {
+          clearAuthCookies(res);
+          return res.status(500).json({
+            success: false,
+            message: "Failed to verify newly generated access token.",
+          });
         }
-
-        next();
-      } else {
-        return res.status(401).json({ success: false, message: decoded.message });
+        accessTokenDecoded = newTokenVerification.decoded;
       }
+
+      if (!accessTokenDecoded) {
+        clearAuthCookies(res);
+        return res.status(401).json({
+          success: false,
+          message: "Authentication failed. Please log in again.",
+        });
+      }
+
+      const user = await userRepository.getUserById({
+        id: accessTokenDecoded.data,
+      });
+
+      if (!user) {
+        clearAuthCookies(res);
+        return res.status(401).json({
+          success: false,
+          message: "User not found. Please log in again.",
+        });
+      }
+
+      if (user.isBlocked) {
+        clearAuthCookies(res);
+        return res.status(403).json({
+          success: false,
+          message: "User is blocked by admin!",
+        });
+      }
+
+      // Check user role authorization
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({
+          success: false,
+          message: "Insufficient permissions. Access denied.",
+        });
+      }
+
+      req.user = user;
+      next();
     } catch (err) {
-      console.log("the error is here.");
-      console.log(err);
-      return res.status(500).send({ success: false, message: "Authentication failed!" });
+      console.log("Authentication error:", err);
+      clearAuthCookies(res);
+      return res.status(500).json({
+        success: false,
+        message: "Authentication failed due to server error!",
+      });
     }
   };
 };
 
+// Helper function to clear authentication cookies
+const clearAuthCookies = (res: Response) => {
+  res.clearCookie("user_access_token");
+  res.clearCookie("user_refresh_token");
+};
+
+// Simplified refresh token function
 const refreshAccessToken = async (refreshToken: string, res: Response) => {
   try {
-    if (!refreshToken) throw new Error("No refresh token found");
+    if (!refreshToken) {
+      throw new Error("No refresh token provided");
+    }
 
     const decoded = jwt.verifyRefreshToken(refreshToken, res);
     if (decoded.success && decoded.decoded) {
-      const newAccessToken = jwt.generateToken(decoded.decoded.data, decoded.decoded.role);
+      const newAccessToken = jwt.generateAccessToken(
+        decoded.decoded.data,
+        decoded.decoded.role
+      );
       return newAccessToken;
     } else {
-      return null;
+      throw new Error("Invalid refresh token");
     }
   } catch (error) {
-    console.log(error as Error);
-    throw new Error("Invalid refresh token");
+    console.log("Error refreshing access token:", error);
+    return null;
   }
 };
 
