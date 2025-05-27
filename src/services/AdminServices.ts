@@ -78,7 +78,7 @@ class adminService implements IAdminService {
   }
 
   //function for admin login
-  async adminLogin(data: AdminLoginDTO): Promise<AdminLoginResponse> {
+  async adminLogin(data: AdminLoginDTO): Promise<AdminLoginResponse>{
     try {
       console.log("entered in the admin login");
       const { email, password } = data;
@@ -86,7 +86,7 @@ class adminService implements IAdminService {
       if (check) {
         const admin = await this.adminRepository.isAdminExist({ email });
         if (admin?.id) {
-          if (admin?.password === password) {
+          if (admin?.password === password){
             console.log("passwrod from the admin side is ", admin.password);
             const token = this.createjwt.generateAccessToken(admin.id, admin.role);
             const refreshToken = this.createjwt.generateRefreshToken(admin.id);

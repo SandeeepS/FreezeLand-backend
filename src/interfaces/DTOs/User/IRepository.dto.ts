@@ -93,6 +93,7 @@ export interface EmailExistCheckResponse {
   email: string;
   phone: number;
   profile_picture: string;
+  password:string;
   role: string;
   address: {
     name: string;

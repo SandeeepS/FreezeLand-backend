@@ -49,7 +49,7 @@ import {
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
 } from "../interfaces/DTOs/Mech/IService.dto";
-import { SignUpValidation } from "../utils/validator";
+import { LoginValidation, SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
@@ -302,87 +302,105 @@ class userService implements IUserServices {
     }
   }
 
-  async userLogin(userData: UserLoginDTO): Promise<UserLoginResponse> {
+  async userLogin(data: UserLoginDTO): Promise<UserLoginResponse> {
     try {
-      const { email, password } = userData;
-      const user: EmailExistCheckDTO | null =
-        await this.userRepository.emailExistCheck({ email });
+      console.log("entered in the user login");
+      const { email, password } = data;
+      const check = LoginValidation(email, password);
+      if (check) {
+        const user = await this.userRepository.emailExistCheck({ email });
+        console.log(
+          "accessed user details from the userService, in the userLogin function is ",
+          user
+        );
 
-      console.log("User found message from the userService:",user);
+        if (user?.id) {
+          if (user.isBlocked) {
+            console.log("User is blocked");
+            return {
+              status: STATUS_CODES.UNAUTHORIZED,
+              data: {
+                success: false,
+                message: "Your account has been blocked by the admin",
+              },
+            } as const;
+          } else {
+            if (user.password && password) {
+              const passwordMatch = await this.encrypt.compare(
+                password,
+                user.password as string
+              );
 
-      // If user doesn't exist
-      if (!user?.id) {
+              if (passwordMatch) {
+                console.log("password from the user side is ", user.password);
+                const userId = user.id;
+                const token = this.createjwt.generateAccessToken(
+                  userId,
+                  user.role
+                );
+                const refreshToken =
+                  this.createjwt.generateRefreshToken(userId);
+                console.log("user is exist", user);
+
+                const filteredUser = {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email,
+                  role: user.role,
+                };
+
+                return {
+                  status: STATUS_CODES.OK || 200,
+                  data: {
+                    success: true,
+                    message: "Authentication Successful !",
+                    data: filteredUser,
+                    userId: userId,
+                    token: token,
+                    refresh_token: refreshToken,
+                  },
+                };
+              } else {
+                console.log("Incorrect password");
+                return {
+                  status: STATUS_CODES.UNAUTHORIZED,
+                  data: {
+                    success: false,
+                    message: "Incorrted password",
+                  },
+                } as const;
+              }
+            } else {
+              console.log("Email or password is missing");
+              return {
+                status: STATUS_CODES.UNAUTHORIZED,
+                data: {
+                  success: false,
+                  message: "Email or password is missing",
+                },
+              } as const;
+            }
+          }
+        } else {
+          return {
+            status: STATUS_CODES.UNAUTHORIZED,
+            data: {
+              success: false,
+              message: "Email not exist",
+            },
+          } as const;
+        }
+      } else {
         return {
-          status: OK,
+          status: STATUS_CODES.UNAUTHORIZED,
           data: {
             success: false,
-            message: "Invalid email or password",
+            message: "Email or password is incorrect",
           },
         } as const;
       }
-
-      // Create user data object to return the nessesary data.
-      const returnUserData: ILoginResponse = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      };
-
-      // Check if user is blocked
-      if (user.isBlocked) {
-        return {
-          status: UNAUTHORIZED,
-          data: {
-            success: false,
-            message: "Your account has been blocked by the admin",
-          },
-        } as const;
-      }
-
-      if (!user?.password || !password) {
-        return {
-          status: UNAUTHORIZED,
-          data: {
-            success: false,
-            message: "Invalid email or password",
-          },
-        } as const;
-      }
-      const passwordMatch = await this.encrypt.compare(
-        password,
-        user.password as string
-      );
-      if (!passwordMatch) {
-        return {
-          status: UNAUTHORIZED,
-          data: {
-            success: false,
-            message: "Invalid email or password",
-          },
-        } as const;
-      }
-
-      // Authentication successful
-      const token = await this.createjwt.generateAccessToken(user.id, user.role);
-      const refreshToken = await this.createjwt.generateRefreshToken(user.id);
-
-      console.log("Token generated:", !!token);
-      console.log("Refresh token generated:", !!refreshToken);
-
-      return {
-        status: OK,
-        data: {
-          success: true,
-          message: "Authentication Successful!",
-          data: returnUserData,
-          userId: user.id,
-          token: token,
-          refresh_token: refreshToken,
-        },
-      } as const;
     } catch (error) {
-      console.log("Login error in service:", error);
+      console.log("Error occurred in the userLogin in the userService", error);
       throw error;
     }
   }
@@ -483,7 +501,7 @@ class userService implements IUserServices {
         },
       } as const;
     } catch (error) {
-      console.log("Error occured in the getProfile in userService",error);
+      console.log("Error occured in the getProfile in userService", error);
       throw error;
     }
   }
@@ -511,7 +529,7 @@ class userService implements IUserServices {
         message: "success",
       };
     } catch (error) {
-      console.log("Error occured in the getService in the useService",error);
+      console.log("Error occured in the getService in the useService", error);
       throw error;
     }
   }
@@ -536,7 +554,7 @@ class userService implements IUserServices {
     } catch (error) {
       console.log(
         "Error occured while fetching the user registerd complaint in the userSercvice ",
-        error 
+        error
       );
       throw error;
     }
@@ -554,7 +572,7 @@ class userService implements IUserServices {
         return null;
       }
     } catch (error) {
-      console.log("Error while getService in the userService",error);
+      console.log("Error while getService in the userService", error);
       throw error;
     }
   }
@@ -569,7 +587,7 @@ class userService implements IUserServices {
       const result = await this.userRepository.getMechanicDetails({ id });
       return result;
     } catch (error) {
-      console.log("Error in getMechanicDetails ",error);
+      console.log("Error in getMechanicDetails ", error);
       throw error;
     }
   }
@@ -614,7 +632,10 @@ class userService implements IUserServices {
         userId,
       });
     } catch (error) {
-      console.log("Error occured in the updateNewPassword in the userService",error);
+      console.log(
+        "Error occured in the updateNewPassword in the userService",
+        error
+      );
       throw error;
     }
   }
@@ -629,7 +650,7 @@ class userService implements IUserServices {
         profile_picture,
       });
     } catch (error) {
-      console.log("Error occured in the editUser",error);
+      console.log("Error occured in the editUser", error);
       throw error;
     }
   }
@@ -660,7 +681,7 @@ class userService implements IUserServices {
       const { _id, addressId, values } = data;
       return await this.userRepository.editAddress({ _id, addressId, values });
     } catch (error) {
-      console.log("Error occured in the editAddress in the useService",error)
+      console.log("Error occured in the editAddress in the useService", error);
       throw error;
     }
   }
@@ -673,7 +694,10 @@ class userService implements IUserServices {
       console.log("entered in the userService ");
       return await this.userRepository.setDefaultAddress({ userId, addressId });
     } catch (error) {
-      console.log("Error occured in the setUserDefaultAddress in the userService",error);
+      console.log(
+        "Error occured in the setUserDefaultAddress in the userService",
+        error
+      );
       throw error;
     }
   }
@@ -685,8 +709,11 @@ class userService implements IUserServices {
       console.log("entered in the userService for register Service");
       return await this.userRepository.registerService(data);
     } catch (error) {
-      console.log("Error occured in the registerService in the userService",error);
-      throw error
+      console.log(
+        "Error occured in the registerService in the userService",
+        error
+      );
+      throw error;
     }
   }
 

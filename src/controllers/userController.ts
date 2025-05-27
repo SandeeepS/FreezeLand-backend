@@ -263,97 +263,54 @@ class userController implements IUserController {
     }
   }
 
-  async userLogin(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async userLogin(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("entered in the backend userLogin in userController");
       const { email, password }: { email: string; password: string } = req.body;
 
-
-
-      // Validate input
-      const isValid = LoginValidation(email, password);
-      if (!isValid) {
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "Please provide valid email and password",
-        });
-        return;
-      }
-
-      // Call service
       const loginStatus = await this.userServices.userLogin({
         email,
         password,
+        role: "user",
       });
 
-      // Debug log full response structure
-      console.log(
-        "Login status in controller:",
-        JSON.stringify(loginStatus, null, 2)
-      );
+      console.log("user login status:", loginStatus);
 
-      // Handle unsuccessful login without correct structure
-      if (!loginStatus?.data || typeof loginStatus.data !== "object") {
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "Authentication error: Invalid response structure",
+      if (loginStatus.data.success === false) {
+        res.status(OK).json({
+          data: {
+            success: false,
+            message: loginStatus.data.message,
+          },
         });
         return;
+      } else {
+        const access_token = loginStatus.data.token;
+        const refresh_token = loginStatus.data.refresh_token;
+        const accessTokenMaxAge = 5 * 60 * 1000; //5 min
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
+        console.log("response is going to send to the frontend");
+        res
+          .status(loginStatus.status)
+          .cookie("user_access_token", access_token, {
+            maxAge: accessTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+          })
+          .cookie("user_refresh_token", refresh_token, {
+            maxAge: refreshTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+          })
+          .json(loginStatus);
       }
-
-      // Check for successful login by checking success flag
-      if (!loginStatus.data.success) {
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: loginStatus.data.message || "Authentication failed",
-        });
-        return;
-      }
-
-      // Check for token in the data object
-      if (!loginStatus.data.token) {
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "Authentication error: Token missing",
-        });
-        return;
-      }
-
-      // Successful login - set cookies and send response
-      const accessTokenMaxAge = 5 * 60 * 1000; // 5 minutes
-      const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
-
-      res
-        .status(loginStatus.status)
-        .cookie("user_access_token", loginStatus.data.token, {
-          maxAge: accessTokenMaxAge,
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-        })
-        .cookie("user_refresh_token", loginStatus.data.refresh_token, {
-          maxAge: refreshTokenMaxAge,
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-        })
-        .json(loginStatus);
     } catch (error) {
-      console.error("Login error:", error);
-      // res.status(INTERNAL_SERVER_ERROR).json({
-      //   success: false,
-      //   message: "An error occurred during login",
-      // });
-      next({
-        statusCode: 500,
-        message: "An error occurred during login",
-      });
+      console.log(error as Error);
+      next(error);
     }
   }
-
   async googleLogin(
     req: Request,
     res: Response,
