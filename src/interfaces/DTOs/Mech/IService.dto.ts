@@ -93,6 +93,7 @@ export interface SaveMechResponse {
 export interface MechLoginDTO {
   email: string;
   password: string;
+  role:string;
 }
 
 export interface MechLoginResponse {

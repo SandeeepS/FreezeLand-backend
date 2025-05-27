@@ -170,56 +170,49 @@ class mechController implements IMechController {
   //for login of mechanic
   async mechLogin(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("entered in the backend mechLogin in mechController");
       const { email, password }: { email: string; password: string } = req.body;
-      const check = LoginValidation(email, password);
-      if (check) {
-        const loginStatus = await this.mechServices.mechLogin({
-          email,
-          password,
+
+      const loginStatus = await this.mechServices.mechLogin({
+        email,
+        password,
+        role: "mechanic",
+      });
+
+      console.log("mechanic login status:", loginStatus);
+
+      if (loginStatus.data.success === false) {
+        res.status(OK).json({
+          data: {
+            success: false,
+            message: loginStatus.data.message,
+          },
         });
-        console.log(loginStatus);
-        if (
-          loginStatus &&
-          loginStatus.data &&
-          typeof loginStatus.data == "object" &&
-          "token" in loginStatus.data
-        ) {
-          if (!loginStatus.data.success) {
-            res
-              .status(UNAUTHORIZED)
-              .json({ success: false, message: loginStatus.data.message });
-            return;
-          }
-          const access_token = loginStatus.data.token;
-          const refresh_token = loginStatus.data.refresh_token;
-          const accessTokenMaxAge = 5 * 60 * 1000; //15 min
-          const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
-          res
-            .status(loginStatus.status)
-            .cookie("mech_access_token", access_token, {
-              maxAge: accessTokenMaxAge,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production", // Set to true in production
-              sameSite: "strict",
-            })
-            .cookie("mech_refresh_token", refresh_token, {
-              maxAge: refreshTokenMaxAge,
-              httpOnly: true,
-              secure: process.env.NODE_ENV === "production", // Set to true in production
-              sameSite: "strict",
-            })
-            .json(loginStatus);
-        } else {
-          res
-            .status(UNAUTHORIZED)
-            .json({ success: false, message: "Authentication error" });
-        }
+        return;
       } else {
+        const access_token = loginStatus.data.token;
+        const refresh_token = loginStatus.data.refresh_token;
+        const accessTokenMaxAge = 5 * 60 * 1000; //5 min
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
+        console.log("response is going to send to the frontend");
         res
-          .status(UNAUTHORIZED)
-          .json({ success: false, message: "Check the email and password" });
+          .status(loginStatus.status)
+          .cookie("mech_access_token", access_token, {
+            maxAge: accessTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", 
+            sameSite: "strict",
+          })
+          .cookie("mech_refresh_token", refresh_token, {
+            maxAge: refreshTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", 
+            sameSite: "strict",
+          })
+          .json(loginStatus);
       }
     } catch (error) {
+      console.log(error as Error);
       next(error);
     }
   }

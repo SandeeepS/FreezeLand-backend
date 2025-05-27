@@ -43,7 +43,7 @@ import { IMechServices } from "../interfaces/IServices/IMechServices";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech } from "../interfaces/Model/IMech";
-import { SignUpValidation } from "../utils/validator";
+import { LoginValidation, SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
 import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
@@ -277,74 +277,110 @@ class mechService implements IMechServices {
     }
   }
 
+  
   async mechLogin(data: MechLoginDTO): Promise<MechLoginResponse> {
     try {
+      console.log("entered in the mech login");
       const { email, password } = data;
-      const mech = await this.mechRepository.emailExistCheck({ email });
-      console.log(
-        "accessed mechanic details from the mechService , in the mechLogin function is ",
-        mech
-      );
-      if (mech && mech.isBlocked) {
-        return {
-          status: UNAUTHORIZED,
-          data: {
-            success: false,
-            message: "You have been blocked by the mech!",
-          },
-        } as const;
-      }
-      if (mech?.password && password) {
-        const passwordMatch = await this.encrypt.compare(
-          password,
-          mech.password as string
+      const check = LoginValidation(email, password);
+      if (check) {
+        const mech = await this.mechRepository.emailExistCheck({ email });
+        console.log(
+          "accessed mechanic details from the mechService, in the mechLogin function is ",
+          mech
         );
-        if (passwordMatch) {
-          const mechId = mech._id.toString();
-          const token = this.createjwt.generateAccessToken(mechId, mech.role);
-          const refreshToken = this.createjwt.generateRefreshToken(mechId);
 
-          const filteredMech = {
-            id: mech._id.toString(),
-            name: mech.name,
-            email: mech.email,
-            role: mech.role,
-          };
+        if (mech?._id) {
+          if (mech.isBlocked) {
+            console.log("Mechanic is blocked");
+            return {
+              status: STATUS_CODES.UNAUTHORIZED,
+              data: {
+                success: false,
+                message: "You have been blocked by the admin!",
+              },
+            } as const;
+          } else {
+            if (mech.password && password) {
+              const passwordMatch = await this.encrypt.compare(
+                password,
+                mech.password as string
+              );
 
-          return {
-            status: OK,
-            data: {
-              success: true,
-              message: "Authentication Successful !",
-              data: filteredMech,
-              mechId: mechId,
-              token: token,
-              refresh_token: refreshToken,
-            },
-          } as const;
+              if (passwordMatch) {
+                console.log("password from the mech side is ", mech.password);
+                const mechId = mech._id.toString();
+                const token = this.createjwt.generateAccessToken(
+                  mechId,
+                  mech.role
+                );
+                const refreshToken =
+                  this.createjwt.generateRefreshToken(mechId);
+                console.log("mech is exist", mech);
+
+                const filteredMech = {
+                  id: mech._id.toString(),
+                  name: mech.name,
+                  email: mech.email,
+                  role: mech.role,
+                };
+
+                return {
+                  status: STATUS_CODES.OK || 200,
+                  data: {
+                    success: true,
+                    message: "Authentication Successful !",
+                    data: filteredMech,
+                    mechId: mechId,
+                    token: token,
+                    refresh_token: refreshToken,
+                  },
+                };
+              } else {
+                console.log("Incorrect password");
+                return {
+                  status: STATUS_CODES.UNAUTHORIZED,
+                  data: {
+                    success: false,
+                    message: "Incorrect password!",
+                  },
+                } as const;
+              }
+            } else {
+              console.log("Email or password is missing");
+              return {
+                status: STATUS_CODES.UNAUTHORIZED,
+                data: {
+                  success: false,
+                  message: "Email or password is missing",
+                },
+              } as const;
+            }
+          }
         } else {
           return {
-            status: UNAUTHORIZED,
+            status: STATUS_CODES.UNAUTHORIZED,
             data: {
               success: false,
-              message: "Authentication failed...",
+              message: "Email not exist",
             },
           } as const;
         }
       } else {
         return {
-          status: UNAUTHORIZED,
+          status: STATUS_CODES.UNAUTHORIZED,
           data: {
             success: false,
-            message: "Authentication failed...",
+            message: "Email or password is incorrect",
           },
         } as const;
       }
     } catch (error) {
-      console.log("Error occured in the mechLogin in the mechServie", error);
+      console.log("Error occurred in the mechLogin in the mechService", error);
       throw error;
     }
   }
+
 
   async getUserByEmail(
     data: EmailExitCheckDTO
