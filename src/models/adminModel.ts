@@ -6,6 +6,7 @@ export interface AdminInterface extends Document {
   email: string;
   password: string;
   role: string;
+  wallet: Number;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -25,7 +26,10 @@ const adminSchema: Schema<AdminInterface> = new Schema({
     type: String,
     default: "admin",
   },
-
+  wallet: {
+    type: Number,
+    default: 0,
+  },
   password: {
     type: String,
     required: true,
