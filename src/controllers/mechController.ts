@@ -115,38 +115,10 @@ class mechController implements IMechController {
             data: result.data,
           });
       } else {
-        // Handle different failure scenarios with appropriate status codes
-        switch (result.message) {
-          case "Temporary mech data not found":
-            res.status(404).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "Invalid OTP":
-            res.status(401).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "Mech data not found":
-            res.status(404).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          case "Mechanic creation failed or role not defined":
-            res.status(500).json({
-              success: false,
-              message: result.message,
-            });
-            break;
-          default:
-            res.status(400).json({
-              success: false,
-              message: result.message || "Verification failed",
-            });
-        }
+        res.status(200).json({
+          success: false,
+          message: result.message,
+        });
       }
     } catch (error) {
       console.log(error as Error);
@@ -166,6 +138,44 @@ class mechController implements IMechController {
       }
     }
   }
+
+  //function for resend OTP
+  async resendOTP(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { tempMechId } = req.body;
+      console.log(
+        "TempMechId in the resend OTP in the ressend otp function in the mechController",
+        tempMechId
+      );
+      const response = await this.mechServices.resendOTP({ tempMechId });
+      if (response) {
+        res.status(200).json({
+          success: true,
+          message: "OTP resended Successfully ,\n Check your Mail",
+          data: response,
+        });
+      } else {
+        res.status(200).json({
+          success: false,
+          message: "OTP resend is failed!!",
+        });
+      }
+    } catch (error) {
+      console.log(
+        "Error occured in the resendOTP in the mechController",
+        error
+      );
+      res.status(500).json({
+        success: false,
+        message: "An Error occured while resending OTP",
+      });
+    }
+  }
+
 
   //for login of mechanic
   async mechLogin(req: Request, res: Response, next: NextFunction) {
@@ -200,13 +210,13 @@ class mechController implements IMechController {
           .cookie("mech_access_token", access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", 
+            secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
           })
           .cookie("mech_refresh_token", refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", 
+            secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
           })
           .json(loginStatus);

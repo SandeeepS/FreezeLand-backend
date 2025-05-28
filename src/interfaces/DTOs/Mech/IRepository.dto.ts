@@ -252,6 +252,13 @@ export interface IEditAddressResponse {
 }
 
 
+export interface IUpdateTempDataWithOTP {
+  tempMechId:string;
+  otp:string;
+}
+
+
+
 export interface getUpdatedWorkAssingnedResponse{
     _id: mongoose.Types.ObjectId;
     name: string;

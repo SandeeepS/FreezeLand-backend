@@ -39,6 +39,11 @@ export interface verifyOTPResponse {
   refresh_token?: string;
 }
 
+
+export interface IResendOTPData {
+  tempMechId:string
+}
+
 export interface SignUpMechResponse {
   _id: Types.ObjectId;
   name: string;

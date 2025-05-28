@@ -18,6 +18,7 @@ import {
   IEditAddress,
   IEditAddressResponse,
   IupdateingMechanicDetailsResponse,
+  IUpdateTempDataWithOTP,
   IUpdatingMechanicDetails,
   MechRegistrationData,
   SaveMechDTO,
@@ -440,6 +441,24 @@ class MechRepository
            throw error;
          }
        }
+
+
+         async updateTempMechData(
+           data: IUpdateTempDataWithOTP
+         ): Promise<ITempMech | null> {
+           try {
+             const { tempMechId, otp } = data;
+             const result = await TempMech.findByIdAndUpdate(tempMechId, { otp: otp });
+             console.log("Updated tempMechData in the mechTempMechData in the mechRepository",result);
+             return result;
+           } catch (error){
+             console.log(
+               "Error occured while udating the tempMechData while storing the new otp in the updateTempmechData , mechRepository",
+               error
+             );
+             throw error;
+           }
+         }
 }
 
 export default MechRepository;

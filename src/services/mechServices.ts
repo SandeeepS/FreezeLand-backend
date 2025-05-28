@@ -23,6 +23,7 @@ import {
   ICreateRoomResponse,
   IEditAddress,
   IEditAddressResponse,
+  IResendOTPData,
   IupdateingMechanicDetailsResponse,
   IUpdateWorkDetails,
   IUpdatingMechanicDetails,
@@ -205,6 +206,34 @@ class mechService implements IMechServices {
       throw error;
     }
   }
+
+
+  //function to resnedOTP
+   async resendOTP(data: IResendOTPData): Promise<Partial<ITempMech> | null> {
+      try {
+        const { tempMechId } = data;
+        console.log("TempMechId isssssssss",tempMechId);
+        const tempUserData = await this.mechRepository.getTempMechData(
+          tempMechId
+        );
+        console.log("tempMechData in the resendOTP in the mechService",tempUserData);
+        const userEmail = tempUserData?.mechData.email;
+        const otp = await this.email.generateAndSendOTP(userEmail as string);
+        if (!otp) {
+          throw new Error("Failed to generate OTP");
+        }
+  
+        const updatedTempUserData = await this.mechRepository.updateTempMechData({
+          tempMechId,
+          otp,
+        });
+        return updatedTempUserData;
+      } catch (error) {
+        console.log("Errror occured while resendOTP in the mechService", error);
+        throw error;
+      }
+    }
+
 
   async signupMech(
     mechData: SignUpMechDTO
