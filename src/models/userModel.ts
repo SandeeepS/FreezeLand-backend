@@ -75,7 +75,10 @@ const userSchema: Schema<UserInterface> = new Schema({
   },
 
   locationData: LocationDataSchema,
-
+  wallet: {
+    type: Number,
+    default: 0,
+  },
   isBlocked: {
     type: Boolean,
     default: false,

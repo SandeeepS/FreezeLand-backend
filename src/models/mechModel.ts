@@ -58,12 +58,11 @@ const mechSchema: Schema<MechInterface> = new Schema({
     default: "mechanic",
     required: true,
   },
-  
+
   address: {
     type: [AddressSchema],
     required: false,
   },
-
 
   mechanicType: {
     type: [String],
@@ -85,6 +84,11 @@ const mechSchema: Schema<MechInterface> = new Schema({
     required: false,
   },
   locationData: LocationDataSchema,
+
+  wallet: {
+    type: Number,
+    default: 0,
+  },
 
   isVerified: {
     type: Boolean,
