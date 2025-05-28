@@ -32,6 +32,8 @@ class OrderRepository
         complaintId,
         amount,
         paymentStatus,
+        adminCommission,
+        mechanicEarning
       } = orderData;
       let objectMechId = new mongoose.Types.ObjectId(mechanicId);
       let objectCompId = new mongoose.Types.ObjectId(complaintId);
@@ -45,6 +47,8 @@ class OrderRepository
         complaintId: objectCompId,
         amount: amount,
         paymentStatus: paymentStatus,
+        adminCommission:adminCommission,
+        mechanicEarning:mechanicEarning
       };
       const savedOrder = await this.save(dataToSave);
       console.log("saved order from the database is ", savedOrder);

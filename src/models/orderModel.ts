@@ -9,7 +9,15 @@ const OrderSchema: Schema = new Schema({
   complaintId: { type: mongoose.Types.ObjectId, required: true },
   amount: { type: Number, required: true },
   paymentStatus: { type: Boolean, default: false },
-  isDeleted: { type: Boolean, default: false ,required:false},
+  adminCommission:{
+    type: Number,
+    default: 0,
+  },
+  mechanicEarning:{
+    type: Number,
+    default: 0,
+  },
+  isDeleted: { type: Boolean, default: false, required: false },
   timestamp: { type: Date, default: Date.now },
 });
 

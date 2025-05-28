@@ -7,7 +7,7 @@ export interface Iconcern extends Document {
   serviceId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   defaultAddress: mongoose.Types.ObjectId;
-  orderId:mongoose.Types.ObjectId;
+  orderId: mongoose.Types.ObjectId;
   discription: string;
   locationName: object;
   status: string;
@@ -37,6 +37,7 @@ export interface Iconcern extends Document {
     }
   ];
   chatId?: mongoose.Types.ObjectId;
+
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -63,9 +64,9 @@ const concernSchema: Schema<Iconcern> = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
-    orderId:{
-      type:mongoose.Schema.Types.ObjectId,
-      default: null
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
     },
     discription: {
       type: String,
@@ -160,6 +161,7 @@ const concernSchema: Schema<Iconcern> = new Schema(
       type: mongoose.Types.ObjectId,
       required: false,
     },
+   
     isBlocked: {
       type: Boolean,
       default: false,

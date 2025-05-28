@@ -15,12 +15,35 @@ export interface OrderEventData {
   serviceId: string;
   userId: string;
   paymentStatus: boolean;
+  adminCommission: number;
+  mechanicEarning: number;
   timestamp: Date;
 }
 
 class OrderServices implements IOrderService {
-  constructor(private orderRepository: IOrderRepository){
+  constructor(private orderRepository: IOrderRepository) {
     this.orderRepository = orderRepository;
+  }
+
+  private calculateCommissionAndEarning(totalAmount: number): {
+    adminCommission: number;
+    mechanicEarning: number;
+  } {
+    const adminCommissionRate = 0.05;
+    const adminCommission = Math.round(totalAmount * adminCommissionRate);
+
+    const mechanicEarning = totalAmount - adminCommission;
+
+    console.log(`Commission Calculation:
+      Total Amount: ₹${totalAmount}
+      Admin Commission (5%): ₹${adminCommission}
+      Mechanic Earning (95%): ₹${mechanicEarning}
+    `);
+
+    return {
+      adminCommission,
+      mechanicEarning,
+    };
   }
 
   async createStripeSession(orderData: IPaymentData): Promise<unknown> {
@@ -78,9 +101,11 @@ class OrderServices implements IOrderService {
         const { amount, complaintId, mechanicId, serviceId, status } =
           session.metadata;
 
-        //create a shre here in the future for admin adn mechanic.
-        // Make a request to the Order Service to create the order
-
+        //generatiogn share for mechanic and admin
+        const { adminCommission, mechanicEarning } =
+          this.calculateCommissionAndEarning(purchasedAmount);
+        console.log("Admin comission and mechanic Commission is",adminCommission,mechanicEarning);
+        
         const order: OrderEventData = {
           orderId: session.id,
           userId: session.metadata?.userId,
@@ -89,6 +114,8 @@ class OrderServices implements IOrderService {
           mechanicId: mechanicId,
           serviceId: serviceId,
           paymentStatus: true,
+          adminCommission: adminCommission,
+          mechanicEarning: mechanicEarning,
           timestamp: new Date(),
         };
 
@@ -116,8 +143,6 @@ class OrderServices implements IOrderService {
       };
     }
   }
-
-
 }
 
 export default OrderServices;

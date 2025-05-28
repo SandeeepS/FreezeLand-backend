@@ -8,6 +8,8 @@ export interface IOrderData {
   serviceId: string | mongoose.Types.ObjectId;
   amount: number;
   paymentStatus: boolean;
+  adminCommission: number;
+  mechanicEarning: number;
   isDeleted?: boolean;
   timestamp: Date;
 }
