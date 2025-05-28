@@ -133,6 +133,8 @@ const mechAuth = (allowedRoles: string[]) => {
         });
       }
 
+      
+
       // Check mechanic role authorization
       if (!allowedRoles.includes(mechanic.role)) {
         return res.status(403).json({
@@ -140,6 +142,8 @@ const mechAuth = (allowedRoles: string[]) => {
           message: "Insufficient permissions. Access denied.",
         });
       }
+
+
 
       // Attach mechanic data to request object
       req.mechanicId = id;
