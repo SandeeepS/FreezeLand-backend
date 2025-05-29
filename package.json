@@ -39,7 +39,11 @@
   "scripts": {
     "start": "ts-node src/server.ts",
     "build": "tsc",
-    "dev": "nodemon --watch src --exec ts-node src/server.ts"
+    "dev": "nodemon --watch src --exec ts-node src/server.ts",
+    "test": "echo \"No tests specified yet\" && exit 0",
+    "test:watch": "echo \"Test watch mode not implemented yet\"",
+    "lint": "echo \"Linting not configured yet\"",
+    "type-check": "tsc --noEmit"
   },
   "eslintConfig": {
     "extends": [
