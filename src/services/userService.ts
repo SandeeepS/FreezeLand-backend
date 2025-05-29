@@ -129,11 +129,14 @@ class userService implements IUserServices {
   async resendOTP(data: IResendOTPData): Promise<Partial<ITempUser> | null> {
     try {
       const { tempUserId } = data;
-      console.log("TempUserId isssssssss",tempUserId);
+      console.log("TempUserId isssssssss", tempUserId);
       const tempUserData = await this.userRepository.getTempUserData(
         tempUserId
       );
-      console.log("tempUserData in the resendOTP in the userService",tempUserData);
+      console.log(
+        "tempUserData in the resendOTP in the userService",
+        tempUserData
+      );
       const userEmail = tempUserData?.userData.email;
       const otp = await this.email.generateAndSendOTP(userEmail as string);
       if (!otp) {
@@ -544,7 +547,6 @@ class userService implements IUserServices {
         limit,
         searchQuery,
       });
-      console.log("list of services is ", services);
       const servicesCount = await this.userRepository.getServiceCount({
         searchQuery,
       });
@@ -760,32 +762,29 @@ class userService implements IUserServices {
       throw error;
     }
   }
-
   async successPayment(data: string): Promise<unknown> {
     try {
-      console.log(
-        "entered in the successPayment  user service in the backend "
-      );
+      console.log("entered in the successPayment user service in the backend");
       const result = await this.orderService.successPayment(data);
       console.log("result in the userService for success payment", result);
-      console.log("wnat to update the concern model about the payment ");
-      if (
-        result &&
-        typeof result === "object" &&
-        "response" in result &&
-        (result as any).response &&
-        (result as any).response.status === "SUCCESS"
-      ) {
-        const orderId = (result as any).response.data._id;
-        const complaintId = (result as any).response.data.complaintId;
-        const updatedTheOrderDeatilsInConcenrDataBase =
+      console.log("want to update the concern model about the payment");
+
+      if (result && result.status === "SUCCESS" && result.data) {
+        const orderId = result.data._id?.toString();
+        // FIX: Change this line - remove .response
+        const complaintId = result.data.complaintId.toString();
+
+        console.log("Extracted complaintId:", complaintId);
+        console.log("Extracted orderId:", orderId);
+
+        const updatedTheOrderDetailsInConcernDatabase =
           await this.concernRepository.updateConcernWithOrderId(
             complaintId,
-            orderId
+            orderId as string
           );
         console.log(
           "updated concern details after payment in the userService is ",
-          updatedTheOrderDeatilsInConcenrDataBase
+          updatedTheOrderDetailsInConcernDatabase
         );
         return result;
       } else {
@@ -796,7 +795,7 @@ class userService implements IUserServices {
       }
     } catch (error) {
       console.log(
-        "error occured while creating the stripe session in the userService",
+        "error occurred while creating the stripe session in the userService",
         error
       );
       throw error;

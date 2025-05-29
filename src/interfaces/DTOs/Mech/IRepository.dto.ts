@@ -1,4 +1,4 @@
-import  mongoose, { Types } from "mongoose";
+import  mongoose, { Types, ClientSession } from "mongoose";
 import Iuser from "../../entityInterface/Iuser";
 import { IServices } from "../../Model/IService";
 import { Address } from "../../Model/IMech";
@@ -169,6 +169,12 @@ export interface IUpdatingMechanicDetails {
   };
 }
 
+export interface  IUpdateMechanicDetails {
+  mechanicId:string;
+  mechanicEarning:Number;
+  dbSession: ClientSession;
+}
+
 export interface IupdateingMechanicDetailsResponse{
     _id: Types.ObjectId | string;
   name: string;
@@ -178,6 +184,22 @@ export interface IupdateingMechanicDetailsResponse{
   photo: string;
   adharProof: string | null;
   employeeLicense: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  isVerified: boolean;
+  mechanicType: string[];
+}
+
+export interface IUpdatedMechnicDetails{
+      _id: Types.ObjectId | string;
+  name: string;
+  email: string;
+  phone: number;
+  role: string;
+  photo: string;
+  adharProof: string | null;
+  employeeLicense: string;
+  wallet:Number;
   isBlocked: boolean;
   isDeleted: boolean;
   isVerified: boolean;

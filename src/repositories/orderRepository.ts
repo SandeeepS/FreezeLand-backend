@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ClientSession } from "mongoose";
 import {
   
   IOrderData,
@@ -18,7 +18,7 @@ class OrderRepository
     super(orderModel);
   }
 
-  async createOrder(orderData: IOrderData): Promise<IOrderDataResponse | null> {
+  async createOrder(orderData: IOrderData, dbSession: ClientSession): Promise<IOrderDataResponse> {
     try {
       console.log(
         "entered in the create order method in the order repository",
@@ -50,19 +50,32 @@ class OrderRepository
         adminCommission:adminCommission,
         mechanicEarning:mechanicEarning
       };
-      const savedOrder = await this.save(dataToSave);
+      const savedOrder = await orderModel.create([dataToSave], { session: dbSession });
       console.log("saved order from the database is ", savedOrder);
-      if (savedOrder) {
+      if (savedOrder && savedOrder.length > 0) {
+        const orderDoc = savedOrder[0];
+        const orderDataResponse: IOrderData = {
+          _id:orderDoc._id,
+          orderId: orderDoc.orderId,
+          userId: orderDoc.userId,
+          mechanicId: orderDoc.mechanicId,
+          serviceId: orderDoc.serviceId,
+          complaintId: orderDoc.complaintId,
+          amount: orderDoc.amount,
+          paymentStatus: orderDoc.paymentStatus,
+          adminCommission: orderDoc.adminCommission,
+          mechanicEarning: orderDoc.mechanicEarning
+        };
         return {
           status: "SUCCESS",
           message: "Order created successfully",
-          data: savedOrder as IOrderData,
+          data: orderDataResponse,
         };
       } else {
         return {
           status: "FAILURE",
           message: "Order not created",
-          data: null,
+          
         };
       }
     } catch (error) {

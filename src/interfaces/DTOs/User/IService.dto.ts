@@ -6,6 +6,7 @@ import Service from "../../entityInterface/Iservices";
 import mongoose, { Types } from "mongoose";
 import { Address, ITempUser } from "../../Model/IUser";
 import { ILoginResponse } from "../../entityInterface/ILoginResponse";
+import { IOrderData } from "../Order/IRepository";
 
 export interface SingUpDTO{
   name:string;
@@ -383,6 +384,16 @@ export interface IPaymentData {
   mechanicId: string;
   amount: number;
   serviceId: string;
+}
+
+export interface ISuccessPaymentResponse{
+  status:string;
+  message:string;
+  data:{
+    status:string;
+    message:string;
+    data:IOrderData
+  }
 }
 
 export interface RegisterServiceResponse {

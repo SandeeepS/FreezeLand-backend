@@ -2,7 +2,12 @@ import Stripe from "stripe";
 import IOrderService from "../interfaces/IServices/IOrderService";
 import { IPaymentData } from "../interfaces/DTOs/User/IService.dto";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
-import { IAllOrderDataResponse } from "../interfaces/DTOs/Order/IService";
+import {
+  IAllOrderDataResponse,
+  IOrderDataResponse,
+} from "../interfaces/DTOs/Order/IService";
+import mongoose from "mongoose";
+import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 const frontendBaseUrl = process.env.FRONTEND_BASE_URL as string;
 const stripeKey = process.env.STRIPE_SECRET_KEY as string;
 const stripe = new Stripe(stripeKey);
@@ -21,8 +26,12 @@ export interface OrderEventData {
 }
 
 class OrderServices implements IOrderService {
-  constructor(private orderRepository: IOrderRepository) {
+  constructor(
+    private orderRepository: IOrderRepository,
+    private mechRepository: IMechRepository
+  ) {
     this.orderRepository = orderRepository;
+    this.mechRepository = mechRepository;
   }
 
   private calculateCommissionAndEarning(totalAmount: number): {
@@ -89,57 +98,96 @@ class OrderServices implements IOrderService {
     }
   }
 
-  async successPayment(sessionId: string): Promise<unknown> {
-    console.log("entered in the successPayment  order service in the backend ");
-    console.log(sessionId, "this is session 1");
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+  async successPayment(sessionId: string): Promise<IOrderDataResponse | null> {
+    console.log("Entered successPayment in OrderService.");
+    console.log("Session ID:", sessionId);
+
+    const stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
+
     try {
-      console.log(session, "this is session");
+      console.log("Stripe session data:", stripeSession);
 
-      if (session.payment_status == "paid" && session.metadata?.amount) {
-        const purchasedAmount = parseInt(session.metadata?.amount);
+      if (
+        stripeSession.payment_status === "paid" &&
+        stripeSession.metadata?.amount
+      ) {
+        const purchasedAmount = parseInt(stripeSession.metadata.amount);
         const { amount, complaintId, mechanicId, serviceId, status } =
-          session.metadata;
+          stripeSession.metadata;
 
-        //generatiogn share for mechanic and admin
+        // 1. Calculate commission
         const { adminCommission, mechanicEarning } =
           this.calculateCommissionAndEarning(purchasedAmount);
-        console.log("Admin comission and mechanic Commission is",adminCommission,mechanicEarning);
-        
+        console.log(
+          "Admin Commission:",
+          adminCommission,
+          "Mechanic Earning:",
+          mechanicEarning
+        );
+
+        // 2. Build the order object
         const order: OrderEventData = {
-          orderId: session.id,
-          userId: session.metadata?.userId,
+          orderId: stripeSession.id,
+          userId: stripeSession.metadata.userId,
           amount: purchasedAmount,
-          complaintId: complaintId,
-          mechanicId: mechanicId,
-          serviceId: serviceId,
+          complaintId,
+          mechanicId,
+          serviceId,
           paymentStatus: true,
-          adminCommission: adminCommission,
-          mechanicEarning: mechanicEarning,
+          adminCommission,
+          mechanicEarning,
           timestamp: new Date(),
         };
 
-        console.log("firtsfirtstfirst");
+        // Starting MongoDB session
+        const dbSession = await mongoose.startSession();
+        dbSession.startTransaction();
 
-        const response = await this.orderRepository.createOrder(order);
-        if (response?.status === "SUCCESS") {
-          console.log("triggered success");
+        try {
+          // Create Order (pass session)
+          const orderResponse = await this.orderRepository.createOrder(
+            order,
+            dbSession
+          );
+          console.log("orderResponse in the orderSErvice is ",orderResponse);
+          await this.mechRepository.updateMechanicEarnings({
+            mechanicId,
+            mechanicEarning,
+            dbSession,
+          });
+
+          //  Commit transaction if everything went fine
+          await dbSession.commitTransaction();
+          dbSession.endSession();
+
+          console.log("Transaction committed.");
           return {
-            response,
+            status: "SUCCESS",
+            message: "Payment processed and mechanic updated successfully.",
+            data: orderResponse.data,
           };
-        } else {
-          console.log("triggered fail");
+        } catch (dbError) {
+          // Rollback transaction if any DB operation fails
+          await dbSession.abortTransaction();
+          dbSession.endSession();
+
+          console.error("Transaction failed:", dbError);
           return {
-            response,
+            status: "FAILURE",
+            message: "Database transaction failed.",
           };
         }
       }
-    } catch (error: any) {
-      console.error("Payment processing failed:", error);
+
       return {
-        success: false,
-        message: "transaction failed",
-        // data: session.metadata,
+        status: "FAILURE",
+        message: "Invalid payment or metadata.",
+      };
+    } catch (error: any) {
+      console.error("Stripe retrieval failed:", error);
+      return {
+        status: "FAILURE",
+        message: "Stripe retrival Failed",
       };
     }
   }

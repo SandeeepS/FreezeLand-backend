@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { IOrderData } from "./IRepository";
 
 export interface IPaymentData {
   complaintId: string;
@@ -19,3 +20,10 @@ export interface IAllOrderDataResponse {
   isDeleted: boolean;
   timestamp: Date;
 }
+
+export interface IOrderDataResponse {
+  status: string;
+  message: string;
+  data?: IOrderData ;
+}
+

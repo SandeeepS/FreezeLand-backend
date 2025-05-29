@@ -4,7 +4,6 @@ import {
   EmailExitCheck,
   getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
-
   getComplaintDetailsResponse,
   getMechanicDetailsDTO,
   getMechanicDetailsResponse,
@@ -17,7 +16,9 @@ import {
   IAddMechAddressResponse,
   IEditAddress,
   IEditAddressResponse,
+  IUpdatedMechnicDetails,
   IupdateingMechanicDetailsResponse,
+  IUpdateMechanicDetails,
   IUpdateTempDataWithOTP,
   IUpdatingMechanicDetails,
   MechRegistrationData,
@@ -32,7 +33,7 @@ import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 import concernModel from "../models/concernModel";
 import deviceModel, { IDevice } from "../models/deviceModel";
-import MechModel, {  TempMech } from "../models/mechModel";
+import MechModel, { TempMech } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
 
@@ -52,12 +53,14 @@ class MechRepository
     mechData: MechRegistrationData;
   }): Promise<ITempMech> {
     try {
-      console.log("enterd in the createTempMech funciton in the mechRepository");
+      console.log(
+        "enterd in the createTempMech funciton in the mechRepository"
+      );
       const createdTempMech = new TempMech({
         otp: tempMechDetails.otp,
         mechData: tempMechDetails.mechData,
       });
-      console.log("createdTempMech is = ",createdTempMech);
+      console.log("createdTempMech is = ", createdTempMech);
       const savedMech = await createdTempMech.save();
       return savedMech;
     } catch (error) {
@@ -66,13 +69,13 @@ class MechRepository
     }
   }
 
-  //function to get tempMech data 
-  async getTempMechData(id:string):Promise<ITempMech | null> {
-    try{
+  //function to get tempMech data
+  async getTempMechData(id: string): Promise<ITempMech | null> {
+    try {
       const result = await TempMech.findById(id);
-      console.log("accessed the tempMechData in the mechRepository ",result);
+      console.log("accessed the tempMechData in the mechRepository ", result);
       return result;
-    }catch(error){
+    } catch (error) {
       console.log(error as Error);
       throw error;
     }
@@ -206,8 +209,6 @@ class MechRepository
     }
   }
 
-
-
   //function to get the specified  complaint details  by id
   async getComplaintDetails(
     id: string
@@ -272,7 +273,7 @@ class MechRepository
     complaintId: string,
     mechanicId: string,
     status: string,
-    roomId:string,
+    roomId: string
   ): Promise<getUpdatedWorkAssingnedResponse> {
     try {
       console.log("Entered in the mechRepository");
@@ -289,7 +290,7 @@ class MechRepository
             updatedAt: new Date(),
           },
         },
-        chatId:roomId
+        chatId: roomId,
       };
 
       const result = await concernModel.findByIdAndUpdate(
@@ -397,68 +398,100 @@ class MechRepository
     }
   }
 
-
   //function to update the mechanic Details
-   async editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> {
-     try{
-       const {mechId,values} = mechaicDetails
-       console.log("Values reached in the mechService in the backend while eding the mechanic",mechaicDetails);
-       const phoneNumber = Number(values.phone);
-       const qr = {name:values.name,phone:phoneNumber,photo:values.photo};
-       const result = await this.update(mechId,qr);
-       return result;
-     }catch(error) {
-       console.log(error as Error);
-       throw error;
-     }
-   }
+  async editMechanic(
+    mechaicDetails: IUpdatingMechanicDetails
+  ): Promise<IupdateingMechanicDetailsResponse | null> {
+    try {
+      const { mechId, values } = mechaicDetails;
+      console.log(
+        "Values reached in the mechService in the backend while eding the mechanic",
+        mechaicDetails
+      );
+      const phoneNumber = Number(values.phone);
+      const qr = { name: values.name, phone: phoneNumber, photo: values.photo };
+      const result = await this.update(mechId, qr);
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
 
-   //adding mechanic address
-     async addAddress(
-       data: IAddMechAddress
-     ): Promise<IAddMechAddressResponse | null> {
-       try {
-         const { _id, values } = data;
-         console.log("id from the mechRepository while add addresss is ", _id);
-         console.log("new address from the mechRepository is ", values);
-         const qr = { address: [values] };
-         const addedAddress = await this.updateAddress(_id, qr);
-         return addedAddress ;
-       } catch (error) {
-         console.log(error as Error);
-         throw error;
-       }
-     }
+  //update Mechanic
+  async updateMechanicEarnings(
+    updateMechanicDetails: IUpdateMechanicDetails
+  ): Promise<IUpdatedMechnicDetails | null> {
+    try {
+      const { mechanicId, mechanicEarning, dbSession } = updateMechanicDetails;
+      console.log("Mechanic Earning in the updateMechnicEearning ",mechanicEarning);
 
-     //editing the mechanic address
-       async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
-         try {
-           const { _id, addressId, values } = data;
-           const editedAddress = await this.editExistAddress(_id, addressId, values);
-           return editedAddress;
-         } catch (error) {
-           console.log(error as Error);
-           throw error;
-         }
-       }
+      const result = await MechModel.findByIdAndUpdate(mechanicId, { $inc: { wallet: mechanicEarning } }, {
+        session: dbSession,
+        new: true,
+      });
+      console.log(
+        "wallet updated after adding mechanic earning in the updateMechanicEarning in the mechRepository",
+        result
+      );
+      return result;
+    } catch (error) {
+      console.log(
+        "error occured while updaing the mechanic earning in the mechRepository",
+        error
+      );
+      throw error;
+    }
+  }
 
+  //adding mechanic address
+  async addAddress(
+    data: IAddMechAddress
+  ): Promise<IAddMechAddressResponse | null> {
+    try {
+      const { _id, values } = data;
+      console.log("id from the mechRepository while add addresss is ", _id);
+      console.log("new address from the mechRepository is ", values);
+      const qr = { address: [values] };
+      const addedAddress = await this.updateAddress(_id, qr);
+      return addedAddress;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
 
-         async updateTempMechData(
-           data: IUpdateTempDataWithOTP
-         ): Promise<ITempMech | null> {
-           try {
-             const { tempMechId, otp } = data;
-             const result = await TempMech.findByIdAndUpdate(tempMechId, { otp: otp });
-             console.log("Updated tempMechData in the mechTempMechData in the mechRepository",result);
-             return result;
-           } catch (error){
-             console.log(
-               "Error occured while udating the tempMechData while storing the new otp in the updateTempmechData , mechRepository",
-               error
-             );
-             throw error;
-           }
-         }
+  //editing the mechanic address
+  async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
+    try {
+      const { _id, addressId, values } = data;
+      const editedAddress = await this.editExistAddress(_id, addressId, values);
+      return editedAddress;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
+  async updateTempMechData(
+    data: IUpdateTempDataWithOTP
+  ): Promise<ITempMech | null> {
+    try {
+      const { tempMechId, otp } = data;
+      const result = await TempMech.findByIdAndUpdate(tempMechId, { otp: otp });
+      console.log(
+        "Updated tempMechData in the mechTempMechData in the mechRepository",
+        result
+      );
+      return result;
+    } catch (error) {
+      console.log(
+        "Error occured while udating the tempMechData while storing the new otp in the updateTempmechData , mechRepository",
+        error
+      );
+      throw error;
+    }
+  }
 }
 
 export default MechRepository;

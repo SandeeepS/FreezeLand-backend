@@ -653,10 +653,7 @@ class userController implements IUserController {
         limit,
         searchQuery,
       });
-      console.log(
-        "listed services from the database is in the admin controller is",
-        data
-      );
+   
       res.status(OK).json(data);
     } catch (error) {
       console.log(error as Error);

@@ -1,7 +1,8 @@
-import mongoose from "mongoose";
+import mongoose, { ClientSession } from "mongoose";
 
 export interface IOrderData {
-  orderId: string;
+  _id?: mongoose.Types.ObjectId 
+  orderId: string| mongoose.Types.ObjectId ;
   mechanicId: string | mongoose.Types.ObjectId;
   complaintId: string | mongoose.Types.ObjectId;
   userId: string | mongoose.Types.ObjectId;
@@ -11,13 +12,15 @@ export interface IOrderData {
   adminCommission: number;
   mechanicEarning: number;
   isDeleted?: boolean;
-  timestamp: Date;
+  timestamp?: Date;
 }
 
 export interface IOrderDataResponse {
   status: string;
   message: string;
-  data: IOrderData | null;
+  data?: IOrderData ;
 }
+
+
 
 

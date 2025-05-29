@@ -13,3 +13,9 @@ export interface IOrder extends Document {
   isDeleted: boolean;
   timestamp: Date;
 }
+
+
+export interface IUpdateMechanicDetails{
+  mechanicId:string;
+  query:object;
+}

@@ -14,11 +14,11 @@ const userAuth = (allowedRoles: string[]) => {
       console.log("entered in the userAuth");
       const accessToken = req.cookies.user_access_token;
       const refreshToken = req.cookies.user_refresh_token;
-      console.log(
-        "access token and refresh token are",
-        accessToken,
-        refreshToken
-      );
+      // console.log(
+      //   "access token and refresh token are",
+      //   accessToken,
+      //   refreshToken
+      // );
 
       //  checking  refresh token exists and is valid
       if (!refreshToken) {
@@ -55,7 +55,7 @@ const userAuth = (allowedRoles: string[]) => {
           accessTokenDecoded = accessTokenVerification.decoded;
         }
       }
-      console.log("Access token Decoded data is******", accessTokenDecoded);
+      // console.log("Access token Decoded data is******", accessTokenDecoded);
       // If access token is invalid/expired, generate new one using refresh token
       if (!accessTokenDecoded) {
         console.log("Access token expired or invalid, generating a new one");

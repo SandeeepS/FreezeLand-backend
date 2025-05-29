@@ -303,7 +303,7 @@ class ConcernRepository
   async updateConcernWithOrderId(complaintId:string, orderId:string):Promise<UpdatedcomplaintWithOrderIdResponse | null>{
     try{
       console.log("Entered in the updatedConcernOrderId");
-      const objectIdObject = new mongoose.Types.ObjectId(complaintId);
+      const objectIdObject = new mongoose.Types.ObjectId(orderId);
       const qr = {orderId:objectIdObject};
       const result = await this.update(complaintId,qr)
       return result;

@@ -12,6 +12,7 @@ import OrderServices from "../services/orderServices";
 import OrderRepository from "../repositories/orderRepository";
 import ConcernService from "../services/concernService";
 import ConcernRepository from "../repositories/concernRepository";
+import MechRepository from "../repositories/mechRepository";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
@@ -20,7 +21,8 @@ const userRepository = new UserRepository();
 const serviceRepository = new ServiceRepository();
 const orderRepository = new OrderRepository();
 const concernRepository = new ConcernRepository();
-const orderService = new OrderServices(orderRepository);
+const mechRepository = new MechRepository()
+const orderService = new OrderServices(orderRepository,mechRepository);
 const concernService = new ConcernService(concernRepository);
 const generateOTP  = new GenerateOTP();
 

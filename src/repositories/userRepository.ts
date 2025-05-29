@@ -185,14 +185,10 @@ class UserRepository
       if (!user) {
         return null;
       }
-      console.log("userDeatisl mmmmm ", user);
       const defaultAddressDetails = user.address?.find(
         (addr) => addr._id.toString() === user.defaultAddress?.toString()
       );
-      console.log(
-        "default address from the userRepository",
-        defaultAddressDetails
-      );
+  
       return {
         ...user.toObject(),
         defaultAddressDetails,

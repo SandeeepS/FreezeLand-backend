@@ -18,7 +18,9 @@ import {
     IAddMechAddressResponse,
     IEditAddress,
     IEditAddressResponse,
+    IUpdatedMechnicDetails,
     IupdateingMechanicDetailsResponse,
+    IUpdateMechanicDetails,
     IUpdateTempDataWithOTP,
     IUpdatingMechanicDetails,
     MechRegistrationData,
@@ -52,4 +54,5 @@ export interface IMechRepository{
     addAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null>
     editAddress(data: IEditAddress): Promise<IEditAddressResponse | null>
     updateTempMechData(data: IUpdateTempDataWithOTP): Promise<ITempMech | null> 
+    updateMechanicEarnings(updateMechanicDetails:IUpdateMechanicDetails):Promise<IUpdatedMechnicDetails | null>
 }
