@@ -9,7 +9,6 @@ import {
   SaveUserResponse,
   NewDetailsDTO,
   UserLoginResponse,
-  EmailExistCheckDTO,
   EmailExistCheckResponse,
   GetProfileDTO,
   GetProfileResponse,
@@ -21,7 +20,6 @@ import {
   GenerateTokenDTO,
   GenerateRefreshToken,
   RegisterServiceDTO,
-  ReturnUserdataDTO,
   GetServicesDTO,
   GetServiceResponse,
   AddUserAddressResponse,
@@ -54,12 +52,7 @@ import { LoginValidation, SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
-import { ILoginResponse } from "../interfaces/entityInterface/ILoginResponse";
-import IPaymentServices, {
-  IOrderService,
-} from "../interfaces/IServices/IOrderService";
-import IConcernService from "../interfaces/IServices/IConcernService";
-import { response } from "express";
+import { IOrderService } from "../interfaces/IServices/IOrderService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 dotenv.config();
@@ -430,6 +423,73 @@ class userService implements IUserServices {
       }
     } catch (error) {
       console.log("Error occurred in the userLogin in the userService", error);
+      throw error;
+    }
+  }
+
+  async googleLogin(data: {
+    name: string;
+    email: string;
+    googlePhotoUrl: string;
+  }): Promise<UserLoginResponse> {
+    try {
+      console.log("entered in the google login service");
+      const { email } = data;
+
+      const user = await this.userRepository.emailExistCheck({ email });
+
+      if (user?.id) {
+        // Existing user login
+        if (user.isBlocked) {
+          console.log("User is blocked");
+          return {
+            status: STATUS_CODES.UNAUTHORIZED,
+            data: {
+              success: false,
+              message: "Your account has been blocked by the admin",
+            },
+          } as const;
+        } else {
+          console.log("Existing Google user found", user);
+          const userId = user.id;
+          const token = this.createjwt.generateAccessToken(userId, user.role);
+          const refreshToken = this.createjwt.generateRefreshToken(userId);
+
+          const filteredUser = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+
+          return {
+            status: STATUS_CODES.OK || 200,
+            data: {
+              success: true,
+              message: "Authentication Successful !",
+              data: filteredUser,
+              userId: userId,
+              token: token,
+              refresh_token: refreshToken,
+            },
+          };
+        }
+      } else {
+        // Email not found - user needs to signup first
+        console.log("Email not found for Google login");
+        return {
+          status: STATUS_CODES.UNAUTHORIZED,
+          data: {
+            success: false,
+            message: "Email not found. Please proceed with signup first.",
+          },
+        } as const;
+      }
+    } catch (error) {
+      console.log(
+        "Error occurred in the googleLogin in the userService",
+        error
+      );
       throw error;
     }
   }

@@ -5,15 +5,15 @@ import S3Client from "../awsConfig";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { compareInterface } from "../utils/comparePassword";
 
-const { BAD_REQUEST, OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR, NOT_FOUND } =
+const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } =
   STATUS_CODES;
-import { AddressValidation, LoginValidation } from "../utils/validator";
+import { AddressValidation} from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
 import {
   EditUserDTO,
   ForgotResentOtpResponse,
   GetImageUrlResponse,
-  SaveUserResponse,
+  
 } from "../interfaces/DTOs/User/IController.dto";
 import { IUserController } from "../interfaces/IController/IUserController";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
@@ -66,6 +66,7 @@ class userController implements IUserController {
           .status(500)
           .json({ success: false, message: "An unexpected error occurred" });
       }
+      next(error)
     }
   }
   async verifyOtp(
@@ -132,6 +133,7 @@ class userController implements IUserController {
           message: "An unexpected error occurred during verification",
         });
       }
+      next(error)
     }
   }
 
@@ -169,6 +171,7 @@ class userController implements IUserController {
         success: false,
         message: "An Error occured while resending OTP",
       });
+      next(error)
     }
   }
 
@@ -321,87 +324,63 @@ class userController implements IUserController {
       next(error);
     }
   }
-  async googleLogin(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+
+
+
+async googleLogin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    console.log("entered in the backend googleLogin in userController");
     const { name, email, googlePhotoUrl } = req.body;
     console.log("name and email from the google login", name, email);
-    const accessTokenMaxAge = 5 * 60 * 1000;
-    const refreshTokenMaxAge = 48 * 60 * 60 * 1000;
-    try {
-      const user = await this.userServices.getUserByEmail({ email });
-      if (user) {
-        if (user.isBlocked) {
-          res.status(UNAUTHORIZED).json({
-            success: false,
-            message: "user has been blocked by admin.",
-          });
-          // throw new Error('user has been blocked by admin...');
-        } else {
-          const token = await this.userServices.generateToken(
-            { payload: user.id },
-            user.role
-          );
-          const refreshToken = await this.userServices.generateRefreshToken({
-            payload: user.id,
-          });
-          const data = {
-            success: true,
-            message: "Success",
-            userId: user.id,
-            token: token,
-            refreshToken,
-            data: user,
-          };
 
-          // const time = this.milliseconds(23, 30, 0);
-          res
-            .status(OK)
-            .cookie("access_token", token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", refreshToken, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json(data);
-        }
-      } else {
-        const generatedPassword =
-          Math.random().toString(36).slice(-8) +
-          Math.random().toString(36).slice(-8);
-        const hashedPassword = await this.userServices.hashPassword(
-          generatedPassword
-        );
+    const loginStatus = await this.userServices.googleLogin({
+      name,
+      email,
+      googlePhotoUrl,
+    });
 
-        const newUser: SaveUserResponse = await this.userServices.saveUser({
-          name: name,
-          email: email,
-          password: hashedPassword,
-          profile_picture: googlePhotoUrl,
-        });
-        if (newUser?.data) {
-          // const time = this.milliseconds(23, 30, 0);
-          res
-            .status(OK)
-            .cookie("access_token", newUser.token, {
-              maxAge: accessTokenMaxAge,
-            })
-            .cookie("refresh_token", newUser.refresh_token, {
-              maxAge: refreshTokenMaxAge,
-            })
-            .json(newUser.data);
-        }
-      }
-    } catch (error) {
-      next(error);
+    console.log("google login status:", loginStatus);
+
+    if (loginStatus.data.success === false) {
+      res.status(loginStatus.status).json({
+        data: {
+          success: false,
+          message: loginStatus.data.message,
+        },
+      });
+      return;
+    } else {
+      const access_token = loginStatus.data.token;
+      const refresh_token = loginStatus.data.refresh_token;
+      const accessTokenMaxAge = 5 * 60 * 1000; //5 min
+      const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
+      
+      console.log("response is going to send to the frontend");
       res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error......" });
+        .status(loginStatus.status)
+        .cookie("user_access_token", access_token, {
+          maxAge: accessTokenMaxAge,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        .cookie("user_refresh_token", refresh_token, {
+          maxAge: refreshTokenMaxAge,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        .json(loginStatus);
     }
+  } catch (error) {
+    console.log(error as Error);
+    next(error);
   }
-
+}
   //funciton to update New password
   async updateNewPassword(req: Request, res: Response, next: NextFunction) {
     try {

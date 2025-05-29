@@ -65,5 +65,6 @@ export interface IUserServices {
     successPayment(data:string):Promise<unknown>
     updateUserLocation(data : IupdateUserLocation):Promise<IupdateUserLocationResponse | null>
     resendOTP(data: IResendOTPData): Promise<Partial<ITempUser> | null> 
+    googleLogin(data: { name: string;email: string;googlePhotoUrl: string;}): Promise<UserLoginResponse>
 }
 
