@@ -192,13 +192,14 @@ class userController implements IUserController {
     }
   }
 
-  async forgotResentOtp(
+  async forgotPassWord(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<ForgotResentOtpResponse | void> {
     try {
       const { email } = req.body;
+      console.log("email in the userController in the forgot password function",email);
       req.app.locals.userEmail = email;
       if (!email) {
         return res.status(BAD_REQUEST).json({
@@ -206,7 +207,7 @@ class userController implements IUserController {
           message: "please enter the email",
         }) as ForgotResentOtpResponse;
       }
-      const user = await this.userServices.getUserByEmail(email);
+      const user = await this.userServices.getUserByEmail({email});
       if (!user) {
         return res.status(BAD_REQUEST).json({
           success: false,

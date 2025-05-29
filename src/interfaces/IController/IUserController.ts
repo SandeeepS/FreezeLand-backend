@@ -9,7 +9,7 @@ export interface IUserController{
     userLogin(req: Request, res: Response, next: NextFunction): Promise<void>;
     googleLogin(req: Request, res: Response, next: NextFunction): Promise<void>;
     verifyOtp(req: Request, res: Response, next: NextFunction): Promise<void>;
-    forgotResentOtp(req: Request, res: Response, next: NextFunction): Promise<ForgotResentOtpResponse | void>;
+    forgotPassWord(req: Request, res: Response, next: NextFunction): Promise<ForgotResentOtpResponse | void>;
     VerifyForgotOtp(req: Request, res: Response, next: NextFunction): Promise<unknown>;
     updateNewPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
 

@@ -36,11 +36,11 @@ userRouter.post('/google-login', async (req: Request, res: Response, next: NextF
 userRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => await controller.logout(req, res,next));
 userRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.verifyOtp(req,res,next));
 userRouter.get('/getTempUserData',async(req:Request,res:Response,next:NextFunction) => await controller.getTempUserData(req,res,next));
-userRouter.post('/forgot-password', async (req: Request, res: Response,next:NextFunction) => await controller.forgotResentOtp(req, res,next));
+userRouter.post('/forgot-password', async (req: Request, res: Response,next:NextFunction) => await controller.forgotPassWord(req, res,next));
 userRouter.post('/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await controller.VerifyForgotOtp(req, res,next));
 userRouter.post('/resend-otp',async(req:Request,res:Response,next:NextFunction) => await controller.resendOTP(req,res,next));
 userRouter.post('/handlePayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.createStripeSession(req,res,next));
-userRouter.put('/update-newpassword',userAuth(["user"]),async(req: Request, res: Response,next:NextFunction) => await controller.updateNewPassword(req, res,next));
+userRouter.put('/update-newpassword',async(req: Request, res: Response,next:NextFunction) => await controller.updateNewPassword(req, res,next));
 userRouter.get('/profile',userAuth(["user"]),async (req: Request, res: Response,next:NextFunction) => await controller.getProfile(req, res,next));
 userRouter.put('/editUser',userAuth(["user"]),async (req:Request,res:Response,next:NextFunction) => await controller.editUser(req,res,next));
 userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.addAddress(req,res,next));
