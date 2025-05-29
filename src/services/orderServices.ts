@@ -3,12 +3,10 @@ import IOrderService from "../interfaces/IServices/IOrderService";
 import { IPaymentData } from "../interfaces/DTOs/User/IService.dto";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 import {
-  IAllOrderDataResponse,
   IOrderDataResponse,
 } from "../interfaces/DTOs/Order/IService";
 import mongoose from "mongoose";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
-const frontendBaseUrl = process.env.FRONTEND_BASE_URL as string;
 const stripeKey = process.env.STRIPE_SECRET_KEY as string;
 const stripe = new Stripe(stripeKey);
 
@@ -112,7 +110,7 @@ class OrderServices implements IOrderService {
         stripeSession.metadata?.amount
       ) {
         const purchasedAmount = parseInt(stripeSession.metadata.amount);
-        const { amount, complaintId, mechanicId, serviceId, status } =
+        const { complaintId, mechanicId, serviceId, } =
           stripeSession.metadata;
 
         // 1. Calculate commission
@@ -183,7 +181,7 @@ class OrderServices implements IOrderService {
         status: "FAILURE",
         message: "Invalid payment or metadata.",
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Stripe retrieval failed:", error);
       return {
         status: "FAILURE",
