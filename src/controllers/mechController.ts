@@ -70,6 +70,7 @@ class mechController implements IMechController {
           .status(500)
           .json({ success: false, message: "An unexpected error occurred" });
       }
+      next(error)
     }
   }
 
@@ -136,6 +137,7 @@ class mechController implements IMechController {
           message: "An unexpected error occurred during verification",
         });
       }
+      next(error)
     }
   }
 
@@ -173,6 +175,7 @@ class mechController implements IMechController {
         success: false,
         message: "An Error occured while resending OTP",
       });
+      next(error)
     }
   }
 
@@ -228,7 +231,7 @@ class mechController implements IMechController {
   }
 
   //for forgot reset otp mechanic
-  async forgotResentOtpMech(
+  async forgotPasswordMech(
     req: Request,
     res: Response,
     next: NextFunction
@@ -242,7 +245,7 @@ class mechController implements IMechController {
           message: "please enter the email",
         }) as ForgotResentOtpResponse;
       }
-      const mech = await this.mechServices.getUserByEmail(email);
+      const mech = await this.mechServices.getUserByEmail({email});
       if (!mech) {
         return res.status(BAD_REQUEST).json({
           success: false,
@@ -298,6 +301,7 @@ class mechController implements IMechController {
   async updateNewPasswordMech(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, mechId } = req.body;
+      console.log("passwrond and mechId in the updateNewPassword in the mechController",password,mechId);
       const result = await this.mechServices.updateNewPassword({
         password,
         mechId,

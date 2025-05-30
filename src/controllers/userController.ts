@@ -5,15 +5,13 @@ import S3Client from "../awsConfig";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { compareInterface } from "../utils/comparePassword";
 
-const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } =
-  STATUS_CODES;
-import { AddressValidation} from "../utils/validator";
+const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
+import { AddressValidation } from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
 import {
   EditUserDTO,
   ForgotResentOtpResponse,
   GetImageUrlResponse,
-  
 } from "../interfaces/DTOs/User/IController.dto";
 import { IUserController } from "../interfaces/IController/IUserController";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
@@ -66,7 +64,7 @@ class userController implements IUserController {
           .status(500)
           .json({ success: false, message: "An unexpected error occurred" });
       }
-      next(error)
+      next(error);
     }
   }
   async verifyOtp(
@@ -133,7 +131,7 @@ class userController implements IUserController {
           message: "An unexpected error occurred during verification",
         });
       }
-      next(error)
+      next(error);
     }
   }
 
@@ -171,7 +169,7 @@ class userController implements IUserController {
         success: false,
         message: "An Error occured while resending OTP",
       });
-      next(error)
+      next(error);
     }
   }
 
@@ -199,7 +197,10 @@ class userController implements IUserController {
   ): Promise<ForgotResentOtpResponse | void> {
     try {
       const { email } = req.body;
-      console.log("email in the userController in the forgot password function",email);
+      console.log(
+        "email in the userController in the forgot password function",
+        email
+      );
       req.app.locals.userEmail = email;
       if (!email) {
         return res.status(BAD_REQUEST).json({
@@ -207,7 +208,7 @@ class userController implements IUserController {
           message: "please enter the email",
         }) as ForgotResentOtpResponse;
       }
-      const user = await this.userServices.getUserByEmail({email});
+      const user = await this.userServices.getUserByEmail({ email });
       if (!user) {
         return res.status(BAD_REQUEST).json({
           success: false,
@@ -326,62 +327,60 @@ class userController implements IUserController {
     }
   }
 
+  async googleLogin(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      console.log("entered in the backend googleLogin in userController");
+      const { name, email, googlePhotoUrl } = req.body;
+      console.log("name and email from the google login", name, email);
 
-
-async googleLogin(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    console.log("entered in the backend googleLogin in userController");
-    const { name, email, googlePhotoUrl } = req.body;
-    console.log("name and email from the google login", name, email);
-
-    const loginStatus = await this.userServices.googleLogin({
-      name,
-      email,
-      googlePhotoUrl,
-    });
-
-    console.log("google login status:", loginStatus);
-
-    if (loginStatus.data.success === false) {
-      res.status(loginStatus.status).json({
-        data: {
-          success: false,
-          message: loginStatus.data.message,
-        },
+      const loginStatus = await this.userServices.googleLogin({
+        name,
+        email,
+        googlePhotoUrl,
       });
-      return;
-    } else {
-      const access_token = loginStatus.data.token;
-      const refresh_token = loginStatus.data.refresh_token;
-      const accessTokenMaxAge = 5 * 60 * 1000; //5 min
-      const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
-      
-      console.log("response is going to send to the frontend");
-      res
-        .status(loginStatus.status)
-        .cookie("user_access_token", access_token, {
-          maxAge: accessTokenMaxAge,
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-        })
-        .cookie("user_refresh_token", refresh_token, {
-          maxAge: refreshTokenMaxAge,
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-        })
-        .json(loginStatus);
+
+      console.log("google login status:", loginStatus);
+
+      if (loginStatus.data.success === false) {
+        res.status(loginStatus.status).json({
+          data: {
+            success: false,
+            message: loginStatus.data.message,
+          },
+        });
+        return;
+      } else {
+        const access_token = loginStatus.data.token;
+        const refresh_token = loginStatus.data.refresh_token;
+        const accessTokenMaxAge = 5 * 60 * 1000; //5 min
+        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
+
+        console.log("response is going to send to the frontend");
+        res
+          .status(loginStatus.status)
+          .cookie("user_access_token", access_token, {
+            maxAge: accessTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+          })
+          .cookie("user_refresh_token", refresh_token, {
+            maxAge: refreshTokenMaxAge,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+          })
+          .json(loginStatus);
+      }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
     }
-  } catch (error) {
-    console.log(error as Error);
-    next(error);
   }
-}
   //funciton to update New password
   async updateNewPassword(req: Request, res: Response, next: NextFunction) {
     try {
@@ -633,7 +632,7 @@ async googleLogin(
         limit,
         searchQuery,
       });
-   
+
       res.status(OK).json(data);
     } catch (error) {
       console.log(error as Error);

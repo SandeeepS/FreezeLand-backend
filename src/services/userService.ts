@@ -715,10 +715,13 @@ class userService implements IUserServices {
         saltLength: 10,
       });
       const newPassword = cryptr.encrypt(password);
-      return await this.userRepository.updateNewPassword({
+      const result = await this.userRepository.updateNewPassword({
         password: newPassword,
         userId,
       });
+      console.log("password updated successfully", result);
+
+      return result;
     } catch (error) {
       console.log(
         "Error occured in the updateNewPassword in the userService",

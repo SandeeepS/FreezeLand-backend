@@ -10,7 +10,6 @@ import { Email } from "../utils/email";
 import ServiceRepository from "../repositories/serviceRepository";
 import OrderServices from "../services/orderServices";
 import OrderRepository from "../repositories/orderRepository";
-import ConcernService from "../services/concernService";
 import ConcernRepository from "../repositories/concernRepository";
 import MechRepository from "../repositories/mechRepository";
 
@@ -23,7 +22,6 @@ const orderRepository = new OrderRepository();
 const concernRepository = new ConcernRepository();
 const mechRepository = new MechRepository()
 const orderService = new OrderServices(orderRepository,mechRepository);
-const concernService = new ConcernService(concernRepository);
 const generateOTP  = new GenerateOTP();
 
 const email = new Email(generateOTP);
