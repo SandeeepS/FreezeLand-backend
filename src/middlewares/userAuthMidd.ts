@@ -55,7 +55,6 @@ const userAuth = (allowedRoles: string[]) => {
           accessTokenDecoded = accessTokenVerification.decoded;
         }
       }
-      // console.log("Access token Decoded data is******", accessTokenDecoded);
       // If access token is invalid/expired, generate new one using refresh token
       if (!accessTokenDecoded) {
         console.log("Access token expired or invalid, generating a new one");

@@ -11,6 +11,15 @@ export interface UserSignUpDTO{
       
 }
 
+export interface GetPreSignedUrlResponse {
+    success?:boolean;
+    message?:string;
+    uploadURL?:string;
+    imageName?:string;
+    key?:string;
+
+}
+
 export interface ReturnUserdataDTO {
     _id: string;
     name: string;

@@ -9,9 +9,6 @@ import UserRepository from "../repositories/userRepository";
 import MechRepository from "../repositories/mechRepository";
 import ServiceRepository from "../repositories/serviceRepository";
 import DeviceRepository from "../repositories/deviceRepository";
-import OrderServices from "../services/orderServices";
-import OrderRepository from "../repositories/orderRepository";
-import ConcernService from "../services/concernService";
 import ConcernRepository from "../repositories/concernRepository";
 
 const adminRouter = express.Router();
@@ -22,7 +19,6 @@ const userRepository = new UserRepository();
 const mechRepository = new MechRepository();
 const serviceRepository = new ServiceRepository();
 const deviceRepository = new DeviceRepository();
-const orderRepository = new OrderRepository()
 const concernRepository = new ConcernRepository();
 const adminService: AdminService = new AdminService(adminReopsitory,userRepository,mechRepository,serviceRepository,deviceRepository,concernRepository, encrypt, createjwt);
 const controller = new adminController(adminService);

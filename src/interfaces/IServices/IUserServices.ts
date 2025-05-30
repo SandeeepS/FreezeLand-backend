@@ -34,6 +34,8 @@ import {
     IupdateUserLocationResponse,
     GenerateRefreshToken,
     IResendOTPData,
+    GetPreSignedUrlDTO,
+    GetPreSignedUrlResponse,
   } from "../DTOs/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
@@ -66,5 +68,5 @@ export interface IUserServices {
     updateUserLocation(data : IupdateUserLocation):Promise<IupdateUserLocationResponse | null>
     resendOTP(data: IResendOTPData): Promise<Partial<ITempUser> | null> 
     googleLogin(data: { name: string;email: string;googlePhotoUrl: string;}): Promise<UserLoginResponse>
-}
+getPresignedUrl(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> }
 

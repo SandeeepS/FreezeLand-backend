@@ -319,6 +319,7 @@ class AdminRepository
       const { values } = data;
       console.log("values from the serviceRepository is ", values);
       const addedService = await this.serviceRepository.addService(values);
+      console.log("result added service is",addedService)
       if (addedService) {
         return addedService;
       } else {
@@ -335,7 +336,9 @@ class AdminRepository
   ): Promise<AddNewDeviceResponse | null> {
     try {
       const { name } = data;
+      console.log("reached in the adminrepositor for adding device",name);
       const addedDevice = await this.deviceRepository.addDevice(name);
+      console.log("Result after adding device is ",addedDevice)
       if (addedDevice) {
         return addedDevice;
       } else {

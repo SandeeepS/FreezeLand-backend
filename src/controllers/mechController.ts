@@ -1,12 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 
-import mechService from "../services/mechServices";
-const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
+const { BAD_REQUEST, OK, NOT_FOUND } = STATUS_CODES;
 import {
   AddressValidation,
-  LoginValidation,
-  SignUpValidation,
+
 } from "../utils/validator";
 import { IMechController } from "../interfaces/IController/IMechController";
 import {
@@ -23,7 +21,6 @@ import { Iemail } from "../utils/email";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
-import concernModel from "../models/concernModel";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
 
 class mechController implements IMechController {

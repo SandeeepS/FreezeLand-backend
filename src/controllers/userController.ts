@@ -12,6 +12,7 @@ import {
   EditUserDTO,
   ForgotResentOtpResponse,
   GetImageUrlResponse,
+  GetPreSignedUrlResponse,
 } from "../interfaces/DTOs/User/IController.dto";
 import { IUserController } from "../interfaces/IController/IUserController";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
@@ -709,6 +710,44 @@ class userController implements IUserController {
       next(error);
     }
   }
+
+
+    async getPresignedUrl(
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ): Promise<GetPreSignedUrlResponse | void> {
+      try {
+        const { fileName, fileType, folderName } = req.query as {
+          fileName: string;
+          fileType: string;
+          folderName: string;
+        };
+        console.log("file from the front end is ", fileName, fileType);
+        const result = await this.userServices.getPresignedUrl({
+          fileName,
+          fileType,
+          folderName,
+        });
+        console.log("presinged Url is from teh userController is ", result);
+        if (result.success === false) {
+          return res.status(400).json({
+            success: false,
+            message: "File name and type are required",
+          }) as GetPreSignedUrlResponse;
+        } else {
+          return res.status(200).json({
+            success: true,
+            uploadURL: result.uploadURL,
+            imageName: result.imageName,
+            key: result.key,
+          }) as GetPreSignedUrlResponse;
+        }
+      } catch (error) {
+        console.log(error as Error);
+        next(error);
+      }
+    }
 
   //function to get the specified userComplaint using user Id
   async getUserRegisteredServiceDetailsById(

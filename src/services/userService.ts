@@ -38,6 +38,8 @@ import {
   IupdateUserLocation,
   IupdateUserLocationResponse,
   IResendOTPData,
+  GetPreSignedUrlDTO,
+  GetPreSignedUrlResponse,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -55,6 +57,7 @@ import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository
 import { IOrderService } from "../interfaces/IServices/IOrderService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
+import { generatePresignedUrl } from "../utils/generatePresignedUrl";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
@@ -861,6 +864,23 @@ class userService implements IUserServices {
         "error occurred while creating the stripe session in the userService",
         error
       );
+      throw error;
+    }
+  }
+
+  async getPresignedUrl(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> {
+    try {
+      const { fileName, fileType, folderName } = data;
+      if (!fileName || !fileType) {
+        return {
+          success: false,
+          message: "File name and type are required",
+        } as GetPreSignedUrlResponse;
+      }
+      const result = await generatePresignedUrl(fileName, fileType, folderName);
+      return result as GetPreSignedUrlResponse;
+    } catch (error) {
+      console.log("Error in the getPresignedUrl in the user Service", error);
       throw error;
     }
   }

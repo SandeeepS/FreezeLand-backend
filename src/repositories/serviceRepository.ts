@@ -61,6 +61,18 @@ class ServiceRepository
       throw new Error("Error occured");
     }
   }
+
+    async addService(serviceData: Partial<IServices>): Promise<IServices | null> {
+    try {
+      console.log("Adding new service with data:", serviceData);
+      const result = await this.save(serviceData);
+      console.log("Service added successfully:", result);
+      return result;
+    } catch (error) {
+      console.log("Error adding service in ServiceRepository:", error as Error);
+      throw new Error("Failed to add service");
+    }
+  }
 }
 
 export default ServiceRepository;

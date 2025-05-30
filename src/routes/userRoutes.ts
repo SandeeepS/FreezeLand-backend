@@ -48,6 +48,8 @@ userRouter.post('/registerService',userAuth(["user"]),async(req:Request,res:Resp
 userRouter.get('/getAllServices',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) =>await controller.getAllServices(req,res,next));//getting all service which is provided by the website
 userRouter.get('/getAllUserRegisteredServices',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
 userRouter.get('/getImageUrl',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
+userRouter.get('/getPresignedUrl',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => controller.getPresignedUrl(req,res,next));
+
 userRouter.get('/getUserRegisteredServiceDetailsById',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getUserRegisteredServiceDetailsById(req,res,next));
 userRouter.get('/getMechanicDetails',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getMechanicDetails(req,res,next));
 userRouter.get('/getService/:id',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => controller.getService(req,res,next));

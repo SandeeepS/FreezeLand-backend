@@ -34,6 +34,23 @@ export interface UserSignUpDTO {
   defaultAddress: string;
 }
 
+
+export interface GetPreSignedUrlDTO{
+  fileName:string;
+  fileType:string;
+  folderName:string;
+}
+
+export interface GetPreSignedUrlResponse {
+  success?:boolean;
+  message?:string;
+  uploadURL?:string;
+  imageName?:string;
+  key?:string;
+
+}
+
+
 export interface UserSignUpResponse extends Document {
   userData:Partial<ITempUser>;
   otp:string;

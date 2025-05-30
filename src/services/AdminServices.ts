@@ -422,6 +422,7 @@ class adminService implements IAdminService {
   async addDevice(data: AddDeviceDTO): Promise<AddNewDeviceResponse | null> {
     try {
       const { name } = data;
+      console.log("name in the addDevice in the adminService is",name);
       return await this.adminRepository.addNewDevice({ name });
     } catch (error) {
       console.log("Error while adding new Device form the adminService", error);
