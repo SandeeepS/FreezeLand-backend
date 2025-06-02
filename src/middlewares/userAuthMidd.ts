@@ -25,7 +25,7 @@ const userAuth = (allowedRoles: string[]) => {
         clearAuthCookies(res);
         return res.status(401).json({
           success: false,
-          message: "No refresh token found. Please log in again.",
+          message: "Please log in again.",
         });
       }
 

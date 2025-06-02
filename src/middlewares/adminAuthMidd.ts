@@ -27,7 +27,7 @@ const adminAuth = (allowedRoles: string[]) => {
         res.clearCookie("admin_refresh_token");
         return res.status(401).json({
           success: false,
-          message: "Token expired or not available. Please log in again.",
+          message: "Please log in again.",
         });
       }
 
