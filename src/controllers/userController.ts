@@ -857,6 +857,17 @@ class userController implements IUserController {
       next(err);
     }
   }
+
+  async createReport(req:Request,res:Response,next:NextFunction) {
+    try{
+      const {role,reporterId,complaintId,message,discription} = req.body;
+      console.log("Datas from the frontend  in the createReportFunciton in the userController is ",role,reporterId,complaintId,message,discription);
+      return null;
+    }catch(error){
+      console.log("Error occured in the createReport function in the userController",error);
+      next(error);
+    }
+  }
 }
 
 export default userController;

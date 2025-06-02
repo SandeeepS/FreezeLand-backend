@@ -22,15 +22,18 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
+import IReportService from "../interfaces/IServices/IReportService";
 
 class mechController implements IMechController {
   constructor(
     private mechServices: IMechServices,
+    private reportService: IReportService,
     private encrypt: compareInterface,
     private createdjwt: ICreateJWT,
     private email: Iemail
   ) {
     this.mechServices = mechServices;
+    this.reportService = reportService;
     this.encrypt = encrypt;
     this.createdjwt = createdjwt;
     this.email = email;
@@ -763,6 +766,21 @@ class mechController implements IMechController {
       res.status(200).json({ success: true, result });
     } catch (error) {
       console.log(error);
+      next(error);
+    }
+  }
+
+
+  //function  to create report from the mechside 
+    async createReport(req:Request,res:Response,next:NextFunction) {
+    try{
+      const {reportData} = req.body;
+      console.log("Datas from the frontend  in the createReportFunciton in the mechController is ",reportData);
+      const result = await this.reportService.createReport(reportData);
+      return res.status(200).json({success:true,result});
+    
+    }catch(error){
+      console.log("Error occured in the createReport function in the mechController",error);
       next(error);
     }
   }

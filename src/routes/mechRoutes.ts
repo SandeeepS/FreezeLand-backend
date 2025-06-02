@@ -9,6 +9,8 @@ import { Email } from '../utils/email';
 import { GenerateOTP } from '../utils/generateOtp';
 import RoomRepository from '../repositories/roomRepository';
 import ConcernRepository from '../repositories/concernRepository';
+import ReportService from '../services/reportService';
+import ReportRepository from '../repositories/reportRepository';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
@@ -18,8 +20,10 @@ const roomRepository = new RoomRepository();
 const concernRepository = new ConcernRepository();
 const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
+const reportRepository = new ReportRepository();
+const reportService = new ReportService(reportRepository);
 const mechServices = new mechService(mechRepository,concernRepository,roomRepository,createjwt,encrypt,email);
-const controller = new mechController(mechServices,encrypt,createjwt,email);
+const controller = new mechController(mechServices,reportService,encrypt,createjwt,email);
 
 mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next)); 
 mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await controller.mechSignup(req,res,next));
@@ -46,6 +50,8 @@ mechRouter.get('/getAllCompletedServices',mechAuth(["mechanic"]),async(req:Reque
 mechRouter.put('/editMechanic',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.editMechanic(req,res,next));
 mechRouter.post('/addMechAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.addAddress(req,res,next));
 mechRouter.put('/editAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
+mechRouter.post('/report',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.createReport(req,res,next));
+
 
 
 
