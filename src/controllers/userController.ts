@@ -18,15 +18,18 @@ import { IUserController } from "../interfaces/IController/IUserController";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { ICreateJWT } from "../utils/generateToken";
 import { Iemail } from "../utils/email";
+import IReportService from "../interfaces/IServices/IReportService";
 
 class userController implements IUserController {
   constructor(
     private userServices: IUserServices,
+    private reportService: IReportService,
     private encrypt: compareInterface,
     private createjwt: ICreateJWT,
     private email: Iemail
   ) {
     this.userServices = userServices;
+    this.reportService = reportService;
     this.encrypt = encrypt;
     this.createjwt = createjwt;
     this.email = email;
@@ -860,8 +863,10 @@ class userController implements IUserController {
 
   async createReport(req:Request,res:Response,next:NextFunction) {
     try{
-      const {role,reporterId,complaintId,message,discription} = req.body;
-      console.log("Datas from the frontend  in the createReportFunciton in the userController is ",role,reporterId,complaintId,message,discription);
+      const {reportData} = req.body;
+      console.log("Datas from the frontend  in the createReportFunciton in the userController is ",reportData);
+      const result = await this.reportService.createReport(reportData);
+      res.status(200).json({success:true,result});
       return null;
     }catch(error){
       console.log("Error occured in the createReport function in the userController",error);

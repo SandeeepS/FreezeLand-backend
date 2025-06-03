@@ -30,10 +30,6 @@ class ReportRepository extends BaseRepository<IReport & Document > implements IR
                 throw error;
             }
         }
-
-
-
-
 }
 
 export default ReportRepository;

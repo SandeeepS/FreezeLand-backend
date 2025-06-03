@@ -12,6 +12,8 @@ import OrderServices from "../services/orderServices";
 import OrderRepository from "../repositories/orderRepository";
 import ConcernRepository from "../repositories/concernRepository";
 import MechRepository from "../repositories/mechRepository";
+import ReportRepository from "../repositories/reportRepository";
+import ReportService from "../services/reportService";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
@@ -21,12 +23,14 @@ const serviceRepository = new ServiceRepository();
 const orderRepository = new OrderRepository();
 const concernRepository = new ConcernRepository();
 const mechRepository = new MechRepository()
+const reportRepository = new ReportRepository();
+const reportService = new ReportService(reportRepository);
 const orderService = new OrderServices(orderRepository,mechRepository);
 const generateOTP  = new GenerateOTP();
 
 const email = new Email(generateOTP);
 const userServices = new userService(userRepository,serviceRepository,concernRepository,orderRepository,orderService,createjwt,encrypt,email);
-const controller = new userController(userServices,encrypt,createjwt,email);
+const controller = new userController(userServices,reportService,encrypt,createjwt,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
 userRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next))

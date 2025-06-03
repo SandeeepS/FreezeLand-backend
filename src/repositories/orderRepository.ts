@@ -1,6 +1,5 @@
 import mongoose, { ClientSession } from "mongoose";
 import {
-  
   IOrderData,
   IOrderDataResponse,
 } from "../interfaces/DTOs/Order/IRepository";
@@ -12,13 +11,15 @@ import { BaseRepository } from "./BaseRepository/baseRepository";
 class OrderRepository
   extends BaseRepository<IOrder & Document>
   implements IOrderRepository
-  
 {
-  constructor(){
+  constructor() {
     super(orderModel);
   }
 
-  async createOrder(orderData: IOrderData, dbSession: ClientSession): Promise<IOrderDataResponse> {
+  async createOrder(
+    orderData: IOrderData,
+    dbSession: ClientSession
+  ): Promise<IOrderDataResponse> {
     try {
       console.log(
         "entered in the create order method in the order repository",
@@ -29,16 +30,16 @@ class OrderRepository
         userId,
         mechanicId,
         serviceId,
-        complaintId,
+        complaintId, 
         amount,
         paymentStatus,
         adminCommission,
-        mechanicEarning
+        mechanicEarning,
       } = orderData;
-      let objectMechId = new mongoose.Types.ObjectId(mechanicId);
-      let objectCompId = new mongoose.Types.ObjectId(complaintId);
-      let objectUserId = new mongoose.Types.ObjectId(userId);
-      let objectServiceId = new mongoose.Types.ObjectId(serviceId);
+      const objectMechId = new mongoose.Types.ObjectId(mechanicId);
+      const objectCompId = new mongoose.Types.ObjectId(complaintId);
+      const objectUserId = new mongoose.Types.ObjectId(userId);
+      const objectServiceId = new mongoose.Types.ObjectId(serviceId);
       const dataToSave = {
         orderId: orderId,
         userId: objectUserId,
@@ -47,15 +48,17 @@ class OrderRepository
         complaintId: objectCompId,
         amount: amount,
         paymentStatus: paymentStatus,
-        adminCommission:adminCommission,
-        mechanicEarning:mechanicEarning
+        adminCommission: adminCommission,
+        mechanicEarning: mechanicEarning,
       };
-      const savedOrder = await orderModel.create([dataToSave], { session: dbSession });
+      const savedOrder = await orderModel.create([dataToSave], {
+        session: dbSession,
+      });
       console.log("saved order from the database is ", savedOrder);
       if (savedOrder && savedOrder.length > 0) {
         const orderDoc = savedOrder[0];
         const orderDataResponse: IOrderData = {
-          _id:orderDoc._id,
+          _id: orderDoc._id,
           orderId: orderDoc.orderId,
           userId: orderDoc.userId,
           mechanicId: orderDoc.mechanicId,
@@ -64,7 +67,7 @@ class OrderRepository
           amount: orderDoc.amount,
           paymentStatus: orderDoc.paymentStatus,
           adminCommission: orderDoc.adminCommission,
-          mechanicEarning: orderDoc.mechanicEarning
+          mechanicEarning: orderDoc.mechanicEarning,
         };
         return {
           status: "SUCCESS",
@@ -75,7 +78,6 @@ class OrderRepository
         return {
           status: "FAILURE",
           message: "Order not created",
-          
         };
       }
     } catch (error) {
@@ -83,8 +85,6 @@ class OrderRepository
       throw error;
     }
   }
-
-
 }
 
 export default OrderRepository;
