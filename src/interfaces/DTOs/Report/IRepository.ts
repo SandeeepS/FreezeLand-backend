@@ -18,6 +18,19 @@ export interface ICreateReportResponse {
   reporterId: mongoose.Types.ObjectId;
   complaintId: mongoose.Types.ObjectId;
   targetId: mongoose.Types.ObjectId;
+  status:string
+  reason: string;
+  description: string;
+  isDeleted: boolean;
+}
+export interface IGetAllReportsResponse {
+  _id?: mongoose.Types.ObjectId;
+  reporterRole: string;
+  targetRole: string;
+  reporterId: mongoose.Types.ObjectId;
+  complaintId: mongoose.Types.ObjectId;
+  targetId: mongoose.Types.ObjectId;
+  status:string;
   reason: string;
   description: string;
   isDeleted: boolean;

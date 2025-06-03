@@ -15,11 +15,12 @@ const ReportSchema = new mongoose.Schema(
       required: true,
       ref: "Complaint",
     },
-    targetId:{
-        type:mongoose.Types.ObjectId,
-        required:false,
+    targetId: {
+      type: mongoose.Types.ObjectId,
+      required: false,
     },
     reason: { type: String, required: true },
+    status: { type: String, default: "pending"},
     description: { type: String },
     isDeleted: { type: Boolean, default: false },
   },

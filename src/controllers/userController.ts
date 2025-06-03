@@ -861,7 +861,7 @@ class userController implements IUserController {
     }
   }
 
-  async createReport(req:Request,res:Response,next:NextFunction) {
+  async createReport(req:Request,res:Response,next:NextFunction){
     try{
       const {reportData} = req.body;
       console.log("Datas from the frontend  in the createReportFunciton in the userController is ",reportData);

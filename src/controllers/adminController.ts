@@ -10,17 +10,23 @@ import { IAdminController } from "../interfaces/IController/IAdminController";
 import {
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
-  
 } from "../interfaces/DTOs/Admin/IController.dto";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
+import IReportService from "../interfaces/IServices/IReportService";
 // import { storage } from "../firebase";
 // import { ref, uploadString, getDownloadURL } from "firebase/storage";
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
 class adminController implements IAdminController {
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private reportService: IReportService
+  ) {
+    this.adminService = adminService;
+    this.reportService = reportService;
+  }
 
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
@@ -302,7 +308,7 @@ class adminController implements IAdminController {
         const isExist = await this.adminService.isDeviceExist(name);
         console.log("is devices exits or not ", isExist);
         if (!isExist) {
-          const result = await this.adminService.addDevice({name});
+          const result = await this.adminService.addDevice({ name });
           if (result) {
             res.json({
               success: true,
@@ -667,6 +673,31 @@ class adminController implements IAdminController {
     } catch (error) {
       console.log(error as Error);
       next(error);
+    }
+  }
+
+  //get All reports raised by user reporter Role (user/mechanic )
+  async getAllReportByReporterRole(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { reporterRole } = req.query;
+      console.log("ReporterRole in the adminController", reporterRole);
+      const result = await this.reportService.getAllReportByReporterRole(reporterRole as string);
+      console.log("Reuslt after fetching the report data ,",result);
+      if(result){
+        res.status(200).json({message:"success",result});
+      }else{
+        res.status(200).json({message:"failed"});
+      }
+    } catch (error) {
+      console.log(
+        "Error occured in the getAllReportByReporterRole in the adminController",
+        error
+      );
+      next(error as Error);
     }
   }
 

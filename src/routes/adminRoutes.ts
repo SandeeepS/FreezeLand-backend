@@ -10,6 +10,8 @@ import MechRepository from "../repositories/mechRepository";
 import ServiceRepository from "../repositories/serviceRepository";
 import DeviceRepository from "../repositories/deviceRepository";
 import ConcernRepository from "../repositories/concernRepository";
+import ReportRepository from "../repositories/reportRepository";
+import ReportService from "../services/reportService";
 
 const adminRouter = express.Router();
 const encrypt = new Encrypt();
@@ -18,10 +20,12 @@ const adminReopsitory = new AdminRepository();
 const userRepository = new UserRepository();
 const mechRepository = new MechRepository();
 const serviceRepository = new ServiceRepository();
+const reportRepository = new ReportRepository();
 const deviceRepository = new DeviceRepository();
 const concernRepository = new ConcernRepository();
+const reportService = new ReportService(reportRepository);
 const adminService: AdminService = new AdminService(adminReopsitory,userRepository,mechRepository,serviceRepository,deviceRepository,concernRepository, encrypt, createjwt);
-const controller = new adminController(adminService);
+const controller = new adminController(adminService,reportService);
 
 adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => controller.adminLogin(req, res,next));
 adminRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => controller.adminLogout(req, res,next));
@@ -48,5 +52,6 @@ adminRouter.put('/updateApprove',adminAuth(["admin"]),async(req:Request,res:Resp
 adminRouter.get('/getAllComplaints',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllComplaints(req,res,next));
 adminRouter.get('/getComplaintById/:id',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getComplaintById(req,res,next));
 adminRouter.post('/cancelComplaint',adminAuth(['admin']),async(req:Request,res:Response,next:NextFunction) => controller.cancelComplaint(req,res,next));
+adminRouter.get('/report',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllReportByReporterRole(req,res,next));
 
 export default adminRouter;
