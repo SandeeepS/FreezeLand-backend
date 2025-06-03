@@ -718,10 +718,10 @@ class mechController implements IMechController {
   ) {
     try {
       console.log("Entered in the getAllCompleted Services");
-      const { mechanicId } = req.body;
+      const { mechanicId } = req.query;
       console.log("mechanic id is", mechanicId);
       const result = await this.mechServices.getAllCompletedServices(
-        mechanicId
+        mechanicId as string
       );
       res.status(OK).json({ success: true, result });
     } catch (error) {

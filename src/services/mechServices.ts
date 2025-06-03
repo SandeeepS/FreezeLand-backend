@@ -49,10 +49,9 @@ import { Iemail } from "../utils/email";
 import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import { updateCompleteStatusResponse } from "../interfaces/DTOs/Mech/IRepository.dto";
-import IConcernService from "../interfaces/IServices/IConcernService";
-import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 
-const { OK, UNAUTHORIZED } = STATUS_CODES;
+
+const { OK} = STATUS_CODES;
 class mechService implements IMechServices {
   constructor(
     private mechRepository: IMechRepository,

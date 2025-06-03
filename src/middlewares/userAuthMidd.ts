@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import { CreateJWT } from "../utils/generateToken";
 import UserRepository from "../repositories/userRepository";
-import { UserInterface } from "../interfaces/Model/IUser";
 
 const jwt = new CreateJWT();
 const userRepository = new UserRepository();
@@ -14,11 +13,7 @@ const userAuth = (allowedRoles: string[]) => {
       console.log("entered in the userAuth");
       const accessToken = req.cookies.user_access_token;
       const refreshToken = req.cookies.user_refresh_token;
-      // console.log(
-      //   "access token and refresh token are",
-      //   accessToken,
-      //   refreshToken
-      // );
+   
 
       //  checking  refresh token exists and is valid
       if (!refreshToken) {

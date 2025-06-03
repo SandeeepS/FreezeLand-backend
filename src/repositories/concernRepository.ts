@@ -206,7 +206,6 @@ class ConcernRepository
   ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
       const { page, limit } = data;
-
       // Use aggregation to get user's registered services with lookups
       const result = await concernModel.aggregate([
         {
@@ -238,7 +237,6 @@ class ConcernRepository
         { $limit: limit },
         { $project: { "userDetails.password": 0 } },
       ]);
-
       console.log("User registered services:", result);
       return result as GetAllUserRegisteredServicesResponse[];
     } catch (error) {
@@ -252,19 +250,24 @@ class ConcernRepository
     }
   }
 
-  //function to get the completed complait details by mechanic id
+  //function for getting all the mechanic's completed service history
   async getAllCompletedServiceByMechanic(
     mechanicId: string
   ): Promise<GetAllMechanicCompletedServicesResponse[] | null> {
     try {
-      console.log("Entered in the concern repository", mechanicId);
+      // Convert mechanicId string to ObjectId for comparison
+      const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
 
-      // Use aggregation to get user's registered services with lookups
+      // Use aggregation to get all completed services where mechanic was involved
       const result = await concernModel.aggregate([
         {
           $match: {
             isDeleted: false,
-            currentMechanicId: mechanicId,
+            status: "completed",
+            $or: [
+              { currentMechanicId: mechanicObjectId },
+              { "workHistory.mechanicId": mechanicObjectId },
+            ],
           },
         },
         {
@@ -283,32 +286,62 @@ class ConcernRepository
             as: "serviceDetails",
           },
         },
-        // { $skip: (page - 1) * limit },
-        // { $limit: limit },
-        { $project: { "userDetails.password": 0 } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "currentMechanicId",
+            foreignField: "_id",
+            as: "currentMechanicDetails",
+          },
+        },
+        {
+          $addFields: {
+            mechanicWorkHistory: {
+              $filter: {
+                input: "$workHistory",
+                cond: { $eq: ["$$this.mechanicId", mechanicObjectId] },
+              },
+            },
+          },
+        },
+        { $sort: { updatedAt: -1 } },
+        {
+          $project: {
+            "userDetails.password": 0,
+            "currentMechanicDetails.password": 0,
+          },
+        },
       ]);
 
-      console.log("User registered services:", result);
-
-      return result;
-    } catch (errror) {
-      console.log("error occured in the ");
+      console.log("Mechanic completed service history:", result);
+      return result as GetAllMechanicCompletedServicesResponse[];
+    } catch (error) {
+      console.log(
+        "Error occurred while fetching mechanic completed service history:",
+        error as Error
+      );
       throw new Error(
-        "Error occured in the concernRepository while getting the completed mechanic service"
+        "Error occurred while fetching mechanic completed service history."
       );
     }
   }
 
-  //function to update the orderid in the concern data base after payment optoin 
-  async updateConcernWithOrderId(complaintId:string, orderId:string):Promise<UpdatedcomplaintWithOrderIdResponse | null>{
-    try{
+  //function to update the orderid in the concern data base after payment optoin
+  async updateConcernWithOrderId(
+    complaintId: string,
+    orderId: string
+  ): Promise<UpdatedcomplaintWithOrderIdResponse | null> {
+    try {
       console.log("Entered in the updatedConcernOrderId");
       const objectIdObject = new mongoose.Types.ObjectId(orderId);
-      const qr = {orderId:objectIdObject};
-      const result = await this.update(complaintId,qr)
+      const qr = { orderId: objectIdObject };
+      const result = await this.update(complaintId, qr);
       return result;
-    }catch(error){
-      console.log("Error occured in the updateconcernWithOrderId in concernRepository",error);
+    } catch (error) {
+      console.log(
+        "Error occured in the updateconcernWithOrderId in concernRepository",
+        error
+      );
       throw error;
     }
   }
