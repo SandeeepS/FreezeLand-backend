@@ -150,6 +150,9 @@ class userService implements IUserServices {
     }
   }
 
+ 
+  
+
   //function to verify otp
   async verifyOTP(id: string, otp: string): Promise<verifyOTPResponse> {
     try {
