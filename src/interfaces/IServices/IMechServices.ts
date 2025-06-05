@@ -64,5 +64,6 @@ export interface IMechServices{
     AddUserAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null> 
     editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> 
     resendOTP(data: IResendOTPData): Promise<Partial<ITempMech> | null>
+    handleRemoveMechAddress(mechId: string,addressId:string): Promise<boolean>
 }
 

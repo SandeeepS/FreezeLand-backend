@@ -784,6 +784,33 @@ class mechController implements IMechController {
       next(error);
     }
   }
+
+    //funtion to remove the address
+  async handleRemoveMechAddress(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { mechId, addressId } = req.body;
+      console.log("address id in the mechController is", mechId, addressId);
+      const result = await this.mechServices.handleRemoveMechAddress(
+        mechId as string,
+        addressId as string
+      );
+      if (result) {
+        res.status(200).json({ success: true, result });
+      } else {
+        res.status(200).json({ success: false });
+      }
+    } catch (error) {
+      console.log(
+        "Error occured while handling the remove Address function in the mechController",
+        error
+      );
+      next(error);
+    }
+  }
 }
 
 export default mechController;

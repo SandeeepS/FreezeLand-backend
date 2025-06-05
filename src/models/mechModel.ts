@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Model } from "mongoose";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 
 const AddressSchema = new Schema({
@@ -9,6 +9,7 @@ const AddressSchema = new Schema({
   pin: { type: Number, require: true },
   district: { type: String, require: true },
   landMark: { type: String, require: true },
+  isDeleted: { type: Boolean, default: false },
 });
 
 const LocationDataSchema = new Schema({

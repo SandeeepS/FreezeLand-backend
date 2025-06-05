@@ -148,7 +148,7 @@ class MechRepository
 
   async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
     try {
-      const { page, limit, searchQuery, search } = data;
+      const { page, limit, search } = data;
       console.log("Search in the mechRepository", search);
       const regex = new RegExp(search, "i");
       const result = await this.findAll(page, limit, regex);
@@ -424,12 +424,19 @@ class MechRepository
   ): Promise<IUpdatedMechnicDetails | null> {
     try {
       const { mechanicId, mechanicEarning, dbSession } = updateMechanicDetails;
-      console.log("Mechanic Earning in the updateMechnicEearning ",mechanicEarning);
+      console.log(
+        "Mechanic Earning in the updateMechnicEearning ",
+        mechanicEarning
+      );
 
-      const result = await MechModel.findByIdAndUpdate(mechanicId, { $inc: { wallet: mechanicEarning } }, {
-        session: dbSession,
-        new: true,
-      });
+      const result = await MechModel.findByIdAndUpdate(
+        mechanicId,
+        { $inc: { wallet: mechanicEarning } },
+        {
+          session: dbSession,
+          new: true,
+        }
+      );
       console.log(
         "wallet updated after adding mechanic earning in the updateMechanicEarning in the mechRepository",
         result
@@ -490,6 +497,31 @@ class MechRepository
         error
       );
       throw error;
+    }
+  }
+
+  async handleRemoveMechAddress(
+    mechId: string,
+    addressId: string
+  ): Promise<boolean> {
+    try {
+      const result = await MechModel.updateOne(
+        { _id: mechId, "address._id": addressId },
+        { $set: { "address.$.isDeleted": true } }
+      );
+
+      console.log("Result after updatin the address in the mechSide ", result);
+
+      if (result.modifiedCount === 0) {
+        throw new Error("No address found or already deleted.");
+      } else {
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+      throw new Error(
+        "Error occurred while removing user address in mechRepository"
+      );
     }
   }
 }

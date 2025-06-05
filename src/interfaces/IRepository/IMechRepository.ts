@@ -55,4 +55,5 @@ export interface IMechRepository{
     editAddress(data: IEditAddress): Promise<IEditAddressResponse | null>
     updateTempMechData(data: IUpdateTempDataWithOTP): Promise<ITempMech | null> 
     updateMechanicEarnings(updateMechanicDetails:IUpdateMechanicDetails):Promise<IUpdatedMechnicDetails | null>
+    handleRemoveMechAddress(mechId: string,addressId: string): Promise<boolean>
 }

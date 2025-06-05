@@ -756,6 +756,26 @@ class mechService implements IMechServices {
       throw error;
     }
   }
+
+  
+  async handleRemoveMechAddress(mechId: string,addressId:string): Promise<boolean> {
+    try {
+      console.log(
+        "Enterd in the handleRemoveMechAddress in the mechService",
+        mechId,addressId
+      );
+      const result = await this.mechRepository.handleRemoveMechAddress(
+        mechId,addressId
+      );
+      return result;
+    } catch (error) {
+      console.log(
+        "Error occured in thehandleRemoveMechAddress function in mech service ",
+        error
+      );
+      throw error;
+    }
+  }
 }
 
 export default mechService;
