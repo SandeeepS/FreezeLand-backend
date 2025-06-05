@@ -84,6 +84,15 @@ class ConcernRepository
             as: "serviceDetails",
           },
         },
+         {
+          $lookup: {
+            from: "orders",
+            localField: "orderId",
+            foreignField: "_id",
+            as: "orderDetails",
+          },
+        },
+
 
         { $project: { "userDetails.password": 0 } },
       ]);

@@ -62,5 +62,4 @@ userRouter.post('/report',userAuth(["user"]),async(req:Request,res:Response,next
 // userRouter.get('/report',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllreport(req,res,next));
 
 
-
 export default userRouter;
