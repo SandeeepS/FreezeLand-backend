@@ -714,43 +714,42 @@ class userController implements IUserController {
     }
   }
 
-
-    async getPresignedUrl(
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ): Promise<GetPreSignedUrlResponse | void> {
-      try {
-        const { fileName, fileType, folderName } = req.query as {
-          fileName: string;
-          fileType: string;
-          folderName: string;
-        };
-        console.log("file from the front end is ", fileName, fileType);
-        const result = await this.userServices.getPresignedUrl({
-          fileName,
-          fileType,
-          folderName,
-        });
-        console.log("presinged Url is from teh userController is ", result);
-        if (result.success === false) {
-          return res.status(400).json({
-            success: false,
-            message: "File name and type are required",
-          }) as GetPreSignedUrlResponse;
-        } else {
-          return res.status(200).json({
-            success: true,
-            uploadURL: result.uploadURL,
-            imageName: result.imageName,
-            key: result.key,
-          }) as GetPreSignedUrlResponse;
-        }
-      } catch (error) {
-        console.log(error as Error);
-        next(error);
+  async getPresignedUrl(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<GetPreSignedUrlResponse | void> {
+    try {
+      const { fileName, fileType, folderName } = req.query as {
+        fileName: string;
+        fileType: string;
+        folderName: string;
+      };
+      console.log("file from the front end is ", fileName, fileType);
+      const result = await this.userServices.getPresignedUrl({
+        fileName,
+        fileType,
+        folderName,
+      });
+      console.log("presinged Url is from teh userController is ", result);
+      if (result.success === false) {
+        return res.status(400).json({
+          success: false,
+          message: "File name and type are required",
+        }) as GetPreSignedUrlResponse;
+      } else {
+        return res.status(200).json({
+          success: true,
+          uploadURL: result.uploadURL,
+          imageName: result.imageName,
+          key: result.key,
+        }) as GetPreSignedUrlResponse;
       }
+    } catch (error) {
+      console.log(error as Error);
+      next(error);
     }
+  }
 
   //function to get the specified userComplaint using user Id
   async getUserRegisteredServiceDetailsById(
@@ -861,15 +860,48 @@ class userController implements IUserController {
     }
   }
 
-  async createReport(req:Request,res:Response,next:NextFunction){
-    try{
-      const {reportData} = req.body;
-      console.log("Datas from the frontend  in the createReportFunciton in the userController is ",reportData);
+  async createReport(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { reportData } = req.body;
+      console.log(
+        "Datas from the frontend  in the createReportFunciton in the userController is ",
+        reportData
+      );
       const result = await this.reportService.createReport(reportData);
-      res.status(200).json({success:true,result});
+      res.status(200).json({ success: true, result });
       return null;
-    }catch(error){
-      console.log("Error occured in the createReport function in the userController",error);
+    } catch (error) {
+      console.log(
+        "Error occured in the createReport function in the userController",
+        error
+      );
+      next(error);
+    }
+  }
+
+  //funtion to remove the address
+  async handleRemoveUserAddress(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { userId, addressId } = req.body;
+      console.log("address id in the userController is", userId, addressId);
+      const result = await this.userServices.handleRemoveUserAddress(
+        userId as string,
+        addressId as string
+      );
+      if (result) {
+        res.status(200).json({ success: true, result });
+      } else {
+        res.status(200).json({ success: false });
+      }
+    } catch (error) {
+      console.log(
+        "Error occured while handling the remove Address function in the userController",
+        error
+      );
       next(error);
     }
   }

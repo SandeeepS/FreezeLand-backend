@@ -150,9 +150,6 @@ class userService implements IUserServices {
     }
   }
 
- 
-  
-
   //function to verify otp
   async verifyOTP(id: string, otp: string): Promise<verifyOTPResponse> {
     try {
@@ -871,7 +868,9 @@ class userService implements IUserServices {
     }
   }
 
-  async getPresignedUrl(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> {
+  async getPresignedUrl(
+    data: GetPreSignedUrlDTO
+  ): Promise<GetPreSignedUrlResponse> {
     try {
       const { fileName, fileType, folderName } = data;
       if (!fileName || !fileType) {
@@ -906,6 +905,25 @@ class userService implements IUserServices {
     } catch (error) {
       console.log(
         "Error occured in the updateUserLocation function in user service ",
+        error
+      );
+      throw error;
+    }
+  }
+
+  async handleRemoveUserAddress(userId: string,addressId:string): Promise<boolean> {
+    try {
+      console.log(
+        "Enterd in the handleRemoveUserAddress in the userService",
+        userId,addressId
+      );
+      const result = await this.userRepository.handleRemoveUserAddress(
+        userId,addressId
+      );
+      return result;
+    } catch (error) {
+      console.log(
+        "Error occured in thehandleRemoveUserAddress function in user service ",
         error
       );
       throw error;

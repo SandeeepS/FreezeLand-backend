@@ -9,6 +9,7 @@ const AddressSchema = new Schema({
   pin: { type: Number, require: true },
   district: { type: String, require: true },
   landMark: { type: String, require: true },
+  isDeleted:{type:Boolean,default:false},
 });
 
 const LocationDataSchema = new Schema({

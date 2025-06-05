@@ -68,5 +68,9 @@ export interface IUserServices {
     updateUserLocation(data : IupdateUserLocation):Promise<IupdateUserLocationResponse | null>
     resendOTP(data: IResendOTPData): Promise<Partial<ITempUser> | null> 
     googleLogin(data: { name: string;email: string;googlePhotoUrl: string;}): Promise<UserLoginResponse>
-getPresignedUrl(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> }
+    getPresignedUrl(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> 
+    handleRemoveUserAddress(userId: string,addressId:string): Promise<boolean>
+
+}
+
 

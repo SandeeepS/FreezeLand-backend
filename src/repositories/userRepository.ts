@@ -45,7 +45,7 @@ import {
   getMechanicDetailsResponse,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import MechModel from "../models/mechModel";
-import { Address, ITempUser, UserInterface } from "../interfaces/Model/IUser";
+import {  ITempUser, UserInterface } from "../interfaces/Model/IUser";
 import { SingUpDTO } from "../interfaces/DTOs/User/IService.dto";
 import { MechInterface } from "../interfaces/Model/IMech";
 
@@ -462,6 +462,28 @@ class UserRepository
       );
     }
   }
+
+async handleRemoveUserAddress(userId: string, addressId: string): Promise<boolean> {
+  try {
+    const result = await userModel.updateOne(
+      { _id: userId, "address._id": addressId },
+      { $set: { "address.$.isDeleted": true } }
+    );
+    
+    console.log("Result after updatin the address in the userSide ",result);
+
+    if (result.modifiedCount === 0) {
+      throw new Error("No address found or already deleted.");
+    }else{
+      return true;
+    }
+    
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error occurred while removing user address in userRepository");
+  }
+}
+
 }
 
 export default UserRepository;
