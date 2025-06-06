@@ -147,6 +147,7 @@ export class BaseRepository<T extends Searchable>
     
   ): Promise<T[] | null> {
     try {
+      console.log("Regex in the baserepo",regex);
       return await this.model
         .find({
           isDeleted: false,

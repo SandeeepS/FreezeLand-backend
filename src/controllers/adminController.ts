@@ -80,15 +80,18 @@ class adminController implements IAdminController {
 
   async getUserList(req: Request, res: Response, next: NextFunction) {
     try {
+      const search = req.query.search as string;
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log("page is ", page);
       console.log("limit is ", limit);
+      console.log("Search is ",search);
       const data = await this.adminService.getUserList({
         page,
         limit,
         searchQuery,
+        search
       });
       console.log("usersData from the admin controller is ", data);
       res.status(OK).json(data);

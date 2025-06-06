@@ -150,7 +150,7 @@ class MechRepository
     try {
       const { page, limit, search } = data;
       console.log("Search in the mechRepository", search);
-      const regex = new RegExp(search, "i");
+      const regex = new RegExp(search.trim(), "i");
       const result = await this.findAll(page, limit, regex);
       console.log("mech list is ", result);
       return result as MechInterface[];

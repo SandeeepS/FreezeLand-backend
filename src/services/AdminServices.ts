@@ -78,7 +78,7 @@ class adminService implements IAdminService {
   }
 
   //function for admin login
-  async adminLogin(data: AdminLoginDTO): Promise<AdminLoginResponse>{
+  async adminLogin(data: AdminLoginDTO): Promise<AdminLoginResponse> {
     try {
       console.log("entered in the admin login");
       const { email, password } = data;
@@ -86,9 +86,12 @@ class adminService implements IAdminService {
       if (check) {
         const admin = await this.adminRepository.isAdminExist({ email });
         if (admin?.id) {
-          if (admin?.password === password){
+          if (admin?.password === password) {
             console.log("passwrod from the admin side is ", admin.password);
-            const token = this.createjwt.generateAccessToken(admin.id, admin.role);
+            const token = this.createjwt.generateAccessToken(
+              admin.id,
+              admin.role
+            );
             const refreshToken = this.createjwt.generateRefreshToken(admin.id);
             console.log("admin is exist", admin);
 
@@ -147,6 +150,7 @@ class adminService implements IAdminService {
   async getUserList(data: GetUserList): Promise<GetUserListResponse> {
     try {
       let { page, limit, searchQuery } = data;
+      const { search } = data;
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
@@ -154,6 +158,7 @@ class adminService implements IAdminService {
         page,
         limit,
         searchQuery,
+        search,
       });
       if (users) {
         const searchRegex = new RegExp(searchQuery, "i");
@@ -422,7 +427,7 @@ class adminService implements IAdminService {
   async addDevice(data: AddDeviceDTO): Promise<AddNewDeviceResponse | null> {
     try {
       const { name } = data;
-      console.log("name in the addDevice in the adminService is",name);
+      console.log("name in the addDevice in the adminService is", name);
       return await this.adminRepository.addNewDevice({ name });
     } catch (error) {
       console.log("Error while adding new Device form the adminService", error);

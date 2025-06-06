@@ -204,8 +204,9 @@ class UserRepository
   //methods used in the admin side
   async getUserList(data: GetUserListDTO): Promise<GetUserListResponse[]> {
     try {
-      const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
+      const { page, limit,search } = data;
+      console.log("search ins the getUserlits , userRepo",search);
+      const regex = new RegExp(search.trim(),"i");
       const result = await this.findAll(page, limit, regex);
       console.log("users list is ", result);
       return result as UserInterface[];

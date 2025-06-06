@@ -169,6 +169,7 @@ export interface GetUserListDTO {
   page: number;
   limit: number;
   searchQuery: string;
+  search:string;
 }
 
 export interface GetUserListResponse {

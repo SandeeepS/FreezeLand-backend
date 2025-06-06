@@ -28,6 +28,7 @@ export interface GetUserList {
   page: number;
   limit: number;
   searchQuery: string | undefined;
+  search:string;
 }
 
 export interface UpdateApproveDTO{

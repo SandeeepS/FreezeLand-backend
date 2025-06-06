@@ -19,7 +19,7 @@ class DeviceRepository
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
       const { page, limit, searchQuery, search } = data;
-      const regex = new RegExp(search, "i");
+      const regex = new RegExp(search.trim(), "i");
       const result = await this.findAll(page, limit, regex);
       return result;
     } catch (error) {
