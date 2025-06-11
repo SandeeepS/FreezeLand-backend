@@ -18,7 +18,7 @@ class DeviceRepository
     data: GetAllDevicesDTO
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
-      const { page, limit, searchQuery, search } = data;
+      const { page, limit, search } = data;
       const regex = new RegExp(search.trim(), "i");
       const result = await this.findAll(page, limit, regex);
       return result;
