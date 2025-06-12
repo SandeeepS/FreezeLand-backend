@@ -152,27 +152,6 @@ const clearAuthCookies = (res: Response) => {
   res.clearCookie("user_refresh_token");
 };
 
-// Simplified refresh token function
-const refreshAccessToken = async (refreshToken: string, res: Response) => {
-  try {
-    if (!refreshToken) {
-      throw new Error("No refresh token provided");
-    }
 
-    const decoded = jwt.verifyRefreshToken(refreshToken, res);
-    if (decoded.success && decoded.decoded) {
-      const newAccessToken = jwt.generateAccessToken(
-        decoded.decoded.data,
-        decoded.decoded.role
-      );
-      return newAccessToken;
-    } else {
-      throw new Error("Invalid refresh token");
-    }
-  } catch (error) {
-    console.log("Error refreshing access token:", error);
-    return null;
-  }
-};
 
 export default userAuth;

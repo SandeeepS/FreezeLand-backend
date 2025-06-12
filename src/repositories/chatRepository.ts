@@ -34,7 +34,7 @@ class ChatRepository extends BaseRepository<IMessage & Document> implements ICha
 
       async getMessagesByRoomId(roomId:string):Promise<unknown>{
         try{
-            let roomIdObject = new  mongoose.Types.ObjectId(roomId)
+            const  roomIdObject = new  mongoose.Types.ObjectId(roomId)
             console.log("room id from the chatRepository while getting the older messages is",roomId);
             const result = await this.find({roomId:roomIdObject});
             console.log("result after getting the meessages in the userRepository",result);

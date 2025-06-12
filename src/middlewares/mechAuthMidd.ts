@@ -10,7 +10,7 @@ declare global {
   namespace Express {
     interface Request {
       mechanicId?: string;
-      mechanic?: any; // Add mechanic object to request
+      mechanic?: any;
     }
   }
 }
@@ -167,27 +167,6 @@ const clearMechanicAuthCookies = (res: Response) => {
   res.clearCookie("mech_refresh_token");
 };
 
-// Simplified refresh token function (if you still need it separately)
-const refreshMechanicAccessToken = async (refreshToken: string, res: Response) => {
-  try {
-    if (!refreshToken) {
-      throw new Error("No refresh token provided");
-    }
 
-    const decoded = jwt.verifyRefreshToken(refreshToken, res);
-    if (decoded.success && decoded.decoded) {
-      const newAccessToken = jwt.generateAccessToken(
-        decoded.decoded.data,
-        decoded.decoded.role
-      );
-      return newAccessToken;
-    } else {
-      throw new Error("Invalid refresh token");
-    }
-  } catch (error) {
-    console.error("Error refreshing mechanic access token:", error);
-    return null;
-  }
-};
 
 export default mechAuth;

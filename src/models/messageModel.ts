@@ -1,5 +1,5 @@
 // messageModel.ts
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Model } from "mongoose";
 import { IMessage } from "../interfaces/Model/IChat";
 
 const MessageSchema: Schema = new Schema({

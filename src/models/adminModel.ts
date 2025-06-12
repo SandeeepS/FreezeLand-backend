@@ -6,7 +6,7 @@ export interface AdminInterface extends Document {
   email: string;
   password: string;
   role: string;
-  wallet: Number;
+  wallet: number;
   isBlocked: boolean;
   isDeleted: boolean;
 }

@@ -1,4 +1,4 @@
-import mongoose,{Schema,Document,Model, mongo} from "mongoose";
+import mongoose,{Schema,Model} from "mongoose";
 import { IRoom } from "../interfaces/Model/IRoom";
 
 

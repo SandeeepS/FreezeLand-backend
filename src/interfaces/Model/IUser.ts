@@ -31,7 +31,7 @@ export interface UserInterface extends Document {
   address: Address[];
   defaultAddress: string;
   role: string;
-  wallet:Number
+  wallet:number;
   isBlocked: boolean;
   isDeleted: boolean;
 }
