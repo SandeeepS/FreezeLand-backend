@@ -515,7 +515,7 @@ class adminService implements IAdminService {
     limit: number,
     searchQuery: string,
     search: string
-  ): Promise<any> {
+  ): Promise<unknown> {
     try {
       console.log("reached the getAllComplaints in the adminService");
       console.log("Search in the admin service is ", search);
@@ -548,7 +548,7 @@ class adminService implements IAdminService {
   }
 
   //function to get the complaint by id
-  async getComplaintById(id: string): Promise<any> {
+  async getComplaintById(id: string): Promise<unknown> {
     try {
       console.log("reached the getComplaintById in the adminService");
       const complaint = await this.concernRepository.getComplaintDetails(id);

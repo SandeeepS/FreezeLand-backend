@@ -33,7 +33,7 @@ class ConcernRepository
       console.log("result after updation:", result);
       return result;
     } catch (error) {
-      console.log("errror occured in the concernRepository ");
+      console.log("errror occured in the concernRepository ",error);
       throw new Error("error occured while udating the worker Details");
     }
   }
@@ -182,7 +182,6 @@ class ConcernRepository
 
         if (lastEntry) {
           lastEntry.status = "cancelled";
-          lastEntry.acceptedAt = lastEntry.acceptedAt;
           lastEntry.canceledAt = now;
           lastEntry.reason = reason;
           lastEntry.canceledBy = "mechanic";

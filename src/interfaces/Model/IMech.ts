@@ -35,7 +35,7 @@ export interface MechInterface extends Document {
   };
   address: Address[];
   defaultAddress: string;
-  wallet:Number;
+  wallet:number;
   isVerified: boolean;
   isBlocked: boolean;
   isDeleted: boolean;
