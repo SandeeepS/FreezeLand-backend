@@ -34,16 +34,28 @@ app.use(
   cors({
     origin: (origin, callback) => {
       const allowedOrigins = ["https://freezeland.online", "http://localhost:5173"];
-      if (!origin || allowedOrigins.includes(origin)) {
+      
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      if (allowedOrigins.includes(origin)) {
         callback(null, origin); 
       } else {
         callback(new Error("Not allowed by CORS"));
       }
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    allowedHeaders: [
+      "Content-Type", 
+      "Authorization", 
+      "X-Requested-With",
+      "Accept",
+      "Origin"
+    ], // Add more common headers
     credentials: true,
-    exposedHeaders: ["set-cookie"]
+    exposedHeaders: ["set-cookie"],
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
   })
 );
 
