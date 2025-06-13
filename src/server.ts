@@ -23,12 +23,27 @@ const PORT: string | number = process.env.PORT || 5000;
 
 const server = http.createServer(app);
 
+// app.use(
+//   cors({
+//     origin: ["https://freezeland.online","http://localhost:5173"],
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: ["https://freezeland.online","http://localhost:5173"],
+    origin: (origin, callback) => {
+      const allowedOrigins = ["https://freezeland.online", "http://localhost:5173"];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, origin); 
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 
 
 
