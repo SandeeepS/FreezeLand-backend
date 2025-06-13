@@ -1,0 +1,30 @@
+name: CD - Deploy to Ubuntu Server
+
+on:
+  push:
+    branches:
+      - main  # or master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to server via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@3.109.237.139 << 'EOF'
+            cd ~/FreezeLand-backend
+            git pull origin main
+            docker stop freezeland-container || true
+            docker rm freezeland-container || true
+            docker build -t freezeland-backend .
+            docker run -d -p 5000:5000 --env-file .env --name freezeland-container freezeland-backend
+          EOF
