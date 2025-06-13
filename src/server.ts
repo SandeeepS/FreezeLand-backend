@@ -1,9 +1,12 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+
 import express, { Express, Request, Response } from "express";
 import http from "http";
 import errorHandlerMiddleware from "./middlewares/errorHandler";
 import cors from "cors";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import mechRoutes from "./routes/mechRoutes";
@@ -13,7 +16,6 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import configureSocket from "./config.ts/socket";
 
-dotenv.config();
 const morganFormat = ":method :url :status :response-time ms";
 const app: Express = express();
 const PORT: string | number = process.env.PORT || 5000;
@@ -21,12 +23,44 @@ const PORT: string | number = process.env.PORT || 5000;
 
 const server = http.createServer(app);
 
+// app.use(
+//   cors({
+//     origin: ["https://freezeland.online","http://localhost:5173"],
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: ["https://freezeland.online","http://localhost:5173"],
+    origin: (origin, callback) => {
+      const allowedOrigins = ["https://freezeland.online", "http://localhost:5173"];
+      
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      if (allowedOrigins.includes(origin)) {
+        callback(null, origin); 
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    allowedHeaders: [
+      "Content-Type", 
+      "Authorization", 
+      "X-Requested-With",
+      "Accept",
+      "Origin"
+    ], // Add more common headers
     credentials: true,
+    exposedHeaders: ["set-cookie"],
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
   })
 );
+
+
+
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));

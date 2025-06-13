@@ -87,8 +87,8 @@ const mechAuth = (allowedRoles: string[]) => {
         res.cookie("mech_access_token", finalAccessToken, {
           maxAge: accessTokenMaxAge,
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict' // for CSRF protection
+            secure: true, 
+            sameSite: "none",
         });
 
         // Verifyinmg  the newly generated access token

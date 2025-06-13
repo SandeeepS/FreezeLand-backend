@@ -13,7 +13,6 @@ const userAuth = (allowedRoles: string[]) => {
       console.log("entered in the userAuth");
       const accessToken = req.cookies.user_access_token;
       const refreshToken = req.cookies.user_refresh_token;
-   
 
       //  checking  refresh token exists and is valid
       if (!refreshToken) {
@@ -81,8 +80,8 @@ const userAuth = (allowedRoles: string[]) => {
         res.cookie("user_access_token", finalAccessToken, {
           maxAge: accessTokenMaxAge,
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict", // for CSRF protection
+          secure: true,
+          sameSite: "none",
         });
 
         // Verifying  the newly generated access token
@@ -151,7 +150,5 @@ const clearAuthCookies = (res: Response) => {
   res.clearCookie("user_access_token");
   res.clearCookie("user_refresh_token");
 };
-
-
 
 export default userAuth;

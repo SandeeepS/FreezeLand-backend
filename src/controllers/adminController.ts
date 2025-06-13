@@ -61,14 +61,14 @@ class adminController implements IAdminController {
           .cookie("admin_access_token", access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Set to true in production
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .cookie("admin_refresh_token", refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Set to true in production
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .json(loginStatus);
       }
@@ -86,12 +86,12 @@ class adminController implements IAdminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log("page is ", page);
       console.log("limit is ", limit);
-      console.log("Search is ",search);
+      console.log("Search is ", search);
       const data = await this.adminService.getUserList({
         page,
         limit,
         searchQuery,
-        search
+        search,
       });
       console.log("usersData from the admin controller is ", data);
       res.status(OK).json(data);
@@ -108,17 +108,17 @@ class adminController implements IAdminController {
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string | undefined;
-      console.log("page is",page);
-      console.log("limit is",limit);
+      console.log("page is", page);
+      console.log("limit is", limit);
       const data = await this.adminService.getMechList({
         page,
         limit,
         searchQuery,
         search,
       });
-      console.log("mechsData from the admin controller is ",data);
+      console.log("mechsData from the admin controller is ", data);
       res.status(OK).json(data);
-    } catch (error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
@@ -688,12 +688,14 @@ class adminController implements IAdminController {
     try {
       const { reporterRole } = req.query;
       console.log("ReporterRole in the adminController", reporterRole);
-      const result = await this.reportService.getAllReportByReporterRole(reporterRole as string);
-      console.log("Reuslt after fetching the report data ,",result);
-      if(result){
-        res.status(200).json({message:"success",result});
-      }else{
-        res.status(200).json({message:"failed"});
+      const result = await this.reportService.getAllReportByReporterRole(
+        reporterRole as string
+      );
+      console.log("Reuslt after fetching the report data ,", result);
+      if (result) {
+        res.status(200).json({ message: "success", result });
+      } else {
+        res.status(200).json({ message: "failed" });
       }
     } catch (error) {
       console.log(
@@ -709,13 +711,13 @@ class adminController implements IAdminController {
       res
         .clearCookie("admin_access_token", {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
-          sameSite: "strict",
+          secure: true,
+          sameSite: "none",
         })
         .clearCookie("admin_refresh_token", {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
-          sameSite: "strict",
+          secure: true,
+          sameSite: "none",
         });
       res.status(200).json({ success: true, message: "logout sucessfully" });
     } catch (error) {
