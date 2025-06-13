@@ -23,21 +23,14 @@ const PORT: string | number = process.env.PORT || 5000;
 
 const server = http.createServer(app);
 
-// app.use(
-//   cors({
-//     origin: ["https://freezeland.online","http://localhost:5173"],
-//     credentials: true,
-//   })
-// );
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      callback(null, origin || "*"); // Reflects the request origin
-    },
+    origin: ["https://freezeland.online","http://localhost:5173"],
     credentials: true,
   })
 );
+
+
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
