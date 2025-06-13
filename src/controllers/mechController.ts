@@ -2,10 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 
 const { BAD_REQUEST, OK, NOT_FOUND } = STATUS_CODES;
-import {
-  AddressValidation,
-
-} from "../utils/validator";
+import { AddressValidation } from "../utils/validator";
 import { IMechController } from "../interfaces/IController/IMechController";
 import {
   ForgotResentOtpResponse,
@@ -70,7 +67,7 @@ class mechController implements IMechController {
           .status(500)
           .json({ success: false, message: "An unexpected error occurred" });
       }
-      next(error)
+      next(error);
     }
   }
 
@@ -100,14 +97,14 @@ class mechController implements IMechController {
           .cookie("mech_access_token", result.access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .cookie("mech_refresh_token", result.refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .json({
             success: true,
@@ -137,7 +134,7 @@ class mechController implements IMechController {
           message: "An unexpected error occurred during verification",
         });
       }
-      next(error)
+      next(error);
     }
   }
 
@@ -175,10 +172,9 @@ class mechController implements IMechController {
         success: false,
         message: "An Error occured while resending OTP",
       });
-      next(error)
+      next(error);
     }
   }
-
 
   //for login of mechanic
   async mechLogin(req: Request, res: Response, next: NextFunction) {
@@ -213,14 +209,14 @@ class mechController implements IMechController {
           .cookie("mech_access_token", access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .cookie("mech_refresh_token", refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .json(loginStatus);
       }
@@ -245,7 +241,7 @@ class mechController implements IMechController {
           message: "please enter the email",
         }) as ForgotResentOtpResponse;
       }
-      const mech = await this.mechServices.getUserByEmail({email});
+      const mech = await this.mechServices.getUserByEmail({ email });
       if (!mech) {
         return res.status(BAD_REQUEST).json({
           success: false,
@@ -301,7 +297,11 @@ class mechController implements IMechController {
   async updateNewPasswordMech(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, mechId } = req.body;
-      console.log("passwrond and mechId in the updateNewPassword in the mechController",password,mechId);
+      console.log(
+        "passwrond and mechId in the updateNewPassword in the mechController",
+        password,
+        mechId
+      );
       const result = await this.mechServices.updateNewPassword({
         password,
         mechId,
@@ -739,13 +739,13 @@ class mechController implements IMechController {
       res
         .clearCookie("mech_access_token", {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
-          sameSite: "strict",
+           secure: true, 
+            sameSite: "none",
         })
         .clearCookie("mech_refresh_token", {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
-          sameSite: "strict",
+           secure: true, 
+            sameSite: "none",
         });
       res
         .status(200)
@@ -770,22 +770,26 @@ class mechController implements IMechController {
     }
   }
 
-
-  //function  to create report from the mechside 
-    async createReport(req:Request,res:Response,next:NextFunction) {
-    try{
-      const {reportData} = req.body;
-      console.log("Datas from the frontend  in the createReportFunciton in the mechController is ",reportData);
+  //function  to create report from the mechside
+  async createReport(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { reportData } = req.body;
+      console.log(
+        "Datas from the frontend  in the createReportFunciton in the mechController is ",
+        reportData
+      );
       const result = await this.reportService.createReport(reportData);
-      return res.status(200).json({success:true,result});
-    
-    }catch(error){
-      console.log("Error occured in the createReport function in the mechController",error);
+      return res.status(200).json({ success: true, result });
+    } catch (error) {
+      console.log(
+        "Error occured in the createReport function in the mechController",
+        error
+      );
       next(error);
     }
   }
 
-    //funtion to remove the address
+  //funtion to remove the address
   async handleRemoveMechAddress(
     req: Request,
     res: Response,

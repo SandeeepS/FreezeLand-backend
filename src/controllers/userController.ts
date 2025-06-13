@@ -98,14 +98,14 @@ class userController implements IUserController {
           .cookie("user_access_token", result.token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .cookie("user_refresh_token", result.refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .json({
             success: true,
@@ -314,14 +314,14 @@ class userController implements IUserController {
           .cookie("user_access_token", access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .cookie("user_refresh_token", refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .json(loginStatus);
       }
@@ -369,14 +369,14 @@ class userController implements IUserController {
           .cookie("user_access_token", access_token, {
             maxAge: accessTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .cookie("user_refresh_token", refresh_token, {
             maxAge: refreshTokenMaxAge,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
           })
           .json(loginStatus);
       }
@@ -841,13 +841,13 @@ class userController implements IUserController {
       res
         .clearCookie("user_access_token", {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
-          sameSite: "strict",
+          secure: true,
+          sameSite: "none",
         })
         .clearCookie("user_refresh_token", {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production", // Match the same settings as in login
-          sameSite: "strict",
+          secure: true,
+          sameSite: "none",
         });
 
       // Send a success response
