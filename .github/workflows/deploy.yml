@@ -3,7 +3,7 @@ name: CD Backend to Ubuntu
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
