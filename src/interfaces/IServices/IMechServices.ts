@@ -9,7 +9,7 @@ import {
     GetAllMechanicResponse,
     GetAllMechanicsDTO,
     getComplaintDetailsResponse,
-    getMechanicDetailsDTO,
+    IGetMechanicDetails,
     getMechanicDetailsResponse,
     GetPreSignedUrlDTO,
     GetPreSignedUrlResponse,
@@ -54,7 +54,7 @@ export interface IMechServices{
     getAllAcceptedServices (mechanicId : string) : Promise<getAllAcceptedServiceResponse[]>
     updateWorkDetails(data : IUpdateWorkDetails ) :Promise<unknown>
     getDevcies(): Promise<GetAllDevicesResponse[]>
-    getMechanicDetails(data: getMechanicDetailsDTO): Promise<getMechanicDetailsResponse | null> 
+    getMechanicDetails(data: IGetMechanicDetails): Promise<getMechanicDetailsResponse | null> 
     getS3SingUrlForMechCredinential(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> 
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string,roomId: string): Promise<getUpdatedWorkAssingnedResponse> 
     updateComplaintStatus(complaintId: string, nextStatus: string):Promise<updateCompleteStatusResponse | null>   

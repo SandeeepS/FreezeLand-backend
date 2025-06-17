@@ -7,7 +7,7 @@ import {
     GetAllDevicesResponse,
    
     getComplaintDetailsResponse,
-    getMechanicDetailsDTO,
+    IGetMechanicDetails,
     getMechanicDetailsResponse,
     GetMechByIdDTO,
     GetMechByIdResponse,
@@ -43,7 +43,7 @@ export interface IMechRepository{
     verifyMechanic(values:VerifyMechanicDTO):Promise<unknown> 
     AddService(data:AddServiceDTO):Promise<unknown>;  
     getAllDevices(): Promise<GetAllDevicesResponse[]> 
-    getMechanicDetails (data:getMechanicDetailsDTO):Promise<getMechanicDetailsResponse|null> 
+    getMechanicDetails (data:IGetMechanicDetails):Promise<getMechanicDetailsResponse|null> 
     getComplaintDetails (id:string) :Promise<getComplaintDetailsResponse[]> 
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string,roomId:string): Promise<getUpdatedWorkAssingnedResponse> 
     getAllAcceptedServices (mechanicId:string):Promise <getAllAcceptedServiceResponse[]>

@@ -23,7 +23,7 @@ export interface getComplaintDetailsResponse {
     workDetails:object;
   }
   
-  export interface GetAllUserRegisteredServicesDTO {
+  export interface IGetAllUserRegisteredServices {
   page: number;
   limit: number;
   searchQuery: string;

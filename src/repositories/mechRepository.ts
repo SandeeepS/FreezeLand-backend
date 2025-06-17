@@ -5,7 +5,7 @@ import {
   getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
   getComplaintDetailsResponse,
-  getMechanicDetailsDTO,
+  IGetMechanicDetails,
   getMechanicDetailsResponse,
   GetMechByIdDTO,
   GetMechByIdResponse,
@@ -132,7 +132,7 @@ class MechRepository
   }
 
   async getMechanicDetails(
-    data: getMechanicDetailsDTO
+    data: IGetMechanicDetails
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;

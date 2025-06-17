@@ -12,7 +12,7 @@ import {
   GetAllMechanicsDTO,
   GetAllUserRegisteredServicesResponse,
   getComplaintDetailsResponse,
-  getMechanicDetailsDTO,
+  IGetMechanicDetails,
   getMechanicDetailsResponse,
   GetPreSignedUrlDTO,
   GetPreSignedUrlResponse,
@@ -554,7 +554,7 @@ class mechService implements IMechServices {
   }
 
   async getMechanicDetails(
-    data: getMechanicDetailsDTO
+    data: IGetMechanicDetails
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;

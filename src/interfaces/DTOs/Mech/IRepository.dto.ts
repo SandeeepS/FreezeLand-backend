@@ -121,7 +121,7 @@ export interface VerifyMechanicDTO {
   employeeLicense: string;
 }
 
-export interface getMechanicDetailsDTO {
+export interface IGetMechanicDetails {
   id:string;
 }
 
@@ -331,7 +331,7 @@ export interface getAllAcceptedServiceResponse {
     isDeleted: boolean;
 }
 
-export interface getMechanicDetailsDTO {
+export interface IGetMechanicDetails {
   id:string;
 }
 
