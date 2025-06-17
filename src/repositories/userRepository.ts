@@ -46,7 +46,7 @@ import {
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import MechModel from "../models/mechModel";
 import {  ITempUser, UserInterface } from "../interfaces/Model/IUser";
-import { SingUpDTO } from "../interfaces/DTOs/User/IService.dto";
+import { ISingUp} from "../interfaces/DTOs/User/IService.dto";
 import { MechInterface } from "../interfaces/Model/IMech";
 
 class UserRepository
@@ -71,7 +71,7 @@ class UserRepository
   //creating temperory userDta
   async createTempUserData(tempUserDetails: {
     otp: string;
-    userData: SingUpDTO;
+    userData: ISingUp;
   }): Promise<ITempUser | null> {
     try {
       console.log("entered in the userRepository in userRepository");
