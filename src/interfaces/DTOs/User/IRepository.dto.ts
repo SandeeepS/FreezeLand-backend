@@ -4,7 +4,7 @@ import Iuser from "../../entityInterface/Iuser";
 import { Address, UserInterface } from "../../Model/IUser";
 import { IServices } from "../../Model/IService";
 
-export interface SaveUserDTO {
+export interface ISaveUser {
   name: string;
   password: string;
   email: string;
@@ -335,7 +335,7 @@ export interface GetServiceCountDTO {
   searchQuery: string;
 }
 
-export interface GetAllUserRegisteredServicesDTO {
+export interface IGetAllUserRegisteredServices {
   page: number;
   limit: number;
   searchQuery: string;

@@ -706,6 +706,7 @@ class adminController implements IAdminController {
     }
   }
 
+  //fucntion to logout 
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
       res

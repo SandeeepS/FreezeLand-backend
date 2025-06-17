@@ -55,7 +55,7 @@ export interface ReturnUserdataDTO {
 
 
 
-export interface SaveUserDTO {
+export interface ISaveUser {
     name:string;
     email:string;
     password:string;

@@ -3,53 +3,51 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import dotenv from "dotenv";
 import Cryptr from "cryptr";
 import {
-  UserSignUpDTO,
-  SaveUserDTO,
-  UserLoginDTO,
+  ISaveUser,
   SaveUserResponse,
   NewDetailsDTO,
   UserLoginResponse,
   EmailExistCheckResponse,
-  GetProfileDTO,
   GetProfileResponse,
-  EditUserDTO,
-  AddUserAddressDTO,
-  EditAddressDTO,
-  SetUserDefaultAddressDTO,
   GetUserByEmail,
-  GenerateTokenDTO,
   GenerateRefreshToken,
-  RegisterServiceDTO,
-  GetServicesDTO,
   GetServiceResponse,
   AddUserAddressResponse,
   EditUserResponse,
   RegisterServiceResponse,
-  UpdateNewPasswordDTO,
   UpdateNewPasswordResponse,
   EditAddressResponse,
   SetUserDefaultAddressResponse,
   getUserRegisteredServiceDetailsByIdResponse,
-  SingUpDTO,
   verifyOTPResponse,
-  GetServiceDTO,
   GetServiceResponse2,
   IPaymentData,
   IupdateUserLocation,
   IupdateUserLocationResponse,
   IResendOTPData,
-  GetPreSignedUrlDTO,
   GetPreSignedUrlResponse,
+  IUserSignUp,
+  IUserLogin,
+  IGenerateToken,
+  IGetProfile,
+  IGetServices,
+  IGetService,
+  IUpdateNewPassword,
+  IEditUser,
+  IAddUserAddress,
+  IEditAddress,
+  ISetUserDefaultAddress,
+  IRegisterService,
+  IGetPreSignedUrl,
+  getMechanicDetailsResponse,
+  IGetMechanicDetails,
+  ISingUp,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import { ICreateJWT } from "../utils/generateToken";
 import { compareInterface } from "../utils/comparePassword";
-import {
-  getMechanicDetailsDTO,
-  getMechanicDetailsResponse,
-} from "../interfaces/DTOs/Mech/IService.dto";
 import { LoginValidation, SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
 import { ITempUser } from "../interfaces/Model/IUser";
@@ -85,7 +83,7 @@ class userService implements IUserServices {
   //signup for user
 
   // UserService.ts
-  async userRegister(userData: SingUpDTO): Promise<Partial<ITempUser> | null> {
+  async userRegister(userData: ISingUp): Promise<Partial<ITempUser> | null> {
     try {
       const { email, name, phone, password, cpassword } = userData;
       const isValid = SignUpValidation(
@@ -244,7 +242,7 @@ class userService implements IUserServices {
   }
 
   async isUserExist(
-    userData: UserSignUpDTO
+    userData: IUserSignUp
   ): Promise<EmailExistCheckResponse | null> {
     try {
       const { email } = userData;
@@ -255,7 +253,7 @@ class userService implements IUserServices {
     }
   }
 
-  async saveUser(userData: SaveUserDTO): Promise<SaveUserResponse> {
+  async saveUser(userData: ISaveUser): Promise<SaveUserResponse> {
     try {
       console.log("Entered in user Service and the userData is ", userData);
       const { name, email, password, phone } = userData;
@@ -327,7 +325,7 @@ class userService implements IUserServices {
     }
   }
 
-  async userLogin(data: UserLoginDTO): Promise<UserLoginResponse> {
+  async userLogin(data: IUserLogin): Promise<UserLoginResponse> {
     try {
       console.log("entered in the user login");
       const { email, password } = data;
@@ -511,7 +509,7 @@ class userService implements IUserServices {
   }
 
   //function to generateToken
-  async generateToken(data: GenerateTokenDTO, role: string): Promise<string> {
+  async generateToken(data: IGenerateToken, role: string): Promise<string> {
     const { payload } = data;
 
     if (!payload) {
@@ -558,7 +556,7 @@ class userService implements IUserServices {
     }
   }
 
-  async getProfile(data: GetProfileDTO): Promise<GetProfileResponse> {
+  async getProfile(data: IGetProfile): Promise<GetProfileResponse> {
     try {
       const { id } = data;
       console.log("idddddddddddddddddddddd", id);
@@ -599,7 +597,7 @@ class userService implements IUserServices {
   }
 
   //getting all the services provided by the website
-  async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
+  async getServices(data: IGetServices): Promise<GetServiceResponse | null> {
     try {
       let { page, limit, searchQuery } = data;
       if (isNaN(page)) page = 1;
@@ -652,7 +650,7 @@ class userService implements IUserServices {
   }
 
   //getting the service Deatils from the service repositroy
-  async getService(data: GetServiceDTO): Promise<GetServiceResponse2 | null> {
+  async getService(data: IGetService): Promise<GetServiceResponse2 | null> {
     try {
       const { id } = data;
       console.log("reached the getService in the userService");
@@ -670,7 +668,7 @@ class userService implements IUserServices {
 
   //funtion to get mechanci details
   async getMechanicDetails(
-    data: getMechanicDetailsDTO
+    data: IGetMechanicDetails
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;
@@ -702,7 +700,7 @@ class userService implements IUserServices {
   }
 
   async updateNewPassword(
-    data: UpdateNewPasswordDTO
+    data: IUpdateNewPassword
   ): Promise<UpdateNewPasswordResponse | null> {
     try {
       const { password, userId } = data;
@@ -734,7 +732,7 @@ class userService implements IUserServices {
     }
   }
 
-  async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
+  async editUser(data: IEditUser): Promise<EditUserResponse | null> {
     try {
       const { _id, name, phone, profile_picture } = data;
       return this.userRepository.editUser({
@@ -750,7 +748,7 @@ class userService implements IUserServices {
   }
 
   async AddUserAddress(
-    data: AddUserAddressDTO
+    data: IAddUserAddress
   ): Promise<AddUserAddressResponse | null> {
     try {
       const { _id, values } = data;
@@ -770,7 +768,7 @@ class userService implements IUserServices {
     }
   }
 
-  async editAddress(data: EditAddressDTO): Promise<EditAddressResponse | null> {
+  async editAddress(data: IEditAddress): Promise<EditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
       return await this.userRepository.editAddress({ _id, addressId, values });
@@ -781,7 +779,7 @@ class userService implements IUserServices {
   }
 
   async setUserDefaultAddress(
-    data: SetUserDefaultAddressDTO
+    data: ISetUserDefaultAddress
   ): Promise<SetUserDefaultAddressResponse | null> {
     try {
       const { userId, addressId } = data;
@@ -797,7 +795,7 @@ class userService implements IUserServices {
   }
 
   async registerService(
-    data: RegisterServiceDTO
+    data: IRegisterService
   ): Promise<RegisterServiceResponse | null> {
     try {
       console.log("entered in the userService for register Service");
@@ -869,7 +867,7 @@ class userService implements IUserServices {
   }
 
   async getPresignedUrl(
-    data: GetPreSignedUrlDTO
+    data: IGetPreSignedUrl
   ): Promise<GetPreSignedUrlResponse> {
     try {
       const { fileName, fileType, folderName } = data;
@@ -911,14 +909,19 @@ class userService implements IUserServices {
     }
   }
 
-  async handleRemoveUserAddress(userId: string,addressId:string): Promise<boolean> {
+  async handleRemoveUserAddress(
+    userId: string,
+    addressId: string
+  ): Promise<boolean> {
     try {
       console.log(
         "Enterd in the handleRemoveUserAddress in the userService",
-        userId,addressId
+        userId,
+        addressId
       );
       const result = await this.userRepository.handleRemoveUserAddress(
-        userId,addressId
+        userId,
+        addressId
       );
       return result;
     } catch (error) {

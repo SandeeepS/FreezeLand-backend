@@ -4,7 +4,7 @@ import concernModel, { Iconcern } from "../models/concernModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import {
   GetAllMechanicCompletedServicesResponse,
-  GetAllUserRegisteredServicesDTO,
+  IGetAllUserRegisteredServices,
   GetAllUserRegisteredServicesResponse,
   getComplaintDetailsResponse,
   IAllComplaintDataResponse,
@@ -210,7 +210,7 @@ class ConcernRepository
 
   //function for getting all the userRegistered services
   async getAllUserRegisteredServices(
-    data: GetAllUserRegisteredServicesDTO
+    data: IGetAllUserRegisteredServices
   ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
       const { page, limit } = data;

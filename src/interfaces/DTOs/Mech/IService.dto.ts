@@ -174,7 +174,7 @@ export interface GetPreSignedUrlResponse {
   key?: string;
 }
 
-export interface getMechanicDetailsDTO {
+export interface IGetMechanicDetails{
   id: string;
 }
 
@@ -193,7 +193,7 @@ export interface getMechanicDetailsResponse {
   mechanicType: string[];
 }
 
-export interface GetAllUserRegisteredServicesDTO {
+export interface IGetAllUserRegisteredServices {
   page: number;
   limit: number;
   searchQuery: string;
@@ -281,7 +281,7 @@ export interface getAllAcceptedServiceResponse {
   isDeleted: boolean;
 }
 
-export interface getMechanicDetailsDTO {
+export interface IGetMechanicDetails {
   id: string;
 }
 

@@ -1,7 +1,7 @@
 import { Model } from "mongoose";
 import { ObjectId } from "mongodb";
 import { Iconcern } from "../../models/concernModel";
-import { RegisterServiceDTO } from "../../interfaces/DTOs/User/IService.dto";
+import { IRegisterService} from "../../interfaces/DTOs/User/IService.dto";
 
 interface Deletable {
   isDeleted: boolean;
@@ -206,7 +206,7 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  async addConcern(data: RegisterServiceDTO): Promise<T | null> {
+  async addConcern(data: IRegisterService): Promise<T | null> {
     try {
       const newConcern = new this.model(data);
       await newConcern.save();

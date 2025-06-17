@@ -8,7 +8,7 @@ import { Address, ITempUser } from "../../Model/IUser";
 import { ILoginResponse } from "../../entityInterface/ILoginResponse";
 import { IOrderData } from "../Order/IRepository";
 
-export interface SingUpDTO{
+export interface ISingUp{
   name:string;
   phone:number;
   email:string;
@@ -16,7 +16,7 @@ export interface SingUpDTO{
   cpassword:string;
 }
 
-export interface UserSignUpDTO {
+export interface IUserSignUp {
   name: string;
   password: string;
   email: string;
@@ -35,7 +35,7 @@ export interface UserSignUpDTO {
 }
 
 
-export interface GetPreSignedUrlDTO{
+export interface IGetPreSignedUrl{
   fileName:string;
   fileType:string;
   folderName:string;
@@ -50,6 +50,25 @@ export interface GetPreSignedUrlResponse {
 
 }
 
+export interface getMechanicDetailsResponse {
+  _id: Types.ObjectId | string;
+  name: string;
+  email: string;
+  phone: number;
+  role: string;
+  photo: string;
+  adharProof: string | null;
+  employeeLicense: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  isVerified: boolean;
+  mechanicType: string[];
+}
+
+export interface IGetMechanicDetails{
+  id: string;
+}
+
 
 export interface UserSignUpResponse extends Document {
   userData:Partial<ITempUser>;
@@ -61,9 +80,9 @@ export interface IResendOTPData {
   tempUserId:string
 }
 
-export interface IResendOTPResponse {
+// export interface IResendOTPResponse {
   
-}
+// }
 export interface UserLoginResponse {
   status: number;
   data: {
@@ -76,7 +95,7 @@ export interface UserLoginResponse {
   };
 }
 
-export interface SaveUserDTO {
+export interface ISaveUser {
   id?: string;
   name: string;
   email: string;
@@ -94,7 +113,7 @@ export interface SaveUserResponse {
   refresh_token?: string | undefined;
 }
 
-export interface GetServiceDTO {
+export interface IGetService {
   id: string;
 }
 
@@ -110,7 +129,7 @@ export interface GetServiceResponse2 {
   isDeleted: boolean;
 }
 
-export interface UserLoginDTO {
+export interface IUserLogin {
   email: string;
   password: string;
   role:string
@@ -177,7 +196,7 @@ export interface EmailExistCheckResponse {
   isDeleted: boolean;
 }
 
-export interface GetProfileDTO {
+export interface IGetProfile {
   id: string;
 }
 
@@ -199,13 +218,13 @@ export interface verifyOTPResponse{
   refresh_token?: string;
 }
 
-export interface GetServicesDTO {
+export interface IGetServices {
   page: number;
   limit: number;
   searchQuery: string | undefined;
 }
 
-export interface UpdateNewPasswordDTO {
+export interface IUpdateNewPassword {
   password: string;
   userId: string;
 }
@@ -240,7 +259,7 @@ export interface GetServiceResponse {
   message: string;
 }
 
-export interface EditUserDTO {
+export interface IEditUser{
   _id: string;
   name: string;
   phone: number;
@@ -268,7 +287,7 @@ export interface EditUserResponse {
   isDeleted: boolean;
 }
 
-export interface AddUserAddressDTO {
+export interface IAddUserAddress{
   _id: string;
   values: Address;
 }
@@ -278,7 +297,7 @@ export interface AddUserAddressResponse {
   values: AddAddress;
 }
 
-export interface EditAddressDTO {
+export interface IEditAddress {
   _id: string;
   addressId: string;
   values: AddAddress;
@@ -304,7 +323,7 @@ export interface EditAddressResponse {
   isDeleted: boolean;
 }
 
-export interface SetUserDefaultAddressDTO {
+export interface ISetUserDefaultAddress {
   userId: string;
   addressId: string;
 }
@@ -334,7 +353,7 @@ export interface GetUserByEmail {
   email: string;
 }
 
-export interface GenerateTokenDTO {
+export interface IGenerateToken {
   payload: string | undefined;
 }
 
@@ -342,7 +361,7 @@ export interface GenerateRefreshToken {
   payload: string | undefined;
 }
 
-export interface RegisterServiceDTO {
+export interface IRegisterService {
   _id: Types.ObjectId;
   name: string;
   image: [];

@@ -19,7 +19,7 @@ import {
   RegisterServiceDTO,
   SetUserDefaultAddressDTO,
   GetServiceCountDTO,
-  SaveUserDTO,
+  ISaveUser,
   SaveUserResponse,
   FindEmailDTO,
   FindEmailResponse,
@@ -29,7 +29,7 @@ import {
   UpdateNewPasswordResponse,
   GetUserListResponse,
   GetUserListDTO,
-  GetAllUserRegisteredServicesDTO,
+  IGetAllUserRegisteredServices,
   GetAllUserRegisteredServicesResponse,
   EditAddressResponse,
   SetUserDefaultAddressResponse,
@@ -41,12 +41,12 @@ import {
 } from "../interfaces/DTOs/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import {
-  getMechanicDetailsDTO,
+  IGetMechanicDetails,
   getMechanicDetailsResponse,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import MechModel from "../models/mechModel";
 import {  ITempUser, UserInterface } from "../interfaces/Model/IUser";
-import { SingUpDTO } from "../interfaces/DTOs/User/IService.dto";
+import { ISingUp} from "../interfaces/DTOs/User/IService.dto";
 import { MechInterface } from "../interfaces/Model/IMech";
 
 class UserRepository
@@ -64,14 +64,14 @@ class UserRepository
     this.mechanicRepository = new BaseRepository<MechInterface>(MechModel);
   }
 
-  async saveUser(newDetails: SaveUserDTO): Promise<SaveUserResponse | null> {
+  async saveUser(newDetails: ISaveUser): Promise<SaveUserResponse | null> {
     return this.save(newDetails);
   }
 
   //creating temperory userDta
   async createTempUserData(tempUserDetails: {
     otp: string;
-    userData: SingUpDTO;
+    userData: ISingUp;
   }): Promise<ITempUser | null> {
     try {
       console.log("entered in the userRepository in userRepository");
@@ -259,7 +259,7 @@ class UserRepository
 
   //function for getting all the userRegistered services
   async getAllUserRegisteredServices(
-    data: GetAllUserRegisteredServicesDTO
+    data: IGetAllUserRegisteredServices
   ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
       const { page, limit, userId } = data;
@@ -450,7 +450,7 @@ class UserRepository
 
   //funciton to find mech details
   async getMechanicDetails(
-    data: getMechanicDetailsDTO
+    data: IGetMechanicDetails
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;

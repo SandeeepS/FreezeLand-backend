@@ -52,10 +52,10 @@ app.use(
       "X-Requested-With",
       "Accept",
       "Origin"
-    ], // Add more common headers
+    ], 
     credentials: true,
     exposedHeaders: ["set-cookie"],
-    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+    optionsSuccessStatus: 200 
   })
 );
 
