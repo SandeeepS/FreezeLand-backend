@@ -5,7 +5,6 @@ import Cryptr from "cryptr";
 import {
   ISaveUser,
   SaveUserResponse,
-  NewDetailsDTO,
   UserLoginResponse,
   EmailExistCheckResponse,
   GetProfileResponse,
@@ -42,6 +41,7 @@ import {
   getMechanicDetailsResponse,
   IGetMechanicDetails,
   ISingUp,
+  INewDetails,
 } from "../interfaces/DTOs/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
@@ -187,7 +187,7 @@ class userService implements IUserServices {
           });
 
           const newPassword = cryptr.encrypt(password as string);
-          const newDetails: NewDetailsDTO = {
+          const newDetails: INewDetails = {
             name: name as string,
             password: newPassword as string,
             email: email as string,
@@ -271,7 +271,7 @@ class userService implements IUserServices {
       });
 
       const newPassword = cryptr.encrypt(password);
-      const newDetails: NewDetailsDTO = {
+      const newDetails: INewDetails = {
         name: name,
         password: newPassword,
         email: email,

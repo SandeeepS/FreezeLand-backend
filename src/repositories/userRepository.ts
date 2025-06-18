@@ -7,28 +7,25 @@ import serviceModel from "../models/serviceModel";
 import { IServices } from "../interfaces/Model/IService";
 
 import {
-  AddUserAddressDTO,
+  IAddUserAddress,
   AddUserAddressResponse,
-  GetAllServicesDTO,
+  IGetAllServices,
   GetAllServiceResponse,
-  EditAddressDTO,
-  EditUserDTO,
+  IEditAddress,
+  IEditUser,
   EditUserResponse,
-  EmailExistCheckDTO,
   EmailExistCheckResponse,
-  RegisterServiceDTO,
-  SetUserDefaultAddressDTO,
-  GetServiceCountDTO,
+  IRegisterService,
   ISaveUser,
   SaveUserResponse,
-  FindEmailDTO,
+  IFindEmail,
   FindEmailResponse,
-  GetUserByIdDTO,
+  IGetUserById,
   GetUserByIdResponse,
-  UpdateNewPasswordDTO,
+  IUpdateNewPassword,
   UpdateNewPasswordResponse,
   GetUserListResponse,
-  GetUserListDTO,
+  IGetUserList,
   IGetAllUserRegisteredServices,
   GetAllUserRegisteredServicesResponse,
   EditAddressResponse,
@@ -38,6 +35,9 @@ import {
   IupdateUserLocation,
   IupdateUserLocationResponse,
   IUpdateTempDataWithOTP,
+  IEmailExistCheck,
+  ISetUserDefaultAddress,
+  IGetServiceCount,
 } from "../interfaces/DTOs/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import {
@@ -131,7 +131,7 @@ class UserRepository
   //   }
   // }
 
-  async findEmail(data: FindEmailDTO): Promise<FindEmailResponse | null> {
+  async findEmail(data: IFindEmail): Promise<FindEmailResponse | null> {
     try {
       const { email } = data;
       const userFound = await this.findOne({ email });
@@ -150,7 +150,7 @@ class UserRepository
   }
 
   async emailExistCheck(
-    data: EmailExistCheckDTO
+    data: IEmailExistCheck
   ): Promise<EmailExistCheckResponse | null> {
     const { email } = data;
     console.log("email find in userRepsoi", email);
@@ -158,7 +158,7 @@ class UserRepository
   }
 
   async updateNewPassword(
-    data: UpdateNewPasswordDTO
+    data: IUpdateNewPassword
   ): Promise<UpdateNewPasswordResponse | null> {
     try {
       const { userId, password } = data;
@@ -177,7 +177,7 @@ class UserRepository
     }
   }
   // In UserRepository.ts
-  async getUserById(data: GetUserByIdDTO): Promise<GetUserByIdResponse | null> {
+  async getUserById(data: IGetUserById): Promise<GetUserByIdResponse | null> {
     try {
       const { id } = data;
       console.log("user id is in userRepository", id);
@@ -202,7 +202,7 @@ class UserRepository
   }
 
   //methods used in the admin side
-  async getUserList(data: GetUserListDTO): Promise<GetUserListResponse[]> {
+  async getUserList(data: IGetUserList): Promise<GetUserListResponse[]> {
     try {
       const { page, limit,search } = data;
       console.log("search ins the getUserlits , userRepo",search);
@@ -232,7 +232,7 @@ class UserRepository
 
   //for used in getting all servce provided the website
   async getAllServices(
-    data: GetAllServicesDTO
+    data: IGetAllServices
   ): Promise<GetAllServiceResponse[] | null> {
     try {
       const { page, limit, searchQuery } = data;
@@ -246,7 +246,7 @@ class UserRepository
   }
 
   //getting service count of the services provided by the website
-  async getServiceCount(data: GetServiceCountDTO): Promise<number> {
+  async getServiceCount(data: IGetServiceCount): Promise<number> {
     try {
       const { searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
@@ -350,7 +350,7 @@ class UserRepository
     }
   }
 
-  async editUser(data: EditUserDTO): Promise<EditUserResponse | null> {
+  async editUser(data: IEditUser): Promise<EditUserResponse | null> {
     try {
       console.log("data for editing userDetails is ", data);
       const qr = {
@@ -388,7 +388,7 @@ class UserRepository
   }
 
   async addAddress(
-    data: AddUserAddressDTO
+    data: IAddUserAddress
   ): Promise<AddUserAddressResponse | null> {
     try {
       const { _id, values } = data;
@@ -403,7 +403,7 @@ class UserRepository
     }
   }
 
-  async editAddress(data: EditAddressDTO): Promise<EditAddressResponse | null> {
+  async editAddress(data: IEditAddress): Promise<EditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
       const editedAddress = await this.editExistAddress(_id, addressId, values);
@@ -415,7 +415,7 @@ class UserRepository
   }
 
   async setDefaultAddress(
-    data: SetUserDefaultAddressDTO
+    data: ISetUserDefaultAddress
   ): Promise<SetUserDefaultAddressResponse | null> {
     try {
       const { userId, addressId } = data;
@@ -434,7 +434,7 @@ class UserRepository
   }
 
   async registerService(
-    data: RegisterServiceDTO
+    data: IRegisterService
   ): Promise<RegisterServiceResponse | null> {
     try {
       console.log(

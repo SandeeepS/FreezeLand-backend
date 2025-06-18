@@ -2,49 +2,49 @@ import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { compareInterface } from "../utils/comparePassword";
 import { ICreateJWT } from "../utils/generateToken";
 import {
-  AddDeviceDTO,
+  IAddDevice,
   AddNewDeviceResponse,
   AddNewServiceResponse,
-  AddserviceDTO,
-  AdminLoginDTO,
+  IAddService,
+  IAdminLogin,
   AdminLoginResponse,
-  BlockDeviceDTO,
   BlockDeviceResponse,
-  BlockMechDTO,
+  IBlockMech,
   BlockMechResponse,
-  BlockServiceDTO,
+  IBlockService,
   BlockServiceResponse,
-  BlockUserDTO,
+  IBlockUser,
   BlockUserResponse,
-  DeleteDeviceDTO,
+  IDeleteDevice,
   DeleteDeviceResponse,
-  DeleteMechDTO,
+  IDeleteMech,
   DeleteMechResponse,
-  DeleteServiceDTO,
   DeleteServiceResponse,
-  DeleteUserDTO,
+  IDeleteUser,
   DeleteUserResponse,
-  EditExistServiceDTO,
   EditExistServiceResponse,
-  GetDeviceDTO,
+  IGetDevice,
   GetDeviceResponse,
-  GetMechanicByIdDTO,
+  IGetMechanicById,
   GetMechByIdResponse,
   GetMechList,
   GetMechListResponse,
-  GetPreSignedUrlDTO,
+  IGetPreSignedUrl,
   GetPreSignedUrlResponse,
-  GetServiceDTO,
+  IGetService,
   GetServiceResponse,
   GetServiceResponse2,
-  GetServicesDTO,
+  IGetServices,
   GetUserList,
   GetUserListResponse,
-  isDeviceExistDTO,
+  IisDeviceExist,
   isDeviceExistResponse,
   IsServiceExistResponse,
-  UpdateApproveDTO,
+  IUpdateApprove,
   UpdateApproveResponse,
+  IBlockDevice,
+  IDeleteService,
+  IEditExistService,
 } from "../interfaces/DTOs/Admin/IService.dto";
 import { IAdminService } from "../interfaces/IServices/IAdminService";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
@@ -78,7 +78,7 @@ class adminService implements IAdminService {
   }
 
   //function for admin login
-  async adminLogin(data: AdminLoginDTO): Promise<AdminLoginResponse> {
+  async adminLogin(data: IAdminLogin): Promise<AdminLoginResponse> {
     try {
       console.log("entered in the admin login");
       const { email, password } = data;
@@ -208,7 +208,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async getServices(data: GetServicesDTO): Promise<GetServiceResponse | null> {
+  async getServices(data: IGetServices): Promise<GetServiceResponse | null> {
     try {
       let { page, limit, searchQuery } = data;
       const { search } = data;
@@ -237,7 +237,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async getDevcies(data: GetDeviceDTO): Promise<GetDeviceResponse> {
+  async getDevcies(data: IGetDevice): Promise<GetDeviceResponse> {
     try {
       let { page, limit, searchQuery } = data;
       const { search } = data;
@@ -265,7 +265,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async getService(data: GetServiceDTO): Promise<GetServiceResponse2 | null> {
+  async getService(data: IGetService): Promise<GetServiceResponse2 | null> {
     try {
       const { id } = data;
       console.log("reached the getService in the adminService");
@@ -282,7 +282,7 @@ class adminService implements IAdminService {
   }
 
   async getMechanicById(
-    data: GetMechanicByIdDTO
+    data: IGetMechanicById
   ): Promise<GetMechByIdResponse | null> {
     try {
       const { id } = data;
@@ -298,7 +298,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async blockUser(data: BlockUserDTO): Promise<BlockUserResponse | null> {
+  async blockUser(data: IBlockUser): Promise<BlockUserResponse | null> {
     try {
       const { userId } = data;
       return await this.adminRepository.blockUser({ userId });
@@ -308,7 +308,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async blockMech(data: BlockMechDTO): Promise<BlockMechResponse | null> {
+  async blockMech(data: IBlockMech): Promise<BlockMechResponse | null> {
     try {
       const { mechId } = data;
       return await this.adminRepository.blockMech({ mechId });
@@ -319,7 +319,7 @@ class adminService implements IAdminService {
   }
 
   async blockService(
-    data: BlockServiceDTO
+    data: IBlockService
   ): Promise<BlockServiceResponse | null> {
     try {
       const { _id } = data;
@@ -330,7 +330,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async blockDevice(data: BlockDeviceDTO): Promise<BlockDeviceResponse | null> {
+  async blockDevice(data: IBlockDevice): Promise<BlockDeviceResponse | null> {
     try {
       const { _id } = data;
       return await this.adminRepository.BlockDevice({ _id });
@@ -343,7 +343,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async deleteUser(data: DeleteUserDTO): Promise<DeleteUserResponse | null> {
+  async deleteUser(data: IDeleteUser): Promise<DeleteUserResponse | null> {
     try {
       const { userId } = data;
       return await this.adminRepository.deleteUser({ userId });
@@ -356,7 +356,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async deleteMech(data: DeleteMechDTO): Promise<DeleteMechResponse | null> {
+  async deleteMech(data: IDeleteMech): Promise<DeleteMechResponse | null> {
     try {
       const { mechId } = data;
       return await this.adminRepository.deleteMech({ mechId });
@@ -370,7 +370,7 @@ class adminService implements IAdminService {
   }
 
   async deleteService(
-    data: DeleteServiceDTO
+    data: IDeleteService
   ): Promise<DeleteServiceResponse | null> {
     try {
       const { serviceId } = data;
@@ -385,7 +385,7 @@ class adminService implements IAdminService {
   }
 
   async deleteDevice(
-    data: DeleteDeviceDTO
+    data: IDeleteDevice
   ): Promise<DeleteDeviceResponse | null> {
     try {
       const { deviceId } = data;
@@ -409,7 +409,7 @@ class adminService implements IAdminService {
     }
   }
 
-  async addService(data: AddserviceDTO): Promise<AddNewServiceResponse | null> {
+  async addService(data: IAddService): Promise<AddNewServiceResponse | null> {
     try {
       const { values } = data;
       console.log("values from the service is ", values);
@@ -424,7 +424,7 @@ class adminService implements IAdminService {
   }
 
   //adding new devices
-  async addDevice(data: AddDeviceDTO): Promise<AddNewDeviceResponse | null> {
+  async addDevice(data: IAddDevice): Promise<AddNewDeviceResponse | null> {
     try {
       const { name } = data;
       console.log("name in the addDevice in the adminService is", name);
@@ -437,7 +437,7 @@ class adminService implements IAdminService {
 
   //checking for the divce is existing or not for avoding the duplication
   async isDeviceExist(
-    data: isDeviceExistDTO
+    data: IisDeviceExist
   ): Promise<isDeviceExistResponse | null> {
     try {
       const { name } = data;
@@ -452,7 +452,7 @@ class adminService implements IAdminService {
   }
 
   async editExistingService(
-    data: EditExistServiceDTO
+    data: IEditExistService
   ): Promise<EditExistServiceResponse | null> {
     try {
       const { _id, values } = data;
@@ -464,7 +464,7 @@ class adminService implements IAdminService {
   }
 
   async updateApprove(
-    data: UpdateApproveDTO
+    data: IUpdateApprove
   ): Promise<UpdateApproveResponse | null> {
     try {
       const { id, verificationStatus } = data;
@@ -492,7 +492,7 @@ class adminService implements IAdminService {
   }
 
   //changing this generating presinged url code ot differtnt comon place
-  async getPresignedUrl(data: GetPreSignedUrlDTO) {
+  async getPresignedUrl(data: IGetPreSignedUrl) {
     try {
       const { fileName, fileType, folderName } = data;
       if (!fileName || !fileType) {

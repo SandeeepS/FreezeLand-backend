@@ -15,7 +15,7 @@ export interface MechRegistrationData {
   password: string;
   cpassword: string;
 }
-export interface SignUpMechDTO {
+export interface ISignUpMech {
   name: string;
   email: string;
   password: string;
@@ -23,7 +23,7 @@ export interface SignUpMechDTO {
   isBlocked: boolean;
   isDeleted: boolean;
 }
-export interface NewDetailsDTO {
+export interface INewDetails {
   name: string;
   password: string;
   email: string;
@@ -55,7 +55,7 @@ export interface SignUpMechResponse {
   isBlocked: boolean;
   isDeleted: boolean;
 }
-export interface SaveMechDTO {
+export interface ISaveMech {
   id?: string;
   name: string;
   email: string;
@@ -66,7 +66,7 @@ export interface SaveMechDTO {
   isDeleted?: boolean;
 }
 
-export interface EmailExitCheckDTO {
+export interface IEmailExitCheck {
   email: string;
 }
 
@@ -95,7 +95,7 @@ export interface SaveMechResponse {
 }
 
 //loging DTO and response
-export interface MechLoginDTO {
+export interface IMechLogin {
   email: string;
   password: string;
   role:string;
@@ -113,7 +113,7 @@ export interface MechLoginResponse {
   };
 }
 
-export interface UpdateNewPasswordDTO {
+export interface IUpdateNewPassword {
   password: string;
   mechId: string;
 }
@@ -130,7 +130,7 @@ export interface UpdateNewPasswordResponse {
   isDeleted?: boolean;
 }
 
-export interface GetAllMechanicsDTO {
+export interface IGetAllMechanics {
   page: number;
   limit: number;
   searchQuery: string;
@@ -151,7 +151,7 @@ export interface GetAllDevicesResponse {
   isDeleted: boolean;
 }
 
-export interface VerifyMechanicDTO {
+export interface IVerifyMechanic {
   name: string;
   id: string;
   mechanicType: string[];
@@ -160,7 +160,7 @@ export interface VerifyMechanicDTO {
   employeeLicense: string;
 }
 
-export interface GetPreSignedUrlDTO {
+export interface IGetPreSignedUrl {
   fileName: string;
   fileType: string;
   name: string;

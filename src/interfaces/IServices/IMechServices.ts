@@ -2,16 +2,16 @@
 import { IAddMechAddressResponse } from "../DTOs/Mech/IRepository.dto";
 import {
     EmailExistResponse,
-    EmailExitCheckDTO,
+    IEmailExitCheck,
     getAllAcceptedServiceResponse,
     GetAllDevicesResponse,
     GetAllMechanicCompletedServicesResponse,
     GetAllMechanicResponse,
-    GetAllMechanicsDTO,
+    IGetAllMechanics,
     getComplaintDetailsResponse,
     IGetMechanicDetails,
     getMechanicDetailsResponse,
-    GetPreSignedUrlDTO,
+    IGetPreSignedUrl,
     GetPreSignedUrlResponse,
     getUpdatedWorkAssingnedResponse,
     IAddMechAddress,
@@ -23,17 +23,17 @@ import {
     IupdateingMechanicDetailsResponse,
     IUpdateWorkDetails,
     IUpdatingMechanicDetails,
-    MechLoginDTO,
+    IMechLogin,
     MechLoginResponse,
     MechRegistrationData,
-    SaveMechDTO,
+    ISaveMech,
     SaveMechResponse,
-    SignUpMechDTO,
+    ISignUpMech,
     SignUpMechResponse,
     updateCompleteStatusResponse,
-    UpdateNewPasswordDTO,
+    IUpdateNewPassword,
     UpdateNewPasswordResponse,
-    VerifyMechanicDTO,
+    IVerifyMechanic,
     verifyOTPResponse,
   } from "../DTOs/Mech/IService.dto";
 import { ITempMech } from "../Model/IMech";
@@ -42,20 +42,20 @@ import { ITempMech } from "../Model/IMech";
 export interface IMechServices{
     mechRegistration( mechData: MechRegistrationData): Promise<Partial<ITempMech>>
     verifyOTP(id: string, otp: string): Promise<verifyOTPResponse>
-    signupMech(mechData: SignUpMechDTO): Promise<SignUpMechResponse | null>;
-    saveMech(mechData: SaveMechDTO): Promise<SaveMechResponse> ;
-    mechLogin(data: MechLoginDTO): Promise<MechLoginResponse>;
-    getUserByEmail(data: EmailExitCheckDTO):Promise<EmailExistResponse | null>;
-    getAllMechanics(data: GetAllMechanicsDTO): Promise<GetAllMechanicResponse | null>;
-    VerifyMechanic (values:VerifyMechanicDTO):Promise<unknown>
-    updateNewPassword(data: UpdateNewPasswordDTO):Promise<UpdateNewPasswordResponse | null>;
+    signupMech(mechData: ISignUpMech): Promise<SignUpMechResponse | null>;
+    saveMech(mechData: ISaveMech): Promise<SaveMechResponse> ;
+    mechLogin(data: IMechLogin): Promise<MechLoginResponse>;
+    getUserByEmail(data: IEmailExitCheck):Promise<EmailExistResponse | null>;
+    getAllMechanics(data: IGetAllMechanics): Promise<GetAllMechanicResponse | null>;
+    VerifyMechanic (values:IVerifyMechanic):Promise<unknown>
+    updateNewPassword(data: IUpdateNewPassword):Promise<UpdateNewPasswordResponse | null>;
     getAllUserRegisteredServices(page: number, limit: number, searchQuery: string,userId:string): Promise<unknown>;
     getComplaintDetails(id:string) :Promise<getComplaintDetailsResponse[] | null >
     getAllAcceptedServices (mechanicId : string) : Promise<getAllAcceptedServiceResponse[]>
     updateWorkDetails(data : IUpdateWorkDetails ) :Promise<unknown>
     getDevcies(): Promise<GetAllDevicesResponse[]>
     getMechanicDetails(data: IGetMechanicDetails): Promise<getMechanicDetailsResponse | null> 
-    getS3SingUrlForMechCredinential(data: GetPreSignedUrlDTO):Promise<GetPreSignedUrlResponse> 
+    getS3SingUrlForMechCredinential(data: IGetPreSignedUrl):Promise<GetPreSignedUrlResponse> 
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string,roomId: string): Promise<getUpdatedWorkAssingnedResponse> 
     updateComplaintStatus(complaintId: string, nextStatus: string):Promise<updateCompleteStatusResponse | null>   
     createRoom(data: ICreateRoomData): Promise<ICreateRoomResponse> 

@@ -1,6 +1,5 @@
 import  mongoose, { Types, ClientSession } from "mongoose";
-import Iuser from "../../entityInterface/Iuser";
-import { IServices } from "../../Model/IService";
+
 import { Address } from "../../Model/IMech";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
 
@@ -27,7 +26,7 @@ export interface EmailExistResponse {
   isBlocked: boolean;
   isDeleted: boolean;
 }
-export interface SaveMechDTO {
+export interface ISaveMech {
   id?: string;
   name: string;
   email: string;
@@ -49,7 +48,7 @@ export interface SaveMechResponse {
   isDeleted?: boolean;
 }
 
-export interface UpdateNewPasswordDTO {
+export interface IUpdateNewPassword {
   password: string;
   mechId: string;
 }
@@ -66,7 +65,7 @@ export interface UpdateNewPasswordResponse {
   isDeleted?: boolean;
 }
 
-export interface GetMechByIdDTO {
+export interface IGetMechById {
   id: string;
 }
 
@@ -82,7 +81,7 @@ export interface GetMechByIdResponse {
   isDeleted: boolean;
 }
 
-export interface GetMechListDTO {
+export interface IGetMechList{
   page: number;
   limit: number;
   searchQuery: string;
@@ -101,7 +100,7 @@ export interface GetMechListResponse {
   isDeleted?: boolean;
 }
 
-export interface AddServiceDTO {
+export interface IAddService {
   values: string;
 }
 
@@ -112,7 +111,7 @@ export interface GetAllDevicesResponse {
 }
 
 
-export interface VerifyMechanicDTO {
+export interface IVerifyMechanic {
   name:string;
   id:string;
   mechanicType: string[];
@@ -171,7 +170,7 @@ export interface IUpdatingMechanicDetails {
 
 export interface  IUpdateMechanicDetails {
   mechanicId:string;
-  mechanicEarning:Number;
+  mechanicEarning:number;
   dbSession: ClientSession;
 }
 
@@ -199,7 +198,7 @@ export interface IUpdatedMechnicDetails{
   photo: string;
   adharProof: string | null;
   employeeLicense: string;
-  wallet:Number;
+  wallet:number;
   isBlocked: boolean;
   isDeleted: boolean;
   isVerified: boolean;

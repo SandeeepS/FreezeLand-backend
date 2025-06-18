@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export interface GetServiceDTO {
+export interface IGetService {
   id: string;
 }
 
@@ -17,7 +17,7 @@ export interface GetServiceResponse {
   isDeleted: boolean;
 }
 
-export interface GetAllServicesDTO {
+export interface IGetAllServices {
   page: number;
   limit: number;
   searchQuery: string;
@@ -36,6 +36,6 @@ export interface GetAllServiceResponse {
   isDeleted: boolean;
 }
 
-export interface GetServiceCountDTO {
+export interface IGetServiceCount{
   searchQuery: string;
 }

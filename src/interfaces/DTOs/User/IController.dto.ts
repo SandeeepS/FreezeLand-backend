@@ -1,7 +1,7 @@
 import User from "../../entityInterface/Iuser";
 import { EmailExistCheckResponse } from "./IService.dto";
 
-export interface UserSignUpDTO{
+export interface IUserSignUp{
   
     email:string,
     name:string,
@@ -20,7 +20,7 @@ export interface GetPreSignedUrlResponse {
 
 }
 
-export interface ReturnUserdataDTO {
+export interface IReturnUserdata {
     _id: string;
     name: string;
     email: string;
@@ -31,7 +31,7 @@ export interface ReturnUserdataDTO {
     profile_picture: string;
   }
 
-  export interface EmailExistCheckDTO {
+  export interface IEmailExistCheck{
     id: string;
     name: string;
     email: string;
@@ -70,7 +70,7 @@ export interface SaveUserResponse{
     refresh_token?:string | undefined;
 }
 
-export interface EditUserDTO {
+export interface IEditUser {
     _id:string;
     name:string;
     phone:number;

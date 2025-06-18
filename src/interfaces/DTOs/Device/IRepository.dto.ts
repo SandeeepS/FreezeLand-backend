@@ -1,4 +1,4 @@
-export interface GetAllDevicesDTO {
+export interface IGetAllDevices{
     page: number;
     limit: number;
     searchQuery: string;
@@ -11,7 +11,7 @@ export interface GetAllDevicesDTO {
     isDeleted: boolean;
   }
 
-  export interface GetDeviceCountDTO {
+  export interface IGetDeviceCount {
     searchQuery: string;
   }
   

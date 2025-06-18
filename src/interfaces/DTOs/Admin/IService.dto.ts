@@ -6,7 +6,7 @@ import Service from "../../entityInterface/Iservices";
 import {  Types } from "mongoose";
 import { IServices } from "../../Model/IService";
 
-export interface AdminLoginDTO {
+export interface IAdminLogin {
   email: string;
   password: string;
   role: string;
@@ -31,7 +31,7 @@ export interface GetUserList {
   search:string;
 }
 
-export interface UpdateApproveDTO{
+export interface IUpdateApprove{
   id:string ;
   verificationStatus: string;
 }
@@ -65,7 +65,7 @@ export interface GetMechListResponse {
   message: string;
 }
 
-export interface GetServicesDTO {
+export interface IGetServices {
   page: number;
   limit: number;
   searchQuery: string | undefined;
@@ -82,7 +82,7 @@ export interface GetServiceResponse {
   message: string;
 }
 
-export interface GetDeviceDTO {
+export interface IGetDevice {
   page: number;
   limit: number;
   searchQuery: string | undefined;
@@ -98,7 +98,7 @@ export interface GetDeviceResponse {
   message: string;
 }
 
-export interface GetServiceDTO {
+export interface IGetService {
   id: string;
 }
 
@@ -114,7 +114,7 @@ export interface GetServiceResponse2 {
   isDeleted: boolean;
 }
 
-export interface GetMechanicByIdDTO {
+export interface IGetMechanicById {
   id:string;
 }
 
@@ -133,7 +133,7 @@ export interface GetMechanicByIdResponse{
     isDeleted: boolean;
 }
 
-export interface BlockUserDTO {
+export interface IBlockUser {
   userId: string;
 }
 
@@ -158,7 +158,7 @@ export interface BlockUserResponse {
   isDeleted: boolean;
 }
 
-export interface BlockMechDTO {
+export interface IBlockMech {
   mechId: string;
 }
 
@@ -174,7 +174,7 @@ export interface BlockMechResponse {
   isDeleted: boolean;
 }
 
-export interface BlockServiceDTO {
+export interface IBlockService {
   _id: string;
 }
 
@@ -189,7 +189,7 @@ export interface BlockServiceResponse {
   isDeleted: boolean;
 }
 
-export interface BlockDeviceDTO {
+export interface IBlockDevice{
   _id: string;
 }
 
@@ -201,7 +201,7 @@ export interface BlockDeviceResponse{
 }
 
 
-export interface DeleteUserDTO {
+export interface IDeleteUser {
   userId: string;
 }
 
@@ -226,7 +226,7 @@ export interface DeleteUserResponse {
   isDeleted: boolean;
 }
 
-export interface DeleteMechDTO {
+export interface IDeleteMech {
   mechId: string;
 }
 
@@ -242,7 +242,7 @@ export interface DeleteMechResponse {
   isDeleted: boolean;
 }
 
-export interface DeleteServiceDTO {
+export interface  IDeleteService{
   serviceId: string;
 }
 
@@ -257,7 +257,7 @@ export interface DeleteServiceResponse {
   isDeleted: boolean;
 }
 
-export interface DeleteDeviceDTO {
+export interface  IDeleteDevice {
   deviceId: string;
 }
 
@@ -279,7 +279,7 @@ export interface IsServiceExistResponse{
   isDeleted: boolean;
 }
 
-export interface AddserviceDTO {
+export interface IAddService {
   values: string;
 }
 export interface AddNewServiceResponse {
@@ -293,7 +293,7 @@ export interface AddNewServiceResponse {
   isDeleted: boolean;
 }
 
-export interface AddDeviceDTO {
+export interface  IAddDevice {
   name: string;
 }
 
@@ -303,7 +303,7 @@ export interface AddNewDeviceResponse{
   isDeleted: boolean;
 }
 
-export interface isDeviceExistDTO {
+export interface IisDeviceExist {
   name: string;
 }
 
@@ -313,7 +313,7 @@ export interface isDeviceExistResponse{
   isDeleted: boolean;
 }
 
-export interface EditExistServiceDTO {
+export interface IEditExistService{
   _id: string;
   values: IServices;
 }
@@ -329,7 +329,7 @@ export interface EditExistServiceResponse{
   isDeleted: boolean;
 }
 
-export interface GetPreSignedUrlDTO{
+export interface IGetPreSignedUrl{
   fileName:string;
   fileType:string;
   folderName:string;

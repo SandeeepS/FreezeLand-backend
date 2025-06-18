@@ -11,7 +11,7 @@ export interface ISaveUser {
   phone?: number;
 }
 
-export interface createTempUserDataDTO {
+export interface IcreateTempUserData {
   name: string;
   phone: string;
   password: string;
@@ -27,7 +27,7 @@ export interface UserSignUpResponse extends Document {
   _id:Types.ObjectId;
 }
 
-export interface createTempUserDataDTOResponse {
+export interface IcreateTempUserDataResponse {
   name: string;
   phone: string;
   password: string;
@@ -58,7 +58,7 @@ export interface SaveUserResponse {
   isDeleted: boolean;
 }
 
-export interface FindEmailDTO {
+export interface IFindEmail {
   email: string;
 }
 
@@ -88,7 +88,7 @@ export interface FindEmailResponse {
   isDeleted: boolean;
 }
 
-export interface EmailExistCheckDTO {
+export interface IEmailExistCheck{
   email: string;
 }
 
@@ -114,7 +114,7 @@ export interface EmailExistCheckResponse {
   isDeleted: boolean;
 }
 
-export interface UpdateNewPasswordDTO {
+export interface IUpdateNewPassword {
   password: string;
   userId: string;
 }
@@ -140,7 +140,7 @@ export interface UpdateNewPasswordResponse {
   isDeleted: boolean;
 }
 
-export interface GetUserByIdDTO {
+export interface IGetUserById {
   id: string;
 }
 export interface GetUserByIdResponse {
@@ -165,7 +165,7 @@ export interface GetUserByIdResponse {
   isDeleted: boolean;
 }
 
-export interface GetUserListDTO {
+export interface IGetUserList {
   page: number;
   limit: number;
   searchQuery: string;
@@ -192,7 +192,7 @@ export interface GetUserListResponse {
   isBlocked: boolean;
   isDeleted: boolean;
 }
-export interface EditUserDTO {
+export interface IEditUser {
   _id: string;
   name: string;
   phone: number;
@@ -220,7 +220,7 @@ export interface EditUserResponse {
   isDeleted: boolean;
 }
 
-export interface GetAllServicesDTO {
+export interface IGetAllServices {
   page: number;
   limit: number;
   searchQuery: string;
@@ -237,7 +237,7 @@ export interface GetAllServiceResponse {
   isDeleted: boolean;
 }
 
-export interface AddUserAddressDTO {
+export interface IAddUserAddress {
   _id: string;
   values: Address;
 }
@@ -253,7 +253,7 @@ export interface AddUserAddressResponse {
   landMark?: string;
 }
 
-export interface EditAddressDTO {
+export interface IEditAddress {
   _id: string;
   addressId: string;
   values: AddAddress;
@@ -280,7 +280,7 @@ export interface EditAddressResponse {
   isDeleted: boolean;
 }
 
-export interface SetUserDefaultAddressDTO {
+export interface ISetUserDefaultAddress {
   userId: string;
   addressId: string;
 }
@@ -305,7 +305,7 @@ export interface SetUserDefaultAddressResponse {
   isBlocked: boolean;
   isDeleted: boolean;
 }
-export interface RegisterServiceDTO {
+export interface IRegisterService {
   _id: Types.ObjectId;
   name: string;
   image: [];
@@ -331,7 +331,7 @@ export interface RegisterServiceResponse {
   isDeleted: boolean;
 }
 
-export interface GetServiceCountDTO {
+export interface IGetServiceCount{
   searchQuery: string;
 }
 

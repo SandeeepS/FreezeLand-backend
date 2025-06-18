@@ -1,7 +1,7 @@
 import { ObjectId, Types } from "mongoose";
 import { IServices } from "../../Model/IService";
 
-export interface GetAdminByIdDTO {
+export interface IGetAdminById {
   id: string;
 }
 
@@ -15,7 +15,7 @@ export interface GetAdminByIdResponse {
   isDeleted: boolean;
 }
 
-export interface IsAdminExistDTO {
+export interface IIsAdminExist {
   email: string;
 }
 
@@ -29,7 +29,7 @@ export interface IsAdminExistResponse {
   isDeleted: boolean;
 }
 
-export interface UpdateApproveDTO{
+export interface IUpdateApprove{
   id:string ;
   modifiedVerificationStatus:boolean | undefined;
 }
@@ -38,13 +38,13 @@ export interface UpdateApproveResponse{
    result : boolean;
 }
 
-export interface GetUserListDTO {
+export interface IGetUserList {
   page: number;
   limit: number;
   searchQuery: string;
 }
 
-export interface GetMechanicByIdDTO {
+export interface IGetMechanicById {
   id:string;
 }
 
@@ -84,7 +84,7 @@ export interface GetUserListResponse {
   isDeleted: boolean;
 }
 
-export interface GetMechListDTO {
+export interface IGetMechList{
   page: number;
   limit: number;
   searchQuery: string;
@@ -103,7 +103,7 @@ export interface GetMechListResponse {
   isDeleted: boolean;
 }
 
-export interface GetAllServicesDTO {
+export interface IGetAllServices {
   page: number;
   limit: number;
   searchQuery: string;
@@ -122,7 +122,7 @@ export interface GetAllServiceResponse {
   isDeleted: boolean;
 }
 
-export interface GetAllDevicesDTO {
+export interface IGetAllDevices{
   page: number;
   limit: number;
   searchQuery: string;
@@ -135,11 +135,11 @@ export interface GetAllDevicesResponse {
   isDeleted: boolean;
 }
 
-export interface GetUserCountDTO {
+export interface IGetUserCount {
   searchQuery: string;
 }
 
-export interface GetServiceDTO {
+export interface IGetService {
   id: string;
 }
 
@@ -154,7 +154,7 @@ export interface GetServiceResponse {
   isDeleted: boolean;
 }
 
-export interface EditExistServiceDTO {
+export interface IEditExistService{
   _id: string;
   values: IServices;
 }
@@ -169,7 +169,7 @@ export interface EditExistServiceResponse {
   isDeleted: boolean;
 }
 
-export interface BlockUserDTO {
+export interface IBlockUser {
   userId: string;
 }
 
@@ -194,7 +194,7 @@ export interface BlockUserResponse {
   isDeleted: boolean;
 }
 
-export interface BlockMechDTO {
+export interface IBlockMech {
   mechId: string;
 }
 
@@ -210,7 +210,7 @@ export interface BlockMechResponse {
   isDeleted: boolean;
 }
 
-export interface BlockServiceDTO {
+export interface IBlockService {
   _id: string;
 }
 
@@ -225,7 +225,7 @@ export interface BlockServiceResponse {
   isDeleted: boolean;
 }
 
-export interface BlockDeviceDTO {
+export interface IBlockDevice{
   _id: string;
 }
 
@@ -235,7 +235,7 @@ export interface BlockDeviceResponse {
   isDeleted: boolean;
 }
 
-export interface DeleteUserDTO {
+export interface IDeleteUser {
   userId: string;
 }
 export interface DeleteUserResponse {
@@ -259,7 +259,7 @@ export interface DeleteUserResponse {
   isDeleted: boolean;
 }
 
-export interface DeleteMechDTO {
+export interface IDeleteMech {
   mechId: string;
 }
 
@@ -275,7 +275,7 @@ export interface DeleteMechResponse {
   isDeleted: boolean;
 }
 
-export interface DeleteServiceDTO {
+export interface  IDeleteService{
   serviceId: string;
 }
 
@@ -289,7 +289,7 @@ export interface DeleteServiceResponse {
   isBlocked: boolean;
   isDeleted: boolean;
 }
-export interface DeleteDeviceDTO {
+export interface  IDeleteDevice {
   deviceId: string;
 }
 export interface DeleteDeviceResponse {
@@ -298,7 +298,7 @@ export interface DeleteDeviceResponse {
   isDeleted: boolean;
 }
 
-export interface IsServiceExistDTO {
+export interface IsServiceExist{
   name: string;
 }
 
@@ -313,7 +313,7 @@ export interface IsServiceExistResponse {
   isDeleted: boolean;
 }
 
-export interface IsDeviceExistDTO {
+export interface IisDeviceExist {
   name: string;
 }
 
@@ -323,7 +323,7 @@ export interface isDeviceExistResponse {
   isDeleted: boolean;
 }
 
-export interface AddNewServiceDTO {
+export interface IAddNewService {
   values: string;
 }
 
@@ -338,7 +338,7 @@ export interface AddNewServiceResponse {
   isDeleted: boolean;
 }
 
-export interface AddNewDeviceDTO {
+export interface IAddNewDevice{
   name: string;
 }
 
@@ -348,14 +348,14 @@ export interface AddNewDeviceResponse {
   isDeleted: boolean;
 }
 
-export interface GetMechCountDTO {
+export interface IGetMechCount {
   searchQuery: string;
 }
 
-export interface GetServiceCountDTO {
+export interface IGetServiceCount{
   searchQuery: string;
 }
 
-export interface GetDeviceCountDTO {
+export interface IGetDeviceCount {
   searchQuery: string;
 }

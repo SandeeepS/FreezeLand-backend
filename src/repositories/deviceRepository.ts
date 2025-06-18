@@ -1,7 +1,7 @@
 import {
   GetAllDevicesDTO,
   GetAllDevicesResponse,
-  GetDeviceCountDTO,
+  IGetDeviceCount,
 } from "../interfaces/DTOs/Device/IRepository.dto";
 import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
 import deviceModel, { IDevice } from "../models/deviceModel";
@@ -28,7 +28,7 @@ class DeviceRepository
     }
   }
 
-  async getDeviceCount(data: GetDeviceCountDTO): Promise<number> {
+  async getDeviceCount(data: IGetDeviceCount): Promise<number> {
     try {
       const { searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");

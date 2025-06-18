@@ -4,17 +4,17 @@ import { compareInterface } from "../utils/comparePassword";
 import Cryptr from "cryptr";
 import {
   EmailExistResponse,
-  EmailExitCheckDTO,
+  IEmailExitCheck,
   getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
   GetAllMechanicCompletedServicesResponse,
   GetAllMechanicResponse,
-  GetAllMechanicsDTO,
+  IGetAllMechanics,
   GetAllUserRegisteredServicesResponse,
   getComplaintDetailsResponse,
   IGetMechanicDetails,
   getMechanicDetailsResponse,
-  GetPreSignedUrlDTO,
+  IGetPreSignedUrl,
   GetPreSignedUrlResponse,
   getUpdatedWorkAssingnedResponse,
   IAddMechAddress,
@@ -27,18 +27,18 @@ import {
   IupdateingMechanicDetailsResponse,
   IUpdateWorkDetails,
   IUpdatingMechanicDetails,
-  MechLoginDTO,
+  IMechLogin,
   MechLoginResponse,
   MechRegistrationData,
-  NewDetailsDTO,
-  SaveMechDTO,
+  ISaveMech,
   SaveMechResponse,
-  SignUpMechDTO,
+  ISignUpMech,
   SignUpMechResponse,
-  UpdateNewPasswordDTO,
+  IUpdateNewPassword,
   UpdateNewPasswordResponse,
-  VerifyMechanicDTO,
+  IVerifyMechanic,
   verifyOTPResponse,
+  INewDetails,
 } from "../interfaces/DTOs/Mech/IService.dto";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
@@ -145,7 +145,7 @@ class mechService implements IMechServices {
           });
 
           const newPassword = cryptr.encrypt(password as string);
-          const newDetails: NewDetailsDTO = {
+          const newDetails: INewDetails = {
             name: name as string,
             password: newPassword as string,
             email: email as string,
@@ -235,7 +235,7 @@ class mechService implements IMechServices {
 
 
   async signupMech(
-    mechData: SignUpMechDTO
+    mechData: ISignUpMech
   ): Promise<SignUpMechResponse | null> {
     try {
       const { email } = mechData;
@@ -249,7 +249,7 @@ class mechService implements IMechServices {
     }
   }
 
-  async saveMech(mechData: SaveMechDTO): Promise<SaveMechResponse> {
+  async saveMech(mechData: ISaveMech): Promise<SaveMechResponse> {
     try {
       console.log("Entered in mech Service and the mechData is ", mechData);
       const { name, email, password, phone } = mechData;
@@ -265,7 +265,7 @@ class mechService implements IMechServices {
         saltLength: 10,
       });
       const newPassword = cryptr.encrypt(password);
-      const newDetails: SaveMechDTO = {
+      const newDetails: ISaveMech = {
         name: name,
         password: newPassword,
         email: email,
@@ -306,7 +306,7 @@ class mechService implements IMechServices {
   }
 
   
-  async mechLogin(data: MechLoginDTO): Promise<MechLoginResponse> {
+  async mechLogin(data: IMechLogin): Promise<MechLoginResponse> {
     try {
       console.log("entered in the mech login");
       const { email, password } = data;
@@ -411,7 +411,7 @@ class mechService implements IMechServices {
 
 
   async getUserByEmail(
-    data: EmailExitCheckDTO
+    data: IEmailExitCheck
   ): Promise<EmailExistResponse | null> {
     try {
       const { email } = data;
@@ -423,7 +423,7 @@ class mechService implements IMechServices {
   }
 
   async getAllMechanics(
-    data: GetAllMechanicsDTO
+    data: IGetAllMechanics
   ): Promise<GetAllMechanicResponse | null> {
     try {
       const { page, limit, searchQuery } = data;
@@ -451,7 +451,7 @@ class mechService implements IMechServices {
     }
   }
 
-  async VerifyMechanic(values: VerifyMechanicDTO) {
+  async VerifyMechanic(values: IVerifyMechanic) {
     try {
       console.log("Entered in the mechService for verifiying mechanic", values);
       const response = await this.mechRepository.verifyMechanic(values);
@@ -466,7 +466,7 @@ class mechService implements IMechServices {
   }
 
   async getS3SingUrlForMechCredinential(
-    data: GetPreSignedUrlDTO
+    data: IGetPreSignedUrl
   ): Promise<GetPreSignedUrlResponse> {
     try {
       const { fileName, fileType, name } = data;
@@ -523,7 +523,7 @@ class mechService implements IMechServices {
   }
 
   async updateNewPassword(
-    data: UpdateNewPasswordDTO
+    data: IUpdateNewPassword
   ): Promise<UpdateNewPasswordResponse | null> {
     try {
       const { password, mechId } = data;

@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 import AdminService from "../services/AdminServices";
-
 import {
   AddNewServiceValidation,
   AddNewDeviceValidation,
@@ -15,8 +14,6 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
 import IReportService from "../interfaces/IServices/IReportService";
-// import { storage } from "../firebase";
-// import { ref, uploadString, getDownloadURL } from "firebase/storage";
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
 class adminController implements IAdminController {
@@ -706,7 +703,7 @@ class adminController implements IAdminController {
     }
   }
 
-  //fucntion to logout 
+  //fucntion to logout
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
       res

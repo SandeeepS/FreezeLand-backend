@@ -1,4 +1,4 @@
-import mongoose, { ClientSession } from "mongoose";
+import mongoose from "mongoose";
 
 export interface IOrderData {
   _id?: mongoose.Types.ObjectId 

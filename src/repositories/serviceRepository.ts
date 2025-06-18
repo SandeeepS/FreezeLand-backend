@@ -2,9 +2,9 @@
 
 import {
   GetAllServiceResponse,
-  GetAllServicesDTO,
+  IGetAllServices,
   GetServiceCountDTO,
-  GetServiceDTO,
+  IGetService,
   GetServiceResponse,
 } from "../interfaces/DTOs/Service/IRepository.dto";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
@@ -20,7 +20,7 @@ class ServiceRepository
     super(serviceModel);
   }
 
-  async getService(data: GetServiceDTO): Promise<GetServiceResponse | null> {
+  async getService(data: IGetService): Promise<GetServiceResponse | null> {
     try {
       const { id } = data;
       console.log("entered in the getService in the ServiceRepository and id ",id);
@@ -34,7 +34,7 @@ class ServiceRepository
   }
 
   async getAllServices(
-    data: GetAllServicesDTO
+    data: IGetAllServices
   ): Promise<GetAllServiceResponse[] | null> {
     try {
       const { page, limit, search } = data;
