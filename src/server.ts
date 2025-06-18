@@ -28,7 +28,7 @@ const server = http.createServer(app);
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = ["https://freezeland.online", "http://localhost:5173"];
+      const allowedOrigins = [ "http://localhost:5173","https://freezeland.online"];
       
       if (!origin) {
         return callback(null, true);
