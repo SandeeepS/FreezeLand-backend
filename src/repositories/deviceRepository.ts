@@ -1,6 +1,6 @@
 import {
-  GetAllDevicesDTO,
   GetAllDevicesResponse,
+  IGetAllDevices,
   IGetDeviceCount,
 } from "../interfaces/DTOs/Device/IRepository.dto";
 import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
@@ -15,7 +15,7 @@ class DeviceRepository
     super(deviceModel);
   }
   async getAllDevices(
-    data: GetAllDevicesDTO
+    data: IGetAllDevices
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
       const { page, limit, search } = data;

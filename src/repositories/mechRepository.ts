@@ -9,7 +9,6 @@ import {
   getMechanicDetailsResponse,
   IGetMechById,
   GetMechByIdResponse,
-  GetMechListDTO,
   GetMechListResponse,
   getUpdatedWorkAssingnedResponse,
   IAddMechAddress,
@@ -28,6 +27,7 @@ import {
   IUpdateNewPassword,
   UpdateNewPasswordResponse,
   IVerifyMechanic,
+  IGetMechList,
 } from "../interfaces/DTOs/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
@@ -146,7 +146,7 @@ class MechRepository
     }
   }
 
-  async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
+  async getMechList(data: IGetMechList): Promise<GetMechListResponse[]> {
     try {
       const { page, limit, search } = data;
       console.log("Search in the mechRepository", search);

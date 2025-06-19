@@ -9,7 +9,7 @@ class ChatController implements IChatController {
     this.chatServices = chatServices;
   }
 
-  async saveMessage(messageData: MessageData) {
+  async saveMessage(messageData: MessageData): Promise<unknown> {
     try {
       const savedMessage = await this.chatServices.createMessage({
         roomId: messageData.roomId,
@@ -18,16 +18,18 @@ class ChatController implements IChatController {
         sendAt: messageData.sendAt,
         senderType: messageData.senderType,
       });
-
       return savedMessage;
     } catch (error) {
-      console.error(`Error saving message to database: ${error}`);
-      throw error;
+      console.log("Erorr occured while saveMessage in the controller", error);
     }
   }
 
   //function to get the specified compliant  using compliant Id
-  async getComplaintDetails(req: Request, res: Response, next: NextFunction) {
+  async getComplaintDetails(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const { id } = req.query;
       console.log(

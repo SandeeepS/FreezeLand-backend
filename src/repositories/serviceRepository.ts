@@ -3,9 +3,9 @@
 import {
   GetAllServiceResponse,
   IGetAllServices,
-  GetServiceCountDTO,
   IGetService,
   GetServiceResponse,
+  IGetServiceCount,
 } from "../interfaces/DTOs/Service/IRepository.dto";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { IServices } from "../interfaces/Model/IService";
@@ -51,7 +51,7 @@ class ServiceRepository
     }
   }
 
-  async getServiceCount(data: GetServiceCountDTO): Promise<number> {
+  async getServiceCount(data: IGetServiceCount): Promise<number> {
     try {
       const { searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
