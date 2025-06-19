@@ -1,10 +1,8 @@
 
 import {
-    AddNewDeviceDTO,
     AddNewDeviceResponse,
     IAddNewService,
     AddNewServiceResponse,
-    BlockDeviceDTO,
     BlockDeviceResponse,
     IBlockMech,
     BlockMechResponse,
@@ -16,20 +14,22 @@ import {
     DeleteDeviceResponse,
     IDeleteMech,
     DeleteMechResponse,
-    DeleteServiceDTO,
     DeleteServiceResponse,
     IDeleteUser,
     DeleteUserResponse,
-    EditExistServiceDTO,
     EditExistServiceResponse,
     IIsAdminExist,
     IsAdminExistResponse,
     IisDeviceExist,
     isDeviceExistResponse,
-    IsServiceExistDTO,
     IsServiceExistResponse,
     IUpdateApprove,
     UpdateApproveResponse,
+    IAddNewDevice,
+    IBlockDevice,
+    IDeleteService,
+    IEditExistService,
+    IsServiceExist,
   } from "../dataContracts/Admin/IRepository.dto";
 
 export interface IAdminRepository{
@@ -38,19 +38,19 @@ export interface IAdminRepository{
     blockUser(data: IBlockUser): Promise<BlockUserResponse | null>;
     blockMech(data: IBlockMech): Promise<BlockMechResponse | null>;
     BlockService(data: IBlockService): Promise<BlockServiceResponse | null>;
-    BlockDevice(data: BlockDeviceDTO): Promise<BlockDeviceResponse | null>;
+    BlockDevice(data: IBlockDevice): Promise<BlockDeviceResponse | null>;
 
     deleteUser(data: IDeleteUser): Promise<DeleteUserResponse | null>;
     deleteMech(data: IDeleteMech): Promise<DeleteMechResponse | null>;
-    deleteService(data: DeleteServiceDTO): Promise<DeleteServiceResponse | null>;
+    deleteService(data: IDeleteService): Promise<DeleteServiceResponse | null>;
     deleteDevice(data:  IDeleteDevice): Promise<DeleteDeviceResponse | null>;
 
-    isServiceExist(data: IsServiceExistDTO): Promise<IsServiceExistResponse | null>;
+    isServiceExist(data: IsServiceExist): Promise<IsServiceExistResponse | null>;
     isDeviceExist(data: IisDeviceExist): Promise<isDeviceExistResponse | null>;
     isAdminExist(data: IIsAdminExist): Promise<IsAdminExistResponse | null>
 
     addNewServices(data: IAddNewService): Promise<AddNewServiceResponse | null>;
-    addNewDevice(data: AddNewDeviceDTO): Promise<AddNewDeviceResponse | null>;
-    editExistService(data: EditExistServiceDTO): Promise<EditExistServiceResponse | null>
+    addNewDevice(data: IAddNewDevice): Promise<AddNewDeviceResponse | null>;
+    editExistService(data: IEditExistService): Promise<EditExistServiceResponse | null>
     updateApprove (data:IUpdateApprove) : Promise<UpdateApproveResponse | null> 
 }

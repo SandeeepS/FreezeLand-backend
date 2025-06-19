@@ -11,7 +11,6 @@ import {
     getMechanicDetailsResponse,
     IGetMechById,
     GetMechByIdResponse,
-    GetMechListDTO,
     GetMechListResponse,
     getUpdatedWorkAssingnedResponse,
     IAddMechAddress,
@@ -30,6 +29,7 @@ import {
     IUpdateNewPassword,
     UpdateNewPasswordResponse,
     IVerifyMechanic,
+    IGetMechList,
   } from "../dataContracts/Mech/IRepository.dto";
 import { ITempMech } from "../Model/IMech";
 
@@ -38,7 +38,7 @@ export interface IMechRepository{
     emailExistCheck(data: EmailExitCheck): Promise<EmailExistResponse | null>;
     updateNewPassword(data: IUpdateNewPassword): Promise<UpdateNewPasswordResponse | null>;
     getMechById(data:IGetMechById): Promise<GetMechByIdResponse|null> ; 
-    getMechList(  data:GetMechListDTO): Promise<GetMechListResponse[]>; 
+    getMechList(  data:IGetMechList): Promise<GetMechListResponse[]>; 
     getMechCount(regex: RegExp): Promise<number>; 
     verifyMechanic(values:IVerifyMechanic):Promise<unknown> 
     AddService(data:IAddService):Promise<unknown>;  
