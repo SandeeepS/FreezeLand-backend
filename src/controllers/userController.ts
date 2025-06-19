@@ -13,7 +13,7 @@ import {
   ForgotResentOtpResponse,
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
-} from "../interfaces/DTOs/User/IController.dto";
+} from "../interfaces/dataContracts/User/IController.dto";
 import { IUserController } from "../interfaces/IController/IUserController";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { ICreateJWT } from "../utils/generateToken";

@@ -9,7 +9,7 @@ import { IAdminController } from "../interfaces/IController/IAdminController";
 import {
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
-} from "../interfaces/DTOs/Admin/IController.dto";
+} from "../interfaces/dataContracts/Admin/IController.dto";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";

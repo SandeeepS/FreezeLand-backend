@@ -1,5 +1,5 @@
 import {Request,Response, NextFunction } from "express";
-import { MessageData } from "../DTOs/Chat/IController";
+import { MessageData } from "../dataContracts/Chat/IController";
 
 export interface IChatController{
    saveMessage(messageData: MessageData):Promise<unknown>

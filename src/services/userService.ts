@@ -42,7 +42,7 @@ import {
   IGetMechanicDetails,
   ISingUp,
   INewDetails,
-} from "../interfaces/DTOs/User/IService.dto";
+} from "../interfaces/dataContracts/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";

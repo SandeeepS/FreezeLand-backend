@@ -1,10 +1,10 @@
 import {
-  GetAllDevicesDTO,
   GetAllDevicesResponse,
+  IGetAllDevices,
   IGetDeviceCount,
-} from "../DTOs/Device/IRepository.dto";
+} from "../dataContracts/Device/IRepository.dto";
 
 export interface IDeviceRepository {
-  getAllDevices(data: GetAllDevicesDTO): Promise<GetAllDevicesResponse[] | null>;
+  getAllDevices(data: IGetAllDevices): Promise<GetAllDevicesResponse[] | null>;
   getDeviceCount(data: IGetDeviceCount): Promise<number>;
 }

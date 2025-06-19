@@ -39,7 +39,7 @@ import {
   IVerifyMechanic,
   verifyOTPResponse,
   INewDetails,
-} from "../interfaces/DTOs/Mech/IService.dto";
+} from "../interfaces/dataContracts/Mech/IService.dto";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
@@ -48,7 +48,7 @@ import { LoginValidation, SignUpValidation } from "../utils/validator";
 import { Iemail } from "../utils/email";
 import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
-import { updateCompleteStatusResponse } from "../interfaces/DTOs/Mech/IRepository.dto";
+import { updateCompleteStatusResponse } from "../interfaces/dataContracts/Mech/IRepository.dto";
 
 
 const { OK} = STATUS_CODES;

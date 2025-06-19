@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ICreateReport, ICreateReportResponse, IGetAllReportsResponse } from "../interfaces/DTOs/Report/IRepository";
+import { ICreateReport, ICreateReportResponse, IGetAllReportsResponse } from "../interfaces/dataContracts/Report/IRepository";
 import IReportRepository from "../interfaces/IRepository/IReportRepository";
 import { IReport } from "../interfaces/Model/IReport";
 import reportModel from "../models/reportModel";

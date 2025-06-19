@@ -1,7 +1,7 @@
 import {
   ICreateRoomData,
   ICreateRoomResponse,
-} from "../interfaces/DTOs/Room/IRepository";
+} from "../interfaces/dataContracts/Room/IRepository";
 import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
 import { IRoom } from "../interfaces/Model/IRoom";
 import roomModel from "../models/roomModel";

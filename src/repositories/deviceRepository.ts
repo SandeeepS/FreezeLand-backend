@@ -2,7 +2,7 @@ import {
   GetAllDevicesResponse,
   IGetAllDevices,
   IGetDeviceCount,
-} from "../interfaces/DTOs/Device/IRepository.dto";
+} from "../interfaces/dataContracts/Device/IRepository.dto";
 import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
 import deviceModel, { IDevice } from "../models/deviceModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";

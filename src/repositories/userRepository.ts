@@ -38,15 +38,15 @@ import {
   IEmailExistCheck,
   ISetUserDefaultAddress,
   IGetServiceCount,
-} from "../interfaces/DTOs/User/IRepository.dto";
+} from "../interfaces/dataContracts/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import {
   IGetMechanicDetails,
   getMechanicDetailsResponse,
-} from "../interfaces/DTOs/Mech/IRepository.dto";
+} from "../interfaces/dataContracts/Mech/IRepository.dto";
 import MechModel from "../models/mechModel";
 import {  ITempUser, UserInterface } from "../interfaces/Model/IUser";
-import { ISingUp} from "../interfaces/DTOs/User/IService.dto";
+import { ISingUp} from "../interfaces/dataContracts/User/IService.dto";
 import { MechInterface } from "../interfaces/Model/IMech";
 
 class UserRepository

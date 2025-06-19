@@ -40,7 +40,7 @@ import {
   IEditExistService,
   IsServiceExist,
   IAddNewDevice,
-} from "../interfaces/DTOs/Admin/IRepository.dto";
+} from "../interfaces/dataContracts/Admin/IRepository.dto";
 import { IAdminRepository } from "../interfaces/IRepository/IAdminRepository";
 
 class AdminRepository

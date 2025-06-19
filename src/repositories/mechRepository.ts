@@ -28,7 +28,7 @@ import {
   UpdateNewPasswordResponse,
   IVerifyMechanic,
   IGetMechList,
-} from "../interfaces/DTOs/Mech/IRepository.dto";
+} from "../interfaces/dataContracts/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 import concernModel from "../models/concernModel";

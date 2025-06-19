@@ -6,7 +6,6 @@ import {
     IAddService,
     IAdminLogin,
     AdminLoginResponse,
-    BlockDeviceDTO,
     BlockDeviceResponse,
     IBlockMech,
     BlockMechResponse,
@@ -18,11 +17,9 @@ import {
     DeleteDeviceResponse,
     IDeleteMech,
     DeleteMechResponse,
-    DeleteServiceDTO,
     DeleteServiceResponse,
     IDeleteUser,
     DeleteUserResponse,
-    EditExistServiceDTO,
     EditExistServiceResponse,
     IGetDevice,
     GetDeviceResponse,
@@ -39,7 +36,10 @@ import {
     IsServiceExistResponse,
     IUpdateApprove,
     UpdateApproveResponse,
-  } from "../DTOs/Admin/IService.dto";
+    IBlockDevice,
+    IDeleteService,
+    IEditExistService,
+  } from "../dataContracts/Admin/IService.dto";
 
 
 export interface IAdminService {
@@ -61,14 +61,14 @@ export interface IAdminService {
         getService(data: IGetService):Promise<GetServiceResponse2 | null>;
         addService(data: IAddService):Promise<AddNewServiceResponse | null> ;
         blockService(data: IBlockService):Promise<BlockServiceResponse|null>;
-        deleteService(data: DeleteServiceDTO):Promise<DeleteServiceResponse |null>;
-        editExistingService(data: EditExistServiceDTO):Promise<EditExistServiceResponse|null> ;
+        deleteService(data: IDeleteService):Promise<DeleteServiceResponse |null>;
+        editExistingService(data: IEditExistService):Promise<EditExistServiceResponse|null> ;
         isServiceExist(name:string):Promise<IsServiceExistResponse |null> ;
     
         // Device management
         getDevcies(data: IGetDevice): Promise<GetDeviceResponse>;
         addDevice(data:  IAddDevice):Promise<AddNewDeviceResponse|null>;
-        blockDevice(data: BlockDeviceDTO):Promise<BlockDeviceResponse | null>;
+        blockDevice(data: IBlockDevice):Promise<BlockDeviceResponse | null>;
         deleteDevice(data:  IDeleteDevice):Promise<DeleteDeviceResponse|null>;
         isDeviceExist(data: IisDeviceExist):Promise<isDeviceExistResponse|null>;
         updateApprove (data:IUpdateApprove) : Promise<UpdateApproveResponse  | null>;

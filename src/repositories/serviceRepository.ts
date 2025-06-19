@@ -6,7 +6,7 @@ import {
   IGetService,
   GetServiceResponse,
   IGetServiceCount,
-} from "../interfaces/DTOs/Service/IRepository.dto";
+} from "../interfaces/dataContracts/Service/IRepository.dto";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { IServices } from "../interfaces/Model/IService";
 import serviceModel from "../models/serviceModel";

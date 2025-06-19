@@ -1,4 +1,4 @@
-import { IAllOrderDataResponse, IOrderDataResponse, IPaymentData } from "../DTOs/Order/IService";
+import { IAllOrderDataResponse, IOrderDataResponse, IPaymentData } from "../dataContracts/Order/IService";
 
 export interface IOrderService {
    createStripeSession(orderData: IPaymentData):Promise<unknown>

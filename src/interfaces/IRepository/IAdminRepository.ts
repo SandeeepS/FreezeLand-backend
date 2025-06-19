@@ -30,7 +30,7 @@ import {
     IsServiceExistResponse,
     IUpdateApprove,
     UpdateApproveResponse,
-  } from "../DTOs/Admin/IRepository.dto";
+  } from "../dataContracts/Admin/IRepository.dto";
 
 export interface IAdminRepository{
     

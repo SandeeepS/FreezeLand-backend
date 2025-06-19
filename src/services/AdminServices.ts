@@ -45,7 +45,7 @@ import {
   IBlockDevice,
   IDeleteService,
   IEditExistService,
-} from "../interfaces/DTOs/Admin/IService.dto";
+} from "../interfaces/dataContracts/Admin/IService.dto";
 import { IAdminService } from "../interfaces/IServices/IAdminService";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
 import { LoginValidation } from "../utils/validator";

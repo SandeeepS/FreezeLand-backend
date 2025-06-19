@@ -1,4 +1,4 @@
-import { IGetMechanicDetails, getMechanicDetailsResponse } from "../DTOs/Mech/IRepository.dto";
+import { IGetMechanicDetails, getMechanicDetailsResponse } from "../dataContracts/Mech/IRepository.dto";
 import {
     IAddUserAddress,
     AddUserAddressResponse,
@@ -32,7 +32,7 @@ import {
     IupdateUserLocationResponse,
     IUpdateTempDataWithOTP,
     
-  } from "../DTOs/User/IRepository.dto";
+  } from "../dataContracts/User/IRepository.dto";
 import { ITempUser } from "../Model/IUser";
 
 

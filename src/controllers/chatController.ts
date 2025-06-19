@@ -1,6 +1,6 @@
 //controller for handling chat
 import { Request, Response, NextFunction } from "express";
-import { MessageData } from "../interfaces/DTOs/Chat/IController";
+import { MessageData } from "../interfaces/dataContracts/Chat/IController";
 import IChatController from "../interfaces/IController/IChatController";
 import IChatServices from "../interfaces/IServices/IChatServices";
 

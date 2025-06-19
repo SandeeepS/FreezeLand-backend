@@ -2,7 +2,7 @@ import mongoose, { ClientSession } from "mongoose";
 import {
   IOrderData,
   IOrderDataResponse,
-} from "../interfaces/DTOs/Order/IRepository";
+} from "../interfaces/dataContracts/Order/IRepository";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 import { IOrder } from "../interfaces/Model/IOrder";
 import orderModel from "../models/orderModel";

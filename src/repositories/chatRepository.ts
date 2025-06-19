@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { MessageData, MessageDataResponse } from "../interfaces/DTOs/Chat/IRepository";
+import { MessageData, MessageDataResponse } from "../interfaces/dataContracts/Chat/IRepository";
 import IChatRepository from "../interfaces/IRepository/IChatRepository";
 import { IMessage } from "../interfaces/Model/IChat";
 import messageModel from "../models/messageModel";

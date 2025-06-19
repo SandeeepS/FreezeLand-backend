@@ -1,4 +1,4 @@
-import { ICreateReport, ICreateReportResponse, IGetAllReportsResponse } from "../DTOs/Report/IService";
+import { ICreateReport, ICreateReportResponse, IGetAllReportsResponse } from "../dataContracts/Report/IService";
 
 
 export interface IReportService {

@@ -1,4 +1,4 @@
-import { IGetMechanicDetails, getMechanicDetailsResponse } from "../DTOs/Mech/IService.dto";
+import { IGetMechanicDetails, getMechanicDetailsResponse } from "../dataContracts/Mech/IService.dto";
 import {
     ISaveUser,
     SaveUserResponse,
@@ -36,7 +36,7 @@ import {
     IEditUser,
     IGetProfile,
     IUserLogin,
-  } from "../DTOs/User/IService.dto";
+  } from "../dataContracts/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
 

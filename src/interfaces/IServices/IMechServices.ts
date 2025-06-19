@@ -1,5 +1,5 @@
 
-import { IAddMechAddressResponse } from "../DTOs/Mech/IRepository.dto";
+import { IAddMechAddressResponse } from "../dataContracts/Mech/IRepository.dto";
 import {
     EmailExistResponse,
     IEmailExitCheck,
@@ -35,7 +35,7 @@ import {
     UpdateNewPasswordResponse,
     IVerifyMechanic,
     verifyOTPResponse,
-  } from "../DTOs/Mech/IService.dto";
+  } from "../dataContracts/Mech/IService.dto";
 import { ITempMech } from "../Model/IMech";
 
 

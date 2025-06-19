@@ -30,7 +30,7 @@ import {
     IUpdateNewPassword,
     UpdateNewPasswordResponse,
     IVerifyMechanic,
-  } from "../DTOs/Mech/IRepository.dto";
+  } from "../dataContracts/Mech/IRepository.dto";
 import { ITempMech } from "../Model/IMech";
 
 export interface IMechRepository{

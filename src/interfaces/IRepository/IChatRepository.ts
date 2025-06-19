@@ -1,4 +1,4 @@
-import { MessageData, MessageDataResponse } from "../DTOs/Chat/IRepository";
+import { MessageData, MessageDataResponse } from "../dataContracts/Chat/IRepository";
 
 export interface IChatRepository{
 createMessage(messageData: MessageData):Promise<MessageDataResponse | null>

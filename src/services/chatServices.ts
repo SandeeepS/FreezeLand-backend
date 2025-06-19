@@ -2,7 +2,7 @@ import {
   getComplaintDetailsResponse,
   MessageData,
   MessageDataResponse,
-} from "../interfaces/DTOs/Chat/IServices";
+} from "../interfaces/dataContracts/Chat/IServices";
 import IChatRepository from "../interfaces/IRepository/IChatRepository";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IChatServices from "../interfaces/IServices/IChatServices";
