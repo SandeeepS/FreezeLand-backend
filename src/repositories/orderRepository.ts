@@ -16,6 +16,21 @@ class OrderRepository
     super(orderModel);
   }
 
+  async checkPaymentExist(sessionId:string):Promise<boolean> {
+    try{
+      console.log("Entered in the checkPaymentExist in the order repository ",sessionId);
+      const result = await this.findOne({orderId:sessionId});
+      if(result){
+        return true;
+      }else{
+        return false;
+      }
+    }catch(error){
+      console.log("Error while checking hte payment is exit",error);
+      throw error;
+    }
+  }
+
   async createOrder(
     orderData: IOrderData,
     dbSession: ClientSession

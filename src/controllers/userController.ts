@@ -268,6 +268,8 @@ class userController implements IUserController {
         data
       );
       const session = await this.userServices.createStripeSession(data);
+      console.log("--------------------------------------");
+      console.log("strip session from the createStripSession in the userController",session);
       if (session) {
         res.status(OK).json({ success: true, session });
       } else {

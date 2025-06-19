@@ -339,7 +339,6 @@ class UserRepository
         },
         { $project: { "userDetails.password": 0 } },
       ]);
-      console.log("User registered services:", result);
       return result as getUserRegisteredServiceDetailsByIdResponse[];
     } catch (error) {
       console.log(

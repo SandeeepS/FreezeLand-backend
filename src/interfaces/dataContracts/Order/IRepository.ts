@@ -21,6 +21,12 @@ export interface IOrderDataResponse {
   data?: IOrderData ;
 }
 
+export interface createStripSessionResponse{
+  success:boolean;
+  message:string;
+  sessionId?:string;
+}
+
 
 
 
