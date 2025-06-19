@@ -8,41 +8,39 @@ import MechRepository from "./mechRepository";
 import deviceModel, { IDevice } from "../models/deviceModel";
 import { IServices } from "../interfaces/Model/IService";
 import {
-  AddNewDeviceDTO,
   AddNewDeviceResponse,
-  AddNewServiceDTO,
+  IAddNewService,
   AddNewServiceResponse,
-  BlockDeviceDTO,
   BlockDeviceResponse,
-  BlockMechDTO,
+  IBlockMech,
   BlockMechResponse,
-  BlockServiceDTO,
+  IBlockService,
   BlockServiceResponse,
-  BlockUserDTO,
+  IBlockUser,
   BlockUserResponse,
-  DeleteDeviceDTO,
+   IDeleteDevice,
   DeleteDeviceResponse,
-  DeleteMechDTO,
+  IDeleteMech,
   DeleteMechResponse,
-  DeleteServiceDTO,
   DeleteServiceResponse,
-  DeleteUserDTO,
+  IDeleteUser,
   DeleteUserResponse,
-  EditExistServiceDTO,
   EditExistServiceResponse,
-  GetAdminByIdDTO,
+  IGetAdminById,
   GetAdminByIdResponse,
-
-
-  IsAdminExistDTO,
+  IIsAdminExist,
   IsAdminExistResponse,
-  IsDeviceExistDTO,
+  IisDeviceExist,
   isDeviceExistResponse,
-  IsServiceExistDTO,
   IsServiceExistResponse,
-  UpdateApproveDTO,
+  IUpdateApprove,
   UpdateApproveResponse,
-} from "../interfaces/DTOs/Admin/IRepository.dto";
+  IBlockDevice,
+  IDeleteService,
+  IEditExistService,
+  IsServiceExist,
+  IAddNewDevice,
+} from "../interfaces/dataContracts/Admin/IRepository.dto";
 import { IAdminRepository } from "../interfaces/IRepository/IAdminRepository";
 
 class AdminRepository
@@ -61,7 +59,7 @@ class AdminRepository
     this.deviceRepository = new BaseRepository<IDevice>(deviceModel);
   }
   async getAdminById(
-    data: GetAdminByIdDTO
+    data: IGetAdminById
   ): Promise<GetAdminByIdResponse | null> {
     try {
       const { id } = data;
@@ -74,7 +72,7 @@ class AdminRepository
   }
 
   async updateApprove(
-    data: UpdateApproveDTO
+    data: IUpdateApprove
   ): Promise<UpdateApproveResponse | null> {
     try {
       const { id, modifiedVerificationStatus } = data;
@@ -92,7 +90,7 @@ class AdminRepository
   }
 
   async isAdminExist(
-    data: IsAdminExistDTO
+    data: IIsAdminExist
   ): Promise<IsAdminExistResponse | null> {
     try {
       const { email } = data;
@@ -114,7 +112,7 @@ class AdminRepository
 
 
   async editExistService(
-    data: EditExistServiceDTO
+    data: IEditExistService
   ): Promise<EditExistServiceResponse | null> {
     try {
       const { _id, values } = data;
@@ -128,7 +126,7 @@ class AdminRepository
     }
   }
 
-  async blockUser(data: BlockUserDTO): Promise<BlockUserResponse | null> {
+  async blockUser(data: IBlockUser): Promise<BlockUserResponse | null> {
     try {
       const { userId } = data;
       const user = await this.userRepository.findById(userId);
@@ -145,7 +143,7 @@ class AdminRepository
     }
   }
 
-  async blockMech(data: BlockMechDTO): Promise<BlockMechResponse | null> {
+  async blockMech(data: IBlockMech): Promise<BlockMechResponse | null> {
     try {
       const { mechId } = data;
       const mech = await this.mechRepository.getMechById({ id: mechId });
@@ -163,7 +161,7 @@ class AdminRepository
   }
 
   async BlockService(
-    data: BlockServiceDTO
+    data: IBlockService
   ): Promise<BlockServiceResponse | null> {
     try {
       const { _id } = data;
@@ -183,7 +181,7 @@ class AdminRepository
     }
   }
 
-  async BlockDevice(data: BlockDeviceDTO): Promise<BlockDeviceResponse | null> {
+  async BlockDevice(data: IBlockDevice): Promise<BlockDeviceResponse | null> {
     try {
       const { _id } = data;
       const service = await this.deviceRepository.findById(_id);
@@ -200,7 +198,7 @@ class AdminRepository
     }
   }
 
-  async deleteUser(data: DeleteUserDTO): Promise<DeleteUserResponse | null> {
+  async deleteUser(data: IDeleteUser): Promise<DeleteUserResponse | null> {
     try {
       const { userId } = data;
       const user = await this.userRepository.findById(userId);
@@ -217,7 +215,7 @@ class AdminRepository
     }
   }
 
-  async deleteMech(data: DeleteMechDTO): Promise<DeleteMechResponse | null> {
+  async deleteMech(data: IDeleteMech): Promise<DeleteMechResponse | null> {
     try {
       const { mechId } = data;
       const mech = await this.mechRepository.findById(mechId);
@@ -235,7 +233,7 @@ class AdminRepository
   }
 
   async deleteService(
-    data: DeleteServiceDTO
+    data: IDeleteService
   ): Promise<DeleteServiceResponse | null> {
     try {
       const { serviceId } = data;
@@ -254,7 +252,7 @@ class AdminRepository
   }
 
   async deleteDevice(
-    data: DeleteDeviceDTO
+    data:  IDeleteDevice
   ): Promise<DeleteDeviceResponse | null> {
     try {
       const { deviceId } = data;
@@ -275,7 +273,7 @@ class AdminRepository
   }
 
   async isServiceExist(
-    data: IsServiceExistDTO
+    data: IsServiceExist
   ): Promise<IsServiceExistResponse | null> {
     try {
       const { name } = data;
@@ -294,7 +292,7 @@ class AdminRepository
   }
 
   async isDeviceExist(
-    data: IsDeviceExistDTO
+    data: IisDeviceExist
   ): Promise<isDeviceExistResponse | null> {
     try {
       const { name } = data;
@@ -313,7 +311,7 @@ class AdminRepository
   }
 
   async addNewServices(
-    data: AddNewServiceDTO
+    data: IAddNewService
   ): Promise<AddNewServiceResponse | null> {
     try {
       const { values } = data;
@@ -332,7 +330,7 @@ class AdminRepository
   }
 
   async addNewDevice(
-    data: AddNewDeviceDTO
+    data: IAddNewDevice
   ): Promise<AddNewDeviceResponse | null> {
     try {
       const { name } = data;

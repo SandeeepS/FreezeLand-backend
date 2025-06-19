@@ -1,5 +1,5 @@
 import { Request,Response,NextFunction } from "express";
-import { ForgotResentOtpResponse, VerifyForgotOtpMech } from "../DTOs/User/IController.dto";
+import { ForgotResentOtpResponse, VerifyForgotOtpMech } from "../dataContracts/User/IController.dto";
 
 export interface IMechController{
     mechSignup(req: Request, res: Response, next: NextFunction): Promise<void>;

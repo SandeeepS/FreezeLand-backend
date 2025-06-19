@@ -1,4 +1,4 @@
-import { GetAllMechanicCompletedServicesResponse, IGetAllUserRegisteredServices, GetAllUserRegisteredServicesResponse, getComplaintDetailsResponse, IAllComplaintDataResponse, IUpdateWorkDetails, UpdatedcomplaintWithOrderIdResponse } from "../DTOs/Concern/IRepository";
+import { GetAllMechanicCompletedServicesResponse, IGetAllUserRegisteredServices, GetAllUserRegisteredServicesResponse, getComplaintDetailsResponse, IAllComplaintDataResponse, IUpdateWorkDetails, UpdatedcomplaintWithOrderIdResponse } from "../dataContracts/Concern/IRepository";
 
 export interface IConcernRepository {
     getComplaintDetails(id: string): Promise<getComplaintDetailsResponse[]>

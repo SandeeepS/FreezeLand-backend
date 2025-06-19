@@ -1,12 +1,12 @@
 import {
   GetAllMechanicCompletedServicesResponse,
   GetAllUserRegisteredServicesResponse,
-} from "../interfaces/DTOs/Concern/IRepository";
+} from "../interfaces/dataContracts/Concern/IRepository";
 import {
   getComplaintDetailsResponse,
   IAllComplaintDataResponse,
   UpdatedcomplaintWithOrderIdResponse,
-} from "../interfaces/DTOs/Concern/IService";
+} from "../interfaces/dataContracts/Concern/IService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IConcernService from "../interfaces/IServices/IConcernService";
 

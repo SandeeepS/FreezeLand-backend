@@ -2,7 +2,7 @@ import {
   ICreateReport,
   ICreateReportResponse,
   IGetAllReportsResponse,
-} from "../interfaces/DTOs/Report/IService";
+} from "../interfaces/dataContracts/Report/IService";
 import IReportRepository from "../interfaces/IRepository/IReportRepository";
 import IReportService from "../interfaces/IServices/IReportService";
 

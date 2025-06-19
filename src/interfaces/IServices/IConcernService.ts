@@ -1,5 +1,5 @@
-import { GetAllMechanicCompletedServicesResponse, GetAllUserRegisteredServicesResponse, UpdatedcomplaintWithOrderIdResponse } from "../DTOs/Concern/IRepository";
-import { getComplaintDetailsResponse, IAllComplaintDataResponse } from "../DTOs/Concern/IService";
+import { GetAllMechanicCompletedServicesResponse, GetAllUserRegisteredServicesResponse, UpdatedcomplaintWithOrderIdResponse } from "../dataContracts/Concern/IRepository";
+import { getComplaintDetailsResponse, IAllComplaintDataResponse } from "../dataContracts/Concern/IService";
 
 export interface IConcernService {
      getAllComplaints(page:number,limit:number,searchQuery:string,search:string): Promise<IAllComplaintDataResponse[] | null>

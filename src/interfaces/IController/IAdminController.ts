@@ -1,5 +1,5 @@
 import {Request,Response, NextFunction } from "express";
-import { GetPreSignedUrlResponse } from "../DTOs/Admin/IController.dto";
+import { GetPreSignedUrlResponse } from "../dataContracts/Admin/IController.dto";
 
 export interface IAdminController{
     adminLogin( req: Request, res: Response,next: NextFunction):Promise<void>;

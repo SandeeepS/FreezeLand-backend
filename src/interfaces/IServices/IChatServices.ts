@@ -1,4 +1,4 @@
-import { getComplaintDetailsResponse, MessageData, MessageDataResponse } from "../DTOs/Chat/IServices";
+import { getComplaintDetailsResponse, MessageData, MessageDataResponse } from "../dataContracts/Chat/IServices";
 
 export interface IChatServices {
   createMessage(messageData: MessageData): Promise<MessageDataResponse | null>;

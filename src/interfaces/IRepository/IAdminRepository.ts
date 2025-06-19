@@ -2,55 +2,55 @@
 import {
     AddNewDeviceDTO,
     AddNewDeviceResponse,
-    AddNewServiceDTO,
+    IAddNewService,
     AddNewServiceResponse,
     BlockDeviceDTO,
     BlockDeviceResponse,
-    BlockMechDTO,
+    IBlockMech,
     BlockMechResponse,
-    BlockServiceDTO,
+    IBlockService,
     BlockServiceResponse,
-    BlockUserDTO,
+    IBlockUser,
     BlockUserResponse,
-    DeleteDeviceDTO,
+     IDeleteDevice,
     DeleteDeviceResponse,
-    DeleteMechDTO,
+    IDeleteMech,
     DeleteMechResponse,
     DeleteServiceDTO,
     DeleteServiceResponse,
-    DeleteUserDTO,
+    IDeleteUser,
     DeleteUserResponse,
     EditExistServiceDTO,
     EditExistServiceResponse,
-    IsAdminExistDTO,
+    IIsAdminExist,
     IsAdminExistResponse,
-    IsDeviceExistDTO,
+    IisDeviceExist,
     isDeviceExistResponse,
     IsServiceExistDTO,
     IsServiceExistResponse,
-    UpdateApproveDTO,
+    IUpdateApprove,
     UpdateApproveResponse,
-  } from "../DTOs/Admin/IRepository.dto";
+  } from "../dataContracts/Admin/IRepository.dto";
 
 export interface IAdminRepository{
     
 
-    blockUser(data: BlockUserDTO): Promise<BlockUserResponse | null>;
-    blockMech(data: BlockMechDTO): Promise<BlockMechResponse | null>;
-    BlockService(data: BlockServiceDTO): Promise<BlockServiceResponse | null>;
+    blockUser(data: IBlockUser): Promise<BlockUserResponse | null>;
+    blockMech(data: IBlockMech): Promise<BlockMechResponse | null>;
+    BlockService(data: IBlockService): Promise<BlockServiceResponse | null>;
     BlockDevice(data: BlockDeviceDTO): Promise<BlockDeviceResponse | null>;
 
-    deleteUser(data: DeleteUserDTO): Promise<DeleteUserResponse | null>;
-    deleteMech(data: DeleteMechDTO): Promise<DeleteMechResponse | null>;
+    deleteUser(data: IDeleteUser): Promise<DeleteUserResponse | null>;
+    deleteMech(data: IDeleteMech): Promise<DeleteMechResponse | null>;
     deleteService(data: DeleteServiceDTO): Promise<DeleteServiceResponse | null>;
-    deleteDevice(data: DeleteDeviceDTO): Promise<DeleteDeviceResponse | null>;
+    deleteDevice(data:  IDeleteDevice): Promise<DeleteDeviceResponse | null>;
 
     isServiceExist(data: IsServiceExistDTO): Promise<IsServiceExistResponse | null>;
-    isDeviceExist(data: IsDeviceExistDTO): Promise<isDeviceExistResponse | null>;
-    isAdminExist(data: IsAdminExistDTO): Promise<IsAdminExistResponse | null>
+    isDeviceExist(data: IisDeviceExist): Promise<isDeviceExistResponse | null>;
+    isAdminExist(data: IIsAdminExist): Promise<IsAdminExistResponse | null>
 
-    addNewServices(data: AddNewServiceDTO): Promise<AddNewServiceResponse | null>;
+    addNewServices(data: IAddNewService): Promise<AddNewServiceResponse | null>;
     addNewDevice(data: AddNewDeviceDTO): Promise<AddNewDeviceResponse | null>;
     editExistService(data: EditExistServiceDTO): Promise<EditExistServiceResponse | null>
-    updateApprove (data:UpdateApproveDTO) : Promise<UpdateApproveResponse | null> 
+    updateApprove (data:IUpdateApprove) : Promise<UpdateApproveResponse | null> 
 }

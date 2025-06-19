@@ -135,7 +135,7 @@ export interface IUserLogin {
   role:string
 }
 
-export interface ReturnUserdataDTO {
+export interface IReturnUserdata {
   _id: string;
   name: string;
   email: string;
@@ -146,14 +146,14 @@ export interface ReturnUserdataDTO {
   profile_picture: string;
 }
 
-export interface NewDetailsDTO {
+export interface INewDetails {
   name: string;
   password: string;
   email: string;
   phone: number | undefined;
 }
 
-export interface EmailExistCheckDTO {
+export interface IEmailExistCheck{
   id: string;
   name: string;
   email: string;

@@ -1,5 +1,5 @@
 import {
-  AddServiceDTO,
+  IAddService,
   EmailExistResponse,
   EmailExitCheck,
   getAllAcceptedServiceResponse,
@@ -7,9 +7,8 @@ import {
   getComplaintDetailsResponse,
   IGetMechanicDetails,
   getMechanicDetailsResponse,
-  GetMechByIdDTO,
+  IGetMechById,
   GetMechByIdResponse,
-  GetMechListDTO,
   GetMechListResponse,
   getUpdatedWorkAssingnedResponse,
   IAddMechAddress,
@@ -22,13 +21,14 @@ import {
   IUpdateTempDataWithOTP,
   IUpdatingMechanicDetails,
   MechRegistrationData,
-  SaveMechDTO,
+  ISaveMech,
   SaveMechResponse,
   updateCompleteStatusResponse,
-  UpdateNewPasswordDTO,
+  IUpdateNewPassword,
   UpdateNewPasswordResponse,
-  VerifyMechanicDTO,
-} from "../interfaces/DTOs/Mech/IRepository.dto";
+  IVerifyMechanic,
+  IGetMechList,
+} from "../interfaces/dataContracts/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 import concernModel from "../models/concernModel";
@@ -81,7 +81,7 @@ class MechRepository
     }
   }
 
-  async saveMechanic(mechData: SaveMechDTO): Promise<SaveMechResponse | null> {
+  async saveMechanic(mechData: ISaveMech): Promise<SaveMechResponse | null> {
     return this.save(mechData);
   }
 
@@ -103,7 +103,7 @@ class MechRepository
   }
 
   async updateNewPassword(
-    data: UpdateNewPasswordDTO
+    data: IUpdateNewPassword
   ): Promise<UpdateNewPasswordResponse | null> {
     try {
       const { mechId, password } = data;
@@ -122,7 +122,7 @@ class MechRepository
     }
   }
 
-  async getMechById(data: GetMechByIdDTO): Promise<GetMechByIdResponse | null> {
+  async getMechById(data: IGetMechById): Promise<GetMechByIdResponse | null> {
     try {
       return this.findById(data.id);
     } catch (error) {
@@ -146,7 +146,7 @@ class MechRepository
     }
   }
 
-  async getMechList(data: GetMechListDTO): Promise<GetMechListResponse[]> {
+  async getMechList(data: IGetMechList): Promise<GetMechListResponse[]> {
     try {
       const { page, limit, search } = data;
       console.log("Search in the mechRepository", search);
@@ -174,7 +174,7 @@ class MechRepository
     }
   }
 
-  async AddService(data: AddServiceDTO): Promise<unknown> {
+  async AddService(data: IAddService): Promise<unknown> {
     try {
       const { values } = data;
       const result = await this.addService(values);
@@ -185,7 +185,7 @@ class MechRepository
     }
   }
 
-  async verifyMechanic(values: VerifyMechanicDTO) {
+  async verifyMechanic(values: IVerifyMechanic) {
     try {
       console.log("entered in the mechRepository");
       console.log("valeu sdfsdo dso", values);

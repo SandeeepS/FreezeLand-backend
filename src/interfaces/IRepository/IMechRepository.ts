@@ -1,6 +1,6 @@
 
 import {
-    AddServiceDTO,
+    IAddService,
     EmailExistResponse,
     EmailExitCheck,
     getAllAcceptedServiceResponse,
@@ -9,7 +9,7 @@ import {
     getComplaintDetailsResponse,
     IGetMechanicDetails,
     getMechanicDetailsResponse,
-    GetMechByIdDTO,
+    IGetMechById,
     GetMechByIdResponse,
     GetMechListDTO,
     GetMechListResponse,
@@ -24,24 +24,24 @@ import {
     IUpdateTempDataWithOTP,
     IUpdatingMechanicDetails,
     MechRegistrationData,
-    SaveMechDTO,
+    ISaveMech,
     SaveMechResponse,
     updateCompleteStatusResponse,
-    UpdateNewPasswordDTO,
+    IUpdateNewPassword,
     UpdateNewPasswordResponse,
-    VerifyMechanicDTO,
-  } from "../DTOs/Mech/IRepository.dto";
+    IVerifyMechanic,
+  } from "../dataContracts/Mech/IRepository.dto";
 import { ITempMech } from "../Model/IMech";
 
 export interface IMechRepository{
-    saveMechanic(mechData: SaveMechDTO): Promise<SaveMechResponse | null>;
+    saveMechanic(mechData: ISaveMech): Promise<SaveMechResponse | null>;
     emailExistCheck(data: EmailExitCheck): Promise<EmailExistResponse | null>;
-    updateNewPassword(data: UpdateNewPasswordDTO): Promise<UpdateNewPasswordResponse | null>;
-    getMechById(data:GetMechByIdDTO): Promise<GetMechByIdResponse|null> ; 
+    updateNewPassword(data: IUpdateNewPassword): Promise<UpdateNewPasswordResponse | null>;
+    getMechById(data:IGetMechById): Promise<GetMechByIdResponse|null> ; 
     getMechList(  data:GetMechListDTO): Promise<GetMechListResponse[]>; 
     getMechCount(regex: RegExp): Promise<number>; 
-    verifyMechanic(values:VerifyMechanicDTO):Promise<unknown> 
-    AddService(data:AddServiceDTO):Promise<unknown>;  
+    verifyMechanic(values:IVerifyMechanic):Promise<unknown> 
+    AddService(data:IAddService):Promise<unknown>;  
     getAllDevices(): Promise<GetAllDevicesResponse[]> 
     getMechanicDetails (data:IGetMechanicDetails):Promise<getMechanicDetailsResponse|null> 
     getComplaintDetails (id:string) :Promise<getComplaintDetailsResponse[]> 

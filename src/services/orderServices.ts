@@ -1,10 +1,10 @@
 import Stripe from "stripe";
 import IOrderService from "../interfaces/IServices/IOrderService";
-import { IPaymentData } from "../interfaces/DTOs/User/IService.dto";
+import { IPaymentData } from "../interfaces/dataContracts/User/IService.dto";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 import {
   IOrderDataResponse,
-} from "../interfaces/DTOs/Order/IService";
+} from "../interfaces/dataContracts/Order/IService";
 import mongoose from "mongoose";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 const stripeKey = process.env.STRIPE_SECRET_KEY as string;

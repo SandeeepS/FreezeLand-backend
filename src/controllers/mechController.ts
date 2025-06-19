@@ -7,11 +7,11 @@ import { IMechController } from "../interfaces/IController/IMechController";
 import {
   ForgotResentOtpResponse,
   VerifyForgotOtpMech,
-} from "../interfaces/DTOs/User/IController.dto";
+} from "../interfaces/dataContracts/User/IController.dto";
 import {
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
-} from "../interfaces/DTOs/Mech/IController.dto";
+} from "../interfaces/dataContracts/Mech/IController.dto";
 import { compareInterface } from "../utils/comparePassword";
 import { ICreateJWT } from "../utils/generateToken";
 import { Iemail } from "../utils/email";

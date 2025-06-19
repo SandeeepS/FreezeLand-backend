@@ -1,26 +1,26 @@
-import { IGetMechanicDetails, getMechanicDetailsResponse } from "../DTOs/Mech/IRepository.dto";
+import { IGetMechanicDetails, getMechanicDetailsResponse } from "../dataContracts/Mech/IRepository.dto";
 import {
-    AddUserAddressDTO,
+    IAddUserAddress,
     AddUserAddressResponse,
-    GetAllServicesDTO,
+    IGetAllServices,
     GetAllServiceResponse,
-    EditAddressDTO,
-    EditUserDTO,
+    IEditAddress,
+    IEditUser,
     EditUserResponse,
     EmailExistCheckDTO,
     EmailExistCheckResponse,
-    RegisterServiceDTO,
+    IRegisterService,
     SetUserDefaultAddressDTO,
     GetServiceCountDTO,
     SaveUserResponse,
     ISaveUser,
     FindEmailResponse,
-    FindEmailDTO,
-    GetUserByIdDTO,
+    IFindEmail,
+    IGetUserById,
     GetUserByIdResponse,
     UpdateNewPasswordResponse,
-    UpdateNewPasswordDTO,
-    GetUserListDTO,
+    IUpdateNewPassword,
+    IGetUserList,
     GetUserListResponse,
     IGetAllUserRegisteredServices,
     GetAllUserRegisteredServicesResponse,
@@ -32,27 +32,27 @@ import {
     IupdateUserLocationResponse,
     IUpdateTempDataWithOTP,
     
-  } from "../DTOs/User/IRepository.dto";
+  } from "../dataContracts/User/IRepository.dto";
 import { ITempUser } from "../Model/IUser";
 
 
 export interface IUserRepository {
     saveUser( userData: ISaveUser): Promise<SaveUserResponse | null>;
-    findEmail(data:FindEmailDTO): Promise<FindEmailResponse | null>;
+    findEmail(data:IFindEmail): Promise<FindEmailResponse | null>;
     emailExistCheck(data: EmailExistCheckDTO): Promise<EmailExistCheckResponse | null>;
-    updateNewPassword(data:UpdateNewPasswordDTO): Promise<UpdateNewPasswordResponse | null>;
-    getUserById(data:GetUserByIdDTO): Promise<GetUserByIdResponse | null>;
-    getUserList(data:GetUserListDTO): Promise<GetUserListResponse[]> ;
+    updateNewPassword(data:IUpdateNewPassword): Promise<UpdateNewPasswordResponse | null>;
+    getUserById(data:IGetUserById): Promise<GetUserByIdResponse | null>;
+    getUserList(data:IGetUserList): Promise<GetUserListResponse[]> ;
     getUserCount(regex: RegExp): Promise<number>;
-    getAllServices(data: GetAllServicesDTO): Promise<GetAllServiceResponse[] | null>;
+    getAllServices(data: IGetAllServices): Promise<GetAllServiceResponse[] | null>;
     getServiceCount(data: GetServiceCountDTO): Promise<number>;
     getAllUserRegisteredServices(data: IGetAllUserRegisteredServices): Promise<GetAllUserRegisteredServicesResponse[] | null>;
     getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[]>
-    editUser(data: EditUserDTO): Promise<EditUserResponse | null>;
-    addAddress(data: AddUserAddressDTO): Promise<AddUserAddressResponse | null>;
-    editAddress(data: EditAddressDTO): Promise<EditAddressResponse | null>;
+    editUser(data: IEditUser): Promise<EditUserResponse | null>;
+    addAddress(data: IAddUserAddress): Promise<AddUserAddressResponse | null>;
+    editAddress(data: IEditAddress): Promise<EditAddressResponse | null>;
     setDefaultAddress(data: SetUserDefaultAddressDTO): Promise<SetUserDefaultAddressResponse| null> ;
-    registerService(data: RegisterServiceDTO):Promise<RegisterServiceResponse | null> ;
+    registerService(data: IRegisterService):Promise<RegisterServiceResponse | null> ;
     getMechanicDetails(data: IGetMechanicDetails): Promise<getMechanicDetailsResponse | null>
     createTempUserData(data: Partial<ITempUser>): Promise<Partial<ITempUser | null>>
     getTempUserData(id:string):Promise<ITempUser | null>

@@ -10,7 +10,7 @@ import {
   IAllComplaintDataResponse,
   IUpdateWorkDetails,
   UpdatedcomplaintWithOrderIdResponse,
-} from "../interfaces/DTOs/Concern/IRepository";
+} from "../interfaces/dataContracts/Concern/IRepository";
 
 class ConcernRepository
   extends BaseRepository<Iconcern & Document>

@@ -1,8 +1,8 @@
 import {
-  GetAllDevicesDTO,
   GetAllDevicesResponse,
-  GetDeviceCountDTO,
-} from "../interfaces/DTOs/Device/IRepository.dto";
+  IGetAllDevices,
+  IGetDeviceCount,
+} from "../interfaces/dataContracts/Device/IRepository.dto";
 import { IDeviceRepository } from "../interfaces/IRepository/IDeviceRepository";
 import deviceModel, { IDevice } from "../models/deviceModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
@@ -15,7 +15,7 @@ class DeviceRepository
     super(deviceModel);
   }
   async getAllDevices(
-    data: GetAllDevicesDTO
+    data: IGetAllDevices
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
       const { page, limit, search } = data;
@@ -28,7 +28,7 @@ class DeviceRepository
     }
   }
 
-  async getDeviceCount(data: GetDeviceCountDTO): Promise<number> {
+  async getDeviceCount(data: IGetDeviceCount): Promise<number> {
     try {
       const { searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");

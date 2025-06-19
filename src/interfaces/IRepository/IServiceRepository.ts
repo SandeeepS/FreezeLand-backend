@@ -1,15 +1,15 @@
 import {
   GetAllServiceResponse,
-  GetAllServicesDTO,
-  GetServiceCountDTO,
-  GetServiceDTO,
+  IGetAllServices,
+  IGetService,
   GetServiceResponse,
-} from "../DTOs/Service/IRepository.dto";
+  IGetServiceCount,
+} from "../dataContracts/Service/IRepository.dto";
 
 export interface IServiceRepository {
-  getService(data: GetServiceDTO): Promise<GetServiceResponse | null>;
-  getAllServices(data: GetAllServicesDTO): Promise<GetAllServiceResponse[] | null> 
-  getServiceCount(data: GetServiceCountDTO): Promise<number>
+  getService(data: IGetService): Promise<GetServiceResponse | null>;
+  getAllServices(data: IGetAllServices): Promise<GetAllServiceResponse[] | null> 
+  getServiceCount(data: IGetServiceCount): Promise<number>
 }
 
 

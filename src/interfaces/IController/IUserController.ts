@@ -1,5 +1,5 @@
 import { Request,Response,NextFunction } from "express";
-import { ForgotResentOtpResponse, GetImageUrlResponse } from "../DTOs/User/IController.dto";
+import { ForgotResentOtpResponse, GetImageUrlResponse } from "../dataContracts/User/IController.dto";
 
 
 export interface IUserController{

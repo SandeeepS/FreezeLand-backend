@@ -1,7 +1,7 @@
 import { Model } from "mongoose";
 import { ObjectId } from "mongodb";
 import { Iconcern } from "../../models/concernModel";
-import { IRegisterService} from "../../interfaces/DTOs/User/IService.dto";
+import { IRegisterService} from "../../interfaces/dataContracts/User/IService.dto";
 
 interface Deletable {
   isDeleted: boolean;

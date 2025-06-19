@@ -9,11 +9,11 @@ const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 import { AddressValidation } from "../utils/validator";
 import { EditUserDetailsValidator } from "../utils/validator";
 import {
-  EditUserDTO,
+  IEditUser,
   ForgotResentOtpResponse,
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
-} from "../interfaces/DTOs/User/IController.dto";
+} from "../interfaces/dataContracts/User/IController.dto";
 import { IUserController } from "../interfaces/IController/IUserController";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { ICreateJWT } from "../utils/generateToken";
@@ -431,7 +431,7 @@ class userController implements IUserController {
   async editUser(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("req bidt kdjfsfdsffh", req.body);
-      const { _id, name, phone, profile_picture }: EditUserDTO = req.body;
+      const { _id, name, phone, profile_picture }: IEditUser = req.body;
       const check = EditUserDetailsValidator(name, phone);
       if (check) {
         const editedUser = await this.userServices.editUser({
