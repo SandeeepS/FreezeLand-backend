@@ -830,7 +830,7 @@ class userService implements IUserServices {
         return {
           success:true,
           message:"payment is not exist , can proceed with payment ",
-          result:result
+          result
         }
       }
     } catch (error) {
