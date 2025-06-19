@@ -817,7 +817,22 @@ class userService implements IUserServices {
         "result in the userService for creating stripe session",
         result
       );
-      return result;
+      //herer need to check the session id is present in the current database
+   
+      const isPaymentExist = await this.orderRepository.checkPaymentExist(result.sessionId as string);
+      if(isPaymentExist){
+         return {
+           success:false,
+           message:"payment is already exist , can't commit to payment "
+          
+         }
+      }else{
+        return {
+          success:true,
+          message:"payment is not exist , can proceed with payment ",
+          result:result
+        }
+      }
     } catch (error) {
       console.log(
         "error occured while creating the stripe session in the userService",

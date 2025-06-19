@@ -7,6 +7,7 @@ import {
 } from "../interfaces/dataContracts/Order/IService";
 import mongoose from "mongoose";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
+import { createStripSessionResponse } from "../interfaces/dataContracts/Order/IRepository";
 const stripeKey = process.env.STRIPE_SECRET_KEY as string;
 const stripe = new Stripe(stripeKey);
 
@@ -53,7 +54,7 @@ class OrderServices implements IOrderService {
     };
   }
 
-  async createStripeSession(orderData: IPaymentData): Promise<unknown> {
+  async createStripeSession(orderData: IPaymentData): Promise<createStripSessionResponse> {
     try {
       console.log("Reached orderService for purchasing order");
       console.log(orderData, "orderdatatata");
