@@ -2,6 +2,8 @@ import {
   ICreateReport,
   ICreateReportResponse,
   IGetAllReportsResponse,
+  IUpdateReportStatus,
+  IUpdateReportStatusResponse,
 } from "../interfaces/dataContracts/Report/IService";
 import IReportRepository from "../interfaces/IRepository/IReportRepository";
 import IReportService from "../interfaces/IServices/IReportService";
@@ -43,6 +45,18 @@ class ReportService implements IReportService {
       }
     } catch (error) {
       console.log("error occured while getAllReporst ", error);
+      throw error;
+    }
+  }
+
+  //function to updating the existing report status
+  async updateReportStatus( data : IUpdateReportStatus ) : Promise <IUpdateReportStatusResponse | null> {
+    try{
+      const {reportId,status} = data;
+       const response = await this.reportRepository.updateReportStatus({reportId,status});
+       return response;
+    }catch(error){
+      console.log("error occured while updating the report in the updateReportService in the report Service.ts ",error);
       throw error;
     }
   }

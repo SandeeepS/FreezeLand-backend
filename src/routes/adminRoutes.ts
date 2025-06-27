@@ -53,5 +53,6 @@ adminRouter.get('/getAllComplaints',adminAuth(["admin"]),async(req:Request,res:R
 adminRouter.get('/getComplaintById/:id',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getComplaintById(req,res,next));
 adminRouter.post('/cancelComplaint',adminAuth(['admin']),async(req:Request,res:Response,next:NextFunction) => controller.cancelComplaint(req,res,next));
 adminRouter.get('/report',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllReportByReporterRole(req,res,next));
+adminRouter.put('/updateReportStatus' ,adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateReportStatus(req,res,next))
 
 export default adminRouter;
