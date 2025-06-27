@@ -255,7 +255,6 @@ class userController implements IUserController {
     }
   }
 
-  //funciton to craete Stript session
   async createStripeSession(
     req: Request,
     res: Response,

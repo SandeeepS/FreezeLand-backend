@@ -59,7 +59,7 @@ class OrderServices implements IOrderService {
     try {
       console.log("Reached orderService for purchasing order");
       console.log(orderData, "orderdatatata");
-
+      console.log("frontend url is ",FRONTEND_BASE_URL);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
