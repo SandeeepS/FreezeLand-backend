@@ -10,6 +10,7 @@ import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { createStripSessionResponse } from "../interfaces/dataContracts/Order/IRepository";
 const stripeKey = process.env.STRIPE_SECRET_KEY as string;
 const stripe = new Stripe(stripeKey);
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL
 
 export interface OrderEventData {
   orderId: string;
@@ -75,8 +76,8 @@ class OrderServices implements IOrderService {
           },
         ],
         mode: "payment",
-        success_url: `http://localhost:5173/user/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `http://localhost:5173/user/payment/failed?complaintId{orderData.complaintId}`,
+        success_url: `${FRONTEND_BASE_URL}/user/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${FRONTEND_BASE_URL}/user/payment/failed?complaintId{orderData.complaintId}`,
         metadata: {
           complaintId: orderData.complaintId,
           status: orderData.status,
