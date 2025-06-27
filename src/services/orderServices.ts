@@ -76,8 +76,8 @@ class OrderServices implements IOrderService {
           },
         ],
         mode: "payment",
-        success_url: `https://freezeland.online/user/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `https://freezeland.online/user/payment/failed?complaintId{orderData.complaintId}`,
+        success_url: `${FRONTEND_BASE_URL}/user/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${FRONTEND_BASE_URL}/user/payment/failed?complaintId{orderData.complaintId}`,
         metadata: {
           complaintId: orderData.complaintId,
           status: orderData.status,
