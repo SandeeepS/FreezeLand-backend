@@ -665,7 +665,7 @@ class adminController implements IAdminController {
         userRole,
         reason
       );
-      if (result != null) {
+      if (result != null){
         res.status(OK).json({ message: "success", result });
       } else {
         res.status(OK).json({ message: "failed to cancel complaitn" });
