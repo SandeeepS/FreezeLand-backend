@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ICreateReport, ICreateReportResponse, IGetAllReportsResponse } from "../interfaces/dataContracts/Report/IRepository";
+import { ICreateReport, ICreateReportResponse, IGetAllReportsResponse, IUpdateReportStatus, IUpdateReportStatusResponse } from "../interfaces/dataContracts/Report/IRepository";
 import IReportRepository from "../interfaces/IRepository/IReportRepository";
 import { IReport } from "../interfaces/Model/IReport";
 import reportModel from "../models/reportModel";
@@ -42,6 +42,20 @@ class ReportRepository extends BaseRepository<IReport & Document > implements IR
                 throw error;
             }
         }
+
+
+          //function to updating the existing report status
+          async updateReportStatus( data : IUpdateReportStatus ) : Promise <IUpdateReportStatusResponse | null> {
+            try{
+              const {reportId,status} = data;
+               const response = await reportModel.findByIdAndUpdate(reportId,{status:status});
+
+               return response;
+            }catch(error){
+              console.log("error occured while updating the report in the updateReportService in the report Service.ts ",error);
+              throw error;
+            }
+          }
 }
 
 export default ReportRepository;

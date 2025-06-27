@@ -703,6 +703,32 @@ class adminController implements IAdminController {
     }
   }
 
+  //function to update the report status in the admin side 
+  async updateReportStatus (req:Request,res:Response,next:NextFunction) {
+    try{
+      console.log("Entered in the updateReportStatus function in the admin side ");
+      const {reportId,status} = req.body;
+      console.log("report id and status are ",reportId,status);
+      const response = await this.reportService.updateReportStatus({reportId,status});
+      if(response){
+        res.status(200).json({
+          success:true,
+          message:"updated successfully",
+          response
+        })
+      }else{
+        res.status(200).json({
+          success:false,
+          message:"error occured while updaing the status"
+        })
+      }
+      return response;
+    }catch(error){
+      console.log("errro occured while updating the report status",error);
+      next(error as Error);
+    }
+  }
+
   //fucntion to logout
   async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
