@@ -12,6 +12,7 @@ const stripeKey = process.env.STRIPE_SECRET_KEY as string;
 const stripe = new Stripe(stripeKey);
 const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL
 
+
 export interface OrderEventData {
   orderId: string;
   amount: number;
@@ -25,7 +26,7 @@ export interface OrderEventData {
   timestamp: Date;
 }
 
-class OrderServices implements IOrderService {
+class OrderServices implements IOrderService{
   constructor(
     private orderRepository: IOrderRepository,
     private mechRepository: IMechRepository
