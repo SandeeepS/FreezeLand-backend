@@ -492,7 +492,7 @@ class adminService implements IAdminService {
   }
 
   //changing this generating presinged url code ot differtnt comon place
-  async getPresignedUrl(data: IGetPreSignedUrl) {
+  async getPresignedUrl(data: IGetPreSignedUrl):Promise<GetPreSignedUrlResponse> {
     try {
       const { fileName, fileType, folderName } = data;
       if (!fileName || !fileType) {

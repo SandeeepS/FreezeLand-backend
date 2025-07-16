@@ -39,6 +39,10 @@ import {
     IBlockDevice,
     IDeleteService,
     IEditExistService,
+    IGetPreSignedUrl,
+    GetPreSignedUrlResponse,
+    IGetMechanicById,
+    GetMechByIdResponse,
   } from "../dataContracts/Admin/IService.dto";
 
 
@@ -72,4 +76,10 @@ export interface IAdminService {
         deleteDevice(data:  IDeleteDevice):Promise<DeleteDeviceResponse|null>;
         isDeviceExist(data: IisDeviceExist):Promise<isDeviceExistResponse|null>;
         updateApprove (data:IUpdateApprove) : Promise<UpdateApproveResponse  | null>;
+
+        getPresignedUrl(data: IGetPreSignedUrl):Promise<GetPreSignedUrlResponse>
+        getMechanicById(data: IGetMechanicById): Promise<GetMechByIdResponse | null>
+        getAllComplaints(page: number,limit: number, searchQuery: string,search: string): Promise<unknown> 
+        getComplaintById(id: string): Promise<unknown> 
+        cancelComplaint(complaintId: string,userRole: string,reason: string): Promise<unknown>
 }

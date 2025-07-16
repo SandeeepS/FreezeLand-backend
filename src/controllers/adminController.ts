@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-import AdminService from "../services/AdminServices";
 import {
   AddNewServiceValidation,
   AddNewDeviceValidation,
@@ -14,11 +13,12 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
 import IReportService from "../interfaces/IServices/IReportService";
+import { IAdminService } from "../interfaces/IServices/IAdminService";
 const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
 class adminController implements IAdminController {
   constructor(
-    private adminService: AdminService,
+    private adminService: IAdminService,
     private reportService: IReportService
   ) {
     this.adminService = adminService;
