@@ -30,7 +30,7 @@ const generateOTP  = new GenerateOTP();
 
 const email = new Email(generateOTP);
 const userServices = new userService(userRepository,serviceRepository,concernRepository,orderRepository,orderService,createjwt,encrypt,email);
-const controller = new userController(userServices,reportService,encrypt,createjwt,email);
+const controller = new userController(userServices,reportService,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
 userRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next))
