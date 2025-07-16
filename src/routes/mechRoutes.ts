@@ -23,7 +23,7 @@ const email = new Email(generateOTP);
 const reportRepository = new ReportRepository();
 const reportService = new ReportService(reportRepository);
 const mechServices = new mechService(mechRepository,concernRepository,roomRepository,createjwt,encrypt,email);
-const controller = new mechController(mechServices,reportService,encrypt,createjwt,email);
+const controller = new mechController(mechServices,reportService,email);
 
 mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next)); 
 mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await controller.mechSignup(req,res,next));
