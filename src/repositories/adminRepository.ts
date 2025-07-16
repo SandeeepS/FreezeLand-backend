@@ -47,16 +47,16 @@ class AdminRepository
   extends BaseRepository<AdminInterface & Document>
   implements IAdminRepository
 {
-  private userRepository: UserRepository;
-  private mechRepository: MechRepository;
-  private serviceRepository: BaseRepository<IServices>;
-  private deviceRepository: BaseRepository<IDevice>;
+  private _userRepository: UserRepository;
+  private _mechRepository: MechRepository;
+  private _serviceRepository: BaseRepository<IServices>;
+  private _deviceRepository: BaseRepository<IDevice>;
   constructor() {
     super(AdminModel);
-    this.userRepository = new UserRepository();
-    this.mechRepository = new MechRepository();
-    this.serviceRepository = new BaseRepository<IServices>(serviceModel);
-    this.deviceRepository = new BaseRepository<IDevice>(deviceModel);
+    this._userRepository = new UserRepository();
+    this._mechRepository = new MechRepository();
+    this._serviceRepository = new BaseRepository<IServices>(serviceModel);
+    this._deviceRepository = new BaseRepository<IDevice>(deviceModel);
   }
   async getAdminById(
     data: IGetAdminById
@@ -77,7 +77,7 @@ class AdminRepository
     try {
       const { id, modifiedVerificationStatus } = data;
       const qr = { isVerified: modifiedVerificationStatus };
-      const result = await this.mechRepository.update(id, qr);
+      const result = await this._mechRepository.update(id, qr);
       if (result) {
         return { result: true };
       } else {
@@ -116,7 +116,7 @@ class AdminRepository
   ): Promise<EditExistServiceResponse | null> {
     try {
       const { _id, values } = data;
-      const editedService = await this.serviceRepository.update(_id, values);
+      const editedService = await this._serviceRepository.update(_id, values);
       return editedService;
     } catch (error) {
       console.log(error as Error);
@@ -129,7 +129,7 @@ class AdminRepository
   async blockUser(data: IBlockUser): Promise<BlockUserResponse | null> {
     try {
       const { userId } = data;
-      const user = await this.userRepository.findById(userId);
+      const user = await this._userRepository.findById(userId);
       if (user) {
         user.isBlocked = !user?.isBlocked;
         await user.save();
@@ -146,10 +146,10 @@ class AdminRepository
   async blockMech(data: IBlockMech): Promise<BlockMechResponse | null> {
     try {
       const { mechId } = data;
-      const mech = await this.mechRepository.getMechById({ id: mechId });
+      const mech = await this._mechRepository.getMechById({ id: mechId });
       if (mech) {
         mech.isBlocked = !mech?.isBlocked;
-        await this.mechRepository.saveMechanic(mech);
+        await this._mechRepository.saveMechanic(mech);
         return mech;
       } else {
         throw new Error("Somthing went wrong!!!");
@@ -165,10 +165,10 @@ class AdminRepository
   ): Promise<BlockServiceResponse | null> {
     try {
       const { _id } = data;
-      const service = await this.serviceRepository.findById(_id);
+      const service = await this._serviceRepository.findById(_id);
       if (service) {
         service.isBlocked = !service?.isBlocked;
-        await this.serviceRepository.save(service);
+        await this._serviceRepository.save(service);
         return service;
       } else {
         return null;
@@ -184,10 +184,10 @@ class AdminRepository
   async BlockDevice(data: IBlockDevice): Promise<BlockDeviceResponse | null> {
     try {
       const { _id } = data;
-      const service = await this.deviceRepository.findById(_id);
+      const service = await this._deviceRepository.findById(_id);
       if (service) {
         service.isBlocked = !service?.isBlocked;
-        await this.deviceRepository.save(service);
+        await this._deviceRepository.save(service);
         return service;
       } else {
         return null;
@@ -201,10 +201,10 @@ class AdminRepository
   async deleteUser(data: IDeleteUser): Promise<DeleteUserResponse | null> {
     try {
       const { userId } = data;
-      const user = await this.userRepository.findById(userId);
+      const user = await this._userRepository.findById(userId);
       if (user) {
         user.isDeleted = !user?.isDeleted;
-        await this.userRepository.saveUser(user);
+        await this._userRepository.saveUser(user);
         return user;
       } else {
         throw new Error("Somthing went wrong!!!");
@@ -218,10 +218,10 @@ class AdminRepository
   async deleteMech(data: IDeleteMech): Promise<DeleteMechResponse | null> {
     try {
       const { mechId } = data;
-      const mech = await this.mechRepository.findById(mechId);
+      const mech = await this._mechRepository.findById(mechId);
       if (mech) {
         mech.isDeleted = !mech?.isDeleted;
-        await this.mechRepository.saveMechanic(mech);
+        await this._mechRepository.saveMechanic(mech);
         return mech;
       } else {
         throw new Error("Somthing went wrong!!!");
@@ -237,10 +237,10 @@ class AdminRepository
   ): Promise<DeleteServiceResponse | null> {
     try {
       const { serviceId } = data;
-      const serivce = await this.serviceRepository.findById(serviceId);
+      const serivce = await this._serviceRepository.findById(serviceId);
       if (serivce) {
         serivce.isDeleted = !serivce?.isDeleted;
-        await this.serviceRepository.save(serivce);
+        await this._serviceRepository.save(serivce);
         return serivce;
       } else {
         throw new Error("Somthing went wrong!!!");
@@ -256,10 +256,10 @@ class AdminRepository
   ): Promise<DeleteDeviceResponse | null> {
     try {
       const { deviceId } = data;
-      const device = await this.deviceRepository.findById(deviceId);
+      const device = await this._deviceRepository.findById(deviceId);
       if (device) {
         device.isDeleted = !device?.isDeleted;
-        await this.deviceRepository.save(device);
+        await this._deviceRepository.save(device);
         return device;
       } else {
         throw new Error("Somthing went wrong!!!");
@@ -278,7 +278,7 @@ class AdminRepository
     try {
       const { name } = data;
       console.log("name in the admin Repository ", name);
-      const serviceExist = await this.serviceRepository.findOne({ name });
+      const serviceExist = await this._serviceRepository.findOne({ name });
       if (serviceExist) {
         return serviceExist;
       }
@@ -296,7 +296,7 @@ class AdminRepository
   ): Promise<isDeviceExistResponse | null> {
     try {
       const { name } = data;
-      const DeviceExist = await this.deviceRepository.findOne({ name: name });
+      const DeviceExist = await this._deviceRepository.findOne({ name: name });
       if (DeviceExist) {
         console.log("divice is exist 1111");
         return DeviceExist;
@@ -315,8 +315,8 @@ class AdminRepository
   ): Promise<AddNewServiceResponse | null> {
     try {
       const { values } = data;
-      console.log("values from the serviceRepository is ", values);
-      const addedService = await this.serviceRepository.addService(values);
+      console.log("values from the _serviceRepository is ", values);
+      const addedService = await this._serviceRepository.addService(values);
       console.log("result added service is",addedService)
       if (addedService) {
         return addedService;
@@ -335,7 +335,7 @@ class AdminRepository
     try {
       const { name } = data;
       console.log("reached in the adminrepositor for adding device",name);
-      const addedDevice = await this.deviceRepository.addDevice(name);
+      const addedDevice = await this._deviceRepository.addDevice(name);
       console.log("Result after adding device is ",addedDevice)
       if (addedDevice) {
         return addedDevice;
