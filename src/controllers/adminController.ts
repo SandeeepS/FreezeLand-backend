@@ -18,11 +18,11 @@ const { OK, INTERNAL_SERVER_ERROR, BAD_REQUEST } = STATUS_CODES;
 
 class adminController implements IAdminController {
   constructor(
-    private adminService: IAdminService,
-    private reportService: IReportService
+    private _adminService: IAdminService,
+    private _reportService: IReportService
   ) {
-    this.adminService = adminService;
-    this.reportService = reportService;
+    this._adminService = _adminService;
+    this._reportService = _reportService;
   }
 
   milliseconds = (h: number, m: number, s: number) =>
@@ -33,7 +33,7 @@ class adminController implements IAdminController {
       console.log("enterd in the backend adminlogin in adminController");
       const { email, password } = req.body;
 
-      const loginStatus = await this.adminService.adminLogin({
+      const loginStatus = await this._adminService.adminLogin({
         email,
         password,
         role: "admin",
@@ -84,7 +84,7 @@ class adminController implements IAdminController {
       console.log("page is ", page);
       console.log("limit is ", limit);
       console.log("Search is ", search);
-      const data = await this.adminService.getUserList({
+      const data = await this._adminService.getUserList({
         page,
         limit,
         searchQuery,
@@ -107,7 +107,7 @@ class adminController implements IAdminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log("page is", page);
       console.log("limit is", limit);
-      const data = await this.adminService.getMechList({
+      const data = await this._adminService.getMechList({
         page,
         limit,
         searchQuery,
@@ -124,7 +124,7 @@ class adminController implements IAdminController {
   async blockUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { userId } = req.params;
-      const result = await this.adminService.blockUser({
+      const result = await this._adminService.blockUser({
         userId,
       });
       if (result)
@@ -146,7 +146,7 @@ class adminController implements IAdminController {
   async blockMech(req: Request, res: Response, next: NextFunction) {
     try {
       const { mechId } = req.params;
-      const result = await this.adminService.blockMech({ mechId });
+      const result = await this._adminService.blockMech({ mechId });
       if (result)
         res.json({ success: true, message: "block or unblocked the mechanic" });
       else
@@ -166,7 +166,7 @@ class adminController implements IAdminController {
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { userId } = req.params;
-      const result = await this.adminService.deleteUser({ userId });
+      const result = await this._adminService.deleteUser({ userId });
       if (result) res.json({ success: true, message: "deleted  the user" });
       else
         res.json({
@@ -182,7 +182,7 @@ class adminController implements IAdminController {
   async deleteMech(req: Request, res: Response, next: NextFunction) {
     try {
       const { mechId } = req.params;
-      const result = await this.adminService.deleteMech({ mechId });
+      const result = await this._adminService.deleteMech({ mechId });
       if (result) res.json({ success: true, message: "deleted  the mechanic" });
       else
         res.json({
@@ -196,7 +196,7 @@ class adminController implements IAdminController {
     }
   }
 
-  //changing getPresignedUrl functionality to adminService ..........
+  //changing getPresignedUrl functionality to _adminService ..........
   /************************ */
 
   async getPresignedUrl(
@@ -211,7 +211,7 @@ class adminController implements IAdminController {
         folderName: string;
       };
       console.log("file from the front end is ", fileName, fileType);
-      const result = await this.adminService.getPresignedUrl({
+      const result = await this._adminService.getPresignedUrl({
         fileName,
         fileType,
         folderName,
@@ -254,9 +254,9 @@ class adminController implements IAdminController {
         // console.log("the url from the firebase is ", downloadURL);
         // values.image = downloadURL;
 
-        const isExist = await this.adminService.isServiceExist(values.name);
+        const isExist = await this._adminService.isServiceExist(values.name);
         if (!isExist) {
-          const result = await this.adminService.addService({ values });
+          const result = await this._adminService.addService({ values });
           if (result) {
             res.json({
               success: true,
@@ -305,10 +305,10 @@ class adminController implements IAdminController {
       const check = AddNewDeviceValidation(name);
       if (check) {
         //lets check the device  is allready present in the device  collection for avoiding duplication
-        const isExist = await this.adminService.isDeviceExist(name);
+        const isExist = await this._adminService.isDeviceExist(name);
         console.log("is devices exits or not ", isExist);
         if (!isExist) {
-          const result = await this.adminService.addDevice({ name });
+          const result = await this._adminService.addDevice({ name });
           if (result) {
             res.json({
               success: true,
@@ -353,7 +353,7 @@ class adminController implements IAdminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log(" page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getServices({
+      const data = await this._adminService.getServices({
         page,
         limit,
         searchQuery,
@@ -381,7 +381,7 @@ class adminController implements IAdminController {
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log(" page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getDevcies({
+      const data = await this._adminService.getDevcies({
         page,
         limit,
         searchQuery,
@@ -404,7 +404,7 @@ class adminController implements IAdminController {
         "reached the getAllServices funciton in the admin controller"
       );
       const id = req.params.id;
-      const result = await this.adminService.getService({ id });
+      const result = await this._adminService.getService({ id });
       res.status(OK).json(result);
     } catch (error) {
       console.log(error as Error);
@@ -416,7 +416,7 @@ class adminController implements IAdminController {
     try {
       const { id } = req.params;
       console.log("id in the adminController is ", id);
-      const result = await this.adminService.getMechanicById({ id });
+      const result = await this._adminService.getMechanicById({ id });
       res.status(OK).json(result);
     } catch (error) {
       console.log(error);
@@ -429,7 +429,7 @@ class adminController implements IAdminController {
       console.log("reached the listUnlistServices at adminController");
       const _id = req.params.serviceId;
       console.log("id reached from the front is ", _id);
-      const result = await this.adminService.blockService({ _id });
+      const result = await this._adminService.blockService({ _id });
       if (result) {
         res.json({ success: true, message: "blocked/unblocked the service " });
       } else {
@@ -449,7 +449,7 @@ class adminController implements IAdminController {
       console.log("reached the listUnlistDevice at adminController");
       const _id = req.params.deviceId;
       console.log("id reached from the front is ", _id);
-      const result = await this.adminService.blockDevice({ _id });
+      const result = await this._adminService.blockDevice({ _id });
       if (result) {
         res.json({ success: true, message: "blocked/unblocked the device " });
       } else {
@@ -469,7 +469,7 @@ class adminController implements IAdminController {
       console.log("entered in the admin controller for deleting the service ");
       console.log(req.params.serviceId);
       const { serviceId } = req.params;
-      const result = await this.adminService.deleteService({ serviceId });
+      const result = await this._adminService.deleteService({ serviceId });
       if (result) res.json({ success: true, message: "Service deleted" });
       else
         res.json({
@@ -488,7 +488,7 @@ class adminController implements IAdminController {
       console.log("entered in the admin controller for deleting the device ");
       console.log(req.params.deviceId);
       const { deviceId } = req.params;
-      const result = await this.adminService.deleteDevice({ deviceId });
+      const result = await this._adminService.deleteDevice({ deviceId });
       if (result) res.json({ success: true, message: "Device deleted" });
       else
         res.json({
@@ -510,10 +510,10 @@ class adminController implements IAdminController {
       const check = AddNewServiceValidation(values.name, values.discription);
       if (check) {
         console.log("validation has no problem in the editExistingService");
-        const isExist = await this.adminService.isServiceExist(values.name);
+        const isExist = await this._adminService.isServiceExist(values.name);
 
         if (isExist == null) {
-          const editedSevice = await this.adminService.editExistingService({
+          const editedSevice = await this._adminService.editExistingService({
             _id,
             values,
           });
@@ -589,7 +589,7 @@ class adminController implements IAdminController {
         verificationStatus
       );
       if (id && verificationStatus) {
-        const result = await this.adminService.updateApprove({
+        const result = await this._adminService.updateApprove({
           id,
           verificationStatus,
         });
@@ -618,7 +618,7 @@ class adminController implements IAdminController {
       const searchQuery = req.query.searchQuery as string;
       console.log(" page is ", page);
       console.log("limit is ", limit);
-      const data = await this.adminService.getAllComplaints(
+      const data = await this._adminService.getAllComplaints(
         page,
         limit,
         searchQuery,
@@ -642,7 +642,7 @@ class adminController implements IAdminController {
         "reached the getComplaintById funciton in the admin controller"
       );
       const id = req.params.id;
-      const result = await this.adminService.getComplaintById(id);
+      const result = await this._adminService.getComplaintById(id);
       res.status(OK).json(result);
     } catch (error) {
       console.log(error as Error);
@@ -660,7 +660,7 @@ class adminController implements IAdminController {
         userRole,
         reason
       );
-      const result = await this.adminService.cancelComplaint(
+      const result = await this._adminService.cancelComplaint(
         complaintId,
         userRole,
         reason
@@ -685,7 +685,7 @@ class adminController implements IAdminController {
     try {
       const { reporterRole } = req.query;
       console.log("ReporterRole in the adminController", reporterRole);
-      const result = await this.reportService.getAllReportByReporterRole(
+      const result = await this._reportService.getAllReportByReporterRole(
         reporterRole as string
       );
       console.log("Reuslt after fetching the report data ,", result);
@@ -709,7 +709,7 @@ class adminController implements IAdminController {
       console.log("Entered in the updateReportStatus function in the admin side ");
       const {reportId,status} = req.body;
       console.log("report id and status are ",reportId,status);
-      const response = await this.reportService.updateReportStatus({reportId,status});
+      const response = await this._reportService.updateReportStatus({reportId,status});
       if(response){
         res.status(200).json({
           success:true,
