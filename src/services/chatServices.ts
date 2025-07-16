@@ -22,7 +22,7 @@ class ChatServices implements IChatServices {
       console.log("Enterd in the getMessageByRoomId", roomId);
       const result = await this._chatRepository.getMessagesByRoomId(roomId);
       return result;
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       throw error;
     }
