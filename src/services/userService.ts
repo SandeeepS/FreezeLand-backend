@@ -123,13 +123,8 @@ class userService implements IUserServices {
   async resendOTP(data: IResendOTPData): Promise<Partial<ITempUser> | null> {
     try {
       const { tempUserId } = data;
-      console.log("TempUserId isssssssss", tempUserId);
       const tempUserData = await this._userRepository.getTempUserData(
         tempUserId
-      );
-      console.log(
-        "tempUserData in the resendOTP in the userService",
-        tempUserData
       );
       const userEmail = tempUserData?.userData.email;
       const otp = await this._email.generateAndSendOTP(userEmail as string);
@@ -153,13 +148,7 @@ class userService implements IUserServices {
   //function to verify otp
   async verifyOTP(id: string, otp: string): Promise<verifyOTPResponse> {
     try {
-      console.log(
-        "Entered in the verifyOpt function in the userService",
-        id,
-        otp
-      );
       const getTempUserData = await this._userRepository.getTempUserData(id);
-
       if (!getTempUserData) {
         return {
           success: false,
@@ -168,11 +157,9 @@ class userService implements IUserServices {
       }
 
       const userData = getTempUserData.userData;
-      console.log("userData from the getTemuserData", userData);
       const storedOtp = getTempUserData.otp;
 
       if (otp.toString() === storedOtp) {
-        console.log("otp verified");
         if (userData) {
           const { name, email, password, phone } = userData;
           const secret_key: string | undefined = process.env.CRYPTR_SECRET;
@@ -196,7 +183,6 @@ class userService implements IUserServices {
             phone: Number(phone),
           };
 
-          console.log("new Encrypted password with data is ", newDetails);
           const user = await this._userRepository.saveUser(newDetails);
 
           if (user && user.role) {
@@ -260,7 +246,6 @@ class userService implements IUserServices {
 
   async saveUser(userData: ISaveUser): Promise<SaveUserResponse> {
     try {
-      console.log("Entered in user Service and the userData is ", userData);
       const { name, email, password, phone } = userData;
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
       if (!secret_key) {
@@ -294,8 +279,6 @@ class userService implements IUserServices {
         const userId = user._id.toString();
         const token = this._createjwt.generateAccessToken(userId, user.role);
         const refresh_token = this._createjwt.generateRefreshToken(userId);
-        console.log("token is ", token);
-        console.log("refresh", refresh_token);
         return {
           success: true,
           message: "Success",
@@ -332,7 +315,6 @@ class userService implements IUserServices {
 
   async userLogin(data: IUserLogin): Promise<UserLoginResponse> {
     try {
-      console.log("entered in the user login");
       const { email, password } = data;
       const check = LoginValidation(email, password);
       if (check) {
@@ -360,7 +342,6 @@ class userService implements IUserServices {
               );
 
               if (passwordMatch) {
-                console.log("password from the user side is ", user.password);
                 const userId = user.id;
                 const token = this._createjwt.generateAccessToken(
                   userId,
@@ -439,11 +420,8 @@ class userService implements IUserServices {
     googlePhotoUrl: string;
   }): Promise<UserLoginResponse> {
     try {
-      console.log("entered in the google login service");
       const { email } = data;
-
       const user = await this._userRepository.emailExistCheck({ email });
-
       if (user?.id) {
         // Existing user login
         if (user.isBlocked) {
@@ -482,7 +460,6 @@ class userService implements IUserServices {
         }
       } else {
         // Email not found - user needs to signup first
-        console.log("Email not found for Google login");
         return {
           status: STATUS_CODES.UNAUTHORIZED,
           data: {
@@ -505,7 +482,6 @@ class userService implements IUserServices {
   ): Promise<EmailExistCheckResponse | null> {
     try {
       const { email } = data;
-      console.log("email from the userSercice ", email);
       return this._userRepository.emailExistCheck({ email });
     } catch (error) {
       console.log("error occured while getUserEmail in the userService", error);
@@ -564,7 +540,6 @@ class userService implements IUserServices {
   async getProfile(data: IGetProfile): Promise<GetProfileResponse> {
     try {
       const { id } = data;
-      console.log("idddddddddddddddddddddd", id);
       if (!id) {
         return {
           status: UNAUTHORIZED,
@@ -576,7 +551,6 @@ class userService implements IUserServices {
       }
 
       const user = await this._userRepository.getUserById({ id });
-      console.log("User detail in the userService from the getUserByid", user);
       if (!user) {
         return {
           status: NOT_FOUND,
@@ -642,8 +616,6 @@ class userService implements IUserServices {
         searchQuery,
         userId,
       });
-      console.log("data in the userSErvice ", data);
-
       return data;
     } catch (error) {
       console.log(
@@ -658,7 +630,6 @@ class userService implements IUserServices {
   async getService(data: IGetService): Promise<GetServiceResponse2 | null> {
     try {
       const { id } = data;
-      console.log("reached the getService in the userService");
       const result = await this._serviceRepository.getService({ id });
       if (result) {
         return result;
@@ -677,7 +648,6 @@ class userService implements IUserServices {
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;
-      console.log("Id in the mechService is ", id);
       const result = await this._userRepository.getMechanicDetails({ id });
       return result;
     } catch (error) {
@@ -691,7 +661,6 @@ class userService implements IUserServices {
     id: string
   ): Promise<getUserRegisteredServiceDetailsByIdResponse[]> {
     try {
-      console.log("Enterdin the userService");
       const result =
         await this._userRepository.getUserRegisteredServiceDetailsById(id);
       return result;
@@ -725,7 +694,6 @@ class userService implements IUserServices {
         password: newPassword,
         userId,
       });
-      console.log("password updated successfully", result);
 
       return result;
     } catch (error) {
@@ -757,7 +725,6 @@ class userService implements IUserServices {
   ): Promise<AddUserAddressResponse | null> {
     try {
       const { _id, values } = data;
-      console.log("id from the addUserAddress in the user service is ", _id);
       const address = await this._userRepository.addAddress({ _id, values });
       if (address) {
         return {
@@ -788,7 +755,6 @@ class userService implements IUserServices {
   ): Promise<SetUserDefaultAddressResponse | null> {
     try {
       const { userId, addressId } = data;
-      console.log("entered in the userService ");
       return await this._userRepository.setDefaultAddress({
         userId,
         addressId,
@@ -806,7 +772,6 @@ class userService implements IUserServices {
     data: IRegisterService
   ): Promise<RegisterServiceResponse | null> {
     try {
-      console.log("entered in the userService for register Service");
       return await this._userRepository.registerService(data);
     } catch (error) {
       console.log(
@@ -821,12 +786,7 @@ class userService implements IUserServices {
   async createStripeSession(data: IPaymentData): Promise<unknown> {
     try {
       const result = await this._orderService.createStripeSession(data);
-      console.log(
-        "result in the userService for creating stripe session",
-        result
-      );
       //herer need to check the session id is present in the current database
-
       const isPaymentExist = await this._orderRepository.checkPaymentExist(
         result.sessionId as string
       );
@@ -854,17 +814,10 @@ class userService implements IUserServices {
     try {
       console.log("entered in the successPayment user service in the backend");
       const result = await this._orderService.successPayment(data);
-      console.log("result in the userService for success payment", result);
-      console.log("want to update the concern model about the payment");
 
       if (result && result.status === "SUCCESS" && result.data) {
         const orderId = result.data._id?.toString();
-        // FIX: Change this line - remove .response
         const complaintId = result.data.complaintId.toString();
-
-        console.log("Extracted complaintId:", complaintId);
-        console.log("Extracted orderId:", orderId);
-
         const updatedTheOrderDetailsInConcernDatabase =
           await this._concernRepository.updateConcernWithOrderId(
             complaintId,
@@ -915,10 +868,6 @@ class userService implements IUserServices {
   ): Promise<IupdateUserLocationResponse | null> {
     try {
       const { userId, locationData } = data;
-      console.log(
-        "Enterd in the updateUserLocation in the userService",
-        locationData
-      );
       const result = await this._userRepository.updateUserLocation({
         userId,
         locationData,
@@ -938,11 +887,6 @@ class userService implements IUserServices {
     addressId: string
   ): Promise<boolean> {
     try {
-      console.log(
-        "Enterd in the handleRemoveUserAddress in the userService",
-        userId,
-        addressId
-      );
       const result = await this._userRepository.handleRemoveUserAddress(
         userId,
         addressId
