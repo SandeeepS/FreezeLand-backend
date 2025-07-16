@@ -11,8 +11,8 @@ import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IConcernService from "../interfaces/IServices/IConcernService";
 
 class ConcernService implements IConcernService {
-  constructor(private concernRepositroy: IConcernRepository) {
-    this.concernRepositroy = concernRepositroy;
+  constructor(private _concernRepositroy: IConcernRepository) {
+    this._concernRepositroy = _concernRepositroy;
   }
 
   async getAllComplaints(
@@ -26,7 +26,7 @@ class ConcernService implements IConcernService {
         "entered in the get all complaints method in the concern service"
       );
       console.log("search in the concern service", search);
-      const response = await this.concernRepositroy.getAllComplaints(
+      const response = await this._concernRepositroy.getAllComplaints(
         page,
         limit,
         searchQuery,
@@ -47,7 +47,7 @@ class ConcernService implements IConcernService {
       console.log(
         "entered in the get complaint by id method in the concern service"
       );
-      const response = await this.concernRepositroy.getComplaintDetails(
+      const response = await this._concernRepositroy.getComplaintDetails(
         complaintId
       );
       return response;
@@ -65,7 +65,7 @@ class ConcernService implements IConcernService {
   ): Promise<unknown> {
     try {
       console.log("Entered in the cancelComplaint in the concern service");
-      const result = await this.concernRepositroy.cancelComplaint(
+      const result = await this._concernRepositroy.cancelComplaint(
         complaintId,
         userRole,
         reason
@@ -83,7 +83,7 @@ class ConcernService implements IConcernService {
     searchQuery: string
   ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
-      const data = await this.concernRepositroy.getAllUserRegisteredServices({
+      const data = await this._concernRepositroy.getAllUserRegisteredServices({
         page,
         limit,
         searchQuery,
@@ -107,7 +107,7 @@ class ConcernService implements IConcernService {
     try {
       console.log("Entered in the concern Service", mechanicId);
       const result =
-        await this.concernRepositroy.getAllCompletedServiceByMechanic(
+        await this._concernRepositroy.getAllCompletedServiceByMechanic(
           mechanicId
         );
       return result;
@@ -124,7 +124,7 @@ class ConcernService implements IConcernService {
   ): Promise<UpdatedcomplaintWithOrderIdResponse | null> {
     try {
       console.log("Entered in the updatedConcernOrderId");
-      const result = await this.concernRepositroy.updateConcernWithOrderId(
+      const result = await this._concernRepositroy.updateConcernWithOrderId(
         complaintId,
         orderId
       );
