@@ -330,14 +330,14 @@ class userService implements IUserServices {
       console.log("entered in the user login");
       const { email, password } = data;
       const check = LoginValidation(email, password);
-      if (check) {
+      if (check){
         const user = await this.userRepository.emailExistCheck({ email });
         console.log(
           "accessed user details from the userService, in the userLogin function is ",
           user
         );
 
-        if (user?.id) {
+        if (user?.id){
           if (user.isBlocked) {
             console.log("User is blocked");
             return {
