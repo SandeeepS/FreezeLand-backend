@@ -61,23 +61,23 @@ dotenv.config();
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 class userService implements IUserServices {
   constructor(
-    private userRepository: IUserRepository,
-    private serviceRepository: IServiceRepository,
-    private concernRepository: IConcernRepository,
-    private orderRepository: IOrderRepository,
-    private orderService: IOrderService,
-    private createjwt: ICreateJWT,
-    private encrypt: compareInterface,
-    private email: Iemail
+    private _userRepository: IUserRepository,
+    private _serviceRepository: IServiceRepository,
+    private _concernRepository: IConcernRepository,
+    private _orderRepository: IOrderRepository,
+    private _orderService: IOrderService,
+    private _createjwt: ICreateJWT,
+    private _encrypt: compareInterface,
+    private _email: Iemail
   ) {
-    this.userRepository = userRepository;
-    this.serviceRepository = serviceRepository;
-    this.concernRepository = concernRepository;
-    this.orderRepository = orderRepository;
-    this.orderService = orderService;
-    this.createjwt = createjwt;
-    this.encrypt = encrypt;
-    this.email = email;
+    this._userRepository = _userRepository;
+    this._serviceRepository = _serviceRepository;
+    this._concernRepository = _concernRepository;
+    this._orderRepository = _orderRepository;
+    this._orderService = _orderService;
+    this._createjwt = _createjwt;
+    this._encrypt = _encrypt;
+    this._email = _email;
   }
 
   //signup for user
@@ -98,18 +98,18 @@ class userService implements IUserServices {
         throw new Error("Invalid user data");
       }
 
-      const userExists = await this.userRepository.emailExistCheck({ email });
+      const userExists = await this._userRepository.emailExistCheck({ email });
       if (userExists) {
         throw new Error("Email already exists");
       }
 
-      const otp = await this.email.generateAndSendOTP(email);
+      const otp = await this._email.generateAndSendOTP(email);
       if (!otp) {
         throw new Error("Failed to generate OTP");
       }
 
       const tempUserDetails = { otp, userData };
-      const savedTempUser = await this.userRepository.createTempUserData(
+      const savedTempUser = await this._userRepository.createTempUserData(
         tempUserDetails
       );
 
@@ -124,7 +124,7 @@ class userService implements IUserServices {
     try {
       const { tempUserId } = data;
       console.log("TempUserId isssssssss", tempUserId);
-      const tempUserData = await this.userRepository.getTempUserData(
+      const tempUserData = await this._userRepository.getTempUserData(
         tempUserId
       );
       console.log(
@@ -132,15 +132,17 @@ class userService implements IUserServices {
         tempUserData
       );
       const userEmail = tempUserData?.userData.email;
-      const otp = await this.email.generateAndSendOTP(userEmail as string);
+      const otp = await this._email.generateAndSendOTP(userEmail as string);
       if (!otp) {
         throw new Error("Failed to generate OTP");
       }
 
-      const updatedTempUserData = await this.userRepository.updateTempUserData({
-        tempUserId,
-        otp,
-      });
+      const updatedTempUserData = await this._userRepository.updateTempUserData(
+        {
+          tempUserId,
+          otp,
+        }
+      );
       return updatedTempUserData;
     } catch (error) {
       console.log("Errror occured while resendOTP in the userService", error);
@@ -156,7 +158,7 @@ class userService implements IUserServices {
         id,
         otp
       );
-      const getTempUserData = await this.userRepository.getTempUserData(id);
+      const getTempUserData = await this._userRepository.getTempUserData(id);
 
       if (!getTempUserData) {
         return {
@@ -195,12 +197,15 @@ class userService implements IUserServices {
           };
 
           console.log("new Encrypted password with data is ", newDetails);
-          const user = await this.userRepository.saveUser(newDetails);
+          const user = await this._userRepository.saveUser(newDetails);
 
           if (user && user.role) {
             const userId = user._id.toString();
-            const token = this.createjwt.generateAccessToken(userId, user.role);
-            const refresh_token = this.createjwt.generateRefreshToken(userId);
+            const token = this._createjwt.generateAccessToken(
+              userId,
+              user.role
+            );
+            const refresh_token = this._createjwt.generateRefreshToken(userId);
             console.log("token is ", token);
             console.log("refresh", refresh_token);
             const newData = {
@@ -246,7 +251,7 @@ class userService implements IUserServices {
   ): Promise<EmailExistCheckResponse | null> {
     try {
       const { email } = userData;
-      return await this.userRepository.emailExistCheck({ email });
+      return await this._userRepository.emailExistCheck({ email });
     } catch (error) {
       console.log("Error occured in the isUserExist in the userService", error);
       throw error;
@@ -279,7 +284,7 @@ class userService implements IUserServices {
       };
 
       console.log("new Encypted password with data is ", newDetails);
-      const user = await this.userRepository.saveUser({
+      const user = await this._userRepository.saveUser({
         name,
         password,
         email,
@@ -287,8 +292,8 @@ class userService implements IUserServices {
       });
       if (user && user?.role) {
         const userId = user._id.toString();
-        const token = this.createjwt.generateAccessToken(userId, user.role);
-        const refresh_token = this.createjwt.generateRefreshToken(userId);
+        const token = this._createjwt.generateAccessToken(userId, user.role);
+        const refresh_token = this._createjwt.generateRefreshToken(userId);
         console.log("token is ", token);
         console.log("refresh", refresh_token);
         return {
@@ -314,7 +319,7 @@ class userService implements IUserServices {
   //getting the tempUser details from the database for otp verification
   async getTempUserData(id: string): Promise<ITempUser | null> {
     try {
-      const result = await this.userRepository.getTempUserData(id);
+      const result = await this._userRepository.getTempUserData(id);
       return result;
     } catch (error) {
       console.log(
@@ -331,7 +336,7 @@ class userService implements IUserServices {
       const { email, password } = data;
       const check = LoginValidation(email, password);
       if (check) {
-        const user = await this.userRepository.emailExistCheck({ email });
+        const user = await this._userRepository.emailExistCheck({ email });
         console.log(
           "accessed user details from the userService, in the userLogin function is ",
           user
@@ -349,7 +354,7 @@ class userService implements IUserServices {
             } as const;
           } else {
             if (user.password && password) {
-              const passwordMatch = await this.encrypt.compare(
+              const passwordMatch = await this._encrypt.compare(
                 password,
                 user.password as string
               );
@@ -357,12 +362,12 @@ class userService implements IUserServices {
               if (passwordMatch) {
                 console.log("password from the user side is ", user.password);
                 const userId = user.id;
-                const token = this.createjwt.generateAccessToken(
+                const token = this._createjwt.generateAccessToken(
                   userId,
                   user.role
                 );
                 const refreshToken =
-                  this.createjwt.generateRefreshToken(userId);
+                  this._createjwt.generateRefreshToken(userId);
                 console.log("user is exist", user);
 
                 const filteredUser = {
@@ -437,7 +442,7 @@ class userService implements IUserServices {
       console.log("entered in the google login service");
       const { email } = data;
 
-      const user = await this.userRepository.emailExistCheck({ email });
+      const user = await this._userRepository.emailExistCheck({ email });
 
       if (user?.id) {
         // Existing user login
@@ -453,8 +458,8 @@ class userService implements IUserServices {
         } else {
           console.log("Existing Google user found", user);
           const userId = user.id;
-          const token = this.createjwt.generateAccessToken(userId, user.role);
-          const refreshToken = this.createjwt.generateRefreshToken(userId);
+          const token = this._createjwt.generateAccessToken(userId, user.role);
+          const refreshToken = this._createjwt.generateRefreshToken(userId);
 
           const filteredUser = {
             id: user.id,
@@ -501,7 +506,7 @@ class userService implements IUserServices {
     try {
       const { email } = data;
       console.log("email from the userSercice ", email);
-      return this.userRepository.emailExistCheck({ email });
+      return this._userRepository.emailExistCheck({ email });
     } catch (error) {
       console.log("error occured while getUserEmail in the userService", error);
       throw error;
@@ -517,7 +522,7 @@ class userService implements IUserServices {
     }
 
     try {
-      const token = this.createjwt.generateAccessToken(payload, role);
+      const token = this._createjwt.generateAccessToken(payload, role);
       if (!token) {
         throw new Error("Failed to generate JWT token");
       }
@@ -536,7 +541,7 @@ class userService implements IUserServices {
     }
 
     try {
-      const refreshToken = this.createjwt.generateRefreshToken(payload);
+      const refreshToken = this._createjwt.generateRefreshToken(payload);
       if (!refreshToken) {
         throw new Error("Failed to generate refresh token");
       }
@@ -549,7 +554,7 @@ class userService implements IUserServices {
 
   async hashPassword(password: string) {
     try {
-      return await this.encrypt.hashPassword(password);
+      return await this._encrypt.hashPassword(password);
     } catch (error) {
       console.log("Error ocured in the haspassword in the userService", error);
       throw error;
@@ -570,7 +575,7 @@ class userService implements IUserServices {
         } as const;
       }
 
-      const user = await this.userRepository.getUserById({ id });
+      const user = await this._userRepository.getUserById({ id });
       console.log("User detail in the userService from the getUserByid", user);
       if (!user) {
         return {
@@ -603,12 +608,12 @@ class userService implements IUserServices {
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const services = await this.userRepository.getAllServices({
+      const services = await this._userRepository.getAllServices({
         page,
         limit,
         searchQuery,
       });
-      const servicesCount = await this.userRepository.getServiceCount({
+      const servicesCount = await this._userRepository.getServiceCount({
         searchQuery,
       });
 
@@ -631,7 +636,7 @@ class userService implements IUserServices {
     userId: string
   ): Promise<unknown> {
     try {
-      const data = await this.userRepository.getAllUserRegisteredServices({
+      const data = await this._userRepository.getAllUserRegisteredServices({
         page,
         limit,
         searchQuery,
@@ -654,7 +659,7 @@ class userService implements IUserServices {
     try {
       const { id } = data;
       console.log("reached the getService in the userService");
-      const result = await this.serviceRepository.getService({ id });
+      const result = await this._serviceRepository.getService({ id });
       if (result) {
         return result;
       } else {
@@ -673,7 +678,7 @@ class userService implements IUserServices {
     try {
       const { id } = data;
       console.log("Id in the mechService is ", id);
-      const result = await this.userRepository.getMechanicDetails({ id });
+      const result = await this._userRepository.getMechanicDetails({ id });
       return result;
     } catch (error) {
       console.log("Error in getMechanicDetails ", error);
@@ -688,7 +693,7 @@ class userService implements IUserServices {
     try {
       console.log("Enterdin the userService");
       const result =
-        await this.userRepository.getUserRegisteredServiceDetailsById(id);
+        await this._userRepository.getUserRegisteredServiceDetailsById(id);
       return result;
     } catch (error) {
       console.log(
@@ -716,7 +721,7 @@ class userService implements IUserServices {
         saltLength: 10,
       });
       const newPassword = cryptr.encrypt(password);
-      const result = await this.userRepository.updateNewPassword({
+      const result = await this._userRepository.updateNewPassword({
         password: newPassword,
         userId,
       });
@@ -735,7 +740,7 @@ class userService implements IUserServices {
   async editUser(data: IEditUser): Promise<EditUserResponse | null> {
     try {
       const { _id, name, phone, profile_picture } = data;
-      return this.userRepository.editUser({
+      return this._userRepository.editUser({
         _id,
         name,
         phone,
@@ -753,7 +758,7 @@ class userService implements IUserServices {
     try {
       const { _id, values } = data;
       console.log("id from the addUserAddress in the user service is ", _id);
-      const address = await this.userRepository.addAddress({ _id, values });
+      const address = await this._userRepository.addAddress({ _id, values });
       if (address) {
         return {
           _id: address._id,
@@ -771,7 +776,7 @@ class userService implements IUserServices {
   async editAddress(data: IEditAddress): Promise<EditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
-      return await this.userRepository.editAddress({ _id, addressId, values });
+      return await this._userRepository.editAddress({ _id, addressId, values });
     } catch (error) {
       console.log("Error occured in the editAddress in the useService", error);
       throw error;
@@ -784,7 +789,10 @@ class userService implements IUserServices {
     try {
       const { userId, addressId } = data;
       console.log("entered in the userService ");
-      return await this.userRepository.setDefaultAddress({ userId, addressId });
+      return await this._userRepository.setDefaultAddress({
+        userId,
+        addressId,
+      });
     } catch (error) {
       console.log(
         "Error occured in the setUserDefaultAddress in the userService",
@@ -799,7 +807,7 @@ class userService implements IUserServices {
   ): Promise<RegisterServiceResponse | null> {
     try {
       console.log("entered in the userService for register Service");
-      return await this.userRepository.registerService(data);
+      return await this._userRepository.registerService(data);
     } catch (error) {
       console.log(
         "Error occured in the registerService in the userService",
@@ -812,26 +820,27 @@ class userService implements IUserServices {
   //funciton to create stripe session
   async createStripeSession(data: IPaymentData): Promise<unknown> {
     try {
-      const result = await this.orderService.createStripeSession(data);
+      const result = await this._orderService.createStripeSession(data);
       console.log(
         "result in the userService for creating stripe session",
         result
       );
       //herer need to check the session id is present in the current database
-   
-      const isPaymentExist = await this.orderRepository.checkPaymentExist(result.sessionId as string);
-      if(isPaymentExist){
-         return {
-           success:false,
-           message:"payment is already exist , can't commit to payment "
-          
-         }
-      }else{
+
+      const isPaymentExist = await this._orderRepository.checkPaymentExist(
+        result.sessionId as string
+      );
+      if (isPaymentExist) {
         return {
-          success:true,
-          message:"payment is not exist , can proceed with payment ",
-          result
-        }
+          success: false,
+          message: "payment is already exist , can't commit to payment ",
+        };
+      } else {
+        return {
+          success: true,
+          message: "payment is not exist , can proceed with payment ",
+          result,
+        };
       }
     } catch (error) {
       console.log(
@@ -844,7 +853,7 @@ class userService implements IUserServices {
   async successPayment(data: string): Promise<unknown> {
     try {
       console.log("entered in the successPayment user service in the backend");
-      const result = await this.orderService.successPayment(data);
+      const result = await this._orderService.successPayment(data);
       console.log("result in the userService for success payment", result);
       console.log("want to update the concern model about the payment");
 
@@ -857,7 +866,7 @@ class userService implements IUserServices {
         console.log("Extracted orderId:", orderId);
 
         const updatedTheOrderDetailsInConcernDatabase =
-          await this.concernRepository.updateConcernWithOrderId(
+          await this._concernRepository.updateConcernWithOrderId(
             complaintId,
             orderId as string
           );
@@ -910,7 +919,7 @@ class userService implements IUserServices {
         "Enterd in the updateUserLocation in the userService",
         locationData
       );
-      const result = await this.userRepository.updateUserLocation({
+      const result = await this._userRepository.updateUserLocation({
         userId,
         locationData,
       });
@@ -934,7 +943,7 @@ class userService implements IUserServices {
         userId,
         addressId
       );
-      const result = await this.userRepository.handleRemoveUserAddress(
+      const result = await this._userRepository.handleRemoveUserAddress(
         userId,
         addressId
       );
