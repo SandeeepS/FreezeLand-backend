@@ -28,11 +28,11 @@ export interface OrderEventData {
 
 class OrderServices implements IOrderService{
   constructor(
-    private orderRepository: IOrderRepository,
-    private mechRepository: IMechRepository
+    private _orderRepository: IOrderRepository,
+    private _mechRepository: IMechRepository
   ) {
-    this.orderRepository = orderRepository;
-    this.mechRepository = mechRepository;
+    this._orderRepository = _orderRepository;
+    this._mechRepository = _mechRepository;
   }
 
   private calculateCommissionAndEarning(totalAmount: number): {
@@ -99,6 +99,7 @@ class OrderServices implements IOrderService{
     }
   }
 
+  //function to handle the sucess payment 
   async successPayment(sessionId: string): Promise<IOrderDataResponse | null> {
     console.log("Entered successPayment in OrderService.");
     console.log("Session ID:", sessionId);
@@ -146,12 +147,12 @@ class OrderServices implements IOrderService{
 
         try {
           // Create Order (pass session)
-          const orderResponse = await this.orderRepository.createOrder(
+          const orderResponse = await this._orderRepository.createOrder(
             order,
             dbSession
           );
           console.log("orderResponse in the orderSErvice is ",orderResponse);
-          await this.mechRepository.updateMechanicEarnings({
+          await this._mechRepository.updateMechanicEarnings({
             mechanicId,
             mechanicEarning,
             dbSession,

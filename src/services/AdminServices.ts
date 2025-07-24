@@ -58,23 +58,23 @@ import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 
 class adminService implements IAdminService {
   constructor(
-    private adminRepository: IAdminRepository,
-    private userRepository: IUserRepository,
-    private mechRepository: IMechRepository,
-    private serviceRepository: IServiceRepository,
-    private deviceRepository: IDeviceRepository,
-    private concernRepository: IConcernRepository,
-    private encrypt: compareInterface,
-    private createjwt: ICreateJWT
+    private _adminRepository: IAdminRepository,
+    private _userRepository: IUserRepository,
+    private _mechRepository: IMechRepository,
+    private _serviceRepository: IServiceRepository,
+    private _deviceRepository: IDeviceRepository,
+    private _concernRepository: IConcernRepository,
+    private _encrypt: compareInterface,
+    private _createjwt: ICreateJWT
   ) {
-    this.adminRepository = adminRepository;
-    this.userRepository = userRepository;
-    this.mechRepository = mechRepository;
-    this.serviceRepository = serviceRepository;
-    this.deviceRepository = deviceRepository;
-    this.concernRepository = concernRepository;
-    this.encrypt = encrypt;
-    this.createjwt = createjwt;
+    this._adminRepository = _adminRepository;
+    this._userRepository = _userRepository;
+    this._mechRepository = _mechRepository;
+    this._serviceRepository = _serviceRepository;
+    this._deviceRepository = _deviceRepository;
+    this._concernRepository = _concernRepository;
+    this._encrypt = _encrypt;
+    this._createjwt = _createjwt;
   }
 
   //function for admin login
@@ -84,15 +84,15 @@ class adminService implements IAdminService {
       const { email, password } = data;
       const check = LoginValidation(email, password);
       if (check) {
-        const admin = await this.adminRepository.isAdminExist({ email });
+        const admin = await this._adminRepository.isAdminExist({ email });
         if (admin?.id) {
           if (admin?.password === password) {
             console.log("passwrod from the admin side is ", admin.password);
-            const token = this.createjwt.generateAccessToken(
+            const token = this._createjwt.generateAccessToken(
               admin.id,
               admin.role
             );
-            const refreshToken = this.createjwt.generateRefreshToken(admin.id);
+            const refreshToken = this._createjwt.generateRefreshToken(admin.id);
             console.log("admin is exist", admin);
 
             const filteredAdminData = {
@@ -154,7 +154,7 @@ class adminService implements IAdminService {
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const users = await this.userRepository.getUserList({
+      const users = await this._userRepository.getUserList({
         page,
         limit,
         searchQuery,
@@ -162,7 +162,7 @@ class adminService implements IAdminService {
       });
       if (users) {
         const searchRegex = new RegExp(searchQuery, "i");
-        const usersCount = await this.userRepository.getUserCount(searchRegex);
+        const usersCount = await this._userRepository.getUserCount(searchRegex);
         return {
           status: STATUS_CODES.OK,
           data: { users, usersCount },
@@ -188,7 +188,7 @@ class adminService implements IAdminService {
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const mechs = await this.mechRepository.getMechList({
+      const mechs = await this._mechRepository.getMechList({
         page,
         limit,
         searchQuery,
@@ -196,7 +196,7 @@ class adminService implements IAdminService {
       });
       console.log("list of mechanics is ", mechs);
       const searchRegex = new RegExp(searchQuery, "i");
-      const mechsCount = await this.mechRepository.getMechCount(searchRegex);
+      const mechsCount = await this._mechRepository.getMechCount(searchRegex);
       return {
         status: STATUS_CODES.OK,
         data: { mechs, mechsCount },
@@ -215,14 +215,14 @@ class adminService implements IAdminService {
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const services = await this.serviceRepository.getAllServices({
+      const services = await this._serviceRepository.getAllServices({
         page,
         limit,
         searchQuery,
         search,
       });
       console.log("list of services is ", services);
-      const servicesCount = await this.serviceRepository.getServiceCount({
+      const servicesCount = await this._serviceRepository.getServiceCount({
         searchQuery,
       });
 
@@ -244,14 +244,14 @@ class adminService implements IAdminService {
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
-      const devices = await this.deviceRepository.getAllDevices({
+      const devices = await this._deviceRepository.getAllDevices({
         page,
         limit,
         searchQuery,
         search,
       });
       console.log("list of device  is ", devices);
-      const devicesCount = await this.deviceRepository.getDeviceCount({
+      const devicesCount = await this._deviceRepository.getDeviceCount({
         searchQuery,
       });
       return {
@@ -269,7 +269,7 @@ class adminService implements IAdminService {
     try {
       const { id } = data;
       console.log("reached the getService in the adminService");
-      const result = await this.serviceRepository.getService({ id });
+      const result = await this._serviceRepository.getService({ id });
       if (result) {
         return result;
       } else {
@@ -287,7 +287,7 @@ class adminService implements IAdminService {
     try {
       const { id } = data;
       console.log("Reached the getMehanic in the adminservice");
-      const result = await this.mechRepository.getMechById({ id });
+      const result = await this._mechRepository.getMechById({ id });
       return result;
     } catch (error) {
       console.log(
@@ -301,7 +301,7 @@ class adminService implements IAdminService {
   async blockUser(data: IBlockUser): Promise<BlockUserResponse | null> {
     try {
       const { userId } = data;
-      return await this.adminRepository.blockUser({ userId });
+      return await this._adminRepository.blockUser({ userId });
     } catch (error) {
       console.log("Error while blocking the user in the adminService ", error);
       throw error;
@@ -311,7 +311,7 @@ class adminService implements IAdminService {
   async blockMech(data: IBlockMech): Promise<BlockMechResponse | null> {
     try {
       const { mechId } = data;
-      return await this.adminRepository.blockMech({ mechId });
+      return await this._adminRepository.blockMech({ mechId });
     } catch (error) {
       console.log("Error occured in the blockMech", error);
       throw error;
@@ -323,7 +323,7 @@ class adminService implements IAdminService {
   ): Promise<BlockServiceResponse | null> {
     try {
       const { _id } = data;
-      return await this.adminRepository.BlockService({ _id });
+      return await this._adminRepository.BlockService({ _id });
     } catch (error) {
       console.log("Error occured while blocking in the adminService", error);
       throw error;
@@ -333,7 +333,7 @@ class adminService implements IAdminService {
   async blockDevice(data: IBlockDevice): Promise<BlockDeviceResponse | null> {
     try {
       const { _id } = data;
-      return await this.adminRepository.BlockDevice({ _id });
+      return await this._adminRepository.BlockDevice({ _id });
     } catch (error) {
       console.log(
         "error while blocking the device from the adminService",
@@ -346,7 +346,7 @@ class adminService implements IAdminService {
   async deleteUser(data: IDeleteUser): Promise<DeleteUserResponse | null> {
     try {
       const { userId } = data;
-      return await this.adminRepository.deleteUser({ userId });
+      return await this._adminRepository.deleteUser({ userId });
     } catch (error) {
       console.log(
         "Error occured while deleting the user in the admin service",
@@ -359,7 +359,7 @@ class adminService implements IAdminService {
   async deleteMech(data: IDeleteMech): Promise<DeleteMechResponse | null> {
     try {
       const { mechId } = data;
-      return await this.adminRepository.deleteMech({ mechId });
+      return await this._adminRepository.deleteMech({ mechId });
     } catch (error) {
       console.log(
         "Error while deleting the mechanic from the adminService ",
@@ -374,7 +374,7 @@ class adminService implements IAdminService {
   ): Promise<DeleteServiceResponse | null> {
     try {
       const { serviceId } = data;
-      return await this.adminRepository.deleteService({ serviceId });
+      return await this._adminRepository.deleteService({ serviceId });
     } catch (error) {
       console.log(
         "Error while deleting a service from the admin Services",
@@ -389,7 +389,7 @@ class adminService implements IAdminService {
   ): Promise<DeleteDeviceResponse | null> {
     try {
       const { deviceId } = data;
-      return await this.adminRepository.deleteDevice({ deviceId });
+      return await this._adminRepository.deleteDevice({ deviceId });
     } catch (error) {
       console.log("Error while deleteDevice from the adminService");
       throw error;
@@ -399,7 +399,7 @@ class adminService implements IAdminService {
   async isServiceExist(name: string): Promise<IsServiceExistResponse | null> {
     try {
       console.log("name in the adminServie ", name);
-      return await this.adminRepository.isServiceExist({ name });
+      return await this._adminRepository.isServiceExist({ name });
     } catch (error) {
       console.log(
         "error while checking isServiceExist or not  in the adminService",
@@ -413,7 +413,7 @@ class adminService implements IAdminService {
     try {
       const { values } = data;
       console.log("values from the service is ", values);
-      return await this.adminRepository.addNewServices({ values });
+      return await this._adminRepository.addNewServices({ values });
     } catch (error) {
       console.log(
         "Error while adding new Services in the adminService ",
@@ -428,7 +428,7 @@ class adminService implements IAdminService {
     try {
       const { name } = data;
       console.log("name in the addDevice in the adminService is", name);
-      return await this.adminRepository.addNewDevice({ name });
+      return await this._adminRepository.addNewDevice({ name });
     } catch (error) {
       console.log("Error while adding new Device form the adminService", error);
       throw error;
@@ -441,7 +441,7 @@ class adminService implements IAdminService {
   ): Promise<isDeviceExistResponse | null> {
     try {
       const { name } = data;
-      return await this.adminRepository.isDeviceExist({ name });
+      return await this._adminRepository.isDeviceExist({ name });
     } catch (error) {
       console.log(
         "error while checking the isDeviceExist in the adminService",
@@ -456,7 +456,7 @@ class adminService implements IAdminService {
   ): Promise<EditExistServiceResponse | null> {
     try {
       const { _id, values } = data;
-      return await this.adminRepository.editExistService({ _id, values });
+      return await this._adminRepository.editExistService({ _id, values });
     } catch (error) {
       console.log("error while editExistingService in AdminService", error);
       throw error;
@@ -475,7 +475,7 @@ class adminService implements IAdminService {
         modifiedVerificationStatus = false;
       }
       if (id) {
-        const result = await this.adminRepository.updateApprove({
+        const result = await this._adminRepository.updateApprove({
           id,
           modifiedVerificationStatus,
         });
@@ -492,7 +492,7 @@ class adminService implements IAdminService {
   }
 
   //changing this generating presinged url code ot differtnt comon place
-  async getPresignedUrl(data: IGetPreSignedUrl) {
+  async getPresignedUrl(data: IGetPreSignedUrl):Promise<GetPreSignedUrlResponse> {
     try {
       const { fileName, fileType, folderName } = data;
       if (!fileName || !fileType) {
@@ -519,7 +519,7 @@ class adminService implements IAdminService {
     try {
       console.log("reached the getAllComplaints in the adminService");
       console.log("Search in the admin service is ", search);
-      const complaints = await this.concernRepository.getAllComplaints(
+      const complaints = await this._concernRepository.getAllComplaints(
         page,
         limit,
         searchQuery,
@@ -551,7 +551,7 @@ class adminService implements IAdminService {
   async getComplaintById(id: string): Promise<unknown> {
     try {
       console.log("reached the getComplaintById in the adminService");
-      const complaint = await this.concernRepository.getComplaintDetails(id);
+      const complaint = await this._concernRepository.getComplaintDetails(id);
       if (complaint) {
         return {
           status: STATUS_CODES.OK,
@@ -583,7 +583,7 @@ class adminService implements IAdminService {
         complaintId,
         userRole
       );
-      const result = await this.concernRepository.cancelComplaint(
+      const result = await this._concernRepository.cancelComplaint(
         complaintId,
         userRole,
         reason

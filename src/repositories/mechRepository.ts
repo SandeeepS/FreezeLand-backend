@@ -41,11 +41,11 @@ class MechRepository
   extends BaseRepository<MechInterface & Document>
   implements IMechRepository
 {
-  private deviceRepository: BaseRepository<IDevice>;
+  private _deviceRepository: BaseRepository<IDevice>;
 
   constructor() {
     super(MechModel);
-    this.deviceRepository = new BaseRepository<IDevice>(deviceModel);
+    this._deviceRepository = new BaseRepository<IDevice>(deviceModel);
   }
 
   async createTempMechData(tempMechDetails: {
@@ -201,7 +201,7 @@ class MechRepository
 
   async getAllDevices(): Promise<GetAllDevicesResponse[]> {
     try {
-      const result = await this.deviceRepository.findAll2();
+      const result = await this._deviceRepository.findAll2();
       return result as GetAllDevicesResponse[];
     } catch (error) {
       console.log(error as Error);

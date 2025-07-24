@@ -54,19 +54,19 @@ import { updateCompleteStatusResponse } from "../interfaces/dataContracts/Mech/I
 const { OK} = STATUS_CODES;
 class mechService implements IMechServices {
   constructor(
-    private mechRepository: IMechRepository,
-    private concernRepository: IConcernRepository,
-    private roomRepository: IRoomRepository,
-    private createjwt: ICreateJWT,
-    private encrypt: compareInterface,
-    private email: Iemail
+    private _mechRepository: IMechRepository,
+    private _concernRepository: IConcernRepository,
+    private _roomRepository: IRoomRepository,
+    private _createjwt: ICreateJWT,
+    private _encrypt: compareInterface,
+    private _email: Iemail
   ) {
-    this.mechRepository = mechRepository;
-    this.concernRepository = concernRepository;
-    this.roomRepository = roomRepository;
-    this.createjwt = createjwt;
-    this.encrypt = encrypt;
-    this.email = email;
+    this._mechRepository = _mechRepository;
+    this._concernRepository = _concernRepository;
+    this._roomRepository = _roomRepository;
+    this._createjwt = _createjwt;
+    this._encrypt = _encrypt;
+    this._email = _email;
   }
 
   async mechRegistration(
@@ -86,17 +86,17 @@ class mechService implements IMechServices {
         throw new Error("Invalid user data");
       }
 
-      const mechExists = await this.mechRepository.emailExistCheck({ email });
+      const mechExists = await this._mechRepository.emailExistCheck({ email });
       if (mechExists) {
         throw new Error("Email already exists");
       }
 
-      const otp = await this.email.generateAndSendOTP(email);
+      const otp = await this._email.generateAndSendOTP(email);
       if (!otp) {
         throw new Error("Failed to generate OTP");
       }
       const tempMechDetails = { otp, mechData };
-      const savedTempMech = await this.mechRepository.createTempMechData(
+      const savedTempMech = await this._mechRepository.createTempMechData(
         tempMechDetails
       );
       return savedTempMech;
@@ -116,7 +116,7 @@ class mechService implements IMechServices {
         id,
         otp
       );
-      const getTempMechData = await this.mechRepository.getTempMechData(id);
+      const getTempMechData = await this._mechRepository.getTempMechData(id);
       if (!getTempMechData) {
         return {
           success: false,
@@ -153,14 +153,14 @@ class mechService implements IMechServices {
           };
 
           console.log("new Encryped password with data is ", newDetails);
-          const mech = await this.mechRepository.saveMechanic(newDetails);
+          const mech = await this._mechRepository.saveMechanic(newDetails);
           if (mech && mech.role) {
             const mechId = mech.id?.toString();
-            const access_token = this.createjwt.generateAccessToken(
+            const access_token = this._createjwt.generateAccessToken(
               mechId as string,
               mech.role
             );
-            const refresh_token = this.createjwt.generateRefreshToken(
+            const refresh_token = this._createjwt.generateRefreshToken(
               mechId as string
             );
             console.log("access token is", access_token);
@@ -212,17 +212,17 @@ class mechService implements IMechServices {
       try {
         const { tempMechId } = data;
         console.log("TempMechId isssssssss",tempMechId);
-        const tempUserData = await this.mechRepository.getTempMechData(
+        const tempUserData = await this._mechRepository.getTempMechData(
           tempMechId
         );
         console.log("tempMechData in the resendOTP in the mechService",tempUserData);
         const userEmail = tempUserData?.mechData.email;
-        const otp = await this.email.generateAndSendOTP(userEmail as string);
+        const otp = await this._email.generateAndSendOTP(userEmail as string);
         if (!otp) {
           throw new Error("Failed to generate OTP");
         }
   
-        const updatedTempUserData = await this.mechRepository.updateTempMechData({
+        const updatedTempUserData = await this._mechRepository.updateTempMechData({
           tempMechId,
           otp,
         });
@@ -239,7 +239,7 @@ class mechService implements IMechServices {
   ): Promise<SignUpMechResponse | null> {
     try {
       const { email } = mechData;
-      return await this.mechRepository.emailExistCheck({ email });
+      return await this._mechRepository.emailExistCheck({ email });
     } catch (error) {
       console.log(
         "Error occured in the singup function in the mechService ",
@@ -273,10 +273,10 @@ class mechService implements IMechServices {
         role: "mechanic",
       };
       console.log("new Encypted password with data is ", newDetails);
-      const mech = await this.mechRepository.saveMechanic(newDetails);
+      const mech = await this._mechRepository.saveMechanic(newDetails);
       if (mech?.id) {
-        const token = this.createjwt.generateAccessToken(mech.id, mech.role);
-        const refresh_token = this.createjwt.generateRefreshToken(mech.id);
+        const token = this._createjwt.generateAccessToken(mech.id, mech.role);
+        const refresh_token = this._createjwt.generateRefreshToken(mech.id);
 
         return {
           status: OK,
@@ -312,7 +312,7 @@ class mechService implements IMechServices {
       const { email, password } = data;
       const check = LoginValidation(email, password);
       if (check) {
-        const mech = await this.mechRepository.emailExistCheck({ email });
+        const mech = await this._mechRepository.emailExistCheck({ email });
         console.log(
           "accessed mechanic details from the mechService, in the mechLogin function is ",
           mech
@@ -330,7 +330,7 @@ class mechService implements IMechServices {
             } as const;
           } else {
             if (mech.password && password) {
-              const passwordMatch = await this.encrypt.compare(
+              const passwordMatch = await this._encrypt.compare(
                 password,
                 mech.password as string
               );
@@ -338,12 +338,12 @@ class mechService implements IMechServices {
               if (passwordMatch) {
                 console.log("password from the mech side is ", mech.password);
                 const mechId = mech._id.toString();
-                const token = this.createjwt.generateAccessToken(
+                const token = this._createjwt.generateAccessToken(
                   mechId,
                   mech.role
                 );
                 const refreshToken =
-                  this.createjwt.generateRefreshToken(mechId);
+                  this._createjwt.generateRefreshToken(mechId);
                 console.log("mech is exist", mech);
 
                 const filteredMech = {
@@ -415,7 +415,7 @@ class mechService implements IMechServices {
   ): Promise<EmailExistResponse | null> {
     try {
       const { email } = data;
-      return this.mechRepository.emailExistCheck({ email });
+      return this._mechRepository.emailExistCheck({ email });
     } catch (error) {
       console.log("Error occured in the getUserByEmail", error);
       throw error;
@@ -429,14 +429,14 @@ class mechService implements IMechServices {
       const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
       const search = "";
-      const mech = await this.mechRepository.getMechList({
+      const mech = await this._mechRepository.getMechList({
         page,
         limit,
         searchQuery,
         search,
       });
       console.log("list of all mechanics is from the mechService is ", mech);
-      const mechCount = await this.mechRepository.getMechCount(regex);
+      const mechCount = await this._mechRepository.getMechCount(regex);
       return {
         status: STATUS_CODES.OK,
         data: { mech, mechCount },
@@ -454,7 +454,7 @@ class mechService implements IMechServices {
   async VerifyMechanic(values: IVerifyMechanic) {
     try {
       console.log("Entered in the mechService for verifiying mechanic", values);
-      const response = await this.mechRepository.verifyMechanic(values);
+      const response = await this._mechRepository.verifyMechanic(values);
       return response;
     } catch (error) {
       console.log(
@@ -496,7 +496,7 @@ class mechService implements IMechServices {
   ): Promise<updateCompleteStatusResponse | null> {
     try {
       console.log("Entered in the updateComplaintStatus");
-      const result = await this.mechRepository.updateComplaintStatus(
+      const result = await this._mechRepository.updateComplaintStatus(
         complaintId,
         nextStatus
       );
@@ -513,7 +513,7 @@ class mechService implements IMechServices {
   //getting all devices
   async getDevcies(): Promise<GetAllDevicesResponse[]> {
     try {
-      const devices = await this.mechRepository.getAllDevices();
+      const devices = await this._mechRepository.getAllDevices();
       console.log("list of device  is ", devices);
       return devices as GetAllDevicesResponse[];
     } catch (error) {
@@ -540,7 +540,7 @@ class mechService implements IMechServices {
       });
       const newPassword = cryptr.encrypt(password);
 
-      return await this.mechRepository.updateNewPassword({
+      return await this._mechRepository.updateNewPassword({
         password: newPassword,
         mechId,
       });
@@ -559,7 +559,7 @@ class mechService implements IMechServices {
     try {
       const { id } = data;
       console.log("Id in the mechService is ", id);
-      const result = await this.mechRepository.getMechanicDetails({ id });
+      const result = await this._mechRepository.getMechanicDetails({ id });
       return result;
     } catch (error) {
       console.log(
@@ -576,7 +576,7 @@ class mechService implements IMechServices {
     searchQuery: string
   ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
     try {
-      const data = await this.concernRepository.getAllUserRegisteredServices({
+      const data = await this._concernRepository.getAllUserRegisteredServices({
         page,
         limit,
         searchQuery,
@@ -599,7 +599,7 @@ class mechService implements IMechServices {
   ): Promise<getComplaintDetailsResponse[] | null> {
     try {
       console.log("Enterdin the mechService");
-      const result = await this.concernRepository.getComplaintDetails(id);
+      const result = await this._concernRepository.getComplaintDetails(id);
       return result;
     } catch (error) {
       console.log(
@@ -619,7 +619,7 @@ class mechService implements IMechServices {
   ): Promise<getUpdatedWorkAssingnedResponse> {
     try {
       console.log("Entered the mechservice");
-      const result = await this.mechRepository.updateWorkAssigned(
+      const result = await this._mechRepository.updateWorkAssigned(
         complaintId,
         mechanicId,
         status,
@@ -640,7 +640,7 @@ class mechService implements IMechServices {
   ): Promise<getAllAcceptedServiceResponse[]> {
     try {
       console.log("Enterd in the mechService");
-      const result = await this.mechRepository.getAllAcceptedServices(
+      const result = await this._mechRepository.getAllAcceptedServices(
         mechanicId
       );
       return result;
@@ -657,7 +657,7 @@ class mechService implements IMechServices {
   async createRoom(data: ICreateRoomData): Promise<ICreateRoomResponse> {
     try {
       const { userId, mechId } = data;
-      const result = await this.roomRepository.createRoom({ userId, mechId });
+      const result = await this._roomRepository.createRoom({ userId, mechId });
       return result;
     } catch (error) {
       console.log("Error occured in the createRoom in the MechService", error);
@@ -674,7 +674,7 @@ class mechService implements IMechServices {
         complaintId,
         workDetails
       );
-      const result = await this.concernRepository.updateWorkDetails({
+      const result = await this._concernRepository.updateWorkDetails({
         complaintId,
         workDetails,
       });
@@ -696,7 +696,7 @@ class mechService implements IMechServices {
         "Entered in the getAllCompliantService funtion in the mechService"
       );
       const result =
-        await this.concernRepository.getAllCompletedServiceByMechanic(
+        await this._concernRepository.getAllCompletedServiceByMechanic(
           mechanicId
         );
       return result;
@@ -719,7 +719,7 @@ class mechService implements IMechServices {
         "Values reached in the mechService in the backend while eding the mechanic",
         mechaicDetails
       );
-      const result = await this.mechRepository.editMechanic({ mechId, values });
+      const result = await this._mechRepository.editMechanic({ mechId, values });
       return result;
     } catch (error) {
       console.log("Erro occured in the editMechanic ", error);
@@ -734,7 +734,7 @@ class mechService implements IMechServices {
     try {
       const { _id, values } = data;
       console.log("id from the addMechAddress in the mech service is ", _id);
-      const address = await this.mechRepository.addAddress({ _id, values });
+      const address = await this._mechRepository.addAddress({ _id, values });
       if (address) {
         return address;
       } else {
@@ -750,7 +750,7 @@ class mechService implements IMechServices {
   async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
-      return await this.mechRepository.editAddress({ _id, addressId, values });
+      return await this._mechRepository.editAddress({ _id, addressId, values });
     } catch (error) {
       console.log("error in ediAddress in the mechService ", error);
       throw error;
@@ -764,7 +764,7 @@ class mechService implements IMechServices {
         "Enterd in the handleRemoveMechAddress in the mechService",
         mechId,addressId
       );
-      const result = await this.mechRepository.handleRemoveMechAddress(
+      const result = await this._mechRepository.handleRemoveMechAddress(
         mechId,addressId
       );
       return result;

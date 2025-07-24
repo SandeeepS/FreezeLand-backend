@@ -45,23 +45,23 @@ import {
   getMechanicDetailsResponse,
 } from "../interfaces/dataContracts/Mech/IRepository.dto";
 import MechModel from "../models/mechModel";
-import {  ITempUser, UserInterface } from "../interfaces/Model/IUser";
-import { ISingUp} from "../interfaces/dataContracts/User/IService.dto";
+import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
+import { ISingUp } from "../interfaces/dataContracts/User/IService.dto";
 import { MechInterface } from "../interfaces/Model/IMech";
 
 class UserRepository
   extends BaseRepository<UserInterface & Document>
   implements IUserRepository
 {
-  private concernRepository: BaseRepository<Iconcern>;
-  private serviceRepository: BaseRepository<IServices>;
-  private mechanicRepository: BaseRepository<MechInterface>;
+  private _concernRepository: BaseRepository<Iconcern>;
+  private _serviceRepository: BaseRepository<IServices>;
+  private _mechanicRepository: BaseRepository<MechInterface>;
 
   constructor() {
     super(userModel);
-    this.concernRepository = new BaseRepository<Iconcern>(concernModel);
-    this.serviceRepository = new BaseRepository<IServices>(serviceModel);
-    this.mechanicRepository = new BaseRepository<MechInterface>(MechModel);
+    this._concernRepository = new BaseRepository<Iconcern>(concernModel);
+    this._serviceRepository = new BaseRepository<IServices>(serviceModel);
+    this._mechanicRepository = new BaseRepository<MechInterface>(MechModel);
   }
 
   async saveUser(newDetails: ISaveUser): Promise<SaveUserResponse | null> {
@@ -109,7 +109,10 @@ class UserRepository
     try {
       const { tempUserId, otp } = data;
       const result = await TempUser.findByIdAndUpdate(tempUserId, { otp: otp });
-      console.log("Updated tempUserData in the userTempUserData in the userRepository",result);
+      console.log(
+        "Updated tempUserData in the userTempUserData in the userRepository",
+        result
+      );
       return result;
     } catch (error) {
       console.log(
@@ -188,7 +191,7 @@ class UserRepository
       const defaultAddressDetails = user.address?.find(
         (addr) => addr._id.toString() === user.defaultAddress?.toString()
       );
-  
+
       return {
         ...user.toObject(),
         defaultAddressDetails,
@@ -204,9 +207,9 @@ class UserRepository
   //methods used in the admin side
   async getUserList(data: IGetUserList): Promise<GetUserListResponse[]> {
     try {
-      const { page, limit,search } = data;
-      console.log("search ins the getUserlits , userRepo",search);
-      const regex = new RegExp(search.trim(),"i");
+      const { page, limit, search } = data;
+      console.log("search ins the getUserlits , userRepo", search);
+      const regex = new RegExp(search.trim(), "i");
       const result = await this.findAll(page, limit, regex);
       console.log("users list is ", result);
       return result as UserInterface[];
@@ -237,7 +240,7 @@ class UserRepository
     try {
       const { page, limit, searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
-      const result = await this.serviceRepository.findAll(page, limit, regex);
+      const result = await this._serviceRepository.findAll(page, limit, regex);
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -250,7 +253,7 @@ class UserRepository
     try {
       const { searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
-      return await this.serviceRepository.countDocument(regex);
+      return await this._serviceRepository.countDocument(regex);
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
@@ -439,7 +442,7 @@ class UserRepository
       console.log(
         "enterd in the userRepository for registering the user complaint"
       );
-      const newConcern = await this.concernRepository.addConcern(data);
+      const newConcern = await this._concernRepository.addConcern(data);
       return newConcern;
     } catch (error) {
       console.log(error as Error);
@@ -453,7 +456,7 @@ class UserRepository
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;
-      const result = await this.mechanicRepository.findById(id);
+      const result = await this._mechanicRepository.findById(id);
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -463,27 +466,30 @@ class UserRepository
     }
   }
 
-async handleRemoveUserAddress(userId: string, addressId: string): Promise<boolean> {
-  try {
-    const result = await userModel.updateOne(
-      { _id: userId, "address._id": addressId },
-      { $set: { "address.$.isDeleted": true } }
-    );
-    
-    console.log("Result after updatin the address in the userSide ",result);
+  async handleRemoveUserAddress(
+    userId: string,
+    addressId: string
+  ): Promise<boolean> {
+    try {
+      const result = await userModel.updateOne(
+        { _id: userId, "address._id": addressId },
+        { $set: { "address.$.isDeleted": true } }
+      );
 
-    if (result.modifiedCount === 0) {
-      throw new Error("No address found or already deleted.");
-    }else{
-      return true;
+      console.log("Result after updatin the address in the userSide ", result);
+
+      if (result.modifiedCount === 0) {
+        throw new Error("No address found or already deleted.");
+      } else {
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+      throw new Error(
+        "Error occurred while removing user address in userRepository"
+      );
     }
-    
-  } catch (error) {
-    console.error(error);
-    throw new Error("Error occurred while removing user address in userRepository");
   }
-}
-
 }
 
 export default UserRepository;

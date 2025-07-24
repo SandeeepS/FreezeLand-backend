@@ -9,20 +9,20 @@ import IChatServices from "../interfaces/IServices/IChatServices";
 
 class ChatServices implements IChatServices {
   constructor(
-    private chatRepository: IChatRepository,
-    private concernRepository: IConcernRepository
+    private _chatRepository: IChatRepository,
+    private _concernRepository: IConcernRepository
   ) {
-    this.chatRepository = chatRepository;
-    this.concernRepository = concernRepository;
+    this._chatRepository = _chatRepository;
+    this._concernRepository = _concernRepository;
   }
 
   //function to get the existing messagaes
   async getMessagesByRoomId(roomId: string): Promise<unknown> {
     try {
       console.log("Enterd in the getMessageByRoomId", roomId);
-      const result = await this.chatRepository.getMessagesByRoomId(roomId);
+      const result = await this._chatRepository.getMessagesByRoomId(roomId);
       return result;
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       throw error;
     }
@@ -33,7 +33,7 @@ class ChatServices implements IChatServices {
   ): Promise<MessageDataResponse | null> {
     try {
       const { roomId, message, senderId, sendAt, senderType } = messageData;
-      return await this.chatRepository.createMessage({
+      return await this._chatRepository.createMessage({
         roomId,
         message,
         senderId,
@@ -52,7 +52,7 @@ class ChatServices implements IChatServices {
   ): Promise<getComplaintDetailsResponse[]>{
     try {
       console.log("Enterdin the mechService");
-      const result = await this.concernRepository.getComplaintDetails(id);
+      const result = await this._concernRepository.getComplaintDetails(id);
       return result;
     } catch (error) {
       console.log(

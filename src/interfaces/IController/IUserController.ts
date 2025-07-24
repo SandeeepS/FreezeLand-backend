@@ -1,7 +1,6 @@
 import { Request,Response,NextFunction } from "express";
 import { ForgotResentOtpResponse, GetImageUrlResponse } from "../dataContracts/User/IController.dto";
 
-
 export interface IUserController{
     
     // User Management 

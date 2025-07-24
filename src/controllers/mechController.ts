@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-
 const { BAD_REQUEST, OK, NOT_FOUND } = STATUS_CODES;
 import { AddressValidation } from "../utils/validator";
 import { IMechController } from "../interfaces/IController/IMechController";
@@ -12,8 +11,6 @@ import {
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
 } from "../interfaces/dataContracts/Mech/IController.dto";
-import { compareInterface } from "../utils/comparePassword";
-import { ICreateJWT } from "../utils/generateToken";
 import { Iemail } from "../utils/email";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -23,17 +20,13 @@ import IReportService from "../interfaces/IServices/IReportService";
 
 class mechController implements IMechController {
   constructor(
-    private mechServices: IMechServices,
-    private reportService: IReportService,
-    private encrypt: compareInterface,
-    private createdjwt: ICreateJWT,
-    private email: Iemail
+    private _mechServices: IMechServices,
+    private _reportService: IReportService,
+    private _email: Iemail
   ) {
-    this.mechServices = mechServices;
-    this.reportService = reportService;
-    this.encrypt = encrypt;
-    this.createdjwt = createdjwt;
-    this.email = email;
+    this._mechServices = _mechServices;
+    this._reportService = _reportService;
+    this._email = _email;
   }
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
@@ -47,7 +40,7 @@ class mechController implements IMechController {
     try {
       const mechData = req.body;
       console.log("Details from the mechSignuppage (frontend) is ", mechData);
-      const result = await this.mechServices.mechRegistration(mechData);
+      const result = await this._mechServices.mechRegistration(mechData);
       res.status(201).json({ success: true, result });
     } catch (error) {
       console.log(error as Error);
@@ -87,7 +80,7 @@ class mechController implements IMechController {
         });
       }
 
-      const result = await this.mechServices.verifyOTP(id, otp);
+      const result = await this._mechServices.verifyOTP(id, otp);
       if (result.success) {
         const accessTokenMaxAge = 15 * 60 * 1000; // 15 minutes
         const refreshTokenMaxAge = 48 * 60 * 60 * 1000; // 48 hours
@@ -150,7 +143,7 @@ class mechController implements IMechController {
         "TempMechId in the resend OTP in the ressend otp function in the mechController",
         tempMechId
       );
-      const response = await this.mechServices.resendOTP({ tempMechId });
+      const response = await this._mechServices.resendOTP({ tempMechId });
       if (response) {
         res.status(200).json({
           success: true,
@@ -182,7 +175,7 @@ class mechController implements IMechController {
       console.log("entered in the backend mechLogin in mechController");
       const { email, password }: { email: string; password: string } = req.body;
 
-      const loginStatus = await this.mechServices.mechLogin({
+      const loginStatus = await this._mechServices.mechLogin({
         email,
         password,
         role: "mechanic",
@@ -241,14 +234,14 @@ class mechController implements IMechController {
           message: "please enter the email",
         }) as ForgotResentOtpResponse;
       }
-      const mech = await this.mechServices.getUserByEmail({ email });
+      const mech = await this._mechServices.getUserByEmail({ email });
       if (!mech) {
         return res.status(BAD_REQUEST).json({
           success: false,
           message: "mech with email is not exist!",
         }) as ForgotResentOtpResponse;
       }
-      const otp = await this.email.generateAndSendOTP(email);
+      const otp = await this._email.generateAndSendOTP(email);
       req.app.locals.resendOtp = otp;
 
       const expirationMinutes = 1;
@@ -302,7 +295,7 @@ class mechController implements IMechController {
         password,
         mechId
       );
-      const result = await this.mechServices.updateNewPassword({
+      const result = await this._mechServices.updateNewPassword({
         password,
         mechId,
       });
@@ -323,7 +316,7 @@ class mechController implements IMechController {
       const limit = parseInt(req.query.limit as string);
       const searchQuery = req.query.searchQuery as string;
 
-      const data = await this.mechServices.getAllMechanics({
+      const data = await this._mechServices.getAllMechanics({
         page,
         limit,
         searchQuery,
@@ -344,7 +337,7 @@ class mechController implements IMechController {
       console.log(
         "reached the getAllDevces  funciton in the mech controller to  access the all the devices "
       );
-      const data = await this.mechServices.getDevcies();
+      const data = await this._mechServices.getDevcies();
       console.log(
         "listed services from the database is in the mech controller is",
         data
@@ -363,7 +356,7 @@ class mechController implements IMechController {
         "reached in the mechController for mech Verification ",
         values
       );
-      const data = await this.mechServices.VerifyMechanic(values);
+      const data = await this._mechServices.VerifyMechanic(values);
       res.status(OK).json(data);
     } catch (error) {
       console.log(error as Error);
@@ -379,7 +372,7 @@ class mechController implements IMechController {
         id
       );
       if (typeof id === "string") {
-        const result = await this.mechServices.getMechanicDetails({ id });
+        const result = await this._mechServices.getMechanicDetails({ id });
         res.status(OK).json({ success: true, result: result });
       } else {
         console.log(
@@ -405,7 +398,7 @@ class mechController implements IMechController {
         name: string;
       };
       console.log("file from the front end is ", fileName, fileType);
-      const result = await this.mechServices.getS3SingUrlForMechCredinential({
+      const result = await this._mechServices.getS3SingUrlForMechCredinential({
         fileName,
         fileType,
         name,
@@ -445,7 +438,7 @@ class mechController implements IMechController {
       const limit = 10;
       const searchQuery = "";
       const allRegisteredUserServices =
-        await this.mechServices.getAllUserRegisteredServices(
+        await this._mechServices.getAllUserRegisteredServices(
           page,
           limit,
           searchQuery,
@@ -480,7 +473,7 @@ class mechController implements IMechController {
         "Enterd in the getComplaintDetails function in the mechController with id",
         id
       );
-      const result = await this.mechServices.getComplaintDetails(id as string);
+      const result = await this._mechServices.getComplaintDetails(id as string);
       res.status(200).json({ success: true, result });
     } catch (error) {
       next(error);
@@ -524,7 +517,7 @@ class mechController implements IMechController {
         status,
         roomId
       );
-      const result = await this.mechServices.updateWorkAssigned(
+      const result = await this._mechServices.updateWorkAssigned(
         complaintId,
         mechanicId,
         status,
@@ -548,7 +541,7 @@ class mechController implements IMechController {
         "mechanic id in the getAllAcceptedServices in the mechController is ",
         mechanicId
       );
-      const result = await this.mechServices.getAllAcceptedServices(
+      const result = await this._mechServices.getAllAcceptedServices(
         mechanicId as string
       );
       res.status(200).json({ success: true, result });
@@ -567,7 +560,7 @@ class mechController implements IMechController {
         complaintId,
         nextStatus
       );
-      const result = await this.mechServices.updateComplaintStatus(
+      const result = await this._mechServices.updateComplaintStatus(
         complaintId,
         nextStatus
       );
@@ -586,7 +579,7 @@ class mechController implements IMechController {
         mechId,
         values
       );
-      const result = await this.mechServices.editMechanic({ mechId, values });
+      const result = await this._mechServices.editMechanic({ mechId, values });
       res.status(OK).json({ success: true, result });
     } catch (error) {
       console.log(error as Error);
@@ -612,7 +605,7 @@ class mechController implements IMechController {
         values.landMark
       );
       if (check) {
-        const addedAddress = await this.mechServices.AddUserAddress({
+        const addedAddress = await this._mechServices.AddUserAddress({
           _id,
           values,
         });
@@ -657,7 +650,7 @@ class mechController implements IMechController {
       );
       if (check) {
         console.log("address validation done ");
-        const editedAddress = await this.mechServices.editAddress({
+        const editedAddress = await this._mechServices.editAddress({
           _id,
           addressId,
           values,
@@ -697,7 +690,7 @@ class mechController implements IMechController {
           ...workDetails,
         ]}`
       );
-      const result = await this.mechServices.updateWorkDetails({
+      const result = await this._mechServices.updateWorkDetails({
         complaintId,
         workDetails,
       });
@@ -720,7 +713,7 @@ class mechController implements IMechController {
       console.log("Entered in the getAllCompleted Services");
       const { mechanicId } = req.query;
       console.log("mechanic id is", mechanicId);
-      const result = await this.mechServices.getAllCompletedServices(
+      const result = await this._mechServices.getAllCompletedServices(
         mechanicId as string
       );
       res.status(OK).json({ success: true, result });
@@ -739,13 +732,13 @@ class mechController implements IMechController {
       res
         .clearCookie("mech_access_token", {
           httpOnly: true,
-           secure: true, 
-            sameSite: "none",
+          secure: true,
+          sameSite: "none",
         })
         .clearCookie("mech_refresh_token", {
           httpOnly: true,
-           secure: true, 
-            sameSite: "none",
+          secure: true,
+          sameSite: "none",
         });
       res
         .status(200)
@@ -761,7 +754,7 @@ class mechController implements IMechController {
       const { userId, mechId } = req.body;
       console.log("entered in the createRoom in the mechControler");
       console.log(`user id is ${userId} and mechId is ${mechId}`);
-      const result = await this.mechServices.createRoom({ userId, mechId });
+      const result = await this._mechServices.createRoom({ userId, mechId });
       console.log("result fo createRoom in controller is", this.createRoom);
       res.status(200).json({ success: true, result });
     } catch (error) {
@@ -778,7 +771,7 @@ class mechController implements IMechController {
         "Datas from the frontend  in the createReportFunciton in the mechController is ",
         reportData
       );
-      const result = await this.reportService.createReport(reportData);
+      const result = await this._reportService.createReport(reportData);
       return res.status(200).json({ success: true, result });
     } catch (error) {
       console.log(
@@ -798,7 +791,7 @@ class mechController implements IMechController {
     try {
       const { mechId, addressId } = req.body;
       console.log("address id in the mechController is", mechId, addressId);
-      const result = await this.mechServices.handleRemoveMechAddress(
+      const result = await this._mechServices.handleRemoveMechAddress(
         mechId as string,
         addressId as string
       );
