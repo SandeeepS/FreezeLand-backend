@@ -22,7 +22,7 @@ const reportService = new ReportService(reportRepository);
 const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
 const mechServices = new mechService(mechRepository,concernRepository,roomRepository,createjwt,encrypt,email);
-const controller = new mechController(mechServices,reportService,encrypt,createjwt,email);
+const controller = new mechController(mechServices,reportService,email);
 
 chatRouter.post("/createRoom",async(req:Request,res:Response,next:NextFunction) => await controller.createRoom(req,res,next));
 chatRouter.get('/getComplaintDetails',async(req:Request,res:Response,next:NextFunction) => await controller.getComplaintDetails(req,res,next));
