@@ -45,7 +45,7 @@ const userSchema: Schema<UserInterface> = new Schema({
     type: String,
   },
 
-  email: {
+  email:{
     type: String,
     required: true,
   },
@@ -54,7 +54,7 @@ const userSchema: Schema<UserInterface> = new Schema({
     type: Number,
   },
 
-  profile_picture: {
+  profile_picture:{
     type: String,
     default:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/680px-Default_pfp.svg.png",

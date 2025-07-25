@@ -324,7 +324,7 @@ class userService implements IUserServices {
           user
         );
 
-        if (user?.id) {
+        if (user?.id){
           if (user.isBlocked) {
             console.log("User is blocked");
             return {
