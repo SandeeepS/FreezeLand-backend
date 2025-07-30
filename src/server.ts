@@ -14,43 +14,13 @@ import logger from "./utils/logger";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import configureSocket from "./config.ts/socket";
+import { corsOptions } from "./utils/corsOptions";
 const morganFormat = ":method :url :status :response-time ms";
 const app: Express = express();
 const PORT: string | number = process.env.PORT || 5000;
 const server = http.createServer(app);
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [ "http://localhost:5173","http://localhost:5174","https://freezeland.online"];
-      
-      if (!origin) {
-        return callback(null, true);
-      }
-      
-      if (allowedOrigins.includes(origin)) {
-        callback(null, origin); 
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
-    allowedHeaders: [
-      "Content-Type", 
-      "Authorization", 
-      "X-Requested-With",
-      "Accept",
-      "Origin"
-    ], 
-    credentials: true,
-    exposedHeaders: ["set-cookie"],
-    optionsSuccessStatus: 200 
-  })
-);
-
-
-
-
+app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
@@ -96,7 +66,7 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/mech", mechRoutes);
-app.use("/api/chat",chatRouters);
+app.use("/api/chat", chatRouters);
 
 server.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
