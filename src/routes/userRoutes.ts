@@ -14,6 +14,7 @@ import ConcernRepository from "../repositories/concernRepository";
 import MechRepository from "../repositories/mechRepository";
 import ReportRepository from "../repositories/reportRepository";
 import ReportService from "../services/reportService";
+import { limiter } from "../utils/rateLimiter";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
@@ -33,7 +34,7 @@ const userServices = new userService(userRepository,serviceRepository,concernRep
 const controller = new userController(userServices,reportService,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
-userRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next))
+userRouter.post('/login',limiter,async(req:Request,res:Response,next:NextFunction) => await controller.userLogin(req,res,next))
 userRouter.post('/google-login', async (req: Request, res: Response, next: NextFunction) => await controller.googleLogin(req, res, next));
 userRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => await controller.logout(req, res,next));
 userRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.verifyOtp(req,res,next));
