@@ -40,7 +40,6 @@ app.use(
   })
 );
 
-app.use(errorHandlerMiddleware);
 const uri: string =
   process.env.MONGODB_URI || "mongodb://localhost:27017/your-app";
 
@@ -59,14 +58,16 @@ const io = configureSocket(server);
 // Exporting io
 export { io };
 
-app.get("/", (_req: Request, res: Response) => {
-  res.status(200).send("Server is running");
-});
-
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/mech", mechRoutes);
 app.use("/api/chat", chatRouters);
+
+app.get("/", (_req: Request, res: Response) => {
+  res.status(200).send("Server is running");
+});
+
+app.use(errorHandlerMiddleware);
 
 server.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
