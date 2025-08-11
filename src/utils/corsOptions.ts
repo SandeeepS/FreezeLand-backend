@@ -11,6 +11,7 @@ interface CorsOptions {
   exposedHeaders: string[];
 }
 
+
 export const corsOptions: CorsOptions = {
   origin: (
     origin: string | undefined,
@@ -35,7 +36,6 @@ export const corsOptions: CorsOptions = {
     "X-Requested-With",
     "Access-Control-Request-Method",
     "Access-Control-Request-Headers",
-
     "Accept",
     "Origin",
   ],
