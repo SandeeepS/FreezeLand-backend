@@ -1,17 +1,6 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
 
-const AddressSchema = new Schema({
-  name: { type: String, require: true },
-  phone: { type: Number, require: true },
-  email: { type: String, require: true },
-  state: { type: String, require: true },
-  pin: { type: Number, require: true },
-  district: { type: String, require: true },
-  landMark: { type: String, require: true },
-  isDeleted:{type:Boolean,default:false},
-});
-
 const LocationDataSchema = new Schema({
   type: {
     type: {
@@ -45,7 +34,7 @@ const userSchema: Schema<UserInterface> = new Schema({
     type: String,
   },
 
-  email:{
+  email: {
     type: String,
     required: true,
   },
@@ -54,14 +43,14 @@ const userSchema: Schema<UserInterface> = new Schema({
     type: Number,
   },
 
-  profile_picture:{
+  profile_picture: {
     type: String,
     default:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/680px-Default_pfp.svg.png",
   },
 
   address: {
-    type: [AddressSchema],
+    type: Schema.Types.ObjectId,
     required: false,
   },
 

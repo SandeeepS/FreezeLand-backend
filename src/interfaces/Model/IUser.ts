@@ -1,16 +1,5 @@
 import mongoose, { Types, Document } from "mongoose";
 
-export interface Address {
-  _id: Types.ObjectId;
-  name: string;
-  phone: number;
-  email: string;
-  state: string;
-  pin: number;
-  district: string;
-  landMark: string;
-}
-
 export interface UserInterface extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
@@ -28,7 +17,7 @@ export interface UserInterface extends Document {
     city: string;
     state: string;
   };
-  address: Address[];
+  address: mongoose.Types.ObjectId;
   defaultAddress: string;
   role: string;
   wallet:number;
