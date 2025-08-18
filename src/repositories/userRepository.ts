@@ -7,7 +7,7 @@ import serviceModel from "../models/serviceModel";
 import { IServices } from "../interfaces/Model/IService";
 
 import {
-  IAddUserAddress,
+  // IAddUserAddress,
   AddUserAddressResponse,
   IGetAllServices,
   GetAllServiceResponse,
@@ -188,13 +188,15 @@ class UserRepository
       if (!user) {
         return null;
       }
-      const defaultAddressDetails = user.address?.find(
-        (addr) => addr._id.toString() === user.defaultAddress?.toString()
-      );
+      //currently the detault address is commecnted becuase some changes made in the address
+      //shcema and need to reflect the businnes logic soon
+      // const defaultAddressDetails = user.address?.find(
+      //   (addr) => addr._id.toString() === user.defaultAddress?.toString()
+      // );
 
       return {
         ...user.toObject(),
-        defaultAddressDetails,
+        // defaultAddressDetails,
       };
     } catch (error) {
       console.log(error as Error);
@@ -390,15 +392,18 @@ class UserRepository
   }
 
   async addAddress(
-    data: IAddUserAddress
+    data: null
   ): Promise<AddUserAddressResponse | null> {
     try {
-      const { _id, values } = data;
-      console.log("id from the userRepository while add addresss is ", _id);
-      console.log("new address from the userRepository is ", values);
-      const qr = { address: [values] };
-      const addedAddress = await this.updateAddress(_id, qr);
-      return addedAddress;
+      console.log(data)
+      // const { _id, values } = data;
+      // console.log("id from the userRepository while add addresss is ", _id);
+      // console.log("new address from the userRepository is ", values);
+      //commented bacause some changes made in address updation
+      // const qr = { address: [values] };
+      // const addedAddress = await this.updateAddress(_id, qr);
+      // return addedAddress;
+      return null;
     } catch (error) {
       console.log(error as Error);
       throw error;

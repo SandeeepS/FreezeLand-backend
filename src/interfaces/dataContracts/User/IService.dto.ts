@@ -4,7 +4,7 @@ import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
 import Service from "../../entityInterface/Iservices";
 import mongoose, { Types } from "mongoose";
-import { Address, ITempUser } from "../../Model/IUser";
+import { ITempUser } from "../../Model/IUser";
 import { ILoginResponse } from "../../entityInterface/ILoginResponse";
 import { IOrderData } from "../Order/IRepository";
 
@@ -236,15 +236,7 @@ export interface UpdateNewPasswordResponse {
   phone: number;
   profile_picture: string;
   role: string;
-  address: {
-    name: string;
-    phone: number;
-    email: string;
-    state: string;
-    pin: number;
-    district: string;
-    landMark: string;
-  }[];
+  address:Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -273,24 +265,16 @@ export interface EditUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address: {
-    name: string;
-    phone: number;
-    email: string;
-    state: string;
-    pin: number;
-    district: string;
-    landMark: string;
-  }[];
+  address: Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
 
-export interface IAddUserAddress{
-  _id: string;
-  values: Address;
-}
+// export interface IAddUserAddress{
+//   _id: string;
+//   values: Address;
+// }
 
 export interface AddUserAddressResponse {
   _id: Types.ObjectId;
@@ -308,15 +292,7 @@ export interface EditAddressResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address: {
-    name: string;
-    phone: number;
-    email: string;
-    state: string;
-    pin: number;
-    district: string;
-    landMark: string;
-  }[];
+  address: Types.ObjectId;
   defaultAddress: string;
   role: string;
   isBlocked: boolean;
@@ -334,15 +310,7 @@ export interface SetUserDefaultAddressResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address: {
-    name: string;
-    phone: number;
-    email: string;
-    state: string;
-    pin: number;
-    district: string;
-    landMark: string;
-  }[];
+  address: Types.ObjectId;
   defaultAddress: string;
   role: string;
   isBlocked: boolean;
@@ -406,7 +374,7 @@ export interface IupdateUserLocationResponse{
       city: string;
       state: string;
     };
-    address: Address[];
+    address: Types.ObjectId;
     defaultAddress: string;
     role: string;
   

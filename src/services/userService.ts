@@ -33,7 +33,7 @@ import {
   IGetService,
   IUpdateNewPassword,
   IEditUser,
-  IAddUserAddress,
+  // IAddUserAddress,
   IEditAddress,
   ISetUserDefaultAddress,
   IRegisterService,
@@ -44,7 +44,6 @@ import {
   INewDetails,
 } from "../interfaces/dataContracts/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
-import { AddAddress } from "../interfaces/commonInterfaces/AddAddress";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import { ICreateJWT } from "../utils/generateToken";
 import { compareInterface } from "../utils/comparePassword";
@@ -720,20 +719,20 @@ class userService implements IUserServices {
     }
   }
 
-  async AddUserAddress(
-    data: IAddUserAddress
-  ): Promise<AddUserAddressResponse | null> {
+  async AddUserAddress(data: null): Promise<AddUserAddressResponse | null> {
     try {
-      const { _id, values } = data;
-      const address = await this._userRepository.addAddress({ _id, values });
-      if (address) {
-        return {
-          _id: address._id,
-          values: address as AddAddress,
-        };
-      } else {
-        return null;
-      }
+      console.log(data);
+      // const { _id, values } = data;
+      // const address = await this._userRepository.addAddress({ _id, values });
+      // if (address) {
+      //   return {
+      //     _id: address._id,
+      //     values: address as AddAddress,
+      //   };
+      // } else {
+      //   return null;
+      // }
+      return null;
     } catch (error) {
       console.log("error occured AddUserAddress in the userService");
       throw error;
