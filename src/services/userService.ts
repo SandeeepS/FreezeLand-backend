@@ -42,6 +42,8 @@ import {
   IGetMechanicDetails,
   ISingUp,
   INewDetails,
+  AddUserAddress,
+ 
 } from "../interfaces/dataContracts/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
@@ -55,12 +57,14 @@ import { IOrderService } from "../interfaces/IServices/IOrderService";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import IOrderRepository from "../interfaces/IRepository/IOrderRepository";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
+import IAddressRepository from "../interfaces/IRepository/IAddressRepository";
 dotenv.config();
 
 const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 class userService implements IUserServices {
   constructor(
     private _userRepository: IUserRepository,
+    private _addressReopository:IAddressRepository,
     private _serviceRepository: IServiceRepository,
     private _concernRepository: IConcernRepository,
     private _orderRepository: IOrderRepository,
@@ -70,6 +74,7 @@ class userService implements IUserServices {
     private _email: Iemail
   ) {
     this._userRepository = _userRepository;
+    this._addressReopository = _addressReopository;
     this._serviceRepository = _serviceRepository;
     this._concernRepository = _concernRepository;
     this._orderRepository = _orderRepository;
@@ -719,20 +724,12 @@ class userService implements IUserServices {
     }
   }
 
-  async AddUserAddress(data: null): Promise<AddUserAddressResponse | null> {
+  async AddUserAddress(data: AddUserAddress): Promise<AddUserAddressResponse | null> {
     try {
       console.log(data);
-      // const { _id, values } = data;
-      // const address = await this._userRepository.addAddress({ _id, values });
-      // if (address) {
-      //   return {
-      //     _id: address._id,
-      //     values: address as AddAddress,
-      //   };
-      // } else {
-      //   return null;
-      // }
-      return null;
+      const {values } = data;
+      const address = await this._addressReopository.addAddress({values });
+      return address;
     } catch (error) {
       console.log("error occured AddUserAddress in the userService");
       throw error;

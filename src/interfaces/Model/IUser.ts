@@ -15,11 +15,10 @@ export interface UserInterface extends Document {
       enum: string[];
       default: string;
     };
-    coordinates: number[]; // [longitude, latitude]
+    coordinates: number[]; 
     city: string;
     state: string;
   };
-  address: mongoose.Types.ObjectId;
   defaultAddress: string;
   role: string;
   wallet: number;

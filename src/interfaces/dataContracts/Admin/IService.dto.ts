@@ -144,7 +144,6 @@ export interface BlockUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address:Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -204,7 +203,6 @@ export interface DeleteUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address: Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;

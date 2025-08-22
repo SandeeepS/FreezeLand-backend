@@ -465,21 +465,20 @@ class userController implements IUserController {
       console.log(
         "enterd in the addAddress fucniton in the backend userController"
       );
-      const { values, _id } = req.body;
-      console.log("id from the userController while adding address is", _id);
+      const { newAddress } = req.body;
+      console.log("new Address in the controller is ",newAddress)
       const check = AddressValidation(
-        values.name,
-        values.phone,
-        values.email,
-        values.state,
-        values.pin,
-        values.district,
-        values.landMark
+        newAddress.userId,
+        newAddress.addressType,
+        newAddress.fullAddress,
+        newAddress.houseNumber,
+        newAddress.longitude,
+        newAddress.latitude,
+        newAddress.landmark
       );
       if (check) {
         const addedAddress = await this._userServices.AddUserAddress({
-          _id,
-          values,
+          values: newAddress,
         });
         if (addedAddress) {
           res.status(OK).json({

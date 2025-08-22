@@ -1,43 +1,49 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IAddress } from "../interfaces/Model/IAddress";
 
-const addressFieldsSchema = new Schema({
-  name: { type: String, require: true },
-  phone: { type: Number, require: true },
-  email: { type: String, require: true },
-  state: { type: String, require: true },
-  pin: { type: Number, require: true },
-  district: { type: String, require: true },
-  landMark: { type: String, require: true },
-  isDeleted: { type: Boolean, default: false },
-});
-
-const addressItemSchema = new Schema(
+const addressSchema = new Schema(
   {
-    id: { type: Number, required: true },
-    address: { type: addressFieldsSchema, required: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    addressType: {
+      type: String,
+      enum: ["Work", "Home"],
+      default: "Home",
+    },
+    fullAddress: {
+      type: String,
+      required: true,
+    },
+    houseNumber: {
+      type: String,
+    },
+    longitude: {
+      type: Number,
+      required: true,
+    },
+    latitude: {
+      type: Number,
+      required: true,
+    },
+    landmark: {
+      type: String,
+      required: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    isDefaultAddress: {
+      type: Boolean,
+      default: true,
+    },
   },
-  { _id: false }
+  {
+    timestamps: true,
+  }
 );
-
-const addressSchema = new Schema({
-  userId: {
-    type: Schema.Types.ObjectId,
-    required: true,
-  },
-  defaultAddress: {
-    type: Number,
-    required: true,
-  },
-  addresses: {
-    type: [addressItemSchema],
-    required: true,
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
-});
 
 const addressModel: Model<IAddress> = mongoose.model<IAddress>(
   "address",

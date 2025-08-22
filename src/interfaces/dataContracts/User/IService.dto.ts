@@ -1,4 +1,3 @@
-
 import Iuser from "../../entityInterface/Iuser";
 import { STATUS_CODES } from "../../../constants/httpStatusCodes";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
@@ -8,12 +7,12 @@ import { ITempUser } from "../../Model/IUser";
 import { ILoginResponse } from "../../entityInterface/ILoginResponse";
 import { IOrderData } from "../Order/IRepository";
 
-export interface ISingUp{
-  name:string;
-  phone:number;
-  email:string;
-  password:string;
-  cpassword:string;
+export interface ISingUp {
+  name: string;
+  phone: number;
+  email: string;
+  password: string;
+  cpassword: string;
 }
 
 export interface IUserSignUp {
@@ -34,20 +33,18 @@ export interface IUserSignUp {
   defaultAddress: string;
 }
 
-
-export interface IGetPreSignedUrl{
-  fileName:string;
-  fileType:string;
-  folderName:string;
+export interface IGetPreSignedUrl {
+  fileName: string;
+  fileType: string;
+  folderName: string;
 }
 
 export interface GetPreSignedUrlResponse {
-  success?:boolean;
-  message?:string;
-  uploadURL?:string;
-  imageName?:string;
-  key?:string;
-
+  success?: boolean;
+  message?: string;
+  uploadURL?: string;
+  imageName?: string;
+  key?: string;
 }
 
 export interface getMechanicDetailsResponse {
@@ -65,23 +62,22 @@ export interface getMechanicDetailsResponse {
   mechanicType: string[];
 }
 
-export interface IGetMechanicDetails{
+export interface IGetMechanicDetails {
   id: string;
 }
 
-
 export interface UserSignUpResponse extends Document {
-  userData:Partial<ITempUser>;
-  otp:string;
-  createdAt:Date;
+  userData: Partial<ITempUser>;
+  otp: string;
+  createdAt: Date;
 }
 
 export interface IResendOTPData {
-  tempUserId:string
+  tempUserId: string;
 }
 
 // export interface IResendOTPResponse {
-  
+
 // }
 export interface UserLoginResponse {
   status: number;
@@ -117,13 +113,12 @@ export interface IGetService {
   id: string;
 }
 
-
 export interface GetServiceResponse2 {
   id?: Types.ObjectId;
   name: string;
   imageKey: string;
   discription: string[];
-  serviceCharge:number;
+  serviceCharge: number;
   createdAt: Date;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -132,7 +127,7 @@ export interface GetServiceResponse2 {
 export interface IUserLogin {
   email: string;
   password: string;
-  role:string
+  role: string;
 }
 
 export interface IReturnUserdata {
@@ -153,7 +148,7 @@ export interface INewDetails {
   phone: number | undefined;
 }
 
-export interface IEmailExistCheck{
+export interface IEmailExistCheck {
   id: string;
   name: string;
   email: string;
@@ -209,7 +204,7 @@ export interface GetProfileResponse {
   };
 }
 
-export interface verifyOTPResponse{
+export interface verifyOTPResponse {
   success: boolean;
   message: string;
   userId?: string;
@@ -236,7 +231,6 @@ export interface UpdateNewPasswordResponse {
   phone: number;
   profile_picture: string;
   role: string;
-  address:Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -251,11 +245,11 @@ export interface GetServiceResponse {
   message: string;
 }
 
-export interface IEditUser{
+export interface IEditUser {
   _id: string;
   name: string;
   phone: number;
-  profile_picture:string;
+  profile_picture: string;
 }
 
 export interface EditUserResponse {
@@ -265,20 +259,37 @@ export interface EditUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address: Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
 
-// export interface IAddUserAddress{
-//   _id: string;
-//   values: Address;
-// }
+export interface IAddress {
+  userId: string ;
+  addressType: "Home" | "Work";
+  fullAddress: string;
+  houseNumber: string;
+  landMark: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface AddUserAddress {
+  values: IAddress;
+}
+
 
 export interface AddUserAddressResponse {
-  _id: Types.ObjectId;
-  values: AddAddress;
+  _id: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  addressType: "Home" | "Work";
+  fullAddress:string;
+  houseNumber:string;
+  longitude:number;
+  latitude:number;
+  landmark:string;
+  isDeleted:boolean;
+  isDefaultAddress:boolean;
 }
 
 export interface IEditAddress {
@@ -292,7 +303,6 @@ export interface EditAddressResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address: Types.ObjectId;
   defaultAddress: string;
   role: string;
   isBlocked: boolean;
@@ -310,7 +320,6 @@ export interface SetUserDefaultAddressResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address: Types.ObjectId;
   defaultAddress: string;
   role: string;
   isBlocked: boolean;
@@ -342,44 +351,43 @@ export interface IRegisterService {
   isDeleted: boolean;
 }
 
-export interface ILocationData{
-    type: {
+export interface ILocationData {
+  type: {
     type: string;
     enum: string[];
     default: string;
   };
-  coordinates: number[]; 
+  coordinates: number[];
   city: string;
   state: string;
 }
-export interface IupdateUserLocation{
-  userId:string;
-  locationData:ILocationData
+export interface IupdateUserLocation {
+  userId: string;
+  locationData: ILocationData;
 }
 
-export interface IupdateUserLocationResponse{
-    _id: mongoose.Types.ObjectId;
-    name: string;
-    password: string;
-    email: string;
-    phone: number;
-    profile_picture: string;
-    locationData: {
-      type: {
-        type: string;
-        enum: string[];
-        default: string;
-      };
-      coordinates: number[]; // [longitude, latitude]
-      city: string;
-      state: string;
+export interface IupdateUserLocationResponse {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  password: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+  locationData: {
+    type: {
+      type: string;
+      enum: string[];
+      default: string;
     };
-    address: Types.ObjectId;
-    defaultAddress: string;
-    role: string;
-  
-    isBlocked: boolean;
-    isDeleted: boolean;
+    coordinates: number[]; // [longitude, latitude]
+    city: string;
+    state: string;
+  };
+  defaultAddress: string;
+  role: string;
+
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
 export interface IPaymentData {
@@ -390,14 +398,14 @@ export interface IPaymentData {
   serviceId: string;
 }
 
-export interface ISuccessPaymentResponse{
-  status:string;
-  message:string;
-  data:{
-    status:string;
-    message:string;
-    data:IOrderData
-  }
+export interface ISuccessPaymentResponse {
+  status: string;
+  message: string;
+  data: {
+    status: string;
+    message: string;
+    data: IOrderData;
+  };
 }
 
 export interface RegisterServiceResponse {
@@ -413,7 +421,7 @@ export interface RegisterServiceResponse {
   isDeleted: boolean;
 }
 
-export interface getUserRegisteredServiceDetailsByIdResponse{
+export interface getUserRegisteredServiceDetailsByIdResponse {
   _id: string;
   name: string;
   image: [];

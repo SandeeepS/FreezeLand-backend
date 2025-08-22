@@ -152,15 +152,15 @@ export const AddNewDeviceValidation = (name : string) => {
 }
 
 export const AddressValidation = (
-  name: string,
-  phone: string,
-  email: string,
-  state: string,
-  pin: string,
-  district: string,
-  landMark: string
+  userId:string,
+  addressType: "Home" | "Work",
+  fullAddress:string,
+  houseNumber:string,
+  longitude:number,
+  latitude:number,
+  landmark:string,
 ): boolean => {
-  const fields = { name, phone, email, state, pin, district, landMark };
+  const fields = {userId, addressType,fullAddress,houseNumber,longitude,latitude,landmark};
 
   for (const [key, value] of Object.entries(fields)) {
     if (value == null || value == undefined) {

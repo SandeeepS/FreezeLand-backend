@@ -43,7 +43,6 @@ export interface SaveUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address: Types.ObjectId;
   defaultAddress: string;
   role: string;
   isBlocked: boolean;
@@ -65,7 +64,6 @@ export interface FindEmailResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address:Types.ObjectId;
   defaultAddress: string;
   role: string;
   isBlocked: boolean;
@@ -110,7 +108,6 @@ export interface UpdateNewPasswordResponse {
   phone: number;
   profile_picture: string;
   role: string;
-  address: Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -154,7 +151,6 @@ export interface GetUserListResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address:Types.ObjectId;
   defaultAddress: string;
   role: string;
   isBlocked: boolean;
@@ -174,7 +170,6 @@ export interface EditUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  address:Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -197,20 +192,33 @@ export interface GetAllServiceResponse {
   isDeleted: boolean;
 }
 
-// export interface IAddUserAddress {
-//   _id: string;
-//   values: Address;
-// }
+export interface IAddress{
+  userId:string;
+  addressType:"Home" | "Work";
+  fullAddress:string;
+  houseNumber:string;
+  landMark:string;
+  latitude:number;
+  longitude:number;
+  
+
+}
+
+export interface AddUserAddress{
+  values:IAddress
+}
 
 export interface AddUserAddressResponse {
-  _id: Types.ObjectId;
-  name: string;
-  phone: number;
-  email: string;
-  state?: string;
-  pin?: number;
-  district?: string;
-  landMark?: string;
+  _id: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  addressType: "Home" | "Work";
+  fullAddress:string;
+  houseNumber:string;
+  longitude:number;
+  latitude:number;
+  landmark:string;
+  isDeleted:boolean;
+  isDefaultAddress:boolean;
 }
 
 export interface IEditAddress {
@@ -226,7 +234,6 @@ export interface EditAddressResponse {
   phone: number;
   role: string;
   profile_picture: string;
-  address:Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -244,7 +251,6 @@ export interface SetUserDefaultAddressResponse {
   phone: number;
   profile_picture: string;
   role: string;
-  address: Types.ObjectId;
   defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -319,7 +325,6 @@ export interface IupdateUserLocationResponse {
       city: string;
       state: string;
     };
-    address: Types.ObjectId;
     defaultAddress: string;
     role: string;
   
@@ -343,6 +348,13 @@ export interface IupdateUserLocation{
   locationData:ILocationData
 }
 
+export interface ICheckUserAddressExist {
+  _id:string;
+}
+
+export interface IcheckUserAddressExitResponse{
+  id:string;
+}
 
 export interface getUserRegisteredServiceDetailsByIdResponse {
   _id: string;
