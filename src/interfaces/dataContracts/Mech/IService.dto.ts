@@ -184,7 +184,7 @@ export interface getMechanicDetailsResponse {
   email: string;
   phone: number;
   role: string;
-  photo: string;
+  profile_picture: string;
   adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
@@ -291,7 +291,7 @@ export interface getMechanicDetailsResponse {
   email: string;
   phone: number;
   role: string;
-  photo: string;
+  profile_picture: string;
   adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
@@ -329,7 +329,7 @@ export interface IupdateingMechanicDetailsResponse {
   email: string;
   phone: number;
   role: string;
-  photo: string;
+  profile_picture: string;
   adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
@@ -351,7 +351,7 @@ export interface IAddMechAddressResponse {
   phone: number;
   role: string;
   mechanicType: string[];
-  photo: string;
+  profile_picture: string;
   adharProof: string;
   employeeLicense: string;
   locationData: {
@@ -384,7 +384,7 @@ export interface IEditAddressResponse {
   phone: number;
   role: string;
   mechanicType: string[];
-  photo: string;
+  profile_picture: string;
   adharProof: string;
   employeeLicense: string;
   locationData: {

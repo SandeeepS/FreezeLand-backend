@@ -32,10 +32,10 @@ import {
     IGenerateToken,
     ISetUserDefaultAddress,
     IEditAddress,
-    IAddUserAddress,
     IEditUser,
     IGetProfile,
     IUserLogin,
+    AddUserAddress,
   } from "../dataContracts/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
@@ -55,7 +55,7 @@ export interface IUserServices {
     getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[] >
     updateNewPassword(data:IUpdateNewPassword):Promise<UpdateNewPasswordResponse | null>;
     editUser(data: IEditUser): Promise<EditUserResponse | null> ;
-    AddUserAddress(data: IAddUserAddress): Promise<AddUserAddressResponse | null>;
+    AddUserAddress(data: AddUserAddress): Promise<AddUserAddressResponse | null>;
     editAddress(data: IEditAddress): Promise<EditAddressResponse | null>;
     setUserDefaultAddress(data: ISetUserDefaultAddress): Promise<SetUserDefaultAddressResponse | null>  ;
     registerService(data: IRegisterService):Promise<RegisterServiceResponse | null>;

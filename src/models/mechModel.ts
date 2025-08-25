@@ -70,7 +70,7 @@ const mechSchema: Schema<MechInterface> = new Schema({
     required: false,
   },
 
-  photo: {
+  profile_picture: {
     type: String,
     required: false,
   },

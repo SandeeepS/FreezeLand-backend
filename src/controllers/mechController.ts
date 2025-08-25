@@ -373,6 +373,7 @@ class mechController implements IMechController {
       );
       if (typeof id === "string") {
         const result = await this._mechServices.getMechanicDetails({ id });
+        console.log("result sdlfnsdfndsfdsf",result);
         res.status(OK).json({ success: true, result: result });
       } else {
         console.log(

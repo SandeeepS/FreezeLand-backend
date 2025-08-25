@@ -20,7 +20,7 @@ export interface MechInterface extends Document {
   phone: number;
   role: string;
   mechanicType: string[];
-  photo: string;
+  profile_picture: string;
   adharProof: string;
   employeeLicense: string;
   locationData: {

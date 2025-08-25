@@ -53,7 +53,7 @@ export interface getMechanicDetailsResponse {
   email: string;
   phone: number;
   role: string;
-  photo: string;
+  profile_picture: string;
   adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
