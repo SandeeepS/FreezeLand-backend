@@ -23,16 +23,6 @@ export interface MechInterface extends Document {
   profile_picture: string;
   adharProof: string;
   employeeLicense: string;
-  locationData: {
-    type: {
-      type: string;
-      enum: string[];
-      default: string;
-    };
-    coordinates: number[]; // [longitude, latitude]
-    city: string;
-    state: string;
-  };
   address: Address[];
   defaultAddress: string;
   wallet:number;

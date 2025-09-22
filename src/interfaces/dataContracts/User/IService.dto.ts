@@ -231,7 +231,6 @@ export interface UpdateNewPasswordResponse {
   phone: number;
   profile_picture: string;
   role: string;
-  defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -259,13 +258,12 @@ export interface EditUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
 
 export interface IAddress {
-  userId: string ;
+  userId: string;
   addressType: "Home" | "Work";
   fullAddress: string;
   houseNumber: string;
@@ -278,18 +276,17 @@ export interface AddUserAddress {
   values: IAddress;
 }
 
-
 export interface AddUserAddressResponse {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   addressType: "Home" | "Work";
-  fullAddress:string;
-  houseNumber:string;
-  longitude:number;
-  latitude:number;
-  landmark:string;
-  isDeleted:boolean;
-  isDefaultAddress:boolean;
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
+  isDeleted: boolean;
+  isDefaultAddress: boolean;
 }
 
 export interface IEditAddress {
@@ -303,7 +300,6 @@ export interface EditAddressResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  defaultAddress: string;
   role: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -320,7 +316,6 @@ export interface SetUserDefaultAddressResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  defaultAddress: string;
   role: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -373,19 +368,7 @@ export interface IupdateUserLocationResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  locationData: {
-    type: {
-      type: string;
-      enum: string[];
-      default: string;
-    };
-    coordinates: number[]; // [longitude, latitude]
-    city: string;
-    state: string;
-  };
-  defaultAddress: string;
   role: string;
-
   isBlocked: boolean;
   isDeleted: boolean;
 }

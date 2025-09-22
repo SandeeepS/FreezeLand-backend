@@ -1,28 +1,6 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
 
-const LocationDataSchema = new Schema({
-  type: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      default: "Point",
-    },
-  },
-  coordinates: {
-    type: [Number], // [longitude, latitude]
-    required: true,
-  },
-  city: {
-    type: String,
-    required: true,
-  },
-  state: {
-    type: String,
-    required: true,
-  },
-});
-
 //userSchema
 const userSchema: Schema<UserInterface> = new Schema({
   name: {
@@ -48,10 +26,6 @@ const userSchema: Schema<UserInterface> = new Schema({
     default:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/680px-Default_pfp.svg.png",
   },
-  
-  defaultAddress: {
-    type: String,
-  },
 
   role: {
     type: String,
@@ -59,7 +33,6 @@ const userSchema: Schema<UserInterface> = new Schema({
     required: true,
   },
 
-  locationData: LocationDataSchema,
   wallet: {
     type: Number,
     default: 0,

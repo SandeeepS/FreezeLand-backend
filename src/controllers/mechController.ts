@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 const { BAD_REQUEST, OK, NOT_FOUND } = STATUS_CODES;
-import { AddressValidation } from "../utils/validator";
+import { AddressValidation, mechanicAddressValidation } from "../utils/validator";
 import { IMechController } from "../interfaces/IController/IMechController";
 import {
   ForgotResentOtpResponse,
@@ -594,21 +594,19 @@ class mechController implements IMechController {
       console.log(
         "enterd in the addAddress fucniton in the backend mechController"
       );
-      const { values, _id } = req.body;
-      console.log("id from the mechController while adding address is", _id);
-      const check = AddressValidation(
-        values.name,
-        values.phone,
-        values.email,
-        values.state,
-        values.pin,
-        values.district,
-        values.landMark
+      const { newAddress } = req.body;
+      console.log(newAddress.userId); // here the userId is refer to the mechanci id 
+      const check = mechanicAddressValidation(
+        newAddress.userId,
+        newAddress.fullAddress,
+        newAddress.houseNumber,
+        newAddress.longitude,
+        newAddress.latitude,
+        newAddress.landmark
       );
       if (check) {
-        const addedAddress = await this._mechServices.AddUserAddress({
-          _id,
-          values,
+        const addedAddress = await this._mechServices.AddMechAddress({
+          values:newAddress
         });
         if (addedAddress) {
           res.status(OK).json({

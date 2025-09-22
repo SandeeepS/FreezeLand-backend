@@ -61,7 +61,7 @@ export interface IMechServices{
     createRoom(data: ICreateRoomData): Promise<ICreateRoomResponse> 
     getAllCompletedServices (mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null>
     editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> 
-    AddUserAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null> 
+    AddMechAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null> 
     editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> 
     resendOTP(data: IResendOTPData): Promise<Partial<ITempMech> | null>
     handleRemoveMechAddress(mechId: string,addressId:string): Promise<boolean>

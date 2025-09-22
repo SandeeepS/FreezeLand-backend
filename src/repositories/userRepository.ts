@@ -385,9 +385,10 @@ class UserRepository
         userId,
         locationData
       );
-      const qr = { locationData: locationData };
-      const editedUserData = await this.update(userId, qr);
-      return editedUserData;
+      // const qr = { locationData: locationData };
+      // const editedUserData = await this.update(userId, qr);
+      // return editedUserData;
+      return null;
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -452,9 +453,10 @@ class UserRepository
         userId,
         addressId
       );
-      const qr = { defaultAddress: addressId };
-      const updatedUser = await this.update(userId, qr);
-      return updatedUser;
+      // const qr = { defaultAddress: addressId };
+      // const updatedUser = await this.update(userId, qr);
+      // return updatedUser;
+      return null;
     } catch (error) {
       console.log(error as Error);
       throw error;

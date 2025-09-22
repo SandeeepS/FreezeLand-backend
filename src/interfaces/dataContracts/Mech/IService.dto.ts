@@ -338,9 +338,17 @@ export interface IupdateingMechanicDetailsResponse {
   mechanicType: string[];
 }
 
+export interface IMechAddress {
+  userId:string;
+  fullAddress: string;
+  houseNumber: string;
+  landMark: string;
+  latitude: number;
+  longitude: number;
+}
+
 export interface IAddMechAddress {
-  _id: string;
-  values: Address;
+  values: IMechAddress;
 }
 
 export interface IAddMechAddressResponse {
@@ -354,18 +362,7 @@ export interface IAddMechAddressResponse {
   profile_picture: string;
   adharProof: string;
   employeeLicense: string;
-  locationData: {
-    type: {
-      type: string;
-      enum: string[];
-      default: string;
-    };
-    coordinates: number[]; // [longitude, latitude]
-    city: string;
-    state: string;
-  };
   address: Address[];
-  defaultAddress: string;
   isVerified: boolean;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -387,18 +384,7 @@ export interface IEditAddressResponse {
   profile_picture: string;
   adharProof: string;
   employeeLicense: string;
-  locationData: {
-    type: {
-      type: string;
-      enum: string[];
-      default: string;
-    };
-    coordinates: number[]; // [longitude, latitude]
-    city: string;
-    state: string;
-  };
   address: Address[];
-  defaultAddress: string;
   isVerified: boolean;
   isBlocked: boolean;
   isDeleted: boolean;

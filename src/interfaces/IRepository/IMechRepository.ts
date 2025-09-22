@@ -51,7 +51,7 @@ export interface IMechRepository{
     createTempMechData(tempMechDetails: {otp: string;mechData: MechRegistrationData;}): Promise<ITempMech>
     getTempMechData(id:string):Promise<ITempMech | null>
     editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null>
-    addAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null>
+    addMechAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null>
     editAddress(data: IEditAddress): Promise<IEditAddressResponse | null>
     updateTempMechData(data: IUpdateTempDataWithOTP): Promise<ITempMech | null> 
     updateMechanicEarnings(updateMechanicDetails:IUpdateMechanicDetails):Promise<IUpdatedMechnicDetails | null>

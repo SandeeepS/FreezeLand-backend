@@ -452,15 +452,19 @@ class MechRepository
   }
 
   //adding mechanic address
-  async addAddress(
+  async addMechAddress(
     data: IAddMechAddress
   ): Promise<IAddMechAddressResponse | null> {
     try {
-      const { _id, values } = data;
-      console.log("id from the mechRepository while add addresss is ", _id);
+      const { mechId, values } = data;
       console.log("new address from the mechRepository is ", values);
       const qr = { address: [values] };
-      const addedAddress = await this.updateAddress(_id, qr);
+      const addedAddress = await MechModel.findByIdAndUpdate(
+        mechId,
+        { $push: qr },
+        { new: true }
+      );
+      console.log("added new mech address is ",addedAddress);
       return addedAddress;
     } catch (error) {
       console.log(error as Error);

@@ -21,10 +21,10 @@ export interface IcreateTempUserData {
 }
 
 export interface UserSignUpResponse extends Document {
-  userData:Partial<UserInterface>;
-  otp:string;
-  createdAt:Date;
-  _id:Types.ObjectId;
+  userData: Partial<UserInterface>;
+  otp: string;
+  createdAt: Date;
+  _id: Types.ObjectId;
 }
 
 export interface IcreateTempUserDataResponse {
@@ -43,7 +43,6 @@ export interface SaveUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  defaultAddress: string;
   role: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -54,8 +53,8 @@ export interface IFindEmail {
 }
 
 export interface IUpdateTempDataWithOTP {
-  tempUserId:string;
-  otp:string;
+  tempUserId: string;
+  otp: string;
 }
 
 export interface FindEmailResponse {
@@ -64,13 +63,12 @@ export interface FindEmailResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  defaultAddress: string;
   role: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
 
-export interface IEmailExistCheck{
+export interface IEmailExistCheck {
   email: string;
 }
 
@@ -80,7 +78,7 @@ export interface EmailExistCheckResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  password:string;
+  password: string;
   role: string;
   address: {
     name: string;
@@ -108,7 +106,6 @@ export interface UpdateNewPasswordResponse {
   phone: number;
   profile_picture: string;
   role: string;
-  defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -124,7 +121,7 @@ export interface GetUserByIdResponse {
   profile_picture: string;
   role: string;
   address: {
-    _id:string;
+    _id: string;
     name: string;
     phone: number;
     email: string;
@@ -142,7 +139,7 @@ export interface IGetUserList {
   page: number;
   limit: number;
   searchQuery: string;
-  search:string;
+  search: string;
 }
 
 export interface GetUserListResponse {
@@ -151,7 +148,6 @@ export interface GetUserListResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  defaultAddress: string;
   role: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -160,7 +156,7 @@ export interface IEditUser {
   _id: string;
   name: string;
   phone: number;
-  profile_picture:string;
+  profile_picture: string;
 }
 
 export interface EditUserResponse {
@@ -170,7 +166,6 @@ export interface EditUserResponse {
   email: string;
   phone: number;
   profile_picture: string;
-  defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -192,33 +187,31 @@ export interface GetAllServiceResponse {
   isDeleted: boolean;
 }
 
-export interface IAddress{
-  userId:string;
-  addressType:"Home" | "Work";
-  fullAddress:string;
-  houseNumber:string;
-  landMark:string;
-  latitude:number;
-  longitude:number;
-  
-
+export interface IAddress {
+  userId: string;
+  addressType: "Home" | "Work";
+  fullAddress: string;
+  houseNumber: string;
+  landMark: string;
+  latitude: number;
+  longitude: number;
 }
 
-export interface AddUserAddress{
-  values:IAddress
+export interface AddUserAddress {
+  values: IAddress;
 }
 
 export interface AddUserAddressResponse {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   addressType: "Home" | "Work";
-  fullAddress:string;
-  houseNumber:string;
-  longitude:number;
-  latitude:number;
-  landmark:string;
-  isDeleted:boolean;
-  isDefaultAddress:boolean;
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
+  isDeleted: boolean;
+  isDefaultAddress: boolean;
 }
 
 export interface IEditAddress {
@@ -234,7 +227,6 @@ export interface EditAddressResponse {
   phone: number;
   role: string;
   profile_picture: string;
-  defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -251,7 +243,6 @@ export interface SetUserDefaultAddressResponse {
   phone: number;
   profile_picture: string;
   role: string;
-  defaultAddress: string;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -281,7 +272,7 @@ export interface RegisterServiceResponse {
   isDeleted: boolean;
 }
 
-export interface IGetServiceCount{
+export interface IGetServiceCount {
   searchQuery: string;
 }
 
@@ -307,53 +298,41 @@ export interface GetAllUserRegisteredServicesResponse {
   serviceDetails: IServices;
 }
 
-
 export interface IupdateUserLocationResponse {
-    _id: mongoose.Types.ObjectId;
-    name: string;
-    password: string;
-    email: string;
-    phone: number;
-    profile_picture: string;
-    locationData: {
-      type: {
-        type: string;
-        enum: string[];
-        default: string;
-      };
-      coordinates: number[];
-      city: string;
-      state: string;
-    };
-    defaultAddress: string;
-    role: string;
-  
-    isBlocked: boolean;
-    isDeleted: boolean;
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  password: string;
+  email: string;
+  phone: number;
+  profile_picture: string;
+
+  role: string;
+
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
-
-export interface ILocationData{
-    type: {
+export interface ILocationData {
+  type: {
     type: string;
     enum: string[];
     default: string;
   };
-  coordinates: number[]; 
+  coordinates: number[];
   city: string;
   state: string;
 }
-export interface IupdateUserLocation{
-  userId:string;
-  locationData:ILocationData
+export interface IupdateUserLocation {
+  userId: string;
+  locationData: ILocationData;
 }
 
 export interface ICheckUserAddressExist {
-  _id:string;
+  _id: string;
 }
 
-export interface IcheckUserAddressExitResponse{
-  id:string;
+export interface IcheckUserAddressExitResponse {
+  id: string;
 }
 
 export interface getUserRegisteredServiceDetailsByIdResponse {
