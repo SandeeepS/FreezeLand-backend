@@ -633,6 +633,17 @@ class mechController implements IMechController {
     }
   }
 
+  //function to get the mechanic address 
+  async getMechanicAddress(req:Request,res:Response,next:NextFunction) {
+    try{
+      const {mechanicId} = req.query;
+      console.log("reached the mechController with id for accessing the mehchanic address",mechanicId);
+    }catch(error){
+      console.log("error while accessing the mechanic address in the mech controller ",error);
+      next(error);
+    }
+  }
+
   //editing mechanic address
   async editAddress(req: Request, res: Response, next: NextFunction) {
     try {

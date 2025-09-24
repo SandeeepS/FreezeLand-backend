@@ -43,7 +43,7 @@ import {
   ISingUp,
   INewDetails,
   AddUserAddress,
- 
+  getAllAddressOfUserResponse,
 } from "../interfaces/dataContracts/User/IService.dto";
 import { IUserServices } from "../interfaces/IServices/IUserServices";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
@@ -64,7 +64,7 @@ const { OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
 class userService implements IUserServices {
   constructor(
     private _userRepository: IUserRepository,
-    private _addressReopository:IAddressRepository,
+    private _addressReopository: IAddressRepository,
     private _serviceRepository: IServiceRepository,
     private _concernRepository: IConcernRepository,
     private _orderRepository: IOrderRepository,
@@ -724,11 +724,13 @@ class userService implements IUserServices {
     }
   }
 
-  async AddUserAddress(data: AddUserAddress): Promise<AddUserAddressResponse | null> {
+  async AddUserAddress(
+    data: AddUserAddress
+  ): Promise<AddUserAddressResponse | null> {
     try {
       console.log(data);
-      const {values } = data;
-      const address = await this._addressReopository.addAddress({values });
+      const { values } = data;
+      const address = await this._addressReopository.addAddress({ values });
       return address;
     } catch (error) {
       console.log("error occured AddUserAddress in the userService");
@@ -891,6 +893,21 @@ class userService implements IUserServices {
     } catch (error) {
       console.log(
         "Error occured in thehandleRemoveUserAddress function in user service ",
+        error
+      );
+      throw error;
+    }
+  }
+
+  async getAllAddressOfUser(
+    userId: string
+  ): Promise<getAllAddressOfUserResponse[] | null> {
+    try {
+      const result = await this._addressReopository.getAllAddressOfUser(userId);
+      return result;
+    } catch (error) {
+      console.log(
+        "error occured while accessing the user address from the userController ",
         error
       );
       throw error;

@@ -214,6 +214,19 @@ export interface AddUserAddressResponse {
   isDefaultAddress: boolean;
 }
 
+export interface getAllAddressOfUserResponse {
+  _id: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  addressType: "Home" | "Work";
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
+  isDeleted: boolean;
+  isDefaultAddress: boolean;
+}
+
 export interface IEditAddress {
   _id: string;
   addressId: string;

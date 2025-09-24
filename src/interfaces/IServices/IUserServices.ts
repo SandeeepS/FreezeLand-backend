@@ -36,6 +36,7 @@ import {
     IGetProfile,
     IUserLogin,
     AddUserAddress,
+    getAllAddressOfUserResponse,
   } from "../dataContracts/User/IService.dto";
 import { ITempUser } from "../Model/IUser";
 
@@ -70,6 +71,7 @@ export interface IUserServices {
     googleLogin(data: { name: string;email: string;googlePhotoUrl: string;}): Promise<UserLoginResponse>
     getPresignedUrl(data: IGetPreSignedUrl):Promise<GetPreSignedUrlResponse> 
     handleRemoveUserAddress(userId: string,addressId:string): Promise<boolean>
+    getAllAddressOfUser(userId: string): Promise<getAllAddressOfUserResponse[] | null>
 
 }
 

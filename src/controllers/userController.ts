@@ -901,6 +901,25 @@ class userController implements IUserController {
       next(error);
     }
   }
+
+  //function to getAllUserAddress
+  async getAllAddressOfUser(req:Request,res:Response,next:NextFunction) {
+    try{
+      const {userId} = req.query;
+      console.log("Entered in the userController for accessing the userAddress with userId  ",userId);
+      const result = await this._userServices.getAllAddressOfUser(userId as string);
+      console.log("result from the controller is ",result);
+      if(result) {
+        res.status(200).json({success:true,result});
+      }else{
+        res.status(200).json({success:false});
+      }
+      
+    }catch(error){
+      console.log("Error occured while accessing userAddress in userController",error);
+      next(error);
+    }
+  }
 }
 
 export default userController;
