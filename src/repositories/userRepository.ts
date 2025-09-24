@@ -7,7 +7,7 @@ import serviceModel from "../models/serviceModel";
 import { IServices } from "../interfaces/Model/IService";
 
 import {
-  IAddUserAddress,
+  // IAddUserAddress,
   AddUserAddressResponse,
   IGetAllServices,
   GetAllServiceResponse,
@@ -38,6 +38,9 @@ import {
   IEmailExistCheck,
   ISetUserDefaultAddress,
   IGetServiceCount,
+  ICheckUserAddressExist,
+  IcheckUserAddressExitResponse,
+  AddUserAddress,
 } from "../interfaces/dataContracts/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import {
@@ -46,7 +49,7 @@ import {
 } from "../interfaces/dataContracts/Mech/IRepository.dto";
 import MechModel from "../models/mechModel";
 import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
-import { ISingUp } from "../interfaces/dataContracts/User/IService.dto";
+import {  ISingUp } from "../interfaces/dataContracts/User/IService.dto";
 import { MechInterface } from "../interfaces/Model/IMech";
 
 class UserRepository
@@ -188,13 +191,15 @@ class UserRepository
       if (!user) {
         return null;
       }
-      const defaultAddressDetails = user.address?.find(
-        (addr) => addr._id.toString() === user.defaultAddress?.toString()
-      );
+      //currently the detault address is commecnted becuase some changes made in the address
+      //shcema and need to reflect the businnes logic soon
+      // const defaultAddressDetails = user.address?.find(
+      //   (addr) => addr._id.toString() === user.defaultAddress?.toString()
+      // );
 
       return {
         ...user.toObject(),
-        defaultAddressDetails,
+        // defaultAddressDetails,
       };
     } catch (error) {
       console.log(error as Error);
@@ -380,25 +385,47 @@ class UserRepository
         userId,
         locationData
       );
-      const qr = { locationData: locationData };
-      const editedUserData = await this.update(userId, qr);
-      return editedUserData;
+      // const qr = { locationData: locationData };
+      // const editedUserData = await this.update(userId, qr);
+      // return editedUserData;
+      return null;
     } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
 
+  async checkAddressExist(data:ICheckUserAddressExist):Promise<IcheckUserAddressExitResponse | null>{
+    try{
+      const {_id} = data;
+      console.log(_id)
+      // const addressExit = await this.findById(_id)
+      // if(addressExit && addressExit.address){
+      //   return {
+      //     id:addressExit.address.toString()
+      //   }
+      // }else{
+      //   return null;
+      // }
+      return {id:""}
+    }catch(error){
+      console.log(error as Error);
+      throw error;
+    }
+  }
+
   async addAddress(
-    data: IAddUserAddress
+    data:AddUserAddress
   ): Promise<AddUserAddressResponse | null> {
     try {
-      const { _id, values } = data;
-      console.log("id from the userRepository while add addresss is ", _id);
-      console.log("new address from the userRepository is ", values);
-      const qr = { address: [values] };
-      const addedAddress = await this.updateAddress(_id, qr);
-      return addedAddress;
+      console.log(data)
+      // const { id, values } = data;
+      // console.log("id from the userRepository while add addresss is ", id,values);
+      // console.log("new address from the userRepository is ", values);
+      // const qr = { address: [values] };
+      // const addedAddress = await this.updateAddress(_id, qr);
+      // return addedAddress;
+      return null;
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -426,9 +453,10 @@ class UserRepository
         userId,
         addressId
       );
-      const qr = { defaultAddress: addressId };
-      const updatedUser = await this.update(userId, qr);
-      return updatedUser;
+      // const qr = { defaultAddress: addressId };
+      // const updatedUser = await this.update(userId, qr);
+      // return updatedUser;
+      return null;
     } catch (error) {
       console.log(error as Error);
       throw error;

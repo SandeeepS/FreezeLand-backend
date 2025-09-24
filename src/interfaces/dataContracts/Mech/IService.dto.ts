@@ -184,7 +184,7 @@ export interface getMechanicDetailsResponse {
   email: string;
   phone: number;
   role: string;
-  photo: string;
+  profile_picture: string;
   adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
@@ -291,7 +291,7 @@ export interface getMechanicDetailsResponse {
   email: string;
   phone: number;
   role: string;
-  photo: string;
+  profile_picture: string;
   adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
@@ -329,7 +329,7 @@ export interface IupdateingMechanicDetailsResponse {
   email: string;
   phone: number;
   role: string;
-  photo: string;
+  profile_picture: string;
   adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
@@ -338,9 +338,17 @@ export interface IupdateingMechanicDetailsResponse {
   mechanicType: string[];
 }
 
+export interface IMechAddress {
+  userId:string;
+  fullAddress: string;
+  houseNumber: string;
+  landMark: string;
+  latitude: number;
+  longitude: number;
+}
+
 export interface IAddMechAddress {
-  _id: string;
-  values: Address;
+  values: IMechAddress;
 }
 
 export interface IAddMechAddressResponse {
@@ -351,21 +359,10 @@ export interface IAddMechAddressResponse {
   phone: number;
   role: string;
   mechanicType: string[];
-  photo: string;
+  profile_picture: string;
   adharProof: string;
   employeeLicense: string;
-  locationData: {
-    type: {
-      type: string;
-      enum: string[];
-      default: string;
-    };
-    coordinates: number[]; // [longitude, latitude]
-    city: string;
-    state: string;
-  };
   address: Address[];
-  defaultAddress: string;
   isVerified: boolean;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -384,21 +381,10 @@ export interface IEditAddressResponse {
   phone: number;
   role: string;
   mechanicType: string[];
-  photo: string;
+  profile_picture: string;
   adharProof: string;
   employeeLicense: string;
-  locationData: {
-    type: {
-      type: string;
-      enum: string[];
-      default: string;
-    };
-    coordinates: number[]; // [longitude, latitude]
-    city: string;
-    state: string;
-  };
   address: Address[];
-  defaultAddress: string;
   isVerified: boolean;
   isBlocked: boolean;
   isDeleted: boolean;

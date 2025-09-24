@@ -17,14 +17,12 @@ export const corsOptions: CorsOptions = {
     origin: string | undefined,
     callback: (err: Error | null, allow?: boolean | string) => void
   ) => {
-    console.log("CORS checking origin::", origin);
 
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
       callback(null, origin);
     } else {
-      console.log("CORS blocked origin::", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },

@@ -15,11 +15,13 @@ import MechRepository from "../repositories/mechRepository";
 import ReportRepository from "../repositories/reportRepository";
 import ReportService from "../services/reportService";
 import { limiter } from "../utils/rateLimiter";
+import AddressRepository from "../repositories/addressRepository";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
 const userRepository = new UserRepository();
+const addressRepository = new AddressRepository();
 const serviceRepository = new ServiceRepository();
 const orderRepository = new OrderRepository();
 const concernRepository = new ConcernRepository();
@@ -30,7 +32,7 @@ const orderService = new OrderServices(orderRepository,mechRepository);
 const generateOTP  = new GenerateOTP();
 
 const email = new Email(generateOTP);
-const userServices = new userService(userRepository,serviceRepository,concernRepository,orderRepository,orderService,createjwt,encrypt,email);
+const userServices = new userService(userRepository,addressRepository,serviceRepository,concernRepository,orderRepository,orderService,createjwt,encrypt,email);
 const controller = new userController(userServices,reportService,email);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await controller.userSignup(req,res,next));
@@ -61,6 +63,7 @@ userRouter.get('/successPayment',userAuth(["user"]),async(req:Request,res:Respon
 userRouter.post('/updateUserLocation',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateUserLocation(req,res,next));
 userRouter.post('/report',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.createReport(req,res,next));
 userRouter.put('/handleRemoveUserAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.handleRemoveUserAddress(req,res,next));
+userRouter.get('/getAllAddressOfUser',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllAddressOfUser(req,res,next));
 
 // userRouter.get('/report',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllreport(req,res,next));
 

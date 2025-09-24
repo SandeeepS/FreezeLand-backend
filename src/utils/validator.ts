@@ -128,39 +128,45 @@ export const SignUpValidation = (
 };
 
 export const AddNewServiceValidation = (name: string, discription: string) => {
-  if(name == null || name == undefined){
+  if (name == null || name == undefined) {
     console.log("name is null or undefined ");
-    return false ;
+    return false;
   }
 
-
-  if(discription == null || discription == undefined){
+  if (discription == null || discription == undefined) {
     console.log("discritpion is null or undefined ");
     return false;
   }
 
-
   return true;
 };
 
-export const AddNewDeviceValidation = (name : string) => {
-  if(name == null || name == undefined){
+export const AddNewDeviceValidation = (name: string) => {
+  if (name == null || name == undefined) {
     console.log("name is null or undefined ");
     return false;
   }
   return true;
-}
+};
 
 export const AddressValidation = (
-  name: string,
-  phone: string,
-  email: string,
-  state: string,
-  pin: string,
-  district: string,
-  landMark: string
+  userId: string,
+  addressType: "Home" | "Work",
+  fullAddress: string,
+  houseNumber: string,
+  longitude: number,
+  latitude: number,
+  landmark: string
 ): boolean => {
-  const fields = { name, phone, email, state, pin, district, landMark };
+  const fields = {
+    userId,
+    addressType,
+    fullAddress,
+    houseNumber,
+    longitude,
+    latitude,
+    landmark,
+  };
 
   for (const [key, value] of Object.entries(fields)) {
     if (value == null || value == undefined) {
@@ -169,6 +175,32 @@ export const AddressValidation = (
     }
   }
 
-  return true; 
+  return true;
 };
 
+export const mechanicAddressValidation = (
+  userId: string,
+  fullAddress: string,
+  houseNumber: string,
+  longitude: number,
+  latitude: number,
+  landmark: string
+): boolean => {
+  const fields = {
+    userId,
+    fullAddress,
+    houseNumber,
+    longitude,
+    latitude,
+    landmark,
+  };
+
+  for (const [key, value] of Object.entries(fields)) {
+    if (value == null || value == undefined) {
+      console.log(`${key} is null or undefined`);
+      return false;
+    }
+  }
+
+  return true;
+};

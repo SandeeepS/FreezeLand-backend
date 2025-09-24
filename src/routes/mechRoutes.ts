@@ -48,6 +48,7 @@ mechRouter.post('/updateWorkDetails',mechAuth(["mechanic"]),async(req:Request,re
 mechRouter.get('/getAllCompletedServices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllCompletedServices(req,res,next));
 mechRouter.put('/editMechanic',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.editMechanic(req,res,next));
 mechRouter.post('/addMechAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.addAddress(req,res,next));
+mechRouter.get('/getMechanicAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getMechanicAddress(req,res,next));
 mechRouter.put('/editAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 mechRouter.post('/report',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.createReport(req,res,next));
 mechRouter.get('/logout',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogout(req,res,next));

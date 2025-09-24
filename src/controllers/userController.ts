@@ -465,21 +465,20 @@ class userController implements IUserController {
       console.log(
         "enterd in the addAddress fucniton in the backend userController"
       );
-      const { values, _id } = req.body;
-      console.log("id from the userController while adding address is", _id);
+      const { newAddress } = req.body;
+      console.log("new Address in the controller is ",newAddress)
       const check = AddressValidation(
-        values.name,
-        values.phone,
-        values.email,
-        values.state,
-        values.pin,
-        values.district,
-        values.landMark
+        newAddress.userId,
+        newAddress.addressType,
+        newAddress.fullAddress,
+        newAddress.houseNumber,
+        newAddress.longitude,
+        newAddress.latitude,
+        newAddress.landmark
       );
       if (check) {
         const addedAddress = await this._userServices.AddUserAddress({
-          _id,
-          values,
+          values: newAddress,
         });
         if (addedAddress) {
           res.status(OK).json({
@@ -899,6 +898,25 @@ class userController implements IUserController {
         "Error occured while handling the remove Address function in the userController",
         error
       );
+      next(error);
+    }
+  }
+
+  //function to getAllUserAddress
+  async getAllAddressOfUser(req:Request,res:Response,next:NextFunction) {
+    try{
+      const {userId} = req.query;
+      console.log("Entered in the userController for accessing the userAddress with userId  ",userId);
+      const result = await this._userServices.getAllAddressOfUser(userId as string);
+      console.log("result from the controller is ",result);
+      if(result) {
+        res.status(200).json({success:true,result});
+      }else{
+        res.status(200).json({success:false});
+      }
+      
+    }catch(error){
+      console.log("Error occured while accessing userAddress in userController",error);
       next(error);
     }
   }

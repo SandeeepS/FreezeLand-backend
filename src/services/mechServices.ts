@@ -727,21 +727,23 @@ class mechService implements IMechServices {
     }
   }
 
-  //function to add the address for the user
-  async AddUserAddress(
+  //function to add the address for the mechanic
+  async AddMechAddress(
     data: IAddMechAddress
   ): Promise<IAddMechAddressResponse | null> {
     try {
-      const { _id, values } = data;
-      console.log("id from the addMechAddress in the mech service is ", _id);
-      const address = await this._mechRepository.addAddress({ _id, values });
+      const { values } = data;
+      const mechId = values.userId;
+      // Ensure userId is optional before using delete
+      delete (values as { userId?: string }).userId;
+      const address = await this._mechRepository.addMechAddress({ mechId, values });
       if (address) {
         return address;
       } else {
         return null;
       }
     } catch (error) {
-      console.log("Error in AddUserAddress in mechService", error);
+      console.log("Error in AddMechAddress in mechService", error);
       throw error;
     }
   }

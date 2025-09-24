@@ -2,36 +2,13 @@ import mongoose, { Schema, Model } from "mongoose";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 
 const AddressSchema = new Schema({
-  name: { type: String, require: true },
-  phone: { type: Number, require: true },
-  email: { type: String, require: true },
-  state: { type: String, require: true },
-  pin: { type: Number, require: true },
-  district: { type: String, require: true },
-  landMark: { type: String, require: true },
+  fullAddress: { type: String, required: true },
+  houseNumber: { type: String, required: true },
+  longitude: { type: Number, required: true },
+  latitude: { type: Number, required: true },
+  landmark: { type: String, require: true },
   isDeleted: { type: Boolean, default: false },
-});
-
-const LocationDataSchema = new Schema({
-  type: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      default: "Point",
-    },
-  },
-  coordinates: {
-    type: [Number], // [longitude, latitude]
-    required: true,
-  },
-  city: {
-    type: String,
-    required: true,
-  },
-  state: {
-    type: String,
-    required: true,
-  },
+  isDefaultAddress: { type: Boolean, default: false },
 });
 
 const mechSchema: Schema<MechInterface> = new Schema({
@@ -70,7 +47,7 @@ const mechSchema: Schema<MechInterface> = new Schema({
     required: false,
   },
 
-  photo: {
+  profile_picture: {
     type: String,
     required: false,
   },
@@ -84,7 +61,6 @@ const mechSchema: Schema<MechInterface> = new Schema({
     type: String,
     required: false,
   },
-  locationData: LocationDataSchema,
 
   wallet: {
     type: Number,
