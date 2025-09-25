@@ -32,20 +32,20 @@ import {
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 import concernModel from "../models/concernModel";
-import deviceModel, { IDevice } from "../models/deviceModel";
 import MechModel, { TempMech } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
+import DeviceRepository from "./deviceRepository";
 
 class MechRepository
   extends BaseRepository<MechInterface & Document>
   implements IMechRepository
 {
-  private _deviceRepository: BaseRepository<IDevice>;
+  private _deviceRepository:  DeviceRepository;
 
   constructor() {
     super(MechModel);
-    this._deviceRepository = new BaseRepository<IDevice>(deviceModel);
+    this._deviceRepository = new DeviceRepository();
   }
 
   async createTempMechData(tempMechDetails: {
@@ -464,7 +464,7 @@ class MechRepository
         { $push: qr },
         { new: true }
       );
-      console.log("added new mech address is ",addedAddress);
+      console.log("added new mech address is ", addedAddress);
       return addedAddress;
     } catch (error) {
       console.log(error as Error);
@@ -476,8 +476,9 @@ class MechRepository
   async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
-      const editedAddress = await this.editExistAddress(_id, addressId, values);
-      return editedAddress;
+      console.log(_id, addressId, values);
+      // const editedAddress = await this.editExistAddress(_id, addressId, values);
+      return null;
     } catch (error) {
       console.log(error as Error);
       throw error;

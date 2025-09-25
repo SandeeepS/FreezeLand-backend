@@ -120,7 +120,15 @@ class ConcernRepository
       );
       console.log("search in the order repository", search);
       const regex = new RegExp(search, "i");
-      const result = await this.findAll(page, limit, regex);
+      const result =await concernModel
+        .find({
+          isDeleted: false,
+          $or: [{ name: { $regex: regex } }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       console.log("all complaint list is  in the concern Repository", result);
       return result;
     } catch (error) {

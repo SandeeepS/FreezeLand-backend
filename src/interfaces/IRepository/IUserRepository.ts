@@ -1,10 +1,8 @@
 import { IGetMechanicDetails, getMechanicDetailsResponse } from "../dataContracts/Mech/IRepository.dto";
 import {
-    IAddUserAddress,
-    AddUserAddressResponse,
+
     IGetAllServices,
     GetAllServiceResponse,
-    IEditAddress,
     IEditUser,
     EditUserResponse,
     EmailExistCheckResponse,
@@ -21,7 +19,6 @@ import {
     GetUserListResponse,
     IGetAllUserRegisteredServices,
     GetAllUserRegisteredServicesResponse,
-    EditAddressResponse,
     SetUserDefaultAddressResponse,
     RegisterServiceResponse,
     getUserRegisteredServiceDetailsByIdResponse,
@@ -49,8 +46,6 @@ export interface IUserRepository {
     getAllUserRegisteredServices(data: IGetAllUserRegisteredServices): Promise<GetAllUserRegisteredServicesResponse[] | null>;
     getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[]>
     editUser(data: IEditUser): Promise<EditUserResponse | null>;
-    addAddress(data: IAddUserAddress): Promise<AddUserAddressResponse | null>;
-    editAddress(data: IEditAddress): Promise<EditAddressResponse | null>;
     setDefaultAddress(data: ISetUserDefaultAddress): Promise<SetUserDefaultAddressResponse| null> ;
     registerService(data: IRegisterService):Promise<RegisterServiceResponse | null> ;
     getMechanicDetails(data: IGetMechanicDetails): Promise<getMechanicDetailsResponse | null>

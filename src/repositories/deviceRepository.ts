@@ -18,9 +18,16 @@ class DeviceRepository
     data: IGetAllDevices
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
-      const { page, limit, search } = data;
-      const regex = new RegExp(search.trim(), "i");
-      const result = await this.findAll(page, limit, regex);
+      const { page, limit } = data;
+      // const regex = new RegExp(search.trim(), "i");
+      const result = await deviceModel
+        .find({
+          isDeleted: false,
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       return result;
     } catch (error) {
       console.log(error as Error);

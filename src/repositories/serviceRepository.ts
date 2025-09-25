@@ -23,9 +23,12 @@ class ServiceRepository
   async getService(data: IGetService): Promise<GetServiceResponse | null> {
     try {
       const { id } = data;
-      console.log("entered in the getService in the ServiceRepository and id ",id);
+      console.log(
+        "entered in the getService in the ServiceRepository and id ",
+        id
+      );
       const result = await this.findById(id);
-      console.log("service details is ",result);
+      console.log("service details is ", result);
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -37,9 +40,16 @@ class ServiceRepository
     data: IGetAllServices
   ): Promise<GetAllServiceResponse[] | null> {
     try {
-      const { page, limit, search } = data;
-      const regex = new RegExp(search.trim(), "i");
-      const result = await this.findAll(page, limit, regex);
+      const { page, limit } = data;
+      // const regex = new RegExp(search.trim(), "i");
+      const result = await serviceModel
+        .find({
+          isDeleted: false,
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       console.log(
         "result in the getAllService in the serviceRepositroy",
         result
@@ -62,7 +72,7 @@ class ServiceRepository
     }
   }
 
-    async addService(serviceData: Partial<IServices>): Promise<IServices | null> {
+  async addService(serviceData: Partial<IServices>): Promise<IServices | null> {
     try {
       console.log("Adding new service with data:", serviceData);
       const result = await this.save(serviceData);

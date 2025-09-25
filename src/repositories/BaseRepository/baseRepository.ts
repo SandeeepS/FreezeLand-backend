@@ -1,13 +1,12 @@
 import { Model } from "mongoose";
-import { ObjectId } from "mongodb";
 import { Iconcern } from "../../models/concernModel";
-import { IRegisterService} from "../../interfaces/dataContracts/User/IService.dto";
+import { IRegisterService } from "../../interfaces/dataContracts/User/IService.dto";
 
 interface Deletable {
   isDeleted: boolean;
 }
 
-interface Searchable extends Deletable{
+interface Searchable extends Deletable {
   name?: string;
   email?: string;
 }
@@ -17,17 +16,11 @@ export interface IBaseRepository<T> {
   findById(id: string): Promise<T | null>;
   findOne(filter: Partial<T>): Promise<T | null>;
   update(id: string, qr: Partial<T>): Promise<T | null>;
-  updateAddress(_id: string, qr: Partial<T>): Promise<T | null>;
-  editExistAddress(
-    _id: string,
-    addressId: string,
-    qr: Partial<T>
-  ): Promise<T | null>;
   addService(values: string): Promise<T | null>;
   addConcern(data: Iconcern): Promise<T | null>;
 }
 
-export class BaseRepository<T extends Searchable>
+export  class BaseRepository<T extends Searchable>
   implements IBaseRepository<T>
 {
   private model: Model<T>;
@@ -50,7 +43,7 @@ export class BaseRepository<T extends Searchable>
   async find(query: Partial<T>): Promise<T[] | null> {
     try {
       const messages = await this.model.find(query);
-      return messages as T[]; 
+      return messages as T[];
     } catch (error) {
       console.log("Error in base repository find method", error as Error);
       throw error;
@@ -89,65 +82,13 @@ export class BaseRepository<T extends Searchable>
     }
   }
 
-  async updateAddress(_id: string, qr: Partial<T>): Promise<T | null> {
-    try {
-      console.log("id is ", _id);
-
-      console.log("qr", qr);
-
-      if (!ObjectId.isValid(_id)) {
-        throw new Error("Invalid ID format");
-      }
-
-      const objectId = new ObjectId(_id);
-      const address = await this.model.findByIdAndUpdate(
-        objectId,
-        { $push: qr },
-        { new: true }
-      );
-
-      if (!address) {
-        return null;
-      }
-      return address;
-    } catch (error) {
-      console.log(error as Error);
-      throw error;
-    }
-  }
-
-  async editExistAddress(
-    _id: string,
-    addressId: string,
-    values: Partial<T>
-  ): Promise<T | null> {
-    try {
-      const objectId = new ObjectId(_id);
-      const newAddressId = new ObjectId(addressId);
-
-      return await this.model.findOneAndUpdate(
-        { _id: objectId, "address._id": newAddressId },
-        {
-          $set: {
-            "address.$": values,
-          },
-        },
-        { new: true }
-      );
-    } catch (error) {
-      console.log(error as Error);
-      throw error;
-    }
-  }
-
   async findAll(
     page: number,
     limit: number,
     regex: RegExp | null
-    
   ): Promise<T[] | null> {
     try {
-      console.log("Regex in the baserepo",regex);
+      console.log("Regex in the baserepo", regex);
       return await this.model
         .find({
           isDeleted: false,
