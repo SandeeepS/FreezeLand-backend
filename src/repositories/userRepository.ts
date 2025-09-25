@@ -2,9 +2,6 @@ import userModel, { TempUser } from "../models/userModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
 import concernModel from "../models/concernModel";
-import serviceModel from "../models/serviceModel";
-import { IServices } from "../interfaces/Model/IService";
-
 import {
   // IAddUserAddress,
   IGetAllServices,
@@ -42,25 +39,25 @@ import {
   IGetMechanicDetails,
   getMechanicDetailsResponse,
 } from "../interfaces/dataContracts/Mech/IRepository.dto";
-import MechModel from "../models/mechModel";
 import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
 import { ISingUp } from "../interfaces/dataContracts/User/IService.dto";
-import { MechInterface } from "../interfaces/Model/IMech";
 import ConcernRepository from "./concernRepository";
+import ServiceRepository from "./serviceRepository";
+import MechRepository from "./mechRepository";
 
 class UserRepository
   extends BaseRepository<UserInterface & Document>
   implements IUserRepository
 {
   private _concernRepository: ConcernRepository;
-  private _serviceRepository: BaseRepository<IServices>;
-  private _mechanicRepository: BaseRepository<MechInterface>;
+  private _serviceRepository: ServiceRepository;
+  private _mechanicRepository: MechRepository;
 
   constructor() {
     super(userModel);
     this._concernRepository = new ConcernRepository();
-    this._serviceRepository = new BaseRepository<IServices>(serviceModel);
-    this._mechanicRepository = new BaseRepository<MechInterface>(MechModel);
+    this._serviceRepository = new ServiceRepository();
+    this._mechanicRepository = new MechRepository();
   }
 
   async saveUser(newDetails: ISaveUser): Promise<SaveUserResponse | null> {
@@ -231,7 +228,9 @@ class UserRepository
   //getting the userCount
   async getUserCount(regex: RegExp): Promise<number> {
     try {
-      const result = await this.countDocument(regex);
+      const result = await userModel.countDocuments({
+        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+      });;
       return result as number;
     } catch (error) {
       console.log(
@@ -248,8 +247,7 @@ class UserRepository
   ): Promise<GetAllServiceResponse[] | null> {
     try {
       const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
-      const result = await this._serviceRepository.findAll(page, limit, regex);
+      const result = await this._serviceRepository.getAllServices({page, limit, searchQuery});
       return result;
     } catch (error) {
       console.log(error as Error);

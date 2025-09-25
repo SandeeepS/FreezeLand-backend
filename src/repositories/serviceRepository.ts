@@ -40,8 +40,9 @@ class ServiceRepository
     data: IGetAllServices
   ): Promise<GetAllServiceResponse[] | null> {
     try {
-      const { page, limit } = data;
-      // const regex = new RegExp(search.trim(), "i");
+      const { page, limit, searchQuery } = data;
+      const regex = new RegExp(searchQuery, "i");
+      console.log(regex);
       const result = await serviceModel
         .find({
           isDeleted: false,
@@ -65,7 +66,9 @@ class ServiceRepository
     try {
       const { searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
-      return await this.countDocument(regex);
+      return await serviceModel.countDocuments({
+        $or: [{ name: { $regex: regex } }],
+      });
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
@@ -81,6 +84,21 @@ class ServiceRepository
     } catch (error) {
       console.log("Error adding service in ServiceRepository:", error as Error);
       throw new Error("Failed to add service");
+    }
+  }
+
+    //for counting the userData
+  async countDocument(regex: RegExp): Promise<number> {
+    try {
+      return await serviceModel.countDocuments({
+        $or: [{ name: { $regex: regex } }],
+      });
+    } catch (error) {
+      console.log(
+        "error while getting the count of the document in the baseRepository",
+        error
+      );
+      throw new Error();
     }
   }
 }

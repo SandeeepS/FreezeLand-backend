@@ -1,4 +1,4 @@
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, Document } from "mongoose";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import concernModel, { Iconcern } from "../models/concernModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
@@ -11,6 +11,7 @@ import {
   IUpdateWorkDetails,
   UpdatedcomplaintWithOrderIdResponse,
 } from "../interfaces/dataContracts/Concern/IRepository";
+import { IRegisterService } from "../interfaces/dataContracts/User/IRepository.dto";
 
 class ConcernRepository
   extends BaseRepository<Iconcern & Document>
@@ -361,6 +362,22 @@ class ConcernRepository
       throw error;
     }
   }
+
+
+    async addConcern(data: IRegisterService): Promise<Iconcern & Document | null> {
+      try {
+        const newConcern = new concernModel(data);
+        await newConcern.save();
+        return newConcern ;
+      } catch (error) {
+        console.log(
+          "error from the addconcern form the baseRepository is ",
+          error as Error
+        );
+        throw Error;
+      }
+    }
+  
 }
 
 export default ConcernRepository;

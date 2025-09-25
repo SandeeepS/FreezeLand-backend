@@ -75,6 +75,50 @@ export interface UpdatedcomplaintWithOrderIdResponse {
 
 
 }
+export interface RegisterServiceResponse  {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  image: [];
+  serviceId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  defaultAddress: mongoose.Types.ObjectId;
+  orderId: mongoose.Types.ObjectId; 
+  discription: string;
+  locationName: object;
+  status: string; 
+  currentMechanicId: mongoose.Types.ObjectId | null; 
+  acceptedAt: Date; 
+  workHistory: [
+    {
+      mechanicId: mongoose.Types.ObjectId;
+      status: string;
+      acceptedAt: Date;
+      canceledAt: Date;
+      reason: string;
+      canceledBy: string;
+    }
+  ]; 
+
+  userCancellation: {
+    canceledAt: Date;
+    reason: string;
+  }; 
+
+  needsReassignment: boolean; 
+  workDetails: [
+    {
+      description: string;
+      amount: number;
+      addedAt: Date;
+    }
+  ];
+  chatId?: mongoose.Types.ObjectId;
+
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
+
+
 
   export interface IAllComplaintDataResponse {
     _id: mongoose.Types.ObjectId;

@@ -21,7 +21,7 @@ export interface IGetAllServices {
   page: number;
   limit: number;
   searchQuery: string;
-  search:string;
+  search?:string;
 
 }
 

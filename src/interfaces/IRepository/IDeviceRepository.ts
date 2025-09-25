@@ -7,4 +7,5 @@ import {
 export interface IDeviceRepository {
   getAllDevices(data: IGetAllDevices): Promise<GetAllDevicesResponse[] | null>;
   getDeviceCount(data: IGetDeviceCount): Promise<number>;
+  getAllDevices2() : Promise<GetAllDevicesResponse[] | null>
 }

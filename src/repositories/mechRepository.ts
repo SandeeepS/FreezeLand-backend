@@ -36,6 +36,7 @@ import MechModel, { TempMech } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
 import DeviceRepository from "./deviceRepository";
+import serviceModel from "../models/serviceModel";
 
 class MechRepository
   extends BaseRepository<MechInterface & Document>
@@ -151,7 +152,15 @@ class MechRepository
       const { page, limit, search } = data;
       console.log("Search in the mechRepository", search);
       const regex = new RegExp(search.trim(), "i");
-      const result = await this.findAll(page, limit, regex);
+      const result = await MechModel
+        .find({
+          isDeleted: false,
+          $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       console.log("mech list is ", result);
       return result as MechInterface[];
     } catch (error) {
@@ -163,7 +172,9 @@ class MechRepository
   //getting the mechCount
   async getMechCount(regex: RegExp): Promise<number> {
     try {
-      const result = await this.countDocument(regex);
+      const result = await MechModel.countDocuments({
+        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+      });;
       return result as number;
     } catch (error) {
       console.log(
@@ -177,8 +188,9 @@ class MechRepository
   async AddService(data: IAddService): Promise<unknown> {
     try {
       const { values } = data;
-      const result = await this.addService(values);
-      return result;
+      const newService = new serviceModel(values);
+      await newService.save();
+      return newService;
     } catch (error) {
       console.log(error as Error);
       throw new Error();
@@ -199,10 +211,10 @@ class MechRepository
     }
   }
 
-  async getAllDevices(): Promise<GetAllDevicesResponse[]> {
+  async getAllDevices(): Promise<GetAllDevicesResponse[] | null> {
     try {
-      const result = await this._deviceRepository.findAll2();
-      return result as GetAllDevicesResponse[];
+      const result = await this._deviceRepository.getAllDevices2();
+      return result;
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
