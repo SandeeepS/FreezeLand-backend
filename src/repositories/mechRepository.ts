@@ -32,20 +32,21 @@ import {
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
 import concernModel from "../models/concernModel";
-import deviceModel, { IDevice } from "../models/deviceModel";
 import MechModel, { TempMech } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
+import DeviceRepository from "./deviceRepository";
+import serviceModel from "../models/serviceModel";
 
 class MechRepository
   extends BaseRepository<MechInterface & Document>
   implements IMechRepository
 {
-  private _deviceRepository: BaseRepository<IDevice>;
+  private _deviceRepository:  DeviceRepository;
 
   constructor() {
     super(MechModel);
-    this._deviceRepository = new BaseRepository<IDevice>(deviceModel);
+    this._deviceRepository = new DeviceRepository();
   }
 
   async createTempMechData(tempMechDetails: {
@@ -151,7 +152,15 @@ class MechRepository
       const { page, limit, search } = data;
       console.log("Search in the mechRepository", search);
       const regex = new RegExp(search.trim(), "i");
-      const result = await this.findAll(page, limit, regex);
+      const result = await MechModel
+        .find({
+          isDeleted: false,
+          $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       console.log("mech list is ", result);
       return result as MechInterface[];
     } catch (error) {
@@ -163,7 +172,9 @@ class MechRepository
   //getting the mechCount
   async getMechCount(regex: RegExp): Promise<number> {
     try {
-      const result = await this.countDocument(regex);
+      const result = await MechModel.countDocuments({
+        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+      });;
       return result as number;
     } catch (error) {
       console.log(
@@ -177,8 +188,9 @@ class MechRepository
   async AddService(data: IAddService): Promise<unknown> {
     try {
       const { values } = data;
-      const result = await this.addService(values);
-      return result;
+      const newService = new serviceModel(values);
+      await newService.save();
+      return newService;
     } catch (error) {
       console.log(error as Error);
       throw new Error();
@@ -199,10 +211,10 @@ class MechRepository
     }
   }
 
-  async getAllDevices(): Promise<GetAllDevicesResponse[]> {
+  async getAllDevices(): Promise<GetAllDevicesResponse[] | null> {
     try {
-      const result = await this._deviceRepository.findAll2();
-      return result as GetAllDevicesResponse[];
+      const result = await this._deviceRepository.getAllDevices2();
+      return result;
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
@@ -464,7 +476,7 @@ class MechRepository
         { $push: qr },
         { new: true }
       );
-      console.log("added new mech address is ",addedAddress);
+      console.log("added new mech address is ", addedAddress);
       return addedAddress;
     } catch (error) {
       console.log(error as Error);
@@ -476,8 +488,9 @@ class MechRepository
   async editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
-      const editedAddress = await this.editExistAddress(_id, addressId, values);
-      return editedAddress;
+      console.log(_id, addressId, values);
+      // const editedAddress = await this.editExistAddress(_id, addressId, values);
+      return null;
     } catch (error) {
       console.log(error as Error);
       throw error;

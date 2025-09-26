@@ -2,11 +2,9 @@ import { AdminInterface } from "../models/adminModel";
 import AdminModel from "../models/adminModel";
 import { Document } from "mongoose";
 import { BaseRepository } from "./BaseRepository/baseRepository";
-import serviceModel from "../models/serviceModel";
 import UserRepository from "./userRepository";
 import MechRepository from "./mechRepository";
-import deviceModel, { IDevice } from "../models/deviceModel";
-import { IServices } from "../interfaces/Model/IService";
+
 import {
   AddNewDeviceResponse,
   IAddNewService,
@@ -42,6 +40,8 @@ import {
   IAddNewDevice,
 } from "../interfaces/dataContracts/Admin/IRepository.dto";
 import { IAdminRepository } from "../interfaces/IRepository/IAdminRepository";
+import ServiceRepository from "./serviceRepository";
+import DeviceRepository from "./deviceRepository";
 
 class AdminRepository
   extends BaseRepository<AdminInterface & Document>
@@ -49,14 +49,14 @@ class AdminRepository
 {
   private _userRepository: UserRepository;
   private _mechRepository: MechRepository;
-  private _serviceRepository: BaseRepository<IServices>;
-  private _deviceRepository: BaseRepository<IDevice>;
+  private _serviceRepository: ServiceRepository;
+  private _deviceRepository: DeviceRepository;
   constructor() {
     super(AdminModel);
     this._userRepository = new UserRepository();
     this._mechRepository = new MechRepository();
-    this._serviceRepository = new BaseRepository<IServices>(serviceModel);
-    this._deviceRepository = new BaseRepository<IDevice>(deviceModel);
+    this._serviceRepository = new ServiceRepository();
+    this._deviceRepository = new DeviceRepository();
   }
   async getAdminById(
     data: IGetAdminById

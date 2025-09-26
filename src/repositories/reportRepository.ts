@@ -60,7 +60,9 @@ class ReportRepository
       console.log(
         "Entered in the getAllReport function in the reportRepository"
       );
-      const result = await this.findAll2();
+      const result = await reportModel.find({
+        isDeleted: false,
+      });
       console.log("Reult after getting the report from the databse is", result);
       return result;
     } catch (error) {

@@ -1,17 +1,11 @@
 import userModel, { TempUser } from "../models/userModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
-import { Iconcern } from "../models/concernModel";
 import concernModel from "../models/concernModel";
-import serviceModel from "../models/serviceModel";
-import { IServices } from "../interfaces/Model/IService";
-
 import {
   // IAddUserAddress,
-  AddUserAddressResponse,
   IGetAllServices,
   GetAllServiceResponse,
-  IEditAddress,
   IEditUser,
   EditUserResponse,
   EmailExistCheckResponse,
@@ -28,7 +22,6 @@ import {
   IGetUserList,
   IGetAllUserRegisteredServices,
   GetAllUserRegisteredServicesResponse,
-  EditAddressResponse,
   SetUserDefaultAddressResponse,
   RegisterServiceResponse,
   getUserRegisteredServiceDetailsByIdResponse,
@@ -40,31 +33,31 @@ import {
   IGetServiceCount,
   ICheckUserAddressExist,
   IcheckUserAddressExitResponse,
-  AddUserAddress,
 } from "../interfaces/dataContracts/User/IRepository.dto";
 import { IUserRepository } from "../interfaces/IRepository/IUserRepository";
 import {
   IGetMechanicDetails,
   getMechanicDetailsResponse,
 } from "../interfaces/dataContracts/Mech/IRepository.dto";
-import MechModel from "../models/mechModel";
 import { ITempUser, UserInterface } from "../interfaces/Model/IUser";
-import {  ISingUp } from "../interfaces/dataContracts/User/IService.dto";
-import { MechInterface } from "../interfaces/Model/IMech";
+import { ISingUp } from "../interfaces/dataContracts/User/IService.dto";
+import ConcernRepository from "./concernRepository";
+import ServiceRepository from "./serviceRepository";
+import MechRepository from "./mechRepository";
 
 class UserRepository
   extends BaseRepository<UserInterface & Document>
   implements IUserRepository
 {
-  private _concernRepository: BaseRepository<Iconcern>;
-  private _serviceRepository: BaseRepository<IServices>;
-  private _mechanicRepository: BaseRepository<MechInterface>;
+  private _concernRepository: ConcernRepository;
+  private _serviceRepository: ServiceRepository;
+  private _mechanicRepository: MechRepository;
 
   constructor() {
     super(userModel);
-    this._concernRepository = new BaseRepository<Iconcern>(concernModel);
-    this._serviceRepository = new BaseRepository<IServices>(serviceModel);
-    this._mechanicRepository = new BaseRepository<MechInterface>(MechModel);
+    this._concernRepository = new ConcernRepository();
+    this._serviceRepository = new ServiceRepository();
+    this._mechanicRepository = new MechRepository();
   }
 
   async saveUser(newDetails: ISaveUser): Promise<SaveUserResponse | null> {
@@ -215,7 +208,15 @@ class UserRepository
       const { page, limit, search } = data;
       console.log("search ins the getUserlits , userRepo", search);
       const regex = new RegExp(search.trim(), "i");
-      const result = await this.findAll(page, limit, regex);
+      const result = await userModel
+        .find({
+          isDeleted: false,
+          $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       console.log("users list is ", result);
       return result as UserInterface[];
     } catch (error) {
@@ -227,7 +228,9 @@ class UserRepository
   //getting the userCount
   async getUserCount(regex: RegExp): Promise<number> {
     try {
-      const result = await this.countDocument(regex);
+      const result = await userModel.countDocuments({
+        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+      });;
       return result as number;
     } catch (error) {
       console.log(
@@ -244,8 +247,7 @@ class UserRepository
   ): Promise<GetAllServiceResponse[] | null> {
     try {
       const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
-      const result = await this._serviceRepository.findAll(page, limit, regex);
+      const result = await this._serviceRepository.getAllServices({page, limit, searchQuery});
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -395,10 +397,12 @@ class UserRepository
     }
   }
 
-  async checkAddressExist(data:ICheckUserAddressExist):Promise<IcheckUserAddressExitResponse | null>{
-    try{
-      const {_id} = data;
-      console.log(_id)
+  async checkAddressExist(
+    data: ICheckUserAddressExist
+  ): Promise<IcheckUserAddressExitResponse | null> {
+    try {
+      const { _id } = data;
+      console.log(_id);
       // const addressExit = await this.findById(_id)
       // if(addressExit && addressExit.address){
       //   return {
@@ -407,36 +411,7 @@ class UserRepository
       // }else{
       //   return null;
       // }
-      return {id:""}
-    }catch(error){
-      console.log(error as Error);
-      throw error;
-    }
-  }
-
-  async addAddress(
-    data:AddUserAddress
-  ): Promise<AddUserAddressResponse | null> {
-    try {
-      console.log(data)
-      // const { id, values } = data;
-      // console.log("id from the userRepository while add addresss is ", id,values);
-      // console.log("new address from the userRepository is ", values);
-      // const qr = { address: [values] };
-      // const addedAddress = await this.updateAddress(_id, qr);
-      // return addedAddress;
-      return null;
-    } catch (error) {
-      console.log(error as Error);
-      throw error;
-    }
-  }
-
-  async editAddress(data: IEditAddress): Promise<EditAddressResponse | null> {
-    try {
-      const { _id, addressId, values } = data;
-      const editedAddress = await this.editExistAddress(_id, addressId, values);
-      return editedAddress;
+      return { id: "" };
     } catch (error) {
       console.log(error as Error);
       throw error;

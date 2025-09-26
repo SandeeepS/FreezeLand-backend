@@ -14,4 +14,8 @@ export interface IGetAllDevices{
   export interface IGetDeviceCount {
     searchQuery: string;
   }
-  
+  export interface AddNewDeviceResponse {
+  name: string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+}

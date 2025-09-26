@@ -42,7 +42,7 @@ export interface IMechRepository{
     getMechCount(regex: RegExp): Promise<number>; 
     verifyMechanic(values:IVerifyMechanic):Promise<unknown> 
     AddService(data:IAddService):Promise<unknown>;  
-    getAllDevices(): Promise<GetAllDevicesResponse[]> 
+    getAllDevices(): Promise<GetAllDevicesResponse[] | null> 
     getMechanicDetails (data:IGetMechanicDetails):Promise<getMechanicDetailsResponse|null> 
     getComplaintDetails (id:string) :Promise<getComplaintDetailsResponse[]> 
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string,roomId:string): Promise<getUpdatedWorkAssingnedResponse> 

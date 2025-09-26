@@ -23,9 +23,12 @@ class ServiceRepository
   async getService(data: IGetService): Promise<GetServiceResponse | null> {
     try {
       const { id } = data;
-      console.log("entered in the getService in the ServiceRepository and id ",id);
+      console.log(
+        "entered in the getService in the ServiceRepository and id ",
+        id
+      );
       const result = await this.findById(id);
-      console.log("service details is ",result);
+      console.log("service details is ", result);
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -37,9 +40,17 @@ class ServiceRepository
     data: IGetAllServices
   ): Promise<GetAllServiceResponse[] | null> {
     try {
-      const { page, limit, search } = data;
-      const regex = new RegExp(search.trim(), "i");
-      const result = await this.findAll(page, limit, regex);
+      const { page, limit, searchQuery } = data;
+      const regex = new RegExp(searchQuery, "i");
+      console.log(regex);
+      const result = await serviceModel
+        .find({
+          isDeleted: false,
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       console.log(
         "result in the getAllService in the serviceRepositroy",
         result
@@ -55,14 +66,16 @@ class ServiceRepository
     try {
       const { searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
-      return await this.countDocument(regex);
+      return await serviceModel.countDocuments({
+        $or: [{ name: { $regex: regex } }],
+      });
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
     }
   }
 
-    async addService(serviceData: Partial<IServices>): Promise<IServices | null> {
+  async addService(serviceData: Partial<IServices>): Promise<IServices | null> {
     try {
       console.log("Adding new service with data:", serviceData);
       const result = await this.save(serviceData);
@@ -71,6 +84,21 @@ class ServiceRepository
     } catch (error) {
       console.log("Error adding service in ServiceRepository:", error as Error);
       throw new Error("Failed to add service");
+    }
+  }
+
+    //for counting the userData
+  async countDocument(regex: RegExp): Promise<number> {
+    try {
+      return await serviceModel.countDocuments({
+        $or: [{ name: { $regex: regex } }],
+      });
+    } catch (error) {
+      console.log(
+        "error while getting the count of the document in the baseRepository",
+        error
+      );
+      throw new Error();
     }
   }
 }

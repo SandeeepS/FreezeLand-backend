@@ -741,7 +741,9 @@ class userService implements IUserServices {
   async editAddress(data: IEditAddress): Promise<EditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
-      return await this._userRepository.editAddress({ _id, addressId, values });
+      console.log(_id,addressId,values);
+      // return await this._userRepository.editAddress({ _id, addressId, values });
+      return null;
     } catch (error) {
       console.log("Error occured in the editAddress in the useService", error);
       throw error;
@@ -916,3 +918,6 @@ class userService implements IUserServices {
 }
 
 export default userService;
+
+
+

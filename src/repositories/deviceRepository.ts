@@ -1,4 +1,5 @@
 import {
+  AddNewDeviceResponse,
   GetAllDevicesResponse,
   IGetAllDevices,
   IGetDeviceCount,
@@ -18,9 +19,16 @@ class DeviceRepository
     data: IGetAllDevices
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
-      const { page, limit, search } = data;
-      const regex = new RegExp(search.trim(), "i");
-      const result = await this.findAll(page, limit, regex);
+      const { page, limit } = data;
+      // const regex = new RegExp(search.trim(), "i");
+      const result = await deviceModel
+        .find({
+          isDeleted: false,
+        })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -32,10 +40,35 @@ class DeviceRepository
     try {
       const { searchQuery } = data;
       const regex = new RegExp(searchQuery, "i");
-      return await this.countDocument(regex);
+      return await deviceModel.countDocuments({
+        $or: [{ name: { $regex: regex } }],
+      });
     } catch (error) {
       console.log(error as Error);
       throw new Error("Error occured");
+    }
+  }
+
+  async getAllDevices2(): Promise<GetAllDevicesResponse[] | null> {
+    try {
+      const result = await deviceModel.find({
+        isDeleted: false,
+      });
+      return result;
+    } catch (error) {
+      console.log(error as Error);
+      throw new Error("Error occured ");
+    }
+  }
+
+  async addDevice(name: string): Promise<AddNewDeviceResponse | null> {
+    try {
+      const newSerive = new deviceModel({ name: name });
+      await newSerive.save();
+      return newSerive;
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   }
 }
