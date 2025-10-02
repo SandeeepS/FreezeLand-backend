@@ -1,12 +1,6 @@
 //this repository is used to handle the operaions to the service database . that means the services provided by the website
 
-import {
-  GetAllServiceResponse,
-  IGetAllServices,
-  IGetService,
-  GetServiceResponse,
-  IGetServiceCount,
-} from "../interfaces/dataContracts/Service/IRepository.dto";
+import { GetAllServiceResponse, GetServiceResponse, IGetAllServices, IGetService, IGetServiceCount } from "../interfaces/dataContracts/Service/IRepository.dto";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { IServices } from "../interfaces/Model/IService";
 import serviceModel from "../models/serviceModel";
