@@ -887,7 +887,7 @@ class userService implements IUserServices {
     addressId: string
   ): Promise<boolean> {
     try {
-      const result = await this._userRepository.handleRemoveUserAddress(
+      const result = await this._addressReopository.handleRemoveUserAddress(
         userId,
         addressId
       );

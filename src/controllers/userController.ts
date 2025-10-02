@@ -460,6 +460,7 @@ class userController implements IUserController {
     }
   }
 
+  //this same funciton is also used for editing the existing user Address ,if the _id is present it is used to updated the existing address
   async addAddress(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
@@ -883,7 +884,7 @@ class userController implements IUserController {
   ) {
     try {
       const { userId, addressId } = req.body;
-      console.log("address id in the userController is", userId, addressId);
+      console.log("address, id in the userController is", userId, addressId);
       const result = await this._userServices.handleRemoveUserAddress(
         userId as string,
         addressId as string

@@ -188,6 +188,7 @@ export interface GetAllServiceResponse {
 }
 
 export interface IAddress {
+  _id?:string;
   userId: string;
   addressType: "Home" | "Work";
   fullAddress: string;
@@ -199,6 +200,16 @@ export interface IAddress {
 
 export interface AddUserAddress {
   values: IAddress;
+}
+
+export interface AddUserAddress2{
+    userId: mongoose.Types.ObjectId;
+  addressType: "Home" | "Work";
+  fullAddress: string;
+  houseNumber: string;
+  landMark: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface AddUserAddressResponse {

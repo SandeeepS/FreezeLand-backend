@@ -800,7 +800,6 @@ class mechController implements IMechController {
   ) {
     try {
       const { mechId, addressId } = req.body;
-      console.log("address id in the mechController is", mechId, addressId);
       const result = await this._mechServices.handleRemoveMechAddress(
         mechId as string,
         addressId as string

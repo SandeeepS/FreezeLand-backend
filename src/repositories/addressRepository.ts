@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {
   AddUserAddress,
+  AddUserAddress2,
   AddUserAddressResponse,
   getAllAddressOfUserResponse,
 } from "../interfaces/dataContracts/User/IRepository.dto";
@@ -21,18 +22,29 @@ class AddressRepository
     data: AddUserAddress
   ): Promise<AddUserAddressResponse | null> {
     try {
-      console.log(data);
       const { values } = data;
-      console.log("id from the userRepository while add addresss is ", values);
-      console.log("new address from the userRepository is ", values);
 
-      // Convert userId from string to ObjectId
-      const addressToSave = {
-        ...values,
-        userId: new mongoose.Types.ObjectId(values.userId),
-      };
-      const addedAddress = await this.save(addressToSave);
-      return addedAddress;
+      if (values._id) {
+        const { _id, ...rest } = values;
+        console.log(rest);
+        const updatedAddress = await this.update(_id, {
+          userId: new mongoose.Types.ObjectId(values.userId),
+          addressType: values.addressType,
+          fullAddress: values.fullAddress,
+          houseNumber: values.houseNumber,
+          landmark: values.landMark,
+          latitude: values.latitude,
+          longitude: values.longitude,
+        });
+        return updatedAddress;
+      } else {
+        const addressToSave: AddUserAddress2 = {
+          ...values,
+          userId: new mongoose.Types.ObjectId(values.userId),
+        };
+        const addedAddress = await this.save(addressToSave);
+        return addedAddress;
+      }
     } catch (error) {
       console.log(error as Error);
       throw error;
@@ -44,9 +56,8 @@ class AddressRepository
   ): Promise<getAllAddressOfUserResponse[] | null> {
     try {
       const newObjId = new mongoose.Types.ObjectId(userId);
-      const qr = { userId: newObjId };
+      const qr = { userId: newObjId, isDeleted: false };
       const allAddress = await this.find(qr);
-      console.log("All the address accessed by the database is ", allAddress);
       return allAddress;
     } catch (error) {
       console.log(
@@ -54,6 +65,29 @@ class AddressRepository
         error
       );
       throw error;
+    }
+  }
+
+  async handleRemoveUserAddress(
+    userId: string,
+    addressId: string
+  ): Promise<boolean> {
+    try {
+      const result = await addressModel.findByIdAndUpdate(
+        { _id: addressId, userId: userId },
+        { $set: { isDeleted: true } }
+      );
+
+      if (result) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      throw new Error(
+        "Error occurred while removing user address in userRepository"
+      );
     }
   }
 }
