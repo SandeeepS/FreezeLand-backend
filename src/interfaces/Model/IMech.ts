@@ -1,14 +1,13 @@
 import mongoose, { Types, Document } from "mongoose";
 
 export interface Address {
-  _id: Types.ObjectId;
-  name: string;
-  phone: number;
-  email: string;
-  state: string;
-  pin: number;
-  district: string;
-  landMark: string;
+     fullAddress:string;
+     houseNumber:string;
+     longitude:number;
+     latitude:number;
+     landmark:string;
+     isDeleted:boolean;
+     isDefaultAddress:boolean;
 }
 
 

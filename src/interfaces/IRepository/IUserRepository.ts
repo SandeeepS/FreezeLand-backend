@@ -53,5 +53,4 @@ export interface IUserRepository {
     getTempUserData(id:string):Promise<ITempUser | null>
     updateUserLocation(data:IupdateUserLocation):Promise<IupdateUserLocationResponse | null>
     updateTempUserData(data: IUpdateTempDataWithOTP): Promise<ITempUser | null> 
-    handleRemoveUserAddress(userId: string, addressId: string): Promise<boolean>
 }

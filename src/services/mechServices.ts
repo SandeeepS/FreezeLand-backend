@@ -39,6 +39,8 @@ import {
   IVerifyMechanic,
   verifyOTPResponse,
   INewDetails,
+  IGetMechanicAddress,
+  IGetMechanicAddressResponse,
 } from "../interfaces/dataContracts/Mech/IService.dto";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
@@ -50,8 +52,7 @@ import { IRoomRepository } from "../interfaces/IRepository/IRoomRepository";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import { updateCompleteStatusResponse } from "../interfaces/dataContracts/Mech/IRepository.dto";
 
-
-const { OK} = STATUS_CODES;
+const { OK } = STATUS_CODES;
 class mechService implements IMechServices {
   constructor(
     private _mechRepository: IMechRepository,
@@ -206,37 +207,38 @@ class mechService implements IMechServices {
     }
   }
 
-
   //function to resnedOTP
-   async resendOTP(data: IResendOTPData): Promise<Partial<ITempMech> | null> {
-      try {
-        const { tempMechId } = data;
-        console.log("TempMechId isssssssss",tempMechId);
-        const tempUserData = await this._mechRepository.getTempMechData(
-          tempMechId
-        );
-        console.log("tempMechData in the resendOTP in the mechService",tempUserData);
-        const userEmail = tempUserData?.mechData.email;
-        const otp = await this._email.generateAndSendOTP(userEmail as string);
-        if (!otp) {
-          throw new Error("Failed to generate OTP");
-        }
-  
-        const updatedTempUserData = await this._mechRepository.updateTempMechData({
+  async resendOTP(data: IResendOTPData): Promise<Partial<ITempMech> | null> {
+    try {
+      const { tempMechId } = data;
+      console.log("TempMechId isssssssss", tempMechId);
+      const tempUserData = await this._mechRepository.getTempMechData(
+        tempMechId
+      );
+      console.log(
+        "tempMechData in the resendOTP in the mechService",
+        tempUserData
+      );
+      const userEmail = tempUserData?.mechData.email;
+      const otp = await this._email.generateAndSendOTP(userEmail as string);
+      if (!otp) {
+        throw new Error("Failed to generate OTP");
+      }
+
+      const updatedTempUserData = await this._mechRepository.updateTempMechData(
+        {
           tempMechId,
           otp,
-        });
-        return updatedTempUserData;
-      } catch (error) {
-        console.log("Errror occured while resendOTP in the mechService", error);
-        throw error;
-      }
+        }
+      );
+      return updatedTempUserData;
+    } catch (error) {
+      console.log("Errror occured while resendOTP in the mechService", error);
+      throw error;
     }
+  }
 
-
-  async signupMech(
-    mechData: ISignUpMech
-  ): Promise<SignUpMechResponse | null> {
+  async signupMech(mechData: ISignUpMech): Promise<SignUpMechResponse | null> {
     try {
       const { email } = mechData;
       return await this._mechRepository.emailExistCheck({ email });
@@ -305,7 +307,6 @@ class mechService implements IMechServices {
     }
   }
 
-  
   async mechLogin(data: IMechLogin): Promise<MechLoginResponse> {
     try {
       console.log("entered in the mech login");
@@ -408,7 +409,6 @@ class mechService implements IMechServices {
       throw error;
     }
   }
-
 
   async getUserByEmail(
     data: IEmailExitCheck
@@ -570,6 +570,29 @@ class mechService implements IMechServices {
     }
   }
 
+  //function to get the mechanic address
+  async getMechanicAddress(
+    data: IGetMechanicAddress
+  ): Promise<IGetMechanicAddressResponse[] | null> {
+    try {
+      const {mechanicId} = data;
+      console.log(
+        "reached the mechController with id for accessing the mehchanic address",
+        mechanicId
+      );
+      const result = await this._mechRepository.getMechanicAddress({
+        mechanicId,
+      });
+      return result;
+    } catch (error) {
+      console.log(
+        "error while accessing the mechanic address in the mech service ",
+        error
+      );
+      throw error;
+    }
+  }
+
   async getAllUserRegisteredServices(
     page: number,
     limit: number,
@@ -719,7 +742,10 @@ class mechService implements IMechServices {
         "Values reached in the mechService in the backend while eding the mechanic",
         mechaicDetails
       );
-      const result = await this._mechRepository.editMechanic({ mechId, values });
+      const result = await this._mechRepository.editMechanic({
+        mechId,
+        values,
+      });
       return result;
     } catch (error) {
       console.log("Erro occured in the editMechanic ", error);
@@ -736,7 +762,10 @@ class mechService implements IMechServices {
       const mechId = values.userId;
       // Ensure userId is optional before using delete
       delete (values as { userId?: string }).userId;
-      const address = await this._mechRepository.addMechAddress({ mechId, values });
+      const address = await this._mechRepository.addMechAddress({
+        mechId,
+        values,
+      });
       if (address) {
         return address;
       } else {
@@ -759,15 +788,19 @@ class mechService implements IMechServices {
     }
   }
 
-  
-  async handleRemoveMechAddress(mechId: string,addressId:string): Promise<boolean> {
+  async handleRemoveMechAddress(
+    mechId: string,
+    addressId: string
+  ): Promise<boolean> {
     try {
       console.log(
         "Enterd in the handleRemoveMechAddress in the mechService",
-        mechId,addressId
+        mechId,
+        addressId
       );
       const result = await this._mechRepository.handleRemoveMechAddress(
-        mechId,addressId
+        mechId,
+        addressId
       );
       return result;
     } catch (error) {

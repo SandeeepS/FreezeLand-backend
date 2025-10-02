@@ -50,6 +50,7 @@ userRouter.get('/profile',async (req: Request, res: Response,next:NextFunction) 
 userRouter.put('/editUser',userAuth(["user"]),async (req:Request,res:Response,next:NextFunction) => await controller.editUser(req,res,next));
 userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.addAddress(req,res,next));
 userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
+userRouter.put('/removeAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.handleRemoveUserAddress(req,res,next));
 userRouter.put('/editAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
 userRouter.post('/registerService',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.registerService(req,res,next));
 userRouter.get('/getAllServices',async(req:Request,res:Response,next:NextFunction) =>await controller.getAllServices(req,res,next));//getting all service which is provided by the website

@@ -28,6 +28,8 @@ import {
   UpdateNewPasswordResponse,
   IVerifyMechanic,
   IGetMechList,
+  IGetMechanicAddress,
+  IGetMechanicAddressResponse,
 } from "../interfaces/dataContracts/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
@@ -42,7 +44,7 @@ class MechRepository
   extends BaseRepository<MechInterface & Document>
   implements IMechRepository
 {
-  private _deviceRepository:  DeviceRepository;
+  private _deviceRepository: DeviceRepository;
 
   constructor() {
     super(MechModel);
@@ -147,16 +149,46 @@ class MechRepository
     }
   }
 
+  //function to get the mechanic address
+  async getMechanicAddress(
+    data: IGetMechanicAddress
+  ): Promise<IGetMechanicAddressResponse[] | null> {
+    try {
+      const { mechanicId } = data;
+      console.log(
+        "reached the mechController with id for accessing the mehchanic address",
+        mechanicId
+      );
+      const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
+      const qr = { _id: mechanicObjectId };
+      const result = await this.find(qr);
+      if (result) {
+        console.log(
+          "result after fetching the mech Details ",
+          result[0].address
+        );
+        return result[0].address;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.log(
+        "error while accessing the mechanic address in the mech repository ",
+        error
+      );
+      throw error;
+    }
+  }
+
   async getMechList(data: IGetMechList): Promise<GetMechListResponse[]> {
     try {
       const { page, limit, search } = data;
       console.log("Search in the mechRepository", search);
       const regex = new RegExp(search.trim(), "i");
-      const result = await MechModel
-        .find({
-          isDeleted: false,
-          $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
-        })
+      const result = await MechModel.find({
+        isDeleted: false,
+        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+      })
         .skip((page - 1) * limit)
         .limit(limit)
         .select("-password")
@@ -174,7 +206,7 @@ class MechRepository
     try {
       const result = await MechModel.countDocuments({
         $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
-      });;
+      });
       return result as number;
     } catch (error) {
       console.log(

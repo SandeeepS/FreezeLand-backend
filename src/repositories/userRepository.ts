@@ -469,30 +469,7 @@ class UserRepository
     }
   }
 
-  async handleRemoveUserAddress(
-    userId: string,
-    addressId: string
-  ): Promise<boolean> {
-    try {
-      const result = await userModel.updateOne(
-        { _id: userId, "address._id": addressId },
-        { $set: { "address.$.isDeleted": true } }
-      );
 
-      console.log("Result after updatin the address in the userSide ", result);
-
-      if (result.modifiedCount === 0) {
-        throw new Error("No address found or already deleted.");
-      } else {
-        return true;
-      }
-    } catch (error) {
-      console.error(error);
-      throw new Error(
-        "Error occurred while removing user address in userRepository"
-      );
-    }
-  }
 }
 
 export default UserRepository;

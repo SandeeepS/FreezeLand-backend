@@ -39,9 +39,8 @@ export interface verifyOTPResponse {
   refresh_token?: string;
 }
 
-
 export interface IResendOTPData {
-  tempMechId:string
+  tempMechId: string;
 }
 
 export interface SignUpMechResponse {
@@ -98,7 +97,7 @@ export interface SaveMechResponse {
 export interface IMechLogin {
   email: string;
   password: string;
-  role:string;
+  role: string;
 }
 
 export interface MechLoginResponse {
@@ -174,8 +173,22 @@ export interface GetPreSignedUrlResponse {
   key?: string;
 }
 
-export interface IGetMechanicDetails{
+export interface IGetMechanicDetails {
   id: string;
+}
+
+export interface IGetMechanicAddress {
+  mechanicId: string;
+}
+
+export interface IGetMechanicAddressResponse {
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
+  isDeleted: boolean;
+  isDefaultAddress: boolean;
 }
 
 export interface getMechanicDetailsResponse {
@@ -339,7 +352,7 @@ export interface IupdateingMechanicDetailsResponse {
 }
 
 export interface IMechAddress {
-  userId:string;
+  userId: string;
   fullAddress: string;
   houseNumber: string;
   landMark: string;

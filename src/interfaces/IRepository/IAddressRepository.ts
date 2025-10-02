@@ -3,6 +3,7 @@ import { AddUserAddress, AddUserAddressResponse, getAllAddressOfUserResponse } f
 export interface IAddressRepository{
      addAddress(data:AddUserAddress): Promise<AddUserAddressResponse | null>
       getAllAddressOfUser(userId: string): Promise<getAllAddressOfUserResponse[] | null> 
+      handleRemoveUserAddress(userId: string,addressId: string): Promise<boolean>
 }
 
 export default IAddressRepository;
