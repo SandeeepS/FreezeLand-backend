@@ -124,6 +124,22 @@ export interface IGetMechanicDetails {
   id:string;
 }
 
+
+export interface IGetMechanicAddress {
+  mechanicId: string;
+}
+
+export interface IGetMechanicAddressResponse {
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
+  isDeleted: boolean;
+  isDefaultAddress: boolean;
+}
+
+
 export interface getMechanicDetailsResponse {
   _id:Types.ObjectId | string;
   name: string;

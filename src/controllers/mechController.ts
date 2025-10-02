@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
 const { BAD_REQUEST, OK, NOT_FOUND } = STATUS_CODES;
-import { AddressValidation, mechanicAddressValidation } from "../utils/validator";
+import {
+  AddressValidation,
+  mechanicAddressValidation,
+} from "../utils/validator";
 import { IMechController } from "../interfaces/IController/IMechController";
 import {
   ForgotResentOtpResponse,
@@ -373,7 +376,7 @@ class mechController implements IMechController {
       );
       if (typeof id === "string") {
         const result = await this._mechServices.getMechanicDetails({ id });
-        console.log("result sdlfnsdfndsfdsf",result);
+        console.log("result sdlfnsdfndsfdsf", result);
         res.status(OK).json({ success: true, result: result });
       } else {
         console.log(
@@ -595,7 +598,7 @@ class mechController implements IMechController {
         "enterd in the addAddress fucniton in the backend mechController"
       );
       const { newAddress } = req.body;
-      console.log(newAddress.userId); // here the userId is refer to the mechanci id 
+      console.log(newAddress.userId); // here the userId is refer to the mechanci id
       const check = mechanicAddressValidation(
         newAddress.userId,
         newAddress.fullAddress,
@@ -606,7 +609,7 @@ class mechController implements IMechController {
       );
       if (check) {
         const addedAddress = await this._mechServices.AddMechAddress({
-          values:newAddress
+          values: newAddress,
         });
         if (addedAddress) {
           res.status(OK).json({
@@ -633,13 +636,41 @@ class mechController implements IMechController {
     }
   }
 
-  //function to get the mechanic address 
-  async getMechanicAddress(req:Request,res:Response,next:NextFunction) {
-    try{
-      const {mechanicId} = req.query;
-      console.log("reached the mechController with id for accessing the mehchanic address",mechanicId);
-    }catch(error){
-      console.log("error while accessing the mechanic address in the mech controller ",error);
+  //function to get the mechanic address
+  async getMechanicAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { mechanicId } = req.query;
+      console.log(
+        "reached the mechController with id for accessing the mehchanic address",
+        mechanicId
+      );
+      if (typeof mechanicId !== "string") {
+        res.status(BAD_REQUEST).json({
+          success: false,
+          message: "Invalid mechanicId",
+        });
+        return;
+      }
+      const result = await this._mechServices.getMechanicAddress({
+        mechanicId,
+      });
+      if (result) {
+        res.status(OK).json({
+          success: true,
+          message: "Address fetched successfully",
+          result,
+        });
+      } else {
+        res.status(BAD_REQUEST).json({
+          success: false,
+          message: "Address fetching failed ",
+        });
+      }
+    } catch (error) {
+      console.log(
+        "error while accessing the mechanic address in the mech controller ",
+        error
+      );
       next(error);
     }
   }

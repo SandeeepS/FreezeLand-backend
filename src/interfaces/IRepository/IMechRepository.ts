@@ -30,6 +30,8 @@ import {
     UpdateNewPasswordResponse,
     IVerifyMechanic,
     IGetMechList,
+    IGetMechanicAddress,
+    IGetMechanicAddressResponse,
   } from "../dataContracts/Mech/IRepository.dto";
 import { ITempMech } from "../Model/IMech";
 
@@ -56,4 +58,5 @@ export interface IMechRepository{
     updateTempMechData(data: IUpdateTempDataWithOTP): Promise<ITempMech | null> 
     updateMechanicEarnings(updateMechanicDetails:IUpdateMechanicDetails):Promise<IUpdatedMechnicDetails | null>
     handleRemoveMechAddress(mechId: string,addressId: string): Promise<boolean>
+    getMechanicAddress(data: IGetMechanicAddress): Promise<IGetMechanicAddressResponse[] | null> 
 }
