@@ -69,6 +69,7 @@ class ServiceRepository
     }
   }
 
+  //function created for adding a new service 
   async addService(serviceData: Partial<IServices>): Promise<IServices | null> {
     try {
       console.log("Adding new service with data:", serviceData);
@@ -82,6 +83,7 @@ class ServiceRepository
   }
 
     //for counting the userData
+
   async countDocument(regex: RegExp): Promise<number> {
     try {
       return await serviceModel.countDocuments({
