@@ -4,8 +4,6 @@ export interface IGetService {
   id: string;
 }
 
-
-
 export interface GetServiceResponse {
   id?: Types.ObjectId;
   name: string;
@@ -22,7 +20,6 @@ export interface IGetAllServices {
   limit: number;
   searchQuery: string;
   search?:string;
-
 }
 
 export interface GetAllServiceResponse {
