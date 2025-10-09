@@ -38,12 +38,26 @@ class AddressRepository
         });
         return updatedAddress;
       } else {
-        const addressToSave: AddUserAddress2 = {
-          ...values,
+        const isAddressCheck = await this.find({
           userId: new mongoose.Types.ObjectId(values.userId),
-        };
-        const addedAddress = await this.save(addressToSave);
-        return addedAddress;
+        });
+        console.log("is address is exit for the user ?", isAddressCheck);
+        if (isAddressCheck?.length === 0) {
+          const addressToSave: AddUserAddress2 = {
+            ...values,
+            userId: new mongoose.Types.ObjectId(values.userId),
+          };
+          const addedAddress = await this.save(addressToSave);
+          return addedAddress;
+        } else {
+          const addressToSave: AddUserAddress2 = {
+            ...values,
+            userId: new mongoose.Types.ObjectId(values.userId),
+            isDefaultAddress: false,
+          };
+          const addedAddress = await this.save(addressToSave);
+          return addedAddress;
+        }
       }
     } catch (error) {
       console.log(error as Error);

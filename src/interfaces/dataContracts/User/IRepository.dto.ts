@@ -210,6 +210,7 @@ export interface AddUserAddress2{
   landMark: string;
   latitude: number;
   longitude: number;
+  isDefaultAddress?:boolean;
 }
 
 export interface AddUserAddressResponse {
