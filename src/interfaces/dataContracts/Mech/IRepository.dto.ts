@@ -130,6 +130,7 @@ export interface IGetMechanicAddress {
 }
 
 export interface IGetMechanicAddressResponse {
+  _id:mongoose.Types.ObjectId;
   fullAddress: string;
   houseNumber: string;
   longitude: number;
@@ -280,8 +281,6 @@ export interface IUpdateTempDataWithOTP {
   otp:string;
 }
 
-
-
 export interface getUpdatedWorkAssingnedResponse{
     _id: mongoose.Types.ObjectId;
     name: string;
@@ -331,6 +330,24 @@ export interface getAllAcceptedServiceResponse {
     isBlocked: boolean;
     isDeleted: boolean;
 }
+
+
+export interface ISetMechDefaultAddress {
+  mechId: string;
+  addressId: string;
+}
+
+export interface SetMechDefaultAddressResponse {
+  _id: mongoose.Types.ObjectId;
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
+  isDeleted: boolean;
+  isDefaultAddress: boolean;
+}
+
 
 export interface IGetMechanicDetails {
   id:string;

@@ -4,6 +4,8 @@ import {
   AddUserAddress2,
   AddUserAddressResponse,
   getAllAddressOfUserResponse,
+  ISetUserDefaultAddress,
+  SetUserDefaultAddressResponse,
 } from "../interfaces/dataContracts/User/IRepository.dto";
 import IAddressRepository from "../interfaces/IRepository/IAddressRepository";
 import { IAddress } from "../interfaces/Model/IAddress";
@@ -102,6 +104,43 @@ class AddressRepository
       throw new Error(
         "Error occurred while removing user address in userRepository"
       );
+    }
+  }
+
+  async setDefaultAddress(
+    data: ISetUserDefaultAddress
+  ): Promise<SetUserDefaultAddressResponse | null> {
+    try {
+      const { userId, addressId } = data;
+      console.log(
+        "enterd in the userRepository for upaidng the default address",
+        userId,
+        addressId
+      );
+
+      await addressModel.updateMany(
+        { userId: new mongoose.Types.ObjectId(userId), isDefaultAddress: true },
+        { $set: { isDefaultAddress: false } }
+      );
+
+      const updatedAddress = await addressModel.findOneAndUpdate(
+        {
+          _id: new mongoose.Types.ObjectId(addressId),
+          userId: new mongoose.Types.ObjectId(userId),
+        },
+        { $set: { isDefaultAddress: true } },
+        { new: true }
+      );
+
+      if (!updatedAddress){
+        console.log("Address not found or not updated");
+        return null;
+      }
+      console.log("Updated default address successfully:", updatedAddress);
+      return updatedAddress;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
     }
   }
 }

@@ -19,14 +19,12 @@ import {
     GetUserListResponse,
     IGetAllUserRegisteredServices,
     GetAllUserRegisteredServicesResponse,
-    SetUserDefaultAddressResponse,
     RegisterServiceResponse,
     getUserRegisteredServiceDetailsByIdResponse,
     IupdateUserLocation,
     IupdateUserLocationResponse,
     IUpdateTempDataWithOTP,
     IEmailExistCheck,
-    ISetUserDefaultAddress,
     IGetServiceCount,
     
   } from "../dataContracts/User/IRepository.dto";
@@ -46,7 +44,6 @@ export interface IUserRepository {
     getAllUserRegisteredServices(data: IGetAllUserRegisteredServices): Promise<GetAllUserRegisteredServicesResponse[] | null>;
     getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[]>
     editUser(data: IEditUser): Promise<EditUserResponse | null>;
-    setDefaultAddress(data: ISetUserDefaultAddress): Promise<SetUserDefaultAddressResponse| null> ;
     registerService(data: IRegisterService):Promise<RegisterServiceResponse | null> ;
     getMechanicDetails(data: IGetMechanicDetails): Promise<getMechanicDetailsResponse | null>
     createTempUserData(data: Partial<ITempUser>): Promise<Partial<ITempUser | null>>

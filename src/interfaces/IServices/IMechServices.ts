@@ -1,5 +1,5 @@
 
-import { IAddMechAddressResponse } from "../dataContracts/Mech/IRepository.dto";
+import { IAddMechAddressResponse, SetMechDefaultAddressResponse } from "../dataContracts/Mech/IRepository.dto";
 import {
     EmailExistResponse,
     IEmailExitCheck,
@@ -37,9 +37,9 @@ import {
     verifyOTPResponse,
     IGetMechanicAddress,
     IGetMechanicAddressResponse,
+    ISetMechDefaultAddress,
   } from "../dataContracts/Mech/IService.dto";
 import { ITempMech } from "../Model/IMech";
-
 
 export interface IMechServices{
     mechRegistration( mechData: MechRegistrationData): Promise<Partial<ITempMech>>
@@ -68,5 +68,6 @@ export interface IMechServices{
     resendOTP(data: IResendOTPData): Promise<Partial<ITempMech> | null>
     handleRemoveMechAddress(mechId: string,addressId:string): Promise<boolean>
     getMechanicAddress(data: IGetMechanicAddress): Promise<IGetMechanicAddressResponse[] | null>
+    setUserDefaultAddress( data: ISetMechDefaultAddress): Promise<SetMechDefaultAddressResponse[] | null> 
 }
 

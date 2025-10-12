@@ -41,6 +41,8 @@ import {
   INewDetails,
   IGetMechanicAddress,
   IGetMechanicAddressResponse,
+  ISetMechDefaultAddress,
+  SetMechDefaultAddressResponse,
 } from "../interfaces/dataContracts/Mech/IService.dto";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
@@ -575,7 +577,7 @@ class mechService implements IMechServices {
     data: IGetMechanicAddress
   ): Promise<IGetMechanicAddressResponse[] | null> {
     try {
-      const {mechanicId} = data;
+      const { mechanicId } = data;
       console.log(
         "reached the mechController with id for accessing the mehchanic address",
         mechanicId
@@ -806,6 +808,24 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured in thehandleRemoveMechAddress function in mech service ",
+        error
+      );
+      throw error;
+    }
+  }
+
+  async setUserDefaultAddress(
+    data: ISetMechDefaultAddress
+  ): Promise<SetMechDefaultAddressResponse[] | null> {
+    try {
+      const { mechId, addressId } = data;
+      return await this._mechRepository.setDefaultAddress({
+        mechId,
+        addressId,
+      });
+    } catch (error) {
+      console.log(
+        "Error occured in the setUserDefaultAddress in the mechService",
         error
       );
       throw error;

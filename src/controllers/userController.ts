@@ -567,7 +567,7 @@ class userController implements IUserController {
           .status(BAD_REQUEST)
           .json({ success: false, message: "Default address updation failed" });
       }
-    } catch (error) {
+    } catch (error){
       console.log(error as Error);
       next(error);
     }

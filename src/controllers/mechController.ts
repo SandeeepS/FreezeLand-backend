@@ -848,6 +848,32 @@ class mechController implements IMechController {
       next(error);
     }
   }
+
+  async setDefaultAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "Enterd in the address funciton in the backend mechController"
+      );
+      const { mechId, addressId } = req.body;
+      console.log("mechId and addressId is ", mechId, addressId);
+      const updatedDefaultAddress =
+        await this._mechServices.setUserDefaultAddress({ mechId, addressId });
+      if (updatedDefaultAddress) {
+        res.status(OK).json({
+          success: true,
+          message: "Default address updated successfully",
+        });
+      } else {
+        res
+          .status(BAD_REQUEST)
+          .json({ success: false, message: "Default address updation failed" });
+      }
+    } catch (error){
+      console.log(error as Error);
+      next(error);
+    }
+  }
+
 }
 
 export default mechController;

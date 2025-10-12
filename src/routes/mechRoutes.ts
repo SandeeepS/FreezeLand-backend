@@ -53,6 +53,8 @@ mechRouter.put('/editAddress',mechAuth(["mechanic"]),async(req:Request,res:Respo
 mechRouter.post('/report',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.createReport(req,res,next));
 mechRouter.get('/logout',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogout(req,res,next));
 mechRouter.put('/handleRemoveMechAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.handleRemoveMechAddress(req,res,next));
+mechRouter.put('/setDefaultAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
+
 
 
 
