@@ -403,6 +403,23 @@ export interface IEditAddressResponse {
   isDeleted: boolean;
 }
 
+export interface ISetMechDefaultAddress {
+  mechId: string;
+  addressId: string;
+}
+
+export interface SetMechDefaultAddressResponse {
+  _id: mongoose.Types.ObjectId;
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
+  isDeleted: boolean;
+  isDefaultAddress: boolean;
+}
+
+
 export interface updateCompleteStatusResponse {
   _id: mongoose.Types.ObjectId;
   name: string;

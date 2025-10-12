@@ -30,9 +30,11 @@ import {
   IGetMechList,
   IGetMechanicAddress,
   IGetMechanicAddressResponse,
+  ISetMechDefaultAddress,
+  SetMechDefaultAddressResponse,
 } from "../interfaces/dataContracts/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
-import { ITempMech, MechInterface } from "../interfaces/Model/IMech";
+import { Address, ITempMech, MechInterface } from "../interfaces/Model/IMech";
 import concernModel from "../models/concernModel";
 import MechModel, { TempMech } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
@@ -162,15 +164,16 @@ class MechRepository
       const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
       const qr = { _id: mechanicObjectId };
       const result = await this.find(qr);
-      if (result) {
-        console.log(
-          "result after fetching the mech Details ",
-          result[0].address
+      if (result && result.length > 0) {
+        const activeAddresses = result[0].address.filter(
+          (addr: Address) => !addr.isDeleted
         );
-        return result[0].address;
-      } else {
-        return null;
+
+        console.log("Active mechanic addresses:", activeAddresses);
+        return activeAddresses;
       }
+
+      return null;
     } catch (error) {
       console.log(
         "error while accessing the mechanic address in the mech repository ",
@@ -548,29 +551,79 @@ class MechRepository
       throw error;
     }
   }
-
   async handleRemoveMechAddress(
     mechId: string,
     addressId: string
   ): Promise<boolean> {
     try {
-      const result = await MechModel.updateOne(
-        { _id: mechId, "address._id": addressId },
-        { $set: { "address.$.isDeleted": true } }
+      console.log(
+        "Entered in mechRepository for removing address",
+        mechId,
+        addressId
       );
 
-      console.log("Result after updatin the address in the mechSide ", result);
-
-      if (result.modifiedCount === 0) {
-        throw new Error("No address found or already deleted.");
-      } else {
-        return true;
+      const mechanic = await MechModel.findById(mechId);
+      if (!mechanic) {
+        console.log("Mechanic not found");
+        return false;
       }
-    } catch (error) {
-      console.error(error);
-      throw new Error(
-        "Error occurred while removing user address in mechRepository"
+
+      const targetAddress = mechanic.address.find(
+        (addr: Address) => addr._id.toString() === addressId
       );
+
+      if (!targetAddress) {
+        console.log("Address not found");
+        return false;
+      }
+
+      targetAddress.isDeleted = true;
+      await mechanic.save();
+      console.log("Address marked as deleted successfully");
+
+      return true;
+    } catch (error) {
+      console.error("Error occurred while removing mechanic address:", error);
+      throw error;
+    }
+  }
+
+  async setDefaultAddress(
+    data: ISetMechDefaultAddress
+  ): Promise<SetMechDefaultAddressResponse[] | null> {
+    try {
+      const { mechId, addressId } = data;
+      console.log("Entered setDefaultAddress for mechanic:", mechId, addressId);
+
+      const mechanic = await MechModel.findById(mechId);
+      if (!mechanic) {
+        console.log("Mechanic not found");
+        return null;
+      }
+
+      if (!mechanic.address || mechanic.address.length === 0) {
+        console.log("No addresses found for this mechanic");
+        return null;
+      }
+
+      mechanic.address = mechanic.address.map(
+        (addr: IGetMechanicAddressResponse) => {
+          if (addr._id.toString() === addressId) {
+            return { ...addr, isDefaultAddress: true };
+          }
+          return { ...addr, isDefaultAddress: false };
+        }
+      );
+
+      const updatedMechanic = await mechanic.save();
+      console.log(
+        "Updated default address successfully:",
+        updatedMechanic.address
+      );
+      return updatedMechanic.address;
+    } catch (error) {
+      console.log(error as Error);
+      throw error;
     }
   }
 }

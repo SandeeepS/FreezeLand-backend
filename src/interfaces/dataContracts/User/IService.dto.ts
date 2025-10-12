@@ -312,14 +312,16 @@ export interface ISetUserDefaultAddress {
 }
 
 export interface SetUserDefaultAddressResponse {
-  _id: Types.ObjectId;
-  name: string;
-  email: string;
-  phone: number;
-  profile_picture: string;
-  role: string;
-  isBlocked: boolean;
+  _id: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  addressType: "Home" | "Work";
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
   isDeleted: boolean;
+  isDefaultAddress: boolean;
 }
 
 export interface GetUserByEmail {

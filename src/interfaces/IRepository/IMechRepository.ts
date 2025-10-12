@@ -32,6 +32,8 @@ import {
     IGetMechList,
     IGetMechanicAddress,
     IGetMechanicAddressResponse,
+    ISetMechDefaultAddress,
+    SetMechDefaultAddressResponse,
   } from "../dataContracts/Mech/IRepository.dto";
 import { ITempMech } from "../Model/IMech";
 
@@ -59,4 +61,5 @@ export interface IMechRepository{
     updateMechanicEarnings(updateMechanicDetails:IUpdateMechanicDetails):Promise<IUpdatedMechnicDetails | null>
     handleRemoveMechAddress(mechId: string,addressId: string): Promise<boolean>
     getMechanicAddress(data: IGetMechanicAddress): Promise<IGetMechanicAddressResponse[] | null> 
+    setDefaultAddress(data: ISetMechDefaultAddress): Promise<SetMechDefaultAddressResponse[] | null> 
 }

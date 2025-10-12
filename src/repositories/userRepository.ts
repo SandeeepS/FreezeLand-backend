@@ -22,14 +22,12 @@ import {
   IGetUserList,
   IGetAllUserRegisteredServices,
   GetAllUserRegisteredServicesResponse,
-  SetUserDefaultAddressResponse,
   RegisterServiceResponse,
   getUserRegisteredServiceDetailsByIdResponse,
   IupdateUserLocation,
   IupdateUserLocationResponse,
   IUpdateTempDataWithOTP,
   IEmailExistCheck,
-  ISetUserDefaultAddress,
   IGetServiceCount,
   ICheckUserAddressExist,
   IcheckUserAddressExitResponse,
@@ -418,25 +416,6 @@ class UserRepository
     }
   }
 
-  async setDefaultAddress(
-    data: ISetUserDefaultAddress
-  ): Promise<SetUserDefaultAddressResponse | null> {
-    try {
-      const { userId, addressId } = data;
-      console.log(
-        "enterd in the userRepository for upaidng the default address",
-        userId,
-        addressId
-      );
-      // const qr = { defaultAddress: addressId };
-      // const updatedUser = await this.update(userId, qr);
-      // return updatedUser;
-      return null;
-    } catch (error) {
-      console.log(error as Error);
-      throw error;
-    }
-  }
 
   async registerService(
     data: IRegisterService
