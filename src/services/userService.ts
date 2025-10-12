@@ -741,7 +741,7 @@ class userService implements IUserServices {
   async editAddress(data: IEditAddress): Promise<EditAddressResponse | null> {
     try {
       const { _id, addressId, values } = data;
-      console.log(_id,addressId,values);
+      console.log(_id, addressId, values);
       // return await this._userRepository.editAddress({ _id, addressId, values });
       return null;
     } catch (error) {
@@ -755,7 +755,7 @@ class userService implements IUserServices {
   ): Promise<SetUserDefaultAddressResponse | null> {
     try {
       const { userId, addressId } = data;
-      return await this._userRepository.setDefaultAddress({
+      return await this._addressReopository.setDefaultAddress({
         userId,
         addressId,
       });
@@ -918,6 +918,3 @@ class userService implements IUserServices {
 }
 
 export default userService;
-
-
-

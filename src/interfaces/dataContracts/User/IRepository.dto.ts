@@ -210,6 +210,7 @@ export interface AddUserAddress2{
   landMark: string;
   latitude: number;
   longitude: number;
+  isDefaultAddress?:boolean;
 }
 
 export interface AddUserAddressResponse {
@@ -226,6 +227,24 @@ export interface AddUserAddressResponse {
 }
 
 export interface getAllAddressOfUserResponse {
+  _id: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  addressType: "Home" | "Work";
+  fullAddress: string;
+  houseNumber: string;
+  longitude: number;
+  latitude: number;
+  landmark: string;
+  isDeleted: boolean;
+  isDefaultAddress: boolean;
+}
+
+export interface ISetUserDefaultAddress {
+  userId: string;
+  addressId: string;
+}
+
+export interface SetUserDefaultAddressResponse {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   addressType: "Home" | "Work";
@@ -255,21 +274,7 @@ export interface EditAddressResponse {
   isDeleted: boolean;
 }
 
-export interface ISetUserDefaultAddress {
-  userId: string;
-  addressId: string;
-}
 
-export interface SetUserDefaultAddressResponse {
-  _id: Types.ObjectId;
-  name: string;
-  email: string;
-  phone: number;
-  profile_picture: string;
-  role: string;
-  isBlocked: boolean;
-  isDeleted: boolean;
-}
 export interface IRegisterService {
   _id: Types.ObjectId;
   name: string;
