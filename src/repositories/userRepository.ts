@@ -154,6 +154,7 @@ class UserRepository
     return this.findOne({ email: email }) as unknown as EmailExistCheckResponse;
   }
 
+  //fucntion for updating the password 
   async updateNewPassword(
     data: IUpdateNewPassword
   ): Promise<UpdateNewPasswordResponse | null> {
