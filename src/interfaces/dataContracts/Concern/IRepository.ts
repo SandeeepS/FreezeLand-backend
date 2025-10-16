@@ -8,9 +8,8 @@ export interface getComplaintDetailsResponse {
     image: [];
     serviceId: string;
     userId: string;
-    defaultAddress: string;
+    address: string;
     discription: string;
-    locationName: object;
     isBlocked: boolean;
     isDeleted: boolean;
     userDetails: object;
@@ -36,9 +35,8 @@ export interface GetAllUserRegisteredServicesResponse {
   image: [];
   serviceId: string;
   userId:string;
-  defaultAddress: string;
+  address: string;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
   userDetails:Iuser;
@@ -52,9 +50,8 @@ export interface GetAllMechanicCompletedServicesResponse {
   image: [];
   serviceId: string;
   userId:string;
-  defaultAddress: string;
+  address: string;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
   userDetails:Iuser;
@@ -67,9 +64,8 @@ export interface UpdatedcomplaintWithOrderIdResponse {
   image: [];
   serviceId:  mongoose.Types.ObjectId  ;
   userId: mongoose.Types.ObjectId ;
-  defaultAddress:  mongoose.Types.ObjectId ;
+  address:  mongoose.Types.ObjectId ;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
 
@@ -81,10 +77,9 @@ export interface RegisterServiceResponse  {
   image: [];
   serviceId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  defaultAddress: mongoose.Types.ObjectId;
+  address: mongoose.Types.ObjectId;
   orderId: mongoose.Types.ObjectId; 
   discription: string;
-  locationName: object;
   status: string; 
   currentMechanicId: mongoose.Types.ObjectId | null; 
   acceptedAt: Date; 
@@ -126,9 +121,8 @@ export interface RegisterServiceResponse  {
     image: [];
     serviceId: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId;
-    defaultAddress: mongoose.Types.ObjectId;
+    address: mongoose.Types.ObjectId;
     discription: string;
-    locationName: object;
     status: string;
     currentMechanicId: mongoose.Types.ObjectId | null;
     acceptedAt: Date | null;

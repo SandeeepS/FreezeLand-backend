@@ -69,13 +69,11 @@ class UserRepository
   }): Promise<ITempUser | null> {
     try {
       console.log("entered in the userRepository in userRepository");
-
       // Create the TempUser object with properly structured data
       const createdTempUser = new TempUser({
         otp: tempUserDetails.otp,
         userData: tempUserDetails.userData,
       });
-
       const savedUser = await createdTempUser.save();
       return savedUser;
     } catch (error) {
@@ -89,13 +87,13 @@ class UserRepository
     try {
       const result = await TempUser.findById(id);
       console.log("accessed the tempUserData in the userRepository", result);
-
       return result;
     } catch (error) {
       console.log(error as Error);
       throw error;
     }
   }
+
 
   async updateTempUserData(
     data: IUpdateTempDataWithOTP

@@ -6,10 +6,9 @@ export interface Iconcern extends Document {
   image: [];
   serviceId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  defaultAddress: mongoose.Types.ObjectId;
+  address: mongoose.Types.ObjectId;
   orderId: mongoose.Types.ObjectId;
   discription: string;
-  locationName: object;
   status: string;
   currentMechanicId: mongoose.Types.ObjectId | null;
   acceptedAt: Date;
@@ -60,7 +59,7 @@ const concernSchema: Schema<Iconcern> = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
-    defaultAddress: {
+    address: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
@@ -72,10 +71,7 @@ const concernSchema: Schema<Iconcern> = new Schema(
       type: String,
       required: true,
     },
-    locationName: {
-      type: Object,
-      required: true,
-    },
+ 
     status: {
       type: String,
       enum: [

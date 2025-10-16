@@ -287,9 +287,8 @@ export interface getUpdatedWorkAssingnedResponse{
     image: [];
     serviceId: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId;
-    defaultAddress: mongoose.Types.ObjectId;
+    address: mongoose.Types.ObjectId;
     discription: string;
-    locationName: object;
     status: string;
     currentMechanicId: mongoose.Types.ObjectId | null;
     acceptedAt: Date | null;
@@ -312,9 +311,8 @@ export interface getAllAcceptedServiceResponse {
     image: [];
     serviceId: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId;
-    defaultAddress: mongoose.Types.ObjectId;
+    address: mongoose.Types.ObjectId;
     discription: string;
-    locationName: object;
     status: string;
     currentMechanicId: mongoose.Types.ObjectId | null;
     acceptedAt: Date | null;
@@ -374,9 +372,8 @@ export interface updateCompleteStatusResponse {
   image: [];
   serviceId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  defaultAddress: mongoose.Types.ObjectId;
+  address: mongoose.Types.ObjectId;
   discription: string;
-  locationName: object;
   status: string;
   currentMechanicId: mongoose.Types.ObjectId | null;
   acceptedAt: Date | null;
