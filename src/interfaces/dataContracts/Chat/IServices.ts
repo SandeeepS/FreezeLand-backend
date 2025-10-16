@@ -25,9 +25,8 @@ export interface getComplaintDetailsResponse {
   image: [];
   serviceId: string;
   userId: string;
-  defaultAddress: string;
+  address: string;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
   userDetails: object;

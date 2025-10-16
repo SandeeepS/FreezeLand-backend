@@ -371,7 +371,7 @@ class ConcernRepository
         return newConcern ;
       } catch (error) {
         console.log(
-          "error from the addconcern form the baseRepository is ",
+          "error from the addconcern form the concern repository is ",
           error as Error
         );
         throw Error;

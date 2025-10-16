@@ -219,9 +219,8 @@ export interface GetAllUserRegisteredServicesResponse {
   image: [];
   serviceId: string;
   userId: string;
-  defaultAddress: string;
+  address: string;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
   userDetails: Iuser;
@@ -234,9 +233,8 @@ export interface getComplaintDetailsResponse {
   image: [];
   serviceId: string;
   userId: string;
-  defaultAddress: string;
+  address: string;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
   userDetails: object;
@@ -250,9 +248,8 @@ export interface getUpdatedWorkAssingnedResponse {
   image: [];
   serviceId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  defaultAddress: mongoose.Types.ObjectId;
+  address: mongoose.Types.ObjectId;
   discription: string;
-  locationName: object;
   status: string;
   currentMechanicId: mongoose.Types.ObjectId | null;
   acceptedAt: Date | null;
@@ -275,9 +272,8 @@ export interface getAllAcceptedServiceResponse {
   image: [];
   serviceId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  defaultAddress: mongoose.Types.ObjectId;
+  address: mongoose.Types.ObjectId;
   discription: string;
-  locationName: object;
   status: string;
   currentMechanicId: mongoose.Types.ObjectId | null;
   acceptedAt: Date | null;
@@ -419,16 +415,14 @@ export interface SetMechDefaultAddressResponse {
   isDefaultAddress: boolean;
 }
 
-
 export interface updateCompleteStatusResponse {
   _id: mongoose.Types.ObjectId;
   name: string;
   image: [];
   serviceId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  defaultAddress: mongoose.Types.ObjectId;
+  address: mongoose.Types.ObjectId;
   discription: string;
-  locationName: object;
   status: string;
   currentMechanicId: mongoose.Types.ObjectId | null;
   acceptedAt: Date | null;
@@ -451,9 +445,8 @@ export interface GetAllMechanicCompletedServicesResponse {
   image: [];
   serviceId: string;
   userId: string;
-  defaultAddress: string;
+  address: string;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
   userDetails: Iuser;

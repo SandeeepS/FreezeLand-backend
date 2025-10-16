@@ -342,9 +342,8 @@ export interface IRegisterService {
   image: [];
   serviceId: Types.ObjectId;
   userId: Types.ObjectId;
-  defaultAddress: Types.ObjectId;
+  address: Types.ObjectId;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
 }
@@ -413,9 +412,8 @@ export interface RegisterServiceResponse {
   image: [];
   serviceId: Types.ObjectId;
   userId: Types.ObjectId;
-  defaultAddress: Types.ObjectId;
+  address: Types.ObjectId;
   discription: string;
-  locationName: object;
   isBlocked: boolean;
   isDeleted: boolean;
 }
