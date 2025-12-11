@@ -19,11 +19,12 @@ class DeviceRepository
     data: IGetAllDevices
   ): Promise<GetAllDevicesResponse[] | null> {
     try {
-      const { page, limit } = data;
-      // const regex = new RegExp(search.trim(), "i");
+      const { page, limit,search } = data;
+      const regex = new RegExp(search.trim(), "i");
       const result = await deviceModel
         .find({
           isDeleted: false,
+          name:regex
         })
         .skip((page - 1) * limit)
         .limit(limit)

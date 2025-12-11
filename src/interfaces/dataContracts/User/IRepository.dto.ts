@@ -174,6 +174,7 @@ export interface IGetAllServices {
   page: number;
   limit: number;
   searchQuery: string;
+  search:string;
 }
 
 export interface GetAllServiceResponse {

@@ -120,11 +120,11 @@ class ConcernRepository
         "entered in the get all complaints method in the concern repository"
       );
       console.log("search in the order repository", search);
-      const regex = new RegExp(search, "i");
+      const regex = new RegExp(search.trim(), "i");
       const result =await concernModel
         .find({
           isDeleted: false,
-          $or: [{ name: { $regex: regex } }],
+          name:regex,
         })
         .skip((page - 1) * limit)
         .limit(limit)

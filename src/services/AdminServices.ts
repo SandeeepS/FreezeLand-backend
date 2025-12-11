@@ -244,6 +244,7 @@ class adminService implements IAdminService {
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
+   
       const devices = await this._deviceRepository.getAllDevices({
         page,
         limit,
@@ -251,6 +252,7 @@ class adminService implements IAdminService {
         search,
       });
       console.log("list of device  is ", devices);
+  
       const devicesCount = await this._deviceRepository.getDeviceCount({
         searchQuery,
       });

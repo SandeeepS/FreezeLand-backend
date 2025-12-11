@@ -245,8 +245,8 @@ class UserRepository
     data: IGetAllServices
   ): Promise<GetAllServiceResponse[] | null> {
     try {
-      const { page, limit, searchQuery } = data;
-      const result = await this._serviceRepository.getAllServices({page, limit, searchQuery});
+      const { page, limit, searchQuery ,search} = data;
+      const result = await this._serviceRepository.getAllServices({page, limit, searchQuery,search});
       return result;
     } catch (error) {
       console.log(error as Error);
