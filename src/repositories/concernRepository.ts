@@ -139,7 +139,6 @@ class ConcernRepository
   }
 
   //funciton to cancel complaints
-  // In your concernRepository
   async cancelComplaint(
     complaintId: string,
     userRole: string,
