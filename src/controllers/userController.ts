@@ -625,6 +625,7 @@ class userController implements IUserController {
       console.log("reached the getAllServices funciton in the user controller");
       const page = parseInt(req.query.page as string);
       const limit = parseInt(req.query.limit as string);
+      const search = req.query.search as string;
       const searchQuery = req.query.searchQuery as string | undefined;
       console.log(" page is ", page);
       console.log("limit is ", limit);
@@ -632,6 +633,7 @@ class userController implements IUserController {
         page,
         limit,
         searchQuery,
+        search
       });
 
       res.status(OK).json(data);

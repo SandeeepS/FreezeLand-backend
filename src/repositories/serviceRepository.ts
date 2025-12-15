@@ -1,6 +1,12 @@
 //this repository is used to handle the operaions to the service database . that means the services provided by the website
 
-import { GetAllServiceResponse, GetServiceResponse, IGetAllServices, IGetService, IGetServiceCount } from "../interfaces/dataContracts/Service/IRepository.dto";
+import {
+  GetAllServiceResponse,
+  GetServiceResponse,
+  IGetAllServices,
+  IGetService,
+  IGetServiceCount,
+} from "../interfaces/dataContracts/Service/IRepository.dto";
 import { IServiceRepository } from "../interfaces/IRepository/IServiceRepository";
 import { IServices } from "../interfaces/Model/IService";
 import serviceModel from "../models/serviceModel";
@@ -34,12 +40,12 @@ class ServiceRepository
     data: IGetAllServices
   ): Promise<GetAllServiceResponse[] | null> {
     try {
-      const { page, limit, searchQuery } = data;
-      const regex = new RegExp(searchQuery, "i");
-      console.log(regex);
+      const { page, limit, search } = data;
+      const regex = new RegExp(search.trim(), "i");
       const result = await serviceModel
         .find({
           isDeleted: false,
+          name: regex,
         })
         .skip((page - 1) * limit)
         .limit(limit)
@@ -69,7 +75,7 @@ class ServiceRepository
     }
   }
 
-  //function created for adding a new service 
+  //function created for adding a new service
   async addService(serviceData: Partial<IServices>): Promise<IServices | null> {
     try {
       console.log("Adding new service with data:", serviceData);
@@ -82,7 +88,7 @@ class ServiceRepository
     }
   }
 
-    //for counting the userData
+  //for counting the userData
 
   async countDocument(regex: RegExp): Promise<number> {
     try {

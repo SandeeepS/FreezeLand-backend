@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-
 import express, { Express, Request, Response } from "express";
 import http from "http";
 import errorHandlerMiddleware from "./middlewares/errorHandler";

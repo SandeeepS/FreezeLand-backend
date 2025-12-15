@@ -217,6 +217,7 @@ export interface IGetServices {
   page: number;
   limit: number;
   searchQuery: string | undefined;
+  search:string
 }
 
 export interface IUpdateNewPassword {
