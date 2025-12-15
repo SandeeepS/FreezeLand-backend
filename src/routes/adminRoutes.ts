@@ -16,6 +16,7 @@ import AdminAuthController from "../controllers/admin/adminAuthController";
 import AdminUserManagementController from "../controllers/admin/adminUserManagementController";
 import AdminMechanicManagementController from "../controllers/admin/adminMechanicManagementController";
 import AdminServiceController from "../controllers/admin/adminServiceController";
+import AdminDeviceController from "../controllers/admin/adminDeviceController";
 
 const adminRouter = express.Router();
 const encrypt = new Encrypt();
@@ -34,6 +35,7 @@ const adminAuthController = new AdminAuthController(adminService);
 const adminUserManagementController = new AdminUserManagementController(adminService);
 const adminMechanicManagementController = new AdminMechanicManagementController(adminService);
 const adminServiceController = new AdminServiceController(adminService);
+const adminDeviceController = new AdminDeviceController(adminService);
 
 
 adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => adminAuthController.adminLogin(req, res,next));
@@ -55,12 +57,13 @@ adminRouter.put('/listUnlistServices/:serviceId',adminAuth(["admin"]),async(req:
 adminRouter.put('/deleteService/:serviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminServiceController.deleteService(req,res,next));
 adminRouter.put('/editExistService',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminServiceController.editExistingService(req,res,next));
 
+adminRouter.post('/addNewDevice',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminDeviceController.addNewDevice(req,res,next));
+adminRouter.get('/getAllDevices',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminDeviceController.getAllDevices(req,res,next));
+adminRouter.put('/listUnlistDevices/:deviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminDeviceController.listUnlistDevices(req,res,next));
+adminRouter.put('/deleteDevice/:deviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminDeviceController.deleteDevice(req,res,next));
+
 
 adminRouter.get('/getPresignedUrl',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getPresignedUrl(req,res,next));
-adminRouter.post('/addNewDevice',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.addNewDevice(req,res,next));
-adminRouter.get('/getAllDevices',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllDevices(req,res,next));
-adminRouter.put('/listUnlistDevices/:deviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.listUnlistDevices(req,res,next));
-adminRouter.put('/deleteDevice/:deviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.deleteDevice(req,res,next));
 adminRouter.get('/getImageUrl',adminAuth(["admin"]), async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 adminRouter.put('/updateApprove',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.updateApprove(req,res,next))
 adminRouter.get('/getAllComplaints',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllComplaints(req,res,next));
