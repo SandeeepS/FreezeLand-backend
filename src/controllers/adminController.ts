@@ -28,75 +28,9 @@ class adminController implements IAdminController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-  async adminLogin(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log("enterd in the backend adminlogin in adminController");
-      const { email, password } = req.body;
+ 
 
-      const loginStatus = await this._adminService.adminLogin({
-        email,
-        password,
-        role: "admin",
-      });
-
-      if (loginStatus.data.success === false) {
-        res.status(OK).json({
-          data: {
-            success: false,
-            message: loginStatus.data.message,
-          },
-        });
-        return;
-      } else {
-        const access_token = loginStatus.data.token;
-        const refresh_token = loginStatus.data.refresh_token;
-        const accessTokenMaxAge = 5 * 60 * 1000; //15 min
-        const refreshTokenMaxAge = 48 * 60 * 60 * 1000; //48 h
-        console.log("respose is going to send to the frontend");
-        res
-          .status(loginStatus.status)
-          .cookie("admin_access_token", access_token, {
-            maxAge: accessTokenMaxAge,
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-          })
-          .cookie("admin_refresh_token", refresh_token, {
-            maxAge: refreshTokenMaxAge,
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-          })
-          .json(loginStatus);
-      }
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  async getUserList(req: Request, res: Response, next: NextFunction) {
-    try {
-      const search = req.query.search as string;
-      const page = parseInt(req.query.page as string);
-      const limit = parseInt(req.query.limit as string);
-      const searchQuery = req.query.searchQuery as string | undefined;
-      console.log("page is ", page);
-      console.log("limit is ", limit);
-      console.log("Search is ", search);
-      const data = await this._adminService.getUserList({
-        page,
-        limit,
-        searchQuery,
-        search,
-      });
-      console.log("usersData from the admin controller is ", data);
-      res.status(OK).json(data);
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
+ 
 
   async getMechList(req: Request, res: Response, next: NextFunction) {
     try {
@@ -121,27 +55,7 @@ class adminController implements IAdminController {
     }
   }
 
-  async blockUser(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { userId } = req.params;
-      const result = await this._adminService.blockUser({
-        userId,
-      });
-      if (result)
-        res.json({ success: true, message: "block or unblocked the user" });
-      else
-        res.json({
-          success: false,
-          message: "Something Went wrong please try again",
-        });
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ success: false, message: "Internal server error" });
-    }
-  }
+
 
   async blockMech(req: Request, res: Response, next: NextFunction) {
     try {
@@ -163,21 +77,7 @@ class adminController implements IAdminController {
     }
   }
 
-  async deleteUser(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { userId } = req.params;
-      const result = await this._adminService.deleteUser({ userId });
-      if (result) res.json({ success: true, message: "deleted  the user" });
-      else
-        res.json({
-          success: false,
-          message: "Something Went wrong please try again",
-        });
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
+
 
   async deleteMech(req: Request, res: Response, next: NextFunction) {
     try {
@@ -732,26 +632,7 @@ class adminController implements IAdminController {
     }
   }
 
-  //fucntion to logout
-  async adminLogout(req: Request, res: Response, next: NextFunction) {
-    try {
-      res
-        .clearCookie("admin_access_token", {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        })
-        .clearCookie("admin_refresh_token", {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        });
-      res.status(200).json({ success: true, message: "logout sucessfully" });
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
+ 
 }
 
 export default adminController;

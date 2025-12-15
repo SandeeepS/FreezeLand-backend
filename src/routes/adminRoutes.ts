@@ -12,6 +12,8 @@ import DeviceRepository from "../repositories/deviceRepository";
 import ConcernRepository from "../repositories/concernRepository";
 import ReportRepository from "../repositories/reportRepository";
 import ReportService from "../services/reportService";
+import AdminAuthController from "../controllers/admin/adminAuthController";
+import AdminUserManagementController from "../controllers/admin/adminUserManagementController";
 
 const adminRouter = express.Router();
 const encrypt = new Encrypt();
@@ -26,13 +28,17 @@ const concernRepository = new ConcernRepository();
 const reportService = new ReportService(reportRepository);
 const adminService: AdminService = new AdminService(adminReopsitory,userRepository,mechRepository,serviceRepository,deviceRepository,concernRepository, encrypt, createjwt);
 const controller = new adminController(adminService,reportService);
+const adminAuthController = new AdminAuthController(adminService);
+const adminUserManagementController = new AdminUserManagementController(adminService);
 
-adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => controller.adminLogin(req, res,next));
-adminRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => controller.adminLogout(req, res,next));
-adminRouter.get('/users',adminAuth(["admin"]),  async (req: Request, res: Response,next:NextFunction) => controller.getUserList(req, res,next));
+adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => adminAuthController.adminLogin(req, res,next));
+adminRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => adminAuthController.adminLogout(req, res,next));
+
+adminRouter.get('/users',adminAuth(["admin"]),  async (req: Request, res: Response,next:NextFunction) => adminUserManagementController.getUserList(req, res,next));
+adminRouter.put('/users/block/:userId',adminAuth(["admin"]), async (req: Request, res: Response,next:NextFunction) => adminUserManagementController.blockUser(req, res,next));
+
 adminRouter.get('/mechanics',adminAuth(["admin"]),async (req:Request,res:Response,next:NextFunction) => controller.getMechList(req,res,next));
-adminRouter.put('/users/block/:userId',adminAuth(["admin"]), async (req: Request, res: Response,next:NextFunction) => controller.blockUser(req, res,next));
-adminRouter.put('/users/delete/:userId',adminAuth(["admin"]), async (req: Request, res: Response,next:NextFunction) => controller.deleteUser(req, res,next));
+adminRouter.put('/users/delete/:userId',adminAuth(["admin"]), async (req: Request, res: Response,next:NextFunction) => adminUserManagementController.deleteUser(req, res,next));
 adminRouter.put('/mech/block/:mechId',adminAuth(["admin"]),  async (req: Request, res: Response,next:NextFunction) => controller.blockMech(req, res,next));
 adminRouter.put('/mech/delete/:mechId',adminAuth(["admin"]), async (req: Request, res: Response,next:NextFunction) => controller.deleteMech(req, res,next));
 adminRouter.post('/addNewService',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.addNewServices(req,res,next));
