@@ -17,6 +17,7 @@ import AdminUserManagementController from "../controllers/admin/adminUserManagem
 import AdminMechanicManagementController from "../controllers/admin/adminMechanicManagementController";
 import AdminServiceController from "../controllers/admin/adminServiceController";
 import AdminDeviceController from "../controllers/admin/adminDeviceController";
+import AdminConcernController from "../controllers/admin/adminConcernController";
 
 const adminRouter = express.Router();
 const encrypt = new Encrypt();
@@ -36,6 +37,7 @@ const adminUserManagementController = new AdminUserManagementController(adminSer
 const adminMechanicManagementController = new AdminMechanicManagementController(adminService);
 const adminServiceController = new AdminServiceController(adminService);
 const adminDeviceController = new AdminDeviceController(adminService);
+const adminConcernController = new AdminConcernController(adminService);
 
 
 adminRouter.post('/login', async (req: Request, res: Response,next:NextFunction) => adminAuthController.adminLogin(req, res,next));
@@ -62,13 +64,14 @@ adminRouter.get('/getAllDevices',adminAuth(["admin"]),async(req:Request,res:Resp
 adminRouter.put('/listUnlistDevices/:deviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminDeviceController.listUnlistDevices(req,res,next));
 adminRouter.put('/deleteDevice/:deviceId',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminDeviceController.deleteDevice(req,res,next));
 
+adminRouter.get('/getAllComplaints',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminConcernController.getAllComplaints(req,res,next));
+adminRouter.get('/getComplaintById/:id',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => adminConcernController.getComplaintById(req,res,next));
+adminRouter.post('/cancelComplaint',adminAuth(['admin']),async(req:Request,res:Response,next:NextFunction) => adminConcernController.cancelComplaint(req,res,next));
 
 adminRouter.get('/getPresignedUrl',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getPresignedUrl(req,res,next));
 adminRouter.get('/getImageUrl',adminAuth(["admin"]), async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 adminRouter.put('/updateApprove',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.updateApprove(req,res,next))
-adminRouter.get('/getAllComplaints',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getAllComplaints(req,res,next));
-adminRouter.get('/getComplaintById/:id',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => controller.getComplaintById(req,res,next));
-adminRouter.post('/cancelComplaint',adminAuth(['admin']),async(req:Request,res:Response,next:NextFunction) => controller.cancelComplaint(req,res,next));
+
 adminRouter.get('/report',adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllReportByReporterRole(req,res,next));
 adminRouter.put('/updateReportStatus' ,adminAuth(["admin"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateReportStatus(req,res,next))
 

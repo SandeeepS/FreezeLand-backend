@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { STATUS_CODES } from "../constants/httpStatusCodes";
 import { IAdminController } from "../interfaces/IController/IAdminController";
 import {
   GetImageUrlResponse,
@@ -10,7 +9,6 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../awsConfig";
 import IReportService from "../interfaces/IServices/IReportService";
 import { IAdminService } from "../interfaces/IServices/IAdminService";
-const { OK } = STATUS_CODES;
 
 class adminController implements IAdminController {
   constructor(
@@ -23,8 +21,6 @@ class adminController implements IAdminController {
 
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
-
-
 
   //changing getPresignedUrl functionality to _adminService ..........
   /************************ */
@@ -120,75 +116,8 @@ class adminController implements IAdminController {
   }
 
   //funciton to get all the complaints
-  async getAllComplaints(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log(
-        "reached the getAllComplaints funciton in the admin controller"
-      );
-      const search = req.query.search as string;
-      console.log("Search from the frontend in adminController ", search);
-      const page = parseInt(req.query.page as string);
-      const limit = parseInt(req.query.limit as string);
-      const searchQuery = req.query.searchQuery as string;
-      console.log(" page is ", page);
-      console.log("limit is ", limit);
-      const data = await this._adminService.getAllComplaints(
-        page,
-        limit,
-        searchQuery,
-        search
-      );
-      console.log(
-        "listed services from the database is in the admin controller is",
-        data
-      );
-      res.status(OK).json(data);
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
 
   //funciton to get the complaint by id
-  async getComplaintById(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log(
-        "reached the getComplaintById funciton in the admin controller"
-      );
-      const id = req.params.id;
-      const result = await this._adminService.getComplaintById(id);
-      res.status(OK).json(result);
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  //function to cancel the complaint
-  async cancelComplaint(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { complaintId, userRole, reason } = req.body;
-      console.log(
-        "entered in the cancelcomplaint in the admin controller",
-        complaintId,
-        userRole,
-        reason
-      );
-      const result = await this._adminService.cancelComplaint(
-        complaintId,
-        userRole,
-        reason
-      );
-      if (result != null) {
-        res.status(OK).json({ message: "success", result });
-      } else {
-        res.status(OK).json({ message: "failed to cancel complaitn" });
-      }
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
 
   //get All reports raised by user reporter Role (user/mechanic )
   async getAllReportByReporterRole(
@@ -247,8 +176,6 @@ class adminController implements IAdminController {
       next(error as Error);
     }
   }
-
- 
 }
 
 export default adminController;
