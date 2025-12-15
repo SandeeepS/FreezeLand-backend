@@ -85,7 +85,7 @@ export interface GetServiceResponse {
 export interface IGetDevice {
   page: number;
   limit: number;
-  searchQuery: string | undefined;
+  filter:string;
   search:string;
 }
 

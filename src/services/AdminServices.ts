@@ -239,20 +239,19 @@ class adminService implements IAdminService {
 
   async getDevcies(data: IGetDevice): Promise<GetDeviceResponse> {
     try {
-      let { page, limit, searchQuery } = data;
-      const { search } = data;
-      if (isNaN(page)) page = 1;
-      if (isNaN(limit)) limit = 10;
-      if (!searchQuery) searchQuery = "";
+      const { page, limit,filter,search } = data;
+ 
+   
       const devices = await this._deviceRepository.getAllDevices({
         page,
         limit,
-        searchQuery,
+        filter,
         search,
       });
       console.log("list of device  is ", devices);
+  
       const devicesCount = await this._deviceRepository.getDeviceCount({
-        searchQuery,
+        search,
       });
       return {
         status: STATUS_CODES.OK,

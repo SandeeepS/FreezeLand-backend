@@ -583,6 +583,7 @@ class userService implements IUserServices {
   async getServices(data: IGetServices): Promise<GetServiceResponse | null> {
     try {
       let { page, limit, searchQuery } = data;
+      const {search} = data
       if (isNaN(page)) page = 1;
       if (isNaN(limit)) limit = 10;
       if (!searchQuery) searchQuery = "";
@@ -590,6 +591,7 @@ class userService implements IUserServices {
         page,
         limit,
         searchQuery,
+        search
       });
       const servicesCount = await this._userRepository.getServiceCount({
         searchQuery,
