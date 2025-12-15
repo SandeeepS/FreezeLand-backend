@@ -1,7 +1,7 @@
 export interface IGetAllDevices{
     page: number;
     limit: number;
-    searchQuery: string;
+    filter:string;
     search:string;
   }
   
@@ -12,7 +12,7 @@ export interface IGetAllDevices{
   }
 
   export interface IGetDeviceCount {
-    searchQuery: string;
+    search: string;
   }
   export interface AddNewDeviceResponse {
   name: string;

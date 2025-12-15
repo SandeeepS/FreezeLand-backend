@@ -375,16 +375,14 @@ class adminController implements IAdminController {
       console.log(
         "reached the getAllDevces  funciton in the admin controller to  access the all the devices "
       );
-      const search = req.query.search as string;
-      const page = parseInt(req.query.page as string);
-      const limit = parseInt(req.query.limit as string);
-      const searchQuery = req.query.searchQuery as string | undefined;
-      console.log(" page is ", page);
-      console.log("limit is ", limit);
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const search = ((req.query.search as string) || "").trim();
+      const filter = (req.query.filter as string) || "all"; // for blocked/unblocked/all
       const data = await this._adminService.getDevcies({
         page,
         limit,
-        searchQuery,
+        filter,
         search,
       });
       console.log(
@@ -665,7 +663,7 @@ class adminController implements IAdminController {
         userRole,
         reason
       );
-      if (result != null){
+      if (result != null) {
         res.status(OK).json({ message: "success", result });
       } else {
         res.status(OK).json({ message: "failed to cancel complaitn" });
@@ -703,28 +701,33 @@ class adminController implements IAdminController {
     }
   }
 
-  //function to update the report status in the admin side 
-  async updateReportStatus (req:Request,res:Response,next:NextFunction) {
-    try{
-      console.log("Entered in the updateReportStatus function in the admin side ");
-      const {reportId,status} = req.body;
-      console.log("report id and status are ",reportId,status);
-      const response = await this._reportService.updateReportStatus({reportId,status});
-      if(response){
+  //function to update the report status in the admin side
+  async updateReportStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(
+        "Entered in the updateReportStatus function in the admin side "
+      );
+      const { reportId, status } = req.body;
+      console.log("report id and status are ", reportId, status);
+      const response = await this._reportService.updateReportStatus({
+        reportId,
+        status,
+      });
+      if (response) {
         res.status(200).json({
-          success:true,
-          message:"updated successfully",
-          response
-        })
-      }else{
+          success: true,
+          message: "updated successfully",
+          response,
+        });
+      } else {
         res.status(200).json({
-          success:false,
-          message:"error occured while updaing the status"
-        })
+          success: false,
+          message: "error occured while updaing the status",
+        });
       }
       return response;
-    }catch(error){
-      console.log("errro occured while updating the report status",error);
+    } catch (error) {
+      console.log("errro occured while updating the report status", error);
       next(error as Error);
     }
   }
