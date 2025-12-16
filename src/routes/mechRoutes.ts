@@ -11,6 +11,7 @@ import RoomRepository from '../repositories/roomRepository';
 import ConcernRepository from '../repositories/concernRepository';
 import ReportService from '../services/reportService';
 import ReportRepository from '../repositories/reportRepository';
+import MechanicAuthController from '../controllers/mechanic/mechanicAuthController';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
@@ -24,15 +25,17 @@ const reportRepository = new ReportRepository();
 const reportService = new ReportService(reportRepository);
 const mechServices = new mechService(mechRepository,concernRepository,roomRepository,createjwt,encrypt,email);
 const controller = new mechController(mechServices,reportService,email);
+const mechanicAuthController = new MechanicAuthController(mechServices,email);
 
-mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await controller.mechLogin(req,res,next)); 
-mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await controller.mechSignup(req,res,next));
-mechRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await controller.veryfyMechOtp(req,res,next));
-mechRouter.post('/resend-otp',async(req:Request,res:Response,next:NextFunction) => await controller.resendOTP(req,res,next)); 
-mechRouter.post('/forgot-password',async(req:Request,res:Response,next:NextFunction) => await controller.forgotPasswordMech(req,res,next));
-mechRouter.post('/verify-forgot-otp',async(req:Request,res:Response,next:NextFunction) => await controller.VerifyForgotOtpMech(req,res,next));
+mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.mechLogin(req,res,next)); 
+mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.mechSignup(req,res,next));
+mechRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.veryfyMechOtp(req,res,next));
+mechRouter.post('/resend-otp',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.resendOTP(req,res,next)); 
+mechRouter.post('/forgot-password',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.forgotPasswordMech(req,res,next));
+mechRouter.post('/verify-forgot-otp',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.VerifyForgotOtpMech(req,res,next));
+mechRouter.put('/update-newpassword',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.updateNewPasswordMech(req,res,next));
+
 mechRouter.post("/createRoom",mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.createRoom(req,res,next));
-mechRouter.put('/update-newpassword',async(req:Request,res:Response,next:NextFunction) => await controller.updateNewPasswordMech(req,res,next));
 mechRouter.get('/getAllMechanics',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllMechanics(req,res,next));
 mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) =>await controller.getAllDevices(req,res,next));
 mechRouter.post('/verifyMechanic',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.verifyMechanic(req,res,next));
