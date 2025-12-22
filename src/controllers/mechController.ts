@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-const {
-   OK} = STATUS_CODES;
+const { OK } = STATUS_CODES;
 import { IMechController } from "../interfaces/IController/IMechController";
 
 import {
@@ -104,9 +103,6 @@ class mechController implements IMechController {
     }
   }
 
-
-
-
   //getImageUrl
   async getImageUrl(
     req: Request,
@@ -132,17 +128,6 @@ class mechController implements IMechController {
       next(error);
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 
   async createRoom(req: Request, res: Response, next: NextFunction) {
     try {
@@ -176,10 +161,6 @@ class mechController implements IMechController {
       next(error);
     }
   }
-
-
-
-
 }
 
 export default mechController;

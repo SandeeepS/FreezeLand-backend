@@ -13,6 +13,7 @@ import ReportService from '../services/reportService';
 import ReportRepository from '../repositories/reportRepository';
 import MechanicAuthController from '../controllers/mechanic/mechanicAuth.controller';
 import MechanicProfileController from '../controllers/mechanic/mechanicProfile.controller';
+import MechanicServiceController from '../controllers/mechanic/mechanicService.controller';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
@@ -28,6 +29,8 @@ const mechServices = new mechService(mechRepository,concernRepository,roomReposi
 const controller = new mechController(mechServices,reportService,email);
 const mechanicAuthController = new MechanicAuthController(mechServices,email);
 const mechanicProfileController = new MechanicProfileController(mechServices);
+const mechanicServiceController = new MechanicServiceController(mechServices);
+
 
 mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.mechLogin(req,res,next)); 
 mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.mechSignup(req,res,next));
@@ -47,19 +50,20 @@ mechRouter.get('/getMechanicDetails',mechAuth(["mechanic"]),async(req:Request,re
 mechRouter.put('/handleRemoveMechAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicProfileController.handleRemoveMechAddress(req,res,next));
 mechRouter.put('/setDefaultAddress',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicProfileController.setDefaultAddress(req,res,next));
 
+mechRouter.put('/updateWorkAssigned',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.updateWorkAssigned(req,res,next));
+mechRouter.get('/getAllAcceptedServices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.getAllAcceptedServices(req,res,next));
+mechRouter.put('/updateComplaintStatus',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.updateComplaintStatus(req,res,next));
+mechRouter.post('/updateWorkDetails',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.updateWorkDetails(req,res,next));
+mechRouter.get('/getAllCompletedServices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.getAllCompletedServices(req,res,next));
+mechRouter.get('/getAllUserRegisteredServices',mechAuth(["mechanic"]),  async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
+mechRouter.get('/getComplaintDetails',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.getComplaintDetails(req,res,next));
+
 mechRouter.post("/createRoom",mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.createRoom(req,res,next));
 mechRouter.get('/getAllMechanics',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllMechanics(req,res,next));
 mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) =>await controller.getAllDevices(req,res,next));
 mechRouter.get('/getS3SingUrlForMechCredinential',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getS3SingUrlForMechCredinential(req,res,next));
-mechRouter.get('/getAllUserRegisteredServices',mechAuth(["mechanic"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
-mechRouter.get('/getComplaintDetails',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getComplaintDetails(req,res,next));
-mechRouter.get('/getImageUrl',mechAuth(["mechanic"]), async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
-mechRouter.put('/updateWorkAssigned',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateWorkAssigned(req,res,next));
-mechRouter.get('/getAllAcceptedServices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllAcceptedServices(req,res,next));
-mechRouter.put('/updateComplaintStatus',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateComplaintStatus(req,res,next));
-mechRouter.post('/updateWorkDetails',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateWorkDetails(req,res,next));
-mechRouter.get('/getAllCompletedServices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllCompletedServices(req,res,next));
 
+mechRouter.get('/getImageUrl',mechAuth(["mechanic"]), async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 mechRouter.post('/report',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.createReport(req,res,next));
 
 
