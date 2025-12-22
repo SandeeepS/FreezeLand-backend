@@ -129,19 +129,7 @@ class mechController implements IMechController {
     }
   }
 
-  async createRoom(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { userId, mechId } = req.body;
-      console.log("entered in the createRoom in the mechControler");
-      console.log(`user id is ${userId} and mechId is ${mechId}`);
-      const result = await this._mechServices.createRoom({ userId, mechId });
-      console.log("result fo createRoom in controller is", this.createRoom);
-      res.status(200).json({ success: true, result });
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
-  }
+
 
   //function  to create report from the mechside
   async createReport(req: Request, res: Response, next: NextFunction) {
