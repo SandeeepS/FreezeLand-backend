@@ -14,6 +14,7 @@ import ReportRepository from '../repositories/reportRepository';
 import MechanicAuthController from '../controllers/mechanic/mechanicAuth.controller';
 import MechanicProfileController from '../controllers/mechanic/mechanicProfile.controller';
 import MechanicServiceController from '../controllers/mechanic/mechanicService.controller';
+import MechanicChatController from '../controllers/mechanic/mechanicChat.controller';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
@@ -30,7 +31,7 @@ const controller = new mechController(mechServices,reportService,email);
 const mechanicAuthController = new MechanicAuthController(mechServices,email);
 const mechanicProfileController = new MechanicProfileController(mechServices);
 const mechanicServiceController = new MechanicServiceController(mechServices);
-
+const mechanciChatController = new MechanicChatController(mechServices);
 
 mechRouter.post('/login',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.mechLogin(req,res,next)); 
 mechRouter.post('/signup',async(req:Request,res:Response,next:NextFunction) => await mechanicAuthController.mechSignup(req,res,next));
@@ -58,7 +59,7 @@ mechRouter.get('/getAllCompletedServices',mechAuth(["mechanic"]),async(req:Reque
 mechRouter.get('/getAllUserRegisteredServices',mechAuth(["mechanic"]),  async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
 mechRouter.get('/getComplaintDetails',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.getComplaintDetails(req,res,next));
 
-mechRouter.post("/createRoom",mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.createRoom(req,res,next));
+mechRouter.post("/createRoom",mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanciChatController.createRoom(req,res,next));
 mechRouter.get('/getAllMechanics',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllMechanics(req,res,next));
 mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) =>await controller.getAllDevices(req,res,next));
 mechRouter.get('/getS3SingUrlForMechCredinential',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getS3SingUrlForMechCredinential(req,res,next));
