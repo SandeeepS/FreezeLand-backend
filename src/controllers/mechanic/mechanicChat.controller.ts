@@ -20,6 +20,21 @@ class MechanicChatController implements IMechanicChatController {
       next(error);
     }
   }
+
+    //function to get the specified compliant  using compliant Id
+  async getComplaintDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.query;
+      console.log(
+        "Enterd in the getComplaintDetails function in the mechController with id",
+        id
+      );
+      const result = await this._mechServices.getComplaintDetails(id as string);
+      res.status(200).json({ success: true, result });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default MechanicChatController;
