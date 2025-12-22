@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../constants/httpStatusCodes";
-const { BAD_REQUEST, OK, NOT_FOUND } = STATUS_CODES;
+const {
+   OK} = STATUS_CODES;
 import { IMechController } from "../interfaces/IController/IMechController";
 
 import {
@@ -26,12 +27,6 @@ class mechController implements IMechController {
   }
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
-
-
-
-
-
-
   async getAllMechanics(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("reached the getAllService function in the admin controller");
@@ -66,44 +61,6 @@ class mechController implements IMechController {
         data
       );
       res.status(OK).json(data);
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  async verifyMechanic(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { values } = req.body;
-      console.log(
-        "reached in the mechController for mech Verification ",
-        values
-      );
-      const data = await this._mechServices.VerifyMechanic(values);
-      res.status(OK).json(data);
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
-
-  async getMechanicDetails(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { id } = req.query;
-      console.log(
-        "id reached in the mechController for getting mech details",
-        id
-      );
-      if (typeof id === "string") {
-        const result = await this._mechServices.getMechanicDetails({ id });
-        console.log("result sdlfnsdfndsfdsf", result);
-        res.status(OK).json({ success: true, result: result });
-      } else {
-        console.log(
-          "Id is undifined in the getMechanicDetails in mechController"
-        );
-        res.status(STATUS_CODES.CONFLICT).json({ success: false });
-      }
     } catch (error) {
       console.log(error as Error);
       next(error);
@@ -147,62 +104,8 @@ class mechController implements IMechController {
     }
   }
 
-  //function to get all userRegisterd complaints
-  async getAllUserRegisteredServices(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { id } = req.body;
-      console.log(
-        "userId in the mechController in the getAllUserRegisteredService"
-      );
-      const page = 1;
-      const limit = 10;
-      const searchQuery = "";
-      const allRegisteredUserServices =
-        await this._mechServices.getAllUserRegisteredServices(
-          page,
-          limit,
-          searchQuery,
-          id
-        );
-      if (allRegisteredUserServices) {
-        res.status(OK).json({
-          success: true,
-          message: "data fetched successfully",
-          allRegisteredUserServices: allRegisteredUserServices,
-        });
-      } else {
-        res.status(NOT_FOUND).json({
-          success: true,
-          message: "Not Found",
-        });
-      }
-    } catch (error) {
-      console.log(
-        "error while getting the allregistered complaints from the database in the mechController",
-        error as Error
-      );
-      next(error);
-    }
-  }
 
-  //function to get the specified compliant  using compliant Id
-  async getComplaintDetails(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { id } = req.query;
-      console.log(
-        "Enterd in the getComplaintDetails function in the mechController with id",
-        id
-      );
-      const result = await this._mechServices.getComplaintDetails(id as string);
-      res.status(200).json({ success: true, result });
-    } catch (error) {
-      next(error);
-    }
-  }
+
 
   //getImageUrl
   async getImageUrl(
@@ -230,142 +133,16 @@ class mechController implements IMechController {
     }
   }
 
-  //function to update the complaint database , while accepting the work by mechanic
-  async updateWorkAssigned(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { complaintId, mechanicId, status, roomId } = req.body;
-      console.log(
-        "Entered in the updateWorkAssigned function in mechController",
-        complaintId,
-        mechanicId,
-        status,
-        roomId
-      );
-      const result = await this._mechServices.updateWorkAssigned(
-        complaintId,
-        mechanicId,
-        status,
-        roomId
-      );
-      res.status(200).json({ success: true, result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  //function to access all accepted complaints by the mechanic
-  async getAllAcceptedServices(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { mechanicId } = req.query;
-      console.log(
-        "mechanic id in the getAllAcceptedServices in the mechController is ",
-        mechanicId
-      );
-      const result = await this._mechServices.getAllAcceptedServices(
-        mechanicId as string
-      );
-      res.status(200).json({ success: true, result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  //funciton to update the  complaint details
-  async updateComplaintStatus(req: Request, res: Response, next: NextFunction) {
-    try {
-      const complaintId = req.query.complaintId as string;
-      const nextStatus = req.query.nextStatus as string;
-      console.log(
-        "next status in the updateComplaintStatus is ",
-        complaintId,
-        nextStatus
-      );
-      const result = await this._mechServices.updateComplaintStatus(
-        complaintId,
-        nextStatus
-      );
-      res.status(200).json({ success: true, result });
-    } catch (error) {
-      next(error);
-    }
-  }
 
 
 
-  //function to update the workdetails to the concern database
-  async updateWorkDetails(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log(
-        "entered in the updateworkerDetails function in the mechController"
-      );
-      const { complaintId, workDetails } = req.body;
-      console.log(
-        `complaint id is - ${complaintId} and workdetails is - ${[
-          ...workDetails,
-        ]}`
-      );
-      const result = await this._mechServices.updateWorkDetails({
-        complaintId,
-        workDetails,
-      });
-      res.status(200).json({ success: true, result });
-    } catch (error) {
-      console.log(
-        "Error occured in the mechController while updating Wroker Details"
-      );
-      next(error);
-    }
-  }
 
-  //function to get all completed service for the mech service histroy listing
-  async getAllCompletedServices(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      console.log("Entered in the getAllCompleted Services");
-      const { mechanicId } = req.query;
-      console.log("mechanic id is", mechanicId);
-      const result = await this._mechServices.getAllCompletedServices(
-        mechanicId as string
-      );
-      res.status(OK).json({ success: true, result });
-    } catch (error) {
-      console.log(
-        "Error occured in the mechanic controller while getting the completed complaints by mechic ",
-        error
-      );
-      next(error);
-    }
-  }
 
-  async mechLogout(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log("Entered in the function for logout of mech");
-      res
-        .clearCookie("mech_access_token", {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        })
-        .clearCookie("mech_refresh_token", {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        });
-      res
-        .status(200)
-        .json({ success: true, message: "user logout - clearing cookie" });
-    } catch (err) {
-      console.log(err);
-      next(err);
-    }
-  }
+
+
+
+
+
 
   async createRoom(req: Request, res: Response, next: NextFunction) {
     try {
@@ -400,56 +177,8 @@ class mechController implements IMechController {
     }
   }
 
-  //funtion to remove the address
-  async handleRemoveMechAddress(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { mechId, addressId } = req.body;
-      const result = await this._mechServices.handleRemoveMechAddress(
-        mechId as string,
-        addressId as string
-      );
-      if (result) {
-        res.status(200).json({ success: true, result });
-      } else {
-        res.status(200).json({ success: false });
-      }
-    } catch (error) {
-      console.log(
-        "Error occured while handling the remove Address function in the mechController",
-        error
-      );
-      next(error);
-    }
-  }
 
-  async setDefaultAddress(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log(
-        "Enterd in the address funciton in the backend mechController"
-      );
-      const { mechId, addressId } = req.body;
-      console.log("mechId and addressId is ", mechId, addressId);
-      const updatedDefaultAddress =
-        await this._mechServices.setUserDefaultAddress({ mechId, addressId });
-      if (updatedDefaultAddress) {
-        res.status(OK).json({
-          success: true,
-          message: "Default address updated successfully",
-        });
-      } else {
-        res
-          .status(BAD_REQUEST)
-          .json({ success: false, message: "Default address updation failed" });
-      }
-    } catch (error){
-      console.log(error as Error);
-      next(error);
-    }
-  }
+
 
 }
 

@@ -292,6 +292,30 @@ class MechanicAuthController implements IMechanicAuthController {
       next(error);
     }
   }
+
+    async mechLogout(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("Entered in the function for logout of mech");
+      res
+        .clearCookie("mech_access_token", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        })
+        .clearCookie("mech_refresh_token", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        });
+      res
+        .status(200)
+        .json({ success: true, message: "user logout - clearing cookie" });
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  }
+
 }
 
 export default MechanicAuthController;

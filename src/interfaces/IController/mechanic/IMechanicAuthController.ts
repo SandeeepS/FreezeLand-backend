@@ -11,5 +11,5 @@ export interface IMechanicAuthController{
     forgotPasswordMech(req: Request, res: Response, next: NextFunction): Promise<ForgotResentOtpResponse | void>;
     VerifyForgotOtpMech(req: Request, res: Response, next: NextFunction):Promise<VerifyForgotOtpMech | void> ;
     updateNewPasswordMech(req: Request, res: Response, next: NextFunction): Promise<void>;
-
+    mechLogout(req: Request, res: Response, next: NextFunction):Promise<void>
 }
