@@ -10,7 +10,7 @@ import S3Client from "../awsConfig";
 import IReportService from "../interfaces/IServices/IReportService";
 import { IAdminService } from "../interfaces/IServices/IAdminService";
 
-class adminController implements IAdminController {
+class AdminController implements IAdminController {
   constructor(
     private _adminService: IAdminService,
     private _reportService: IReportService
@@ -42,7 +42,7 @@ class adminController implements IAdminController {
         fileType,
         folderName,
       });
-      console.log("presinged Url is from teh adminController is ", result);
+      console.log("presinged Url is from teh AdminController is ", result);
       if (result.success === false) {
         return res.status(400).json({
           success: false,
@@ -94,7 +94,7 @@ class adminController implements IAdminController {
       const verificationStatus = req.query.verificationStatus as string;
       console.log(typeof verificationStatus);
       console.log(
-        "id and verification status  from the front end in the adminController is ",
+        "id and verification status  from the front end in the AdminController is ",
         id,
         verificationStatus
       );
@@ -127,7 +127,7 @@ class adminController implements IAdminController {
   ) {
     try {
       const { reporterRole } = req.query;
-      console.log("ReporterRole in the adminController", reporterRole);
+      console.log("ReporterRole in the AdminController", reporterRole);
       const result = await this._reportService.getAllReportByReporterRole(
         reporterRole as string
       );
@@ -139,7 +139,7 @@ class adminController implements IAdminController {
       }
     } catch (error) {
       console.log(
-        "Error occured in the getAllReportByReporterRole in the adminController",
+        "Error occured in the getAllReportByReporterRole in the AdminController",
         error
       );
       next(error as Error);
@@ -178,4 +178,4 @@ class adminController implements IAdminController {
   }
 }
 
-export default adminController;
+export default AdminController;
