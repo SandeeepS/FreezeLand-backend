@@ -1,20 +1,20 @@
 import { Request, Response, NextFunction } from "express";
-import { STATUS_CODES } from "../constants/httpStatusCodes";
+import { STATUS_CODES } from "../../constants/httpStatusCodes";
 const { OK } = STATUS_CODES;
-import { IMechController } from "../interfaces/IController/IMechController";
+import { IMechController } from "../../interfaces/IController/IMechController";
 
 import {
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
-} from "../interfaces/dataContracts/Mech/IController.dto";
-import { Iemail } from "../utils/email";
+} from "../../interfaces/dataContracts/Mech/IController.dto";
+import { Iemail } from "../../utils/email";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import S3Client from "../awsConfig";
-import { IMechServices } from "../interfaces/IServices/IMechServices";
-import IReportService from "../interfaces/IServices/IReportService";
+import S3Client from "../../awsConfig";
+import { IMechServices } from "../../interfaces/IServices/IMechServices";
+import IReportService from "../../interfaces/IServices/IReportService";
 
-class mechController implements IMechController {
+class MechanicController implements IMechController {
   constructor(
     private _mechServices: IMechServices,
     private _reportService: IReportService,
@@ -131,19 +131,19 @@ class mechController implements IMechController {
 
 
 
-  //function  to create report from the mechside
+  //function  to create report from the mechside 
   async createReport(req: Request, res: Response, next: NextFunction) {
     try {
       const { reportData } = req.body;
       console.log(
-        "Datas from the frontend  in the createReportFunciton in the mechController is ",
+        "Datas from the frontend  in the createReportFunciton in the MechanicController is ",
         reportData
       );
       const result = await this._reportService.createReport(reportData);
       return res.status(200).json({ success: true, result });
     } catch (error) {
       console.log(
-        "Error occured in the createReport function in the mechController",
+        "Error occured in the createReport function in the MechanicController",
         error
       );
       next(error);
@@ -151,4 +151,4 @@ class mechController implements IMechController {
   }
 }
 
-export default mechController;
+export default MechanicController;

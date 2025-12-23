@@ -1,7 +1,6 @@
 import express,{Router,Request,Response,NextFunction} from 'express'
 import Encrypt from '../utils/comparePassword';
 import MechRepository from '../repositories/mechRepository';
-import mechController from '../controllers/mechController';
 import { CreateJWT } from '../utils/generateToken';
 import mechService from '../services/mechServices';
 import mechAuth from '../middlewares/mechAuthMidd';
@@ -15,6 +14,7 @@ import MechanicAuthController from '../controllers/mechanic/mechanicAuth.control
 import MechanicProfileController from '../controllers/mechanic/mechanicProfile.controller';
 import MechanicServiceController from '../controllers/mechanic/mechanicService.controller';
 import MechanicChatController from '../controllers/mechanic/mechanicChat.controller';
+import MechanicController from '../controllers/mechanic/mechanic.controller';
 
 const encrypt = new Encrypt();
 const createjwt = new CreateJWT();
@@ -27,7 +27,7 @@ const email = new Email(generateOTP);
 const reportRepository = new ReportRepository();
 const reportService = new ReportService(reportRepository);
 const mechServices = new mechService(mechRepository,concernRepository,roomRepository,createjwt,encrypt,email);
-const controller = new mechController(mechServices,reportService,email);
+const mechanicController = new MechanicController(mechServices,reportService,email);
 const mechanicAuthController = new MechanicAuthController(mechServices,email);
 const mechanicProfileController = new MechanicProfileController(mechServices);
 const mechanicServiceController = new MechanicServiceController(mechServices);
@@ -60,12 +60,12 @@ mechRouter.get('/getAllUserRegisteredServices',mechAuth(["mechanic"]),  async(re
 mechRouter.get('/getComplaintDetails',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicServiceController.getComplaintDetails(req,res,next));
 
 mechRouter.post("/createRoom",mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanciChatController.createRoom(req,res,next));
-mechRouter.get('/getAllMechanics',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllMechanics(req,res,next));
-mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) =>await controller.getAllDevices(req,res,next));
-mechRouter.get('/getS3SingUrlForMechCredinential',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.getS3SingUrlForMechCredinential(req,res,next));
+mechRouter.get('/getAllMechanics',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicController.getAllMechanics(req,res,next));
+mechRouter.get('/getAllDevices',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) =>await mechanicController.getAllDevices(req,res,next));
+mechRouter.get('/getS3SingUrlForMechCredinential',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicController.getS3SingUrlForMechCredinential(req,res,next));
 
-mechRouter.get('/getImageUrl',mechAuth(["mechanic"]), async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
-mechRouter.post('/report',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await controller.createReport(req,res,next));
+mechRouter.get('/getImageUrl',mechAuth(["mechanic"]), async(req:Request,res:Response,next:NextFunction) => await mechanicController.getImageUrl(req,res,next));
+mechRouter.post('/report',mechAuth(["mechanic"]),async(req:Request,res:Response,next:NextFunction) => await mechanicController.createReport(req,res,next));
 
 
 
