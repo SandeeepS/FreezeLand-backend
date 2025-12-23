@@ -41,11 +41,13 @@ class ServiceRepository
   ): Promise<GetAllServiceResponse[] | null> {
     try {
       const { page, limit, search } = data;
-      const regex = new RegExp(search.trim(), "i");
+      console.log("search in the getAllServices is ",search);
+      // const regex = new RegExp(search.trim(), "i"); commented bacause of a small issues while accessing this function from admin side due to search .
+      
       const result = await serviceModel
         .find({
           isDeleted: false,
-          name: regex,
+         
         })
         .skip((page - 1) * limit)
         .limit(limit)
