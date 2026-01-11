@@ -1,16 +1,10 @@
 import { Request,Response,NextFunction } from "express";
-import { ForgotResentOtpResponse, GetImageUrlResponse } from "../dataContracts/User/IController.dto";
+import { GetImageUrlResponse } from "../dataContracts/User/IController.dto";
 
 export interface IUserController{
     
     // User Management 
-    userSignup(req: Request, res: Response, next: NextFunction): Promise<void>;
-    userLogin(req: Request, res: Response, next: NextFunction): Promise<void>;
-    googleLogin(req: Request, res: Response, next: NextFunction): Promise<void>;
-    verifyOtp(req: Request, res: Response, next: NextFunction): Promise<void>;
-    forgotPassWord(req: Request, res: Response, next: NextFunction): Promise<ForgotResentOtpResponse | void>;
-    VerifyForgotOtp(req: Request, res: Response, next: NextFunction): Promise<unknown>;
-    updateNewPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
+ 
 
     // Profile Management 
     getProfile(req: Request, res: Response, next: NextFunction): Promise<void>;
