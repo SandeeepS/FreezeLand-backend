@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IAdminUserManagementController } from "../../interfaces/IController/admin/IAdminUserManagementController";
+import { IAdminUserManagementController } from "../../interfaces/IController/admin/IUserManagementController";
 import { IAdminService } from "../../interfaces/IServices/IAdminService";
 import { STATUS_CODES } from "../../constants/httpStatusCodes";
 const { OK,INTERNAL_SERVER_ERROR} = STATUS_CODES;

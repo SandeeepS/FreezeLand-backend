@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IAdminServiceController } from "../../interfaces/IController/admin/IAdminServiceController";
+import { IAdminServiceController } from "../../interfaces/IController/admin/IServiceController";
 import { IAdminService } from "../../interfaces/IServices/IAdminService";
 import { AddNewServiceValidation } from "../../utils/validator";
 import { STATUS_CODES } from "../../constants/httpStatusCodes";

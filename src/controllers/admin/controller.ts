@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { IAdminController } from "../../interfaces/IController/IAdminController";
 import {
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
@@ -9,6 +8,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../../awsConfig";
 import IReportService from "../../interfaces/IServices/IReportService";
 import { IAdminService } from "../../interfaces/IServices/IAdminService";
+import { IAdminController } from "../../interfaces/IController/admin/IController";
 
 class AdminController implements IAdminController {
   constructor(

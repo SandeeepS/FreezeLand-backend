@@ -8,7 +8,7 @@ import {
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
 } from "../../interfaces/dataContracts/User/IController.dto";
-import { IUserController } from "../../interfaces/IController/IUserController";
+import { IUserController } from "../../interfaces/IController/user/IController";
 import { IUserServices } from "../../interfaces/IServices/IUserServices";
 import { Iemail } from "../../utils/email";
 import IReportService from "../../interfaces/IServices/IReportService";
@@ -210,32 +210,6 @@ class userController implements IUserController {
     }
   }
 
-  async logout(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log("Entered in the function for logout");
-
-      // Clear the access_token and refresh_token cookies
-      res
-        .clearCookie("user_access_token", {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        })
-        .clearCookie("user_refresh_token", {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        });
-
-      // Send a success response
-      res
-        .status(200)
-        .json({ success: true, message: "User logged out successfully" });
-    } catch (err) {
-      console.log(err);
-      next(err);
-    }
-  }
 
   async createReport(req: Request, res: Response, next: NextFunction) {
     try {

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IMechanicAuthController } from "../../interfaces/IController/mechanic/IMechanicAuthController";
+import { IMechanicAuthController } from "../../interfaces/IController/mechanic/IAuthController";
 import { IMechServices } from "../../interfaces/IServices/IMechServices";
 import {
   ForgotResentOtpResponse,

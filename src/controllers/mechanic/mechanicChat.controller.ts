@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IMechanicChatController } from "../../interfaces/IController/mechanic/IMechanicChatController";
+import { IMechanicChatController } from "../../interfaces/IController/mechanic/IChatController";
 import { IMechServices } from "../../interfaces/IServices/IMechServices";
 
 class MechanicChatController implements IMechanicChatController {

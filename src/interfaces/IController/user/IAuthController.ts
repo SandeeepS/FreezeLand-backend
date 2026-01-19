@@ -10,4 +10,6 @@ export interface IUserAuthController {
         forgotPassWord(req: Request, res: Response, next: NextFunction): Promise<ForgotResentOtpResponse | void>;
         VerifyForgotOtp(req: Request, res: Response, next: NextFunction): Promise<unknown>;
         updateNewPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
+        logout(req: Request, res: Response, next: NextFunction): Promise<void>;
+
 }

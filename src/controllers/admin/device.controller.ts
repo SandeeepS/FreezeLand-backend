@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { IAdminService } from "../../interfaces/IServices/IAdminService";
 import { AddNewDeviceValidation } from "../../utils/validator";
-import { IAdminDeviceController } from "../../interfaces/IController/admin/IAdminDeviceController";
+import { IAdminDeviceController } from "../../interfaces/IController/admin/IDeviceController";
 import { STATUS_CODES } from "../../constants/httpStatusCodes";
 const { OK } = STATUS_CODES;
 

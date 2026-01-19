@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IMechanicProfileController } from "../../interfaces/IController/mechanic/IMechanicProfileController";
+import { IMechanicProfileController } from "../../interfaces/IController/mechanic/IProfileController";
 import { IMechServices } from "../../interfaces/IServices/IMechServices";
 import { STATUS_CODES } from "../../constants/httpStatusCodes";
 import {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../../constants/httpStatusCodes";
 const { OK } = STATUS_CODES;
-import { IMechController } from "../../interfaces/IController/IMechController";
+import { IMechController } from "../../interfaces/IController/mechanic/IController";
 
 import {
   GetImageUrlResponse,

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IAdminAuthController } from "../../interfaces/IController/admin/IAdminAuthController";
+import { IAdminAuthController } from "../../interfaces/IController/admin/IAuthController";
 import { IAdminService } from "../../interfaces/IServices/IAdminService";
 import { STATUS_CODES } from "../../constants/httpStatusCodes";
 const { OK } = STATUS_CODES;

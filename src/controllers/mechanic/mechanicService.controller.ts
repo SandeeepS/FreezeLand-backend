@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IMechanicServiceController } from "../../interfaces/IController/mechanic/IMechanicServiceController";
+import { IMechanicServiceController } from "../../interfaces/IController/mechanic/IServiceController";
 import { IMechServices } from "../../interfaces/IServices/IMechServices";
 import { STATUS_CODES } from "../../constants/httpStatusCodes";
 const { OK, NOT_FOUND } = STATUS_CODES;

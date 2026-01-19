@@ -1,5 +1,5 @@
 import {Request,Response, NextFunction } from "express";
-import { GetPreSignedUrlResponse } from "../dataContracts/Admin/IController.dto";
+import { GetPreSignedUrlResponse } from "../../dataContracts/Admin/IController.dto";
 
 export interface IAdminController{
     

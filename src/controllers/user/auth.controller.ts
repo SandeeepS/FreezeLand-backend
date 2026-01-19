@@ -350,6 +350,34 @@ class UserAuthController implements IUserAuthController {
       next(error);
     }
   }
+
+  
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("Entered in the function for logout");
+
+      // Clear the access_token and refresh_token cookies
+      res
+        .clearCookie("user_access_token", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        })
+        .clearCookie("user_refresh_token", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        });
+
+      // Send a success response
+      res
+        .status(200)
+        .json({ success: true, message: "User logged out successfully" });
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  }
 }
 
 export default UserAuthController;
