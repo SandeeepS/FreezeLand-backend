@@ -7,13 +7,13 @@ import cors from "cors";
 import mongoose from "mongoose";
 import userRoutes from "./routes/userRoutes";
 import adminRoutes from "./routes/adminRoutes";
-import mechRoutes from "./routes/mechRoutes";
 import chatRouters from "./routes/chatRoutes";
 import logger from "./utils/logger";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import configureSocket from "./config.ts/socket";
 import { corsOptions } from "./utils/corsOptions";
+import mechanicRouter from "./routes/mechRoutes";
 const morganFormat = ":method :url :status :response-time ms";
 const app: Express = express();
 const PORT: string | number = process.env.PORT || 5000;
@@ -59,7 +59,7 @@ export { io };
 
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/mech", mechRoutes);
+app.use("/api/mech", mechanicRouter);
 app.use("/api/chat", chatRouters);
 
 app.get("/", (_req: Request, res: Response) => {
