@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IUserAuthController } from "../../interfaces/IController/user/IUserAuthController";
+import { IUserAuthController } from "../../interfaces/IController/user/IAuthController";
 import { IUserServices } from "../../interfaces/IServices/IUserServices";
 import { ForgotResentOtpResponse } from "../../interfaces/dataContracts/User/IController.dto";
 import { STATUS_CODES } from "../../constants/httpStatusCodes";

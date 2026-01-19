@@ -1,5 +1,5 @@
 import  express,{Router,Request,Response,NextFunction}  from "express";
-import userController from "../controllers/user/userController";
+import userController from "../controllers/user/controller";
 import UserRepository from "../repositories/userRepository";
 import userService from "../services/userService";
 import Encrypt from "../utils/comparePassword";
@@ -16,7 +16,8 @@ import ReportRepository from "../repositories/reportRepository";
 import ReportService from "../services/reportService";
 import { limiter } from "../utils/rateLimiter";
 import AddressRepository from "../repositories/addressRepository";
-import UserAuthController from "../controllers/user/userAuth.controller";
+import UserAuthController from "../controllers/user/auth.controller";
+import ProfileController from "../controllers/user/profile.controller";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
@@ -35,21 +36,22 @@ const generateOTP  = new GenerateOTP();
 const email = new Email(generateOTP);
 const userServices = new userService(userRepository,addressRepository,serviceRepository,concernRepository,orderRepository,orderService,createjwt,encrypt,email);
 const controller = new userController(userServices,reportService,email);
-const userAuthController = new UserAuthController(userServices,email);
+const authController = new UserAuthController(userServices,email);
+const profileController = new ProfileController(userServices,email);
 
-userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await userAuthController.userSignup(req,res,next));
-userRouter.post('/login',limiter,async(req:Request,res:Response,next:NextFunction) => await userAuthController.userLogin(req,res,next))
-userRouter.post('/google-login', async (req: Request, res: Response, next: NextFunction) => await userAuthController.googleLogin(req, res, next));
+userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await authController.userSignup(req,res,next));
+userRouter.post('/login',limiter,async(req:Request,res:Response,next:NextFunction) => await authController.userLogin(req,res,next))
+userRouter.post('/google-login', async (req: Request, res: Response, next: NextFunction) => await authController.googleLogin(req, res, next));
 userRouter.get('/logout', async (req: Request, res: Response,next:NextFunction) => await controller.logout(req, res,next));
-userRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await userAuthController.verifyOtp(req,res,next));
-userRouter.get('/getTempUserData',async(req:Request,res:Response,next:NextFunction) => await userAuthController.getTempUserData(req,res,next));
-userRouter.post('/forgot-password', async (req: Request, res: Response,next:NextFunction) => await userAuthController.forgotPassWord(req, res,next));
-userRouter.post('/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await userAuthController.VerifyForgotOtp(req, res,next));
-userRouter.post('/resend-otp',async(req:Request,res:Response,next:NextFunction) => await userAuthController.resendOTP(req,res,next));
+userRouter.post('/veryfy-otp',async(req:Request,res:Response,next:NextFunction) => await authController.verifyOtp(req,res,next));
+userRouter.get('/getTempUserData',async(req:Request,res:Response,next:NextFunction) => await authController.getTempUserData(req,res,next));
+userRouter.post('/forgot-password', async (req: Request, res: Response,next:NextFunction) => await authController.forgotPassWord(req, res,next));
+userRouter.post('/verify-forgot-otp', async (req: Request, res: Response,next:NextFunction) => await authController.VerifyForgotOtp(req, res,next));
+userRouter.post('/resend-otp',async(req:Request,res:Response,next:NextFunction) => await authController.resendOTP(req,res,next));
 userRouter.post('/handlePayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.createStripeSession(req,res,next));
-userRouter.put('/update-newpassword',async(req: Request, res: Response,next:NextFunction) => await userAuthController.updateNewPassword(req, res,next));
-userRouter.get('/profile',async (req: Request, res: Response,next:NextFunction) => await controller.getProfile(req, res,next));
-userRouter.put('/editUser',userAuth(["user"]),async (req:Request,res:Response,next:NextFunction) => await controller.editUser(req,res,next));
+userRouter.put('/update-newpassword',async(req: Request, res: Response,next:NextFunction) => await authController.updateNewPassword(req, res,next));
+userRouter.get('/profile',async (req: Request, res: Response,next:NextFunction) => await profileController.getProfile(req, res,next));
+userRouter.put('/editUser',userAuth(["user"]),async (req:Request,res:Response,next:NextFunction) => await profileController.editUser(req,res,next));
 userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.addAddress(req,res,next));
 userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
 userRouter.put('/removeAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.handleRemoveUserAddress(req,res,next));

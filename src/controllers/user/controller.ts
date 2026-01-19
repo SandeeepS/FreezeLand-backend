@@ -3,11 +3,9 @@ import { STATUS_CODES } from "../../constants/httpStatusCodes";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../../awsConfig";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
-const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
+const { BAD_REQUEST , OK , NOT_FOUND} = STATUS_CODES;
 import { AddressValidation } from "../../utils/validator";
-import { EditUserDetailsValidator } from "../../utils/validator";
 import {
-  IEditUser,
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
 } from "../../interfaces/dataContracts/User/IController.dto";
@@ -60,65 +58,8 @@ class userController implements IUserController {
     }
   }
 
-  async getProfile(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { userId } = req.query;
-      if (userId) {
-        console.log("userId from the getProfile in the useController", userId);
-        const currentUser = await this._userServices.getProfile({
-          id: userId as string,
-        });
-        if (!currentUser)
-          res
-            .status(UNAUTHORIZED)
-            .json({ success: false, message: "Authentication failed..!" });
-        else if (currentUser?.data.data?.isBlocked)
-          res.status(UNAUTHORIZED).json({
-            success: false,
-            message: "user has been blocked by the admin!",
-          });
-        else res.status(OK).json(currentUser);
-      }
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
 
-  async editUser(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log("req bidt kdjfsfdsffh", req.body);
-      const { _id, name, phone, profile_picture }: IEditUser = req.body;
-      const check = EditUserDetailsValidator(name, phone);
-      if (check) {
-        const editedUser = await this._userServices.editUser({
-          _id,
-          name,
-          phone,
-          profile_picture,
-        });
-        console.log("fghfgdfggdgnfgngnngjdfgnkj", editedUser);
-        if (editedUser) {
-          res
-            .status(OK)
-            .json({ success: true, message: "UserData updated sucessfully" });
-        } else {
-          res.status(BAD_REQUEST).json({
-            success: false,
-            message: "UserData updation is not updated !!",
-          });
-        }
-      } else {
-        res.status(UNAUTHORIZED).json({
-          success: false,
-          message: "Please check the name and phone number  !!",
-        });
-      }
-    } catch (error) {
-      console.log(error as Error);
-      next(error);
-    }
-  }
+
 
   //this same funciton is also used for editing the existing user Address ,if the _id is present it is used to updated the existing address
   async addAddress(req: Request, res: Response, next: NextFunction) {

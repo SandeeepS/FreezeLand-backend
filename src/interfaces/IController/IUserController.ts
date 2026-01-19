@@ -7,8 +7,6 @@ export interface IUserController{
  
 
     // Profile Management 
-    getProfile(req: Request, res: Response, next: NextFunction): Promise<void>;
-    editUser(req: Request, res: Response, next: NextFunction): Promise<void>;
 
     // Address Management 
     addAddress(req: Request, res: Response, next: NextFunction): Promise<void>;
