@@ -19,6 +19,7 @@ import AddressRepository from "../repositories/addressRepository";
 import UserAuthController from "../controllers/user/auth.controller";
 import ProfileController from "../controllers/user/profile.controller";
 import AddressController from "../controllers/user/address.controller";
+import ServiceController from "../controllers/user/service.controller";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
@@ -40,6 +41,7 @@ const controller = new userController(userServices,reportService,email);
 const authController = new UserAuthController(userServices,email);
 const profileController = new ProfileController(userServices,email);
 const addressController = new AddressController(userServices);
+const serviceController = new ServiceController(userServices);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await authController.userSignup(req,res,next));
 userRouter.post('/login',limiter,async(req:Request,res:Response,next:NextFunction) => await authController.userLogin(req,res,next))
@@ -58,12 +60,12 @@ userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,
 userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.setDefaultAddress(req,res,next));
 userRouter.put('/removeAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.handleRemoveUserAddress(req,res,next));
 userRouter.put('/editAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.editAddress(req,res,next));
-userRouter.post('/registerService',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.registerService(req,res,next));
-userRouter.get('/getAllServices',async(req:Request,res:Response,next:NextFunction) =>await controller.getAllServices(req,res,next));//getting all service which is provided by the website
-userRouter.get('/getAllUserRegisteredServices',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
+userRouter.post('/registerService',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await serviceController.registerService(req,res,next));
+userRouter.get('/getAllServices',async(req:Request,res:Response,next:NextFunction) =>await serviceController.getAllServices(req,res,next));//getting all service which is provided by the website
+userRouter.get('/getAllUserRegisteredServices',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await serviceController.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
 userRouter.get('/getImageUrl',async(req:Request,res:Response,next:NextFunction) => await controller.getImageUrl(req,res,next));
 userRouter.get('/getPresignedUrl',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) =>await controller.getPresignedUrl(req,res,next));
-userRouter.get('/getUserRegisteredServiceDetailsById',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getUserRegisteredServiceDetailsById(req,res,next));
+userRouter.get('/getUserRegisteredServiceDetailsById',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await serviceController.getUserRegisteredServiceDetailsById(req,res,next));
 userRouter.get('/getMechanicDetails',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getMechanicDetails(req,res,next));
 userRouter.get('/getService/:id',async(req:Request,res:Response,next:NextFunction) => await controller.getService(req,res,next));
 userRouter.get('/successPayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.successPayment(req,res,next));

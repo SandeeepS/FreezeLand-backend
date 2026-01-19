@@ -3,21 +3,6 @@ import { GetImageUrlResponse } from "../dataContracts/User/IController.dto";
 
 export interface IUserController{
     
-    // User Management 
- 
-
-    // Profile Management 
-
-    // Address Management 
-
-
-    // Service Management 
-    registerService(req: Request, res: Response, next: NextFunction): Promise<void>;
-    getAllServices(req: Request, res: Response, next: NextFunction): Promise<void>;
-    getAllUserRegisteredServices(req: Request, res: Response, next: NextFunction): Promise<void>;
-    getUserRegisteredServiceDetailsById(req:Request,res:Response,next:NextFunction):Promise<void>;
-
-    // Utility Methods
     getImageUrl(req: Request, res: Response, next: NextFunction): Promise<GetImageUrlResponse | void>;
     logout(req: Request, res: Response, next: NextFunction): Promise<void>;
 
