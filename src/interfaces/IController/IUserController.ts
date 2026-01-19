@@ -9,9 +9,7 @@ export interface IUserController{
     // Profile Management 
 
     // Address Management 
-    addAddress(req: Request, res: Response, next: NextFunction): Promise<void>;
-    editAddress(req: Request, res: Response, next: NextFunction): Promise<void>;
-    setDefaultAddress(req: Request, res: Response, next: NextFunction): Promise<void>;
+
 
     // Service Management 
     registerService(req: Request, res: Response, next: NextFunction): Promise<void>;

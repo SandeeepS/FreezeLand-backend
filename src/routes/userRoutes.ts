@@ -18,6 +18,7 @@ import { limiter } from "../utils/rateLimiter";
 import AddressRepository from "../repositories/addressRepository";
 import UserAuthController from "../controllers/user/auth.controller";
 import ProfileController from "../controllers/user/profile.controller";
+import AddressController from "../controllers/user/address.controller";
 
 const userRouter:Router = express.Router();
 const encrypt = new Encrypt();
@@ -38,6 +39,7 @@ const userServices = new userService(userRepository,addressRepository,serviceRep
 const controller = new userController(userServices,reportService,email);
 const authController = new UserAuthController(userServices,email);
 const profileController = new ProfileController(userServices,email);
+const addressController = new AddressController(userServices);
 
 userRouter.post('/registration',async(req:Request,res:Response,next:NextFunction) => await authController.userSignup(req,res,next));
 userRouter.post('/login',limiter,async(req:Request,res:Response,next:NextFunction) => await authController.userLogin(req,res,next))
@@ -52,10 +54,10 @@ userRouter.post('/handlePayment',userAuth(["user"]),async(req:Request,res:Respon
 userRouter.put('/update-newpassword',async(req: Request, res: Response,next:NextFunction) => await authController.updateNewPassword(req, res,next));
 userRouter.get('/profile',async (req: Request, res: Response,next:NextFunction) => await profileController.getProfile(req, res,next));
 userRouter.put('/editUser',userAuth(["user"]),async (req:Request,res:Response,next:NextFunction) => await profileController.editUser(req,res,next));
-userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.addAddress(req,res,next));
-userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.setDefaultAddress(req,res,next));
-userRouter.put('/removeAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.handleRemoveUserAddress(req,res,next));
-userRouter.put('/editAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.editAddress(req,res,next));
+userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.addAddress(req,res,next));
+userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.setDefaultAddress(req,res,next));
+userRouter.put('/removeAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.handleRemoveUserAddress(req,res,next));
+userRouter.put('/editAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.editAddress(req,res,next));
 userRouter.post('/registerService',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.registerService(req,res,next));
 userRouter.get('/getAllServices',async(req:Request,res:Response,next:NextFunction) =>await controller.getAllServices(req,res,next));//getting all service which is provided by the website
 userRouter.get('/getAllUserRegisteredServices',userAuth(["user"]),  async(req:Request,res:Response,next:NextFunction) => await controller.getAllUserRegisteredServices(req,res,next)); //getting all compliantes registrerd by user 
@@ -67,8 +69,8 @@ userRouter.get('/getService/:id',async(req:Request,res:Response,next:NextFunctio
 userRouter.get('/successPayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.successPayment(req,res,next));
 userRouter.post('/updateUserLocation',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.updateUserLocation(req,res,next));
 userRouter.post('/report',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.createReport(req,res,next));
-userRouter.put('/handleRemoveUserAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.handleRemoveUserAddress(req,res,next));
-userRouter.get('/getAllAddressOfUser',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllAddressOfUser(req,res,next));
+userRouter.put('/handleRemoveUserAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.handleRemoveUserAddress(req,res,next));
+userRouter.get('/getAllAddressOfUser',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.getAllAddressOfUser(req,res,next));
 
 // userRouter.get('/report',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.getAllreport(req,res,next));
 
