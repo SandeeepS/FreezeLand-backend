@@ -1,5 +1,5 @@
 import  express,{Router,Request,Response,NextFunction}  from "express";
-import userController from "../controllers/userController";
+import userController from "../controllers/user/userController";
 import UserRepository from "../repositories/userRepository";
 import userService from "../services/userService";
 import Encrypt from "../utils/comparePassword";

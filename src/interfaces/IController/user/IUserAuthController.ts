@@ -3,7 +3,7 @@ import { ForgotResentOtpResponse } from "../../dataContracts/User/IController.dt
 
 export interface IUserAuthController {
 
-       userSignup(req: Request, res: Response, next: NextFunction): Promise<void>;
+        userSignup(req: Request, res: Response, next: NextFunction): Promise<void>;
         userLogin(req: Request, res: Response, next: NextFunction): Promise<void>;
         googleLogin(req: Request, res: Response, next: NextFunction): Promise<void>;
         verifyOtp(req: Request, res: Response, next: NextFunction): Promise<void>;

@@ -1,26 +1,26 @@
 import { Request, Response, NextFunction } from "express";
-import { STATUS_CODES } from "../constants/httpStatusCodes";
+import { STATUS_CODES } from "../../constants/httpStatusCodes";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import S3Client from "../awsConfig";
+import S3Client from "../../awsConfig";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = STATUS_CODES;
-import { AddressValidation } from "../utils/validator";
-import { EditUserDetailsValidator } from "../utils/validator";
+import { AddressValidation } from "../../utils/validator";
+import { EditUserDetailsValidator } from "../../utils/validator";
 import {
   IEditUser,
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
-} from "../interfaces/dataContracts/User/IController.dto";
-import { IUserController } from "../interfaces/IController/IUserController";
-import { IUserServices } from "../interfaces/IServices/IUserServices";
-import { Iemail } from "../utils/email";
-import IReportService from "../interfaces/IServices/IReportService";
+} from "../../interfaces/dataContracts/User/IController.dto";
+import { IUserController } from "../../interfaces/IController/IUserController";
+import { IUserServices } from "../../interfaces/IServices/IUserServices";
+import { Iemail } from "../../utils/email";
+import IReportService from "../../interfaces/IServices/IReportService";
 
 class userController implements IUserController {
   constructor(
     private _userServices: IUserServices,
     private _reportService: IReportService,
-    private _email: Iemail
+    private _email: Iemail,
   ) {
     this._userServices = _userServices;
     this._reportService = _reportService;
@@ -29,24 +29,22 @@ class userController implements IUserController {
   milliseconds = (h: number, m: number, s: number) =>
     (h * 60 * 60 + m * 60 + s) * 1000;
 
-
-
   async createStripeSession(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     try {
       const { data } = req.body;
       console.log(
         "data reached in the usercontroller while creating stripe session ",
-        data
+        data,
       );
       const session = await this._userServices.createStripeSession(data);
       console.log("--------------------------------------");
       console.log(
         "strip session from the createStripSession in the userController",
-        session
+        session,
       );
       if (session) {
         res.status(OK).json({ success: true, session });
@@ -61,8 +59,6 @@ class userController implements IUserController {
       next(error);
     }
   }
-
-
 
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
@@ -128,10 +124,10 @@ class userController implements IUserController {
   async addAddress(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
-        "enterd in the addAddress fucniton in the backend userController"
+        "enterd in the addAddress fucniton in the backend userController",
       );
       const { newAddress } = req.body;
-      console.log("new Address in the controller is ",newAddress)
+      console.log("new Address in the controller is ", newAddress);
       const check = AddressValidation(
         newAddress.userId,
         newAddress.addressType,
@@ -139,7 +135,7 @@ class userController implements IUserController {
         newAddress.houseNumber,
         newAddress.longitude,
         newAddress.latitude,
-        newAddress.landmark
+        newAddress.landmark,
       );
       if (check) {
         const addedAddress = await this._userServices.AddUserAddress({
@@ -157,7 +153,7 @@ class userController implements IUserController {
         }
       } else {
         console.log(
-          "address validation failed form the addAddress in the userController"
+          "address validation failed form the addAddress in the userController",
         );
         res
           .status(BAD_REQUEST)
@@ -180,7 +176,7 @@ class userController implements IUserController {
         values.state,
         values.pin,
         values.district,
-        values.landMark
+        values.landMark,
       );
       if (check) {
         console.log("address validation done ");
@@ -215,7 +211,7 @@ class userController implements IUserController {
   async setDefaultAddress(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
-        "Enterd in the address funciton in the backend userController"
+        "Enterd in the address funciton in the backend userController",
       );
       const { userId, addressId } = req.body;
       console.log("userId and addressId is ", userId, addressId);
@@ -231,7 +227,7 @@ class userController implements IUserController {
           .status(BAD_REQUEST)
           .json({ success: false, message: "Default address updation failed" });
       }
-    } catch (error){
+    } catch (error) {
       console.log(error as Error);
       next(error);
     }
@@ -241,7 +237,7 @@ class userController implements IUserController {
   async registerService(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
-        "entered in the register service in the backend userController"
+        "entered in the register service in the backend userController",
       );
       const { data } = req.body;
       console.log("data from the frontend is ", data);
@@ -269,7 +265,7 @@ class userController implements IUserController {
       console.log(
         "Entered in the updateUserLocation in the userController is ",
         userId,
-        locationData
+        locationData,
       );
       const response = await this._userServices.updateUserLocation({
         userId,
@@ -297,7 +293,7 @@ class userController implements IUserController {
         page,
         limit,
         searchQuery,
-        search
+        search,
       });
 
       res.status(OK).json(data);
@@ -311,13 +307,13 @@ class userController implements IUserController {
   async getAllUserRegisteredServices(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const { userId } = req.query;
       console.log(
         "userId in the userController in the getAllUserRegisteredService",
-        userId
+        userId,
       );
 
       const page = 1;
@@ -328,7 +324,7 @@ class userController implements IUserController {
           page,
           limit,
           searchQuery,
-          userId as string
+          userId as string,
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({
@@ -345,7 +341,7 @@ class userController implements IUserController {
     } catch (error) {
       console.log(
         "error while getting the allregistered complaints from the database in the userController",
-        error as Error
+        error as Error,
       );
       next(error);
     }
@@ -354,7 +350,7 @@ class userController implements IUserController {
   async getImageUrl(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<GetImageUrlResponse | void> {
     try {
       const { imageKey } = req.query;
@@ -380,7 +376,7 @@ class userController implements IUserController {
   async getPresignedUrl(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<GetPreSignedUrlResponse | void> {
     try {
       const { fileName, fileType, folderName } = req.query as {
@@ -418,18 +414,18 @@ class userController implements IUserController {
   async getUserRegisteredServiceDetailsById(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const { id } = req.query;
       console.log(
         "Enterd in the getUserRegisteredServiceDetailsById function in the userController with id",
-        id
+        id,
       );
 
       const result =
         await this._userServices.getUserRegisteredServiceDetailsById(
-          id as string
+          id as string,
         );
       res.status(200).json({ success: true, result });
     } catch (error) {
@@ -443,14 +439,14 @@ class userController implements IUserController {
       const { id } = req.query;
       console.log(
         "id reached in the userController for getting mech details",
-        id
+        id,
       );
       if (typeof id === "string") {
         const result = await this._userServices.getMechanicDetails({ id });
         res.status(OK).json({ success: true, result: result });
       } else {
         console.log(
-          "Id is undifined in the getMechanicDetails in userController"
+          "Id is undifined in the getMechanicDetails in userController",
         );
         res.status(STATUS_CODES.CONFLICT).json({ success: false });
       }
@@ -477,16 +473,16 @@ class userController implements IUserController {
   async successPayment(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> {
     try {
       const { sessionId } = req.query;
       console.log(
-        "entered in the successPayment function in the userController"
+        "entered in the successPayment function in the userController",
       );
       console.log("sessionId from the frontend is ", sessionId);
       const result = await this._userServices.successPayment(
-        sessionId as string
+        sessionId as string,
       );
       console.log("result from the successPayment in the userController");
       res.status(OK).json({ success: true, result });
@@ -528,7 +524,7 @@ class userController implements IUserController {
       const { reportData } = req.body;
       console.log(
         "Datas from the frontend  in the createReportFunciton in the userController is ",
-        reportData
+        reportData,
       );
       const result = await this._reportService.createReport(reportData);
       res.status(200).json({ success: true, result });
@@ -536,7 +532,7 @@ class userController implements IUserController {
     } catch (error) {
       console.log(
         "Error occured in the createReport function in the userController",
-        error
+        error,
       );
       next(error);
     }
@@ -546,14 +542,14 @@ class userController implements IUserController {
   async handleRemoveUserAddress(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const { userId, addressId } = req.body;
       console.log("address, id in the userController is", userId, addressId);
       const result = await this._userServices.handleRemoveUserAddress(
         userId as string,
-        addressId as string
+        addressId as string,
       );
       if (result) {
         res.status(200).json({ success: true, result });
@@ -563,27 +559,34 @@ class userController implements IUserController {
     } catch (error) {
       console.log(
         "Error occured while handling the remove Address function in the userController",
-        error
+        error,
       );
       next(error);
     }
   }
 
   //function to getAllUserAddress
-  async getAllAddressOfUser(req:Request,res:Response,next:NextFunction) {
-    try{
-      const {userId} = req.query;
-      console.log("Entered in the userController for accessing the userAddress with userId  ",userId);
-      const result = await this._userServices.getAllAddressOfUser(userId as string);
-      console.log("result from the controller is ",result);
-      if(result) {
-        res.status(200).json({success:true,result});
-      }else{
-        res.status(200).json({success:false});
+  async getAllAddressOfUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId } = req.query;
+      console.log(
+        "Entered in the userController for accessing the userAddress with userId  ",
+        userId,
+      );
+      const result = await this._userServices.getAllAddressOfUser(
+        userId as string,
+      );
+      console.log("result from the controller is ", result);
+      if (result) {
+        res.status(200).json({ success: true, result });
+      } else {
+        res.status(200).json({ success: false });
       }
-      
-    }catch(error){
-      console.log("Error occured while accessing userAddress in userController",error);
+    } catch (error) {
+      console.log(
+        "Error occured while accessing userAddress in userController",
+        error,
+      );
       next(error);
     }
   }
