@@ -3,7 +3,7 @@ import { STATUS_CODES } from "../../constants/httpStatusCodes";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import S3Client from "../../awsConfig";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
-const { BAD_REQUEST , OK} = STATUS_CODES;
+const { BAD_REQUEST, OK } = STATUS_CODES;
 import {
   GetImageUrlResponse,
   GetPreSignedUrlResponse,
@@ -57,12 +57,6 @@ class userController implements IUserController {
     }
   }
 
-
-
-
-
-
-
   //function to update the userLocation after singup and again login
   async updateUserLocation(req: Request, res: Response, next: NextFunction) {
     try {
@@ -83,8 +77,6 @@ class userController implements IUserController {
       next(error);
     }
   }
-
-
 
   async getImageUrl(
     req: Request,
@@ -149,8 +141,6 @@ class userController implements IUserController {
     }
   }
 
-
-
   //getting mechanic details  in the usercontroller.
   async getMechanicDetails(req: Request, res: Response, next: NextFunction) {
     try {
@@ -210,7 +200,6 @@ class userController implements IUserController {
     }
   }
 
-
   async createReport(req: Request, res: Response, next: NextFunction) {
     try {
       const { reportData } = req.body;
@@ -229,10 +218,6 @@ class userController implements IUserController {
       next(error);
     }
   }
-
- 
-
-
 }
 
 export default userController;
