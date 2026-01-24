@@ -85,7 +85,7 @@ class ServiceController implements IServiceController {
         res.status(OK).json({
           success: true,
           message: "data fetched successfully",
-          allRegisteredUserServices: allRegisteredUserServices,
+          allRegisteredUserServices,
         });
       } else {
         res.status(NOT_FOUND).json({

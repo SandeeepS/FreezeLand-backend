@@ -174,7 +174,7 @@ export interface IGetAllServices {
   page: number;
   limit: number;
   searchQuery: string;
-  search:string;
+  search: string;
 }
 
 export interface GetAllServiceResponse {
@@ -189,7 +189,7 @@ export interface GetAllServiceResponse {
 }
 
 export interface IAddress {
-  _id?:string;
+  _id?: string;
   userId: string;
   addressType: "Home" | "Work";
   fullAddress: string;
@@ -203,15 +203,15 @@ export interface AddUserAddress {
   values: IAddress;
 }
 
-export interface AddUserAddress2{
-    userId: mongoose.Types.ObjectId;
+export interface AddUserAddress2 {
+  userId: mongoose.Types.ObjectId;
   addressType: "Home" | "Work";
   fullAddress: string;
   houseNumber: string;
   landMark: string;
   latitude: number;
   longitude: number;
-  isDefaultAddress?:boolean;
+  isDefaultAddress?: boolean;
 }
 
 export interface AddUserAddressResponse {
@@ -275,7 +275,6 @@ export interface EditAddressResponse {
   isDeleted: boolean;
 }
 
-
 export interface IRegisterService {
   _id: Types.ObjectId;
   name: string;
@@ -312,6 +311,16 @@ export interface IGetAllUserRegisteredServices {
 }
 
 export interface GetAllUserRegisteredServicesResponse {
+  allRegisteredUserServices: GetAllUserRegisteredServicesData[];
+  pagination: {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    itemsPerPage: number;
+  };
+}
+
+export interface GetAllUserRegisteredServicesData {
   _id: Types.ObjectId;
   name: string;
   image: [];
