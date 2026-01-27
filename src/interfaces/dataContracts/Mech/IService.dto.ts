@@ -214,6 +214,16 @@ export interface IGetAllUserRegisteredServices {
 }
 
 export interface GetAllUserRegisteredServicesResponse {
+  allRegisteredUserServices: GetAllUserRegisteredServicesData[];
+  pagination: {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    itemsPerPage: number;
+  };
+}
+
+export interface GetAllUserRegisteredServicesData {
   _id: string;
   name: string;
   image: [];

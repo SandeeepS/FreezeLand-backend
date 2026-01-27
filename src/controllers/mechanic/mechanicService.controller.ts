@@ -16,19 +16,19 @@ class MechanicServiceController implements IMechanicServiceController {
     next: NextFunction,
   ) {
     try {
-      const { id } = req.body;
+      const { page, limit, search } = req.query;
       console.log(
         "userId in the mechController in the getAllUserRegisteredService",
+        page,
+        limit,
+        search,
       );
-      const page = 1;
-      const limit = 10;
-      const searchQuery = "";
+
       const allRegisteredUserServices =
         await this._mechServices.getAllUserRegisteredServices(
-          page,
-          limit,
-          searchQuery,
-          id,
+          parseInt(page as string) || 1,
+          parseInt(limit as string) || 5,
+          search as string,
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({

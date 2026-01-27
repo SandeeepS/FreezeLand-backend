@@ -598,13 +598,13 @@ class mechService implements IMechServices {
   async getAllUserRegisteredServices(
     page: number,
     limit: number,
-    searchQuery: string
-  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+    search: string
+  ): Promise<GetAllUserRegisteredServicesResponse | null> {
     try {
       const data = await this._concernRepository.getAllUserRegisteredServices({
         page,
         limit,
-        searchQuery,
+        search,
       });
       console.log("data in the mechService ", data);
 
