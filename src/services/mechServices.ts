@@ -5,7 +5,6 @@ import Cryptr from "cryptr";
 import {
   EmailExistResponse,
   IEmailExitCheck,
-  getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
   GetAllMechanicCompletedServicesResponse,
   GetAllMechanicResponse,
@@ -43,6 +42,7 @@ import {
   IGetMechanicAddressResponse,
   ISetMechDefaultAddress,
   SetMechDefaultAddressResponse,
+  GetAllAcceptedServiceResponse,
 } from "../interfaces/dataContracts/Mech/IService.dto";
 import { IMechServices } from "../interfaces/IServices/IMechServices";
 import { generatePresignedUrl } from "../utils/generatePresignedUrl";
@@ -661,13 +661,19 @@ class mechService implements IMechServices {
 
   //function to get the all acccepted services by mechanic
   async getAllAcceptedServices(
+    page:number,
+    limit:number,
+    search:string,
     mechanicId: string
-  ): Promise<getAllAcceptedServiceResponse[]> {
+  ): Promise<GetAllAcceptedServiceResponse> {
     try {
       console.log("Enterd in the mechService");
-      const result = await this._mechRepository.getAllAcceptedServices(
+      const result = await this._mechRepository.getAllAcceptedServices({
+        page,
+        limit,
+        search,
         mechanicId
-      );
+    });
       return result;
     } catch (error) {
       console.log(

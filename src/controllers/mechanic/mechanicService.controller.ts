@@ -13,12 +13,12 @@ class MechanicServiceController implements IMechanicServiceController {
   async getAllUserRegisteredServices(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const { id } = req.body;
       console.log(
-        "userId in the mechController in the getAllUserRegisteredService"
+        "userId in the mechController in the getAllUserRegisteredService",
       );
       const page = 1;
       const limit = 10;
@@ -28,7 +28,7 @@ class MechanicServiceController implements IMechanicServiceController {
           page,
           limit,
           searchQuery,
-          id
+          id,
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({
@@ -45,7 +45,7 @@ class MechanicServiceController implements IMechanicServiceController {
     } catch (error) {
       console.log(
         "error while getting the allregistered complaints from the database in the mechController",
-        error as Error
+        error as Error,
       );
       next(error);
     }
@@ -57,7 +57,7 @@ class MechanicServiceController implements IMechanicServiceController {
       const { id } = req.query;
       console.log(
         "Enterd in the getComplaintDetails function in the mechController with id",
-        id
+        id,
       );
       const result = await this._mechServices.getComplaintDetails(id as string);
       res.status(200).json({ success: true, result });
@@ -75,13 +75,13 @@ class MechanicServiceController implements IMechanicServiceController {
         complaintId,
         mechanicId,
         status,
-        roomId
+        roomId,
       );
       const result = await this._mechServices.updateWorkAssigned(
         complaintId,
         mechanicId,
         status,
-        roomId
+        roomId,
       );
       res.status(200).json({ success: true, result });
     } catch (error) {
@@ -89,28 +89,45 @@ class MechanicServiceController implements IMechanicServiceController {
     }
   }
 
-    //function to access all accepted complaints by the mechanic
+  //function to access all accepted complaints by the mechanic
   async getAllAcceptedServices(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
-      const { mechanicId } = req.query;
+      const { mechanicId, page, limit, search } = req.query;
       console.log(
         "mechanic id in the getAllAcceptedServices in the mechController is ",
-        mechanicId
+        mechanicId,
+        page,
+        limit,
+        search,
       );
       const result = await this._mechServices.getAllAcceptedServices(
-        mechanicId as string
+        parseInt(page as string) || 1,
+        parseInt(limit as string) || 5,
+        search as string,
+        mechanicId as string,
       );
-      res.status(200).json({ success: true, result });
+      if (result) {
+        res.status(OK).json({
+          success: true,
+          message: "data fetched successfully",
+          acceptedServices: result,
+        });
+      } else {
+        res.status(NOT_FOUND).json({
+          success: true,
+          message: "Not Found",
+        });
+      }
     } catch (error) {
       next(error);
     }
   }
 
-    //funciton to update the  complaint details
+  //funciton to update the  complaint details
   async updateComplaintStatus(req: Request, res: Response, next: NextFunction) {
     try {
       const complaintId = req.query.complaintId as string;
@@ -118,11 +135,11 @@ class MechanicServiceController implements IMechanicServiceController {
       console.log(
         "next status in the updateComplaintStatus is ",
         complaintId,
-        nextStatus
+        nextStatus,
       );
       const result = await this._mechServices.updateComplaintStatus(
         complaintId,
-        nextStatus
+        nextStatus,
       );
       res.status(200).json({ success: true, result });
     } catch (error) {
@@ -130,18 +147,17 @@ class MechanicServiceController implements IMechanicServiceController {
     }
   }
 
-  
   //function to update the workdetails to the concern database
   async updateWorkDetails(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(
-        "entered in the updateworkerDetails function in the mechController"
+        "entered in the updateworkerDetails function in the mechController",
       );
       const { complaintId, workDetails } = req.body;
       console.log(
         `complaint id is - ${complaintId} and workdetails is - ${[
           ...workDetails,
-        ]}`
+        ]}`,
       );
       const result = await this._mechServices.updateWorkDetails({
         complaintId,
@@ -150,31 +166,30 @@ class MechanicServiceController implements IMechanicServiceController {
       res.status(200).json({ success: true, result });
     } catch (error) {
       console.log(
-        "Error occured in the mechController while updating Wroker Details"
+        "Error occured in the mechController while updating Wroker Details",
       );
       next(error);
     }
   }
 
-  
   //function to get all completed service for the mech service histroy listing
   async getAllCompletedServices(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       console.log("Entered in the getAllCompleted Services");
       const { mechanicId } = req.query;
       console.log("mechanic id is", mechanicId);
       const result = await this._mechServices.getAllCompletedServices(
-        mechanicId as string
+        mechanicId as string,
       );
       res.status(OK).json({ success: true, result });
     } catch (error) {
       console.log(
         "Error occured in the mechanic controller while getting the completed complaints by mechic ",
-        error
+        error,
       );
       next(error);
     }
