@@ -1,4 +1,4 @@
-import mongoose, { Model, Document } from "mongoose";
+import mongoose, { Model, Document, PipelineStage } from "mongoose";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import concernModel, { Iconcern } from "../models/concernModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
@@ -223,12 +223,18 @@ class ConcernRepository
       const { page, limit, search } = data;
       console.log("search is ", search);
 
-      const filter = {
-        status: { $in: ["accepted", "pending", "onProcess"] },
-      };
+      const searchMatch = search
+        ? {
+            $match: {
+              $or: [
+                { "serviceDetails.name": { $regex: search, $options: "i" } },
+                { name: { $regex: search, $options: "i" } },
+              ],
+            },
+          }
+        : null;
 
-      const totalItems = await concernModel.countDocuments(filter);
-      const result = await concernModel.aggregate([
+      const pipeline: PipelineStage[] = [
         {
           $match: {
             isDeleted: false,
@@ -236,6 +242,7 @@ class ConcernRepository
               { currentMechanicId: { $exists: false } },
               { currentMechanicId: null },
             ],
+            status: { $in: ["accepted", "pending", "onProcess"] },
           },
         },
         {
@@ -257,8 +264,27 @@ class ConcernRepository
         { $skip: (page - 1) * limit },
         { $limit: limit },
         { $project: { "userDetails.password": 0 } },
-      ]);
-      console.log("User registered services:", result);
+      ];
+
+      const countPipeline = pipeline.filter(
+        (stage) => !("$skip" in stage) && !("$limit" in stage),
+      );
+      countPipeline.push({ $count: "total" });
+      const countResult = await concernModel.aggregate(countPipeline);
+      const totalItems = countResult[0]?.total || 0;
+
+      if (searchMatch) {
+        pipeline.push(searchMatch);
+      }
+
+      pipeline.push(
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { "userDetails.password": 0 } },
+      );
+
+      const result = await concernModel.aggregate(pipeline);
+
       return {
         allRegisteredUserServices: result,
         pagination: {

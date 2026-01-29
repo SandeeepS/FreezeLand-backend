@@ -1,4 +1,5 @@
 import userModel, { TempUser } from "../models/userModel";
+import { PipelineStage } from "mongoose";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
 import concernModel from "../models/concernModel";
@@ -273,16 +274,23 @@ class UserRepository
     data: IGetAllUserRegisteredServices,
   ): Promise<GetAllUserRegisteredServicesResponse | null> {
     try {
-      const { page, limit, userId } = data;
+      const { page, limit, userId, searchQuery } = data;
       const objectId = new mongoose.Types.ObjectId(userId);
+      console.log("search Query in the userRepo:",searchQuery);
+      const searchMatch = searchQuery
+        ? {
+            $match: {
+              $or: [
+                {
+                  "serviceDetails.name": { $regex: searchQuery, $options: "i" },
+                },
+                { "name": { $regex: searchQuery, $options: "i" } },
+              ],
+            },
+          }
+        : null;
 
-      const totalItems = await concernModel.countDocuments({
-        userId: objectId,
-        isDeleted: false,
-      });
-
-      // Use aggregation to get user's registered services with lookups
-      const result = await concernModel.aggregate([
+      const pipeline: PipelineStage[] = [
         {
           $match: {
             userId: objectId,
@@ -305,11 +313,26 @@ class UserRepository
             as: "serviceDetails",
           },
         },
+      ];
+
+      const countPipeline = pipeline.filter(
+        (stage) => !("$skip" in stage) && !("$limit" in stage),
+      );
+      countPipeline.push({ $count: "total" });
+      const countResult = await concernModel.aggregate(countPipeline);
+      const totalItems = countResult[0]?.total || 0;
+
+      if (searchMatch) {
+        pipeline.push(searchMatch);
+      }
+
+      pipeline.push(
         { $skip: (page - 1) * limit },
         { $limit: limit },
         { $project: { "userDetails.password": 0 } },
-      ]);
+      );
 
+      const result = await concernModel.aggregate(pipeline);
       console.log("User registered services:", result);
       return {
         allRegisteredUserServices: result,
