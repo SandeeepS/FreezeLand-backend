@@ -264,6 +264,11 @@ class ConcernRepository
         { $skip: (page - 1) * limit },
         { $limit: limit },
         { $project: { "userDetails.password": 0 } },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
       ];
 
       const countPipeline = pipeline.filter(

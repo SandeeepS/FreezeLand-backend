@@ -276,7 +276,7 @@ class UserRepository
     try {
       const { page, limit, userId, searchQuery } = data;
       const objectId = new mongoose.Types.ObjectId(userId);
-      console.log("search Query in the userRepo:",searchQuery);
+      console.log("search Query in the userRepo:", searchQuery);
       const searchMatch = searchQuery
         ? {
             $match: {
@@ -284,7 +284,7 @@ class UserRepository
                 {
                   "serviceDetails.name": { $regex: searchQuery, $options: "i" },
                 },
-                { "name": { $regex: searchQuery, $options: "i" } },
+                { name: { $regex: searchQuery, $options: "i" } },
               ],
             },
           }
@@ -311,6 +311,11 @@ class UserRepository
             localField: "serviceId",
             foreignField: "_id",
             as: "serviceDetails",
+          },
+        },
+        {
+          $sort: {
+            createdAt: -1,
           },
         },
       ];
