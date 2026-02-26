@@ -1,15 +1,15 @@
-import mongoose, { Model, Document } from "mongoose";
+import mongoose, { Model, Document, PipelineStage } from "mongoose";
 import IConcernRepository from "../interfaces/IRepository/IConcernRepository";
 import concernModel, { Iconcern } from "../models/concernModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import {
   GetAllMechanicCompletedServicesResponse,
   IGetAllUserRegisteredServices,
-  GetAllUserRegisteredServicesResponse,
   getComplaintDetailsResponse,
   IAllComplaintDataResponse,
   IUpdateWorkDetails,
   UpdatedcomplaintWithOrderIdResponse,
+  GetAllUserRegisteredServicesResponse,
 } from "../interfaces/dataContracts/Concern/IRepository";
 import { IRegisterService } from "../interfaces/dataContracts/User/IRepository.dto";
 
@@ -28,20 +28,20 @@ class ConcernRepository
       const result = await concernModel.findByIdAndUpdate(
         complaintId,
         { $push: { workDetails: { $each: workDetails } } },
-        { new: true }
+        { new: true },
       );
 
       console.log("result after updation:", result);
       return result;
     } catch (error) {
-      console.log("errror occured in the concernRepository ",error);
+      console.log("errror occured in the concernRepository ", error);
       throw new Error("error occured while udating the worker Details");
     }
   }
 
   //function to get the specified  complaint details  by id
   async getComplaintDetails(
-    id: string
+    id: string,
   ): Promise<getComplaintDetailsResponse[]> {
     try {
       console.log("id in the getUserRegisteredServiceDetailsById", id);
@@ -85,7 +85,7 @@ class ConcernRepository
             as: "serviceDetails",
           },
         },
-         {
+        {
           $lookup: {
             from: "orders",
             localField: "orderId",
@@ -94,7 +94,6 @@ class ConcernRepository
           },
         },
 
-
         { $project: { "userDetails.password": 0 } },
       ]);
       console.log("User registered specific  service is :", result);
@@ -102,7 +101,7 @@ class ConcernRepository
     } catch (error) {
       console.log(
         "Error occured while fetching userDetails in the userRepository ",
-        error as Error
+        error as Error,
       );
       throw new Error("Errorrrrr");
     }
@@ -113,18 +112,18 @@ class ConcernRepository
     page: number,
     limit: number,
     searchQuery: string,
-    search: string
+    search: string,
   ): Promise<IAllComplaintDataResponse[] | null> {
     try {
       console.log(
-        "entered in the get all complaints method in the concern repository"
+        "entered in the get all complaints method in the concern repository",
       );
       console.log("search in the order repository", search);
       const regex = new RegExp(search.trim(), "i");
-      const result =await concernModel
+      const result = await concernModel
         .find({
           isDeleted: false,
-          name:regex,
+          name: regex,
         })
         .skip((page - 1) * limit)
         .limit(limit)
@@ -142,7 +141,7 @@ class ConcernRepository
   async cancelComplaint(
     complaintId: string,
     userRole: string,
-    reason: string
+    reason: string,
   ): Promise<unknown> {
     try {
       console.log("Entered cancelComplaint in concernRepository");
@@ -185,7 +184,7 @@ class ConcernRepository
         const lastEntry = [...complaint.workHistory]
           .reverse()
           .find(
-            (entry) => entry.mechanicId.toString() === mechanicId.toString()
+            (entry) => entry.mechanicId.toString() === mechanicId.toString(),
           );
 
         if (lastEntry) {
@@ -218,12 +217,24 @@ class ConcernRepository
 
   //function for getting all the userRegistered services
   async getAllUserRegisteredServices(
-    data: IGetAllUserRegisteredServices
-  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+    data: IGetAllUserRegisteredServices,
+  ): Promise<GetAllUserRegisteredServicesResponse | null> {
     try {
-      const { page, limit } = data;
-      // Use aggregation to get user's registered services with lookups
-      const result = await concernModel.aggregate([
+      const { page, limit, search } = data;
+      console.log("search is ", search);
+
+      const searchMatch = search
+        ? {
+            $match: {
+              $or: [
+                { "serviceDetails.name": { $regex: search, $options: "i" } },
+                { name: { $regex: search, $options: "i" } },
+              ],
+            },
+          }
+        : null;
+
+      const pipeline: PipelineStage[] = [
         {
           $match: {
             isDeleted: false,
@@ -231,6 +242,7 @@ class ConcernRepository
               { currentMechanicId: { $exists: false } },
               { currentMechanicId: null },
             ],
+            status: { $in: ["accepted", "pending", "onProcess"] },
           },
         },
         {
@@ -252,23 +264,55 @@ class ConcernRepository
         { $skip: (page - 1) * limit },
         { $limit: limit },
         { $project: { "userDetails.password": 0 } },
-      ]);
-      console.log("User registered services:", result);
-      return result as GetAllUserRegisteredServicesResponse[];
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+      ];
+
+      const countPipeline = pipeline.filter(
+        (stage) => !("$skip" in stage) && !("$limit" in stage),
+      );
+      countPipeline.push({ $count: "total" });
+      const countResult = await concernModel.aggregate(countPipeline);
+      const totalItems = countResult[0]?.total || 0;
+
+      if (searchMatch) {
+        pipeline.push(searchMatch);
+      }
+
+      pipeline.push(
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { "userDetails.password": 0 } },
+      );
+
+      const result = await concernModel.aggregate(pipeline);
+
+      return {
+        allRegisteredUserServices: result,
+        pagination: {
+          totalItems,
+          totalPages: Math.ceil(totalItems / limit),
+          currentPage: page,
+          itemsPerPage: limit,
+        },
+      };
     } catch (error) {
       console.log(
         "Error occurred while fetching user registered services:",
-        error as Error
+        error as Error,
       );
       throw new Error(
-        "Error occurred while fetching user registered services."
+        "Error occurred while fetching user registered services.",
       );
     }
   }
 
   //function for getting all the mechanic's completed service history
   async getAllCompletedServiceByMechanic(
-    mechanicId: string
+    mechanicId: string,
   ): Promise<GetAllMechanicCompletedServicesResponse[] | null> {
     try {
       // Convert mechanicId string to ObjectId for comparison
@@ -334,10 +378,10 @@ class ConcernRepository
     } catch (error) {
       console.log(
         "Error occurred while fetching mechanic completed service history:",
-        error as Error
+        error as Error,
       );
       throw new Error(
-        "Error occurred while fetching mechanic completed service history."
+        "Error occurred while fetching mechanic completed service history.",
       );
     }
   }
@@ -345,7 +389,7 @@ class ConcernRepository
   //function to update the orderid in the concern data base after payment optoin
   async updateConcernWithOrderId(
     complaintId: string,
-    orderId: string
+    orderId: string,
   ): Promise<UpdatedcomplaintWithOrderIdResponse | null> {
     try {
       console.log("Entered in the updatedConcernOrderId");
@@ -356,27 +400,27 @@ class ConcernRepository
     } catch (error) {
       console.log(
         "Error occured in the updateconcernWithOrderId in concernRepository",
-        error
+        error,
       );
       throw error;
     }
   }
 
-
-    async addConcern(data: IRegisterService): Promise<Iconcern & Document | null> {
-      try {
-        const newConcern = new concernModel(data);
-        await newConcern.save();
-        return newConcern ;
-      } catch (error) {
-        console.log(
-          "error from the addconcern form the concern repository is ",
-          error as Error
-        );
-        throw Error;
-      }
+  async addConcern(
+    data: IRegisterService,
+  ): Promise<(Iconcern & Document) | null> {
+    try {
+      const newConcern = new concernModel(data);
+      await newConcern.save();
+      return newConcern;
+    } catch (error) {
+      console.log(
+        "error from the addconcern form the concern repository is ",
+        error as Error,
+      );
+      throw Error;
     }
-  
+  }
 }
 
 export default ConcernRepository;

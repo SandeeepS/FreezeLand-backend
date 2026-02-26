@@ -1,4 +1,5 @@
 import userModel, { TempUser } from "../models/userModel";
+import { PipelineStage } from "mongoose";
 import { BaseRepository } from "./BaseRepository/baseRepository";
 import mongoose, { Document } from "mongoose";
 import concernModel from "../models/concernModel";
@@ -94,22 +95,21 @@ class UserRepository
     }
   }
 
-
   async updateTempUserData(
-    data: IUpdateTempDataWithOTP
+    data: IUpdateTempDataWithOTP,
   ): Promise<ITempUser | null> {
     try {
       const { tempUserId, otp } = data;
       const result = await TempUser.findByIdAndUpdate(tempUserId, { otp: otp });
       console.log(
         "Updated tempUserData in the userTempUserData in the userRepository",
-        result
+        result,
       );
       return result;
     } catch (error) {
       console.log(
         "Error occured while udating the tempUserData while storing the new otp in the updateTempUserData , userRepository",
-        error
+        error,
       );
       throw error;
     }
@@ -138,23 +138,23 @@ class UserRepository
     } catch (error) {
       console.log(
         "Error in UserRepository while finding the email",
-        error as Error
+        error as Error,
       );
       throw error;
     }
   }
 
   async emailExistCheck(
-    data: IEmailExistCheck
+    data: IEmailExistCheck,
   ): Promise<EmailExistCheckResponse | null> {
     const { email } = data;
     console.log("email find in userRepsoi", email);
     return this.findOne({ email: email }) as unknown as EmailExistCheckResponse;
   }
 
-  //fucntion for updating the password 
+  //fucntion for updating the password
   async updateNewPassword(
-    data: IUpdateNewPassword
+    data: IUpdateNewPassword,
   ): Promise<UpdateNewPasswordResponse | null> {
     try {
       const { userId, password } = data;
@@ -167,7 +167,7 @@ class UserRepository
     } catch (error) {
       console.log(
         "Error in UserRepository while updating password",
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -194,7 +194,7 @@ class UserRepository
     } catch (error) {
       console.log(error as Error);
       throw new Error(
-        "Error occurred while getting the user by ID in the userRepository"
+        "Error occurred while getting the user by ID in the userRepository",
       );
     }
   }
@@ -227,12 +227,12 @@ class UserRepository
     try {
       const result = await userModel.countDocuments({
         $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
-      });;
+      });
       return result as number;
     } catch (error) {
       console.log(
         "error occured while getting the count in the userRepository",
-        error
+        error,
       );
       throw new Error();
     }
@@ -240,11 +240,16 @@ class UserRepository
 
   //for used in getting all servce provided the website
   async getAllServices(
-    data: IGetAllServices
+    data: IGetAllServices,
   ): Promise<GetAllServiceResponse[] | null> {
     try {
-      const { page, limit, searchQuery ,search} = data;
-      const result = await this._serviceRepository.getAllServices({page, limit, searchQuery,search});
+      const { page, limit, searchQuery, search } = data;
+      const result = await this._serviceRepository.getAllServices({
+        page,
+        limit,
+        searchQuery,
+        search,
+      });
       return result;
     } catch (error) {
       console.log(error as Error);
@@ -266,14 +271,26 @@ class UserRepository
 
   //function for getting all the userRegistered services
   async getAllUserRegisteredServices(
-    data: IGetAllUserRegisteredServices
-  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+    data: IGetAllUserRegisteredServices,
+  ): Promise<GetAllUserRegisteredServicesResponse | null> {
     try {
-      const { page, limit, userId } = data;
+      const { page, limit, userId, searchQuery } = data;
       const objectId = new mongoose.Types.ObjectId(userId);
+      console.log("search Query in the userRepo:", searchQuery);
+      const searchMatch = searchQuery
+        ? {
+            $match: {
+              $or: [
+                {
+                  "serviceDetails.name": { $regex: searchQuery, $options: "i" },
+                },
+                { name: { $regex: searchQuery, $options: "i" } },
+              ],
+            },
+          }
+        : null;
 
-      // Use aggregation to get user's registered services with lookups
-      const result = await concernModel.aggregate([
+      const pipeline: PipelineStage[] = [
         {
           $match: {
             userId: objectId,
@@ -282,7 +299,7 @@ class UserRepository
         },
         {
           $lookup: {
-            from: "users", // The users collection
+            from: "users",
             localField: "userId",
             foreignField: "_id",
             as: "userDetails",
@@ -290,33 +307,61 @@ class UserRepository
         },
         {
           $lookup: {
-            from: "services", // The services collection
+            from: "services",
             localField: "serviceId",
             foreignField: "_id",
             as: "serviceDetails",
           },
         },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+      ];
+
+      const countPipeline = pipeline.filter(
+        (stage) => !("$skip" in stage) && !("$limit" in stage),
+      );
+      countPipeline.push({ $count: "total" });
+      const countResult = await concernModel.aggregate(countPipeline);
+      const totalItems = countResult[0]?.total || 0;
+
+      if (searchMatch) {
+        pipeline.push(searchMatch);
+      }
+
+      pipeline.push(
         { $skip: (page - 1) * limit },
         { $limit: limit },
-        { $project: { "userDetails.password": 0 } }, // Exclude password
-      ]);
+        { $project: { "userDetails.password": 0 } },
+      );
 
+      const result = await concernModel.aggregate(pipeline);
       console.log("User registered services:", result);
-      return result as GetAllUserRegisteredServicesResponse[];
+      return {
+        allRegisteredUserServices: result,
+        pagination: {
+          totalItems,
+          totalPages: Math.ceil(totalItems / limit),
+          currentPage: page,
+          itemsPerPage: limit,
+        },
+      };
     } catch (error) {
       console.log(
         "Error occurred while fetching user registered services:",
-        error as Error
+        error as Error,
       );
       throw new Error(
-        "Error occurred while fetching user registered services."
+        "Error occurred while fetching user registered services.",
       );
     }
   }
 
   //function to get the specified registered usercomplaint details
   async getUserRegisteredServiceDetailsById(
-    id: string
+    id: string,
   ): Promise<getUserRegisteredServiceDetailsByIdResponse[]> {
     try {
       console.log("id in the getUserRegisteredServiceDetailsById", id);
@@ -350,7 +395,7 @@ class UserRepository
     } catch (error) {
       console.log(
         "Error occured while fetching userDetails in the userRepository ",
-        error as Error
+        error as Error,
       );
       throw new Error("Errorrrrr");
     }
@@ -375,14 +420,14 @@ class UserRepository
   // //function to updateUserLocation for user
 
   async updateUserLocation(
-    data: IupdateUserLocation
+    data: IupdateUserLocation,
   ): Promise<IupdateUserLocationResponse | null> {
     try {
       const { userId, locationData } = data;
       console.log(
         "Enterd in the updateUserLocation in the usreRepository ",
         userId,
-        locationData
+        locationData,
       );
       // const qr = { locationData: locationData };
       // const editedUserData = await this.update(userId, qr);
@@ -395,7 +440,7 @@ class UserRepository
   }
 
   async checkAddressExist(
-    data: ICheckUserAddressExist
+    data: ICheckUserAddressExist,
   ): Promise<IcheckUserAddressExitResponse | null> {
     try {
       const { _id } = data;
@@ -415,13 +460,12 @@ class UserRepository
     }
   }
 
-
   async registerService(
-    data: IRegisterService
+    data: IRegisterService,
   ): Promise<RegisterServiceResponse | null> {
     try {
       console.log(
-        "enterd in the userRepository for registering the user complaint"
+        "enterd in the userRepository for registering the user complaint",
       );
       const newConcern = await this._concernRepository.addConcern(data);
       return newConcern;
@@ -433,7 +477,7 @@ class UserRepository
 
   //funciton to find mech details
   async getMechanicDetails(
-    data: IGetMechanicDetails
+    data: IGetMechanicDetails,
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;
@@ -442,12 +486,10 @@ class UserRepository
     } catch (error) {
       console.log(error as Error);
       throw new Error(
-        "Error occured while getting mechanic Details in mechRepository"
+        "Error occured while getting mechanic Details in mechRepository",
       );
     }
   }
-
-
 }
 
 export default UserRepository;

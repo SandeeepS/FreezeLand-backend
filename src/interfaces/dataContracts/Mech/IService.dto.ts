@@ -214,6 +214,16 @@ export interface IGetAllUserRegisteredServices {
 }
 
 export interface GetAllUserRegisteredServicesResponse {
+  allRegisteredUserServices: GetAllUserRegisteredServicesData[];
+  pagination: {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    itemsPerPage: number;
+  };
+}
+
+export interface GetAllUserRegisteredServicesData {
   _id: string;
   name: string;
   image: [];
@@ -266,7 +276,17 @@ export interface getUpdatedWorkAssingnedResponse {
   isDeleted: boolean;
 }
 
-export interface getAllAcceptedServiceResponse {
+export interface GetAllAcceptedServiceResponse {
+  allAcceptedServices: IGetAllAcceptedServiceResponse[];
+  pagination: {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    itemsPerPage: number;
+  };
+}
+
+export interface IGetAllAcceptedServiceResponse {
   _id: mongoose.Types.ObjectId;
   name: string;
   image: [];
@@ -284,7 +304,7 @@ export interface getAllAcceptedServiceResponse {
       acceptedAt: Date;
       canceledAt: Date | null;
       reason: string | null;
-    }
+    },
   ];
   isBlocked: boolean;
   isDeleted: boolean;

@@ -1,4 +1,4 @@
-import  mongoose, { Types, ClientSession } from "mongoose";
+import mongoose, { Types, ClientSession } from "mongoose";
 
 import { Address } from "../../Model/IMech";
 import { AddAddress } from "../../commonInterfaces/AddAddress";
@@ -81,11 +81,11 @@ export interface GetMechByIdResponse {
   isDeleted: boolean;
 }
 
-export interface IGetMechList{
+export interface IGetMechList {
   page: number;
   limit: number;
   searchQuery: string;
-  search:string;
+  search: string;
 }
 
 export interface GetMechListResponse {
@@ -110,10 +110,9 @@ export interface GetAllDevicesResponse {
   isDeleted: boolean;
 }
 
-
 export interface IVerifyMechanic {
-  name:string;
-  id:string;
+  name: string;
+  id: string;
   mechanicType: string[];
   photo: string;
   adharProof: string;
@@ -121,16 +120,15 @@ export interface IVerifyMechanic {
 }
 
 export interface IGetMechanicDetails {
-  id:string;
+  id: string;
 }
-
 
 export interface IGetMechanicAddress {
   mechanicId: string;
 }
 
 export interface IGetMechanicAddressResponse {
-  _id:mongoose.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   fullAddress: string;
   houseNumber: string;
   longitude: number;
@@ -140,24 +138,20 @@ export interface IGetMechanicAddressResponse {
   isDefaultAddress: boolean;
 }
 
-
 export interface getMechanicDetailsResponse {
-  _id:Types.ObjectId | string;
+  _id: Types.ObjectId | string;
   name: string;
   email: string;
   phone: number;
   role: string;
   profile_picture: string;
-  adharProof: string | null; 
+  adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
   isDeleted: boolean;
   isVerified: boolean;
   mechanicType: string[];
 }
-
-
-
 
 export interface getComplaintDetailsResponse {
   _id: string;
@@ -172,9 +166,8 @@ export interface getComplaintDetailsResponse {
   isDeleted: boolean;
   userDetails: object;
   serviceDetails: object;
-  detaultAddressDetails:object;
+  detaultAddressDetails: object;
 }
-
 
 export interface IUpdatingMechanicDetails {
   mechId: string;
@@ -185,14 +178,14 @@ export interface IUpdatingMechanicDetails {
   };
 }
 
-export interface  IUpdateMechanicDetails {
-  mechanicId:string;
-  mechanicEarning:number;
+export interface IUpdateMechanicDetails {
+  mechanicId: string;
+  mechanicEarning: number;
   dbSession: ClientSession;
 }
 
-export interface IupdateingMechanicDetailsResponse{
-    _id: Types.ObjectId | string;
+export interface IupdateingMechanicDetailsResponse {
+  _id: Types.ObjectId | string;
   name: string;
   email: string;
   phone: number;
@@ -206,8 +199,8 @@ export interface IupdateingMechanicDetailsResponse{
   mechanicType: string[];
 }
 
-export interface IUpdatedMechnicDetails{
-      _id: Types.ObjectId | string;
+export interface IUpdatedMechnicDetails {
+  _id: Types.ObjectId | string;
   name: string;
   email: string;
   phone: number;
@@ -215,13 +208,12 @@ export interface IUpdatedMechnicDetails{
   profile_picture: string;
   adharProof: string | null;
   employeeLicense: string;
-  wallet:number;
+  wallet: number;
   isBlocked: boolean;
   isDeleted: boolean;
   isVerified: boolean;
   mechanicType: string[];
 }
-
 
 export interface IMechAddress {
   fullAddress: string;
@@ -232,7 +224,7 @@ export interface IMechAddress {
 }
 
 export interface IAddMechAddress {
-  mechId:string;
+  mechId: string;
   values: IMechAddress;
 }
 
@@ -275,60 +267,75 @@ export interface IEditAddressResponse {
   isDeleted: boolean;
 }
 
-
 export interface IUpdateTempDataWithOTP {
-  tempMechId:string;
-  otp:string;
+  tempMechId: string;
+  otp: string;
 }
 
-export interface getUpdatedWorkAssingnedResponse{
-    _id: mongoose.Types.ObjectId;
-    name: string;
-    image: [];
-    serviceId: mongoose.Types.ObjectId;
-    userId: mongoose.Types.ObjectId;
-    address: mongoose.Types.ObjectId;
-    discription: string;
-    status: string;
-    currentMechanicId: mongoose.Types.ObjectId | null;
-    acceptedAt: Date | null;
-    workHistory: [
-      {
-        mechanicId: mongoose.Types.ObjectId;
-        status: string;
-        acceptedAt: Date;
-        canceledAt: Date | null;
-        reason: string | null;
-      }
-    ];
-    isBlocked: boolean;
-    isDeleted: boolean;
+export interface getUpdatedWorkAssingnedResponse {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  image: [];
+  serviceId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  address: mongoose.Types.ObjectId;
+  discription: string;
+  status: string;
+  currentMechanicId: mongoose.Types.ObjectId | null;
+  acceptedAt: Date | null;
+  workHistory: [
+    {
+      mechanicId: mongoose.Types.ObjectId;
+      status: string;
+      acceptedAt: Date;
+      canceledAt: Date | null;
+      reason: string | null;
+    },
+  ];
+  isBlocked: boolean;
+  isDeleted: boolean;
 }
 
-export interface getAllAcceptedServiceResponse {
-    _id: mongoose.Types.ObjectId;
-    name: string;
-    image: [];
-    serviceId: mongoose.Types.ObjectId;
-    userId: mongoose.Types.ObjectId;
-    address: mongoose.Types.ObjectId;
-    discription: string;
-    status: string;
-    currentMechanicId: mongoose.Types.ObjectId | null;
-    acceptedAt: Date | null;
-    workHistory: [
-      {
-        mechanicId: mongoose.Types.ObjectId;
-        status: string;
-        acceptedAt: Date;
-        canceledAt: Date | null;
-        reason: string | null;
-      }
-    ];
-    isBlocked: boolean;
-    isDeleted: boolean;
+export interface IGetallAcceptedServicesData {
+  page: number;
+  limit: number;
+  search: string;
+  mechanicId: string;
 }
 
+export interface GetAllAcceptedServiceResponse {
+  allAcceptedServices: IGetAllAcceptedServiceResponse[];
+  pagination: {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    itemsPerPage: number;
+  };
+}
+
+export interface IGetAllAcceptedServiceResponse {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  image: [];
+  serviceId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  address: mongoose.Types.ObjectId;
+  discription: string;
+  status: string;
+  currentMechanicId: mongoose.Types.ObjectId | null;
+  acceptedAt: Date | null;
+  workHistory: [
+    {
+      mechanicId: mongoose.Types.ObjectId;
+      status: string;
+      acceptedAt: Date;
+      canceledAt: Date | null;
+      reason: string | null;
+    },
+  ];
+  isBlocked: boolean;
+  isDeleted: boolean;
+}
 
 export interface ISetMechDefaultAddress {
   mechId: string;
@@ -346,19 +353,18 @@ export interface SetMechDefaultAddressResponse {
   isDefaultAddress: boolean;
 }
 
-
 export interface IGetMechanicDetails {
-  id:string;
+  id: string;
 }
 
 export interface getMechanicDetailsResponse {
-  _id:Types.ObjectId | string;
+  _id: Types.ObjectId | string;
   name: string;
   email: string;
   phone: number;
   role: string;
-  profile_picture: string ;
-  adharProof: string | null; 
+  profile_picture: string;
+  adharProof: string | null;
   employeeLicense: string;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -384,9 +390,8 @@ export interface updateCompleteStatusResponse {
       acceptedAt: Date;
       canceledAt: Date | null;
       reason: string | null;
-    }
+    },
   ];
   isBlocked: boolean;
   isDeleted: boolean;
 }
-

@@ -2,7 +2,6 @@ import {
   IAddService,
   EmailExistResponse,
   EmailExitCheck,
-  getAllAcceptedServiceResponse,
   GetAllDevicesResponse,
   getComplaintDetailsResponse,
   IGetMechanicDetails,
@@ -32,13 +31,15 @@ import {
   IGetMechanicAddressResponse,
   ISetMechDefaultAddress,
   SetMechDefaultAddressResponse,
+  IGetallAcceptedServicesData,
+  GetAllAcceptedServiceResponse,
 } from "../interfaces/dataContracts/Mech/IRepository.dto";
 import { IMechRepository } from "../interfaces/IRepository/IMechRepository";
 import { Address, ITempMech, MechInterface } from "../interfaces/Model/IMech";
 import concernModel from "../models/concernModel";
 import MechModel, { TempMech } from "../models/mechModel";
 import { BaseRepository } from "./BaseRepository/baseRepository";
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, PipelineStage } from "mongoose";
 import DeviceRepository from "./deviceRepository";
 import serviceModel from "../models/serviceModel";
 
@@ -59,7 +60,7 @@ class MechRepository
   }): Promise<ITempMech> {
     try {
       console.log(
-        "enterd in the createTempMech funciton in the mechRepository"
+        "enterd in the createTempMech funciton in the mechRepository",
       );
       const createdTempMech = new TempMech({
         otp: tempMechDetails.otp,
@@ -91,7 +92,7 @@ class MechRepository
   }
 
   async emailExistCheck(
-    data: EmailExitCheck
+    data: EmailExitCheck,
   ): Promise<EmailExistResponse | null> {
     try {
       const { email } = data;
@@ -101,14 +102,14 @@ class MechRepository
     } catch (error) {
       console.log(
         "Error in MechRepository while checking email existence",
-        error as Error
+        error as Error,
       );
       throw error;
     }
   }
 
   async updateNewPassword(
-    data: IUpdateNewPassword
+    data: IUpdateNewPassword,
   ): Promise<UpdateNewPasswordResponse | null> {
     try {
       const { mechId, password } = data;
@@ -121,7 +122,7 @@ class MechRepository
     } catch (error) {
       console.log(
         "Error in MechRepository while updating password",
-        error as Error
+        error as Error,
       );
       throw error;
     }
@@ -137,7 +138,7 @@ class MechRepository
   }
 
   async getMechanicDetails(
-    data: IGetMechanicDetails
+    data: IGetMechanicDetails,
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;
@@ -146,27 +147,27 @@ class MechRepository
     } catch (error) {
       console.log(error as Error);
       throw new Error(
-        "Error occured while getting mechanic Details in mechRepository"
+        "Error occured while getting mechanic Details in mechRepository",
       );
     }
   }
 
   //function to get the mechanic address
   async getMechanicAddress(
-    data: IGetMechanicAddress
+    data: IGetMechanicAddress,
   ): Promise<IGetMechanicAddressResponse[] | null> {
     try {
       const { mechanicId } = data;
       console.log(
         "reached the mechController with id for accessing the mehchanic address",
-        mechanicId
+        mechanicId,
       );
       const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
       const qr = { _id: mechanicObjectId };
       const result = await this.find(qr);
       if (result && result.length > 0) {
         const activeAddresses = result[0].address.filter(
-          (addr: Address) => !addr.isDeleted
+          (addr: Address) => !addr.isDeleted,
         );
 
         console.log("Active mechanic addresses:", activeAddresses);
@@ -177,7 +178,7 @@ class MechRepository
     } catch (error) {
       console.log(
         "error while accessing the mechanic address in the mech repository ",
-        error
+        error,
       );
       throw error;
     }
@@ -214,7 +215,7 @@ class MechRepository
     } catch (error) {
       console.log(
         "error occured while getting the count in the userRepository",
-        error
+        error,
       );
       throw new Error();
     }
@@ -258,7 +259,7 @@ class MechRepository
 
   //function to get the specified  complaint details  by id
   async getComplaintDetails(
-    id: string
+    id: string,
   ): Promise<getComplaintDetailsResponse[]> {
     try {
       console.log("id in the getUserRegisteredServiceDetailsById", id);
@@ -310,7 +311,7 @@ class MechRepository
     } catch (error) {
       console.log(
         "Error occured while fetching userDetails in the userRepository ",
-        error as Error
+        error as Error,
       );
       throw new Error("Errorrrrr");
     }
@@ -320,7 +321,7 @@ class MechRepository
     complaintId: string,
     mechanicId: string,
     status: string,
-    roomId: string
+    roomId: string,
   ): Promise<getUpdatedWorkAssingnedResponse> {
     try {
       console.log("Entered in the mechRepository");
@@ -343,27 +344,41 @@ class MechRepository
       const result = await concernModel.findByIdAndUpdate(
         complaintId,
         updateData,
-        { new: true }
+        { new: true },
       );
 
       return result as getUpdatedWorkAssingnedResponse;
     } catch (error) {
       console.log(
-        "Error occurred while updating the complaint database while accessing the work by mechanic"
+        "Error occurred while updating the complaint database while accessing the work by mechanic",
       );
       throw error;
     }
   }
 
-  //find all accepted complaints by mechanic
   // find all accepted complaints by mechanic
   async getAllAcceptedServices(
-    mechanicId: string
-  ): Promise<getAllAcceptedServiceResponse[]> {
+    data: IGetallAcceptedServicesData,
+  ): Promise<GetAllAcceptedServiceResponse> {
     try {
       console.log("entered in the mechRepository");
-      const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
-      const result = await concernModel.aggregate([
+      const mechanicObjectId = new mongoose.Types.ObjectId(data.mechanicId);
+      const { page, limit, search } = data;
+      console.log("search in the mechRepo is ", search);
+      const searchMatch = search
+        ? {
+            $match: {
+              $or: [
+                {
+                  "serviceDetails.name": { $regex: search, $options: "i" },
+                },
+                { name: { $regex: search, $options: "i" } },
+              ],
+            },
+          }
+        : null;
+
+      const pipeline: PipelineStage[] = [
         {
           $match: {
             currentMechanicId: mechanicObjectId,
@@ -409,12 +424,40 @@ class MechRepository
             "userDetails.password": 0,
           },
         },
-      ]);
+      ];
 
-      return result;
+      const countPipeline = pipeline.filter(
+        (stage) => !("$skip" in stage) && !("$limit" in stage),
+      );
+
+      countPipeline.push({ $count: "total" });
+
+      const countResult = await concernModel.aggregate(countPipeline);
+      const totalItems = countResult[0]?.total || 0;
+
+      if (searchMatch) {
+        pipeline.push(searchMatch);
+      }
+
+      pipeline.push(
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { "userDetails.password": 0 } },
+      );
+
+      const result = await concernModel.aggregate(pipeline);
+      return {
+        allAcceptedServices: result,
+        pagination: {
+          totalItems,
+          totalPages: Math.ceil(totalItems / limit),
+          currentPage: page,
+          itemsPerPage: limit,
+        },
+      };
     } catch (error) {
       console.log(
-        "error occurred while getting the accepted service from the database in the mechrepository"
+        "error occurred while getting the accepted service from the database in the mechrepository",
       );
       throw error;
     }
@@ -423,13 +466,13 @@ class MechRepository
   //function to update the complaint status
   async updateComplaintStatus(
     complaintId: string,
-    nextStatus: string
+    nextStatus: string,
   ): Promise<updateCompleteStatusResponse | null> {
     try {
       console.log(
         "Entered in the updateCompaoint Stattus in the mechREpositroy",
         complaintId,
-        nextStatus
+        nextStatus,
       );
       const result = await concernModel.findByIdAndUpdate(complaintId, {
         status: nextStatus,
@@ -439,7 +482,7 @@ class MechRepository
     } catch (error) {
       console.log(
         "error occured during the updation of the status in the mechRepository ",
-        error
+        error,
       );
       throw new Error();
     }
@@ -447,13 +490,13 @@ class MechRepository
 
   //function to update the mechanic Details
   async editMechanic(
-    mechaicDetails: IUpdatingMechanicDetails
+    mechaicDetails: IUpdatingMechanicDetails,
   ): Promise<IupdateingMechanicDetailsResponse | null> {
     try {
       const { mechId, values } = mechaicDetails;
       console.log(
         "Values reached in the mechService in the backend while eding the mechanic",
-        mechaicDetails
+        mechaicDetails,
       );
       const phoneNumber = Number(values.phone);
       const qr = { name: values.name, phone: phoneNumber, photo: values.photo };
@@ -467,13 +510,13 @@ class MechRepository
 
   //update Mechanic
   async updateMechanicEarnings(
-    updateMechanicDetails: IUpdateMechanicDetails
+    updateMechanicDetails: IUpdateMechanicDetails,
   ): Promise<IUpdatedMechnicDetails | null> {
     try {
       const { mechanicId, mechanicEarning, dbSession } = updateMechanicDetails;
       console.log(
         "Mechanic Earning in the updateMechnicEearning ",
-        mechanicEarning
+        mechanicEarning,
       );
 
       const result = await MechModel.findByIdAndUpdate(
@@ -482,17 +525,17 @@ class MechRepository
         {
           session: dbSession,
           new: true,
-        }
+        },
       );
       console.log(
         "wallet updated after adding mechanic earning in the updateMechanicEarning in the mechRepository",
-        result
+        result,
       );
       return result;
     } catch (error) {
       console.log(
         "error occured while updaing the mechanic earning in the mechRepository",
-        error
+        error,
       );
       throw error;
     }
@@ -500,7 +543,7 @@ class MechRepository
 
   //adding mechanic address
   async addMechAddress(
-    data: IAddMechAddress
+    data: IAddMechAddress,
   ): Promise<IAddMechAddressResponse | null> {
     try {
       const { mechId, values } = data;
@@ -509,7 +552,7 @@ class MechRepository
       const addedAddress = await MechModel.findByIdAndUpdate(
         mechId,
         { $push: qr },
-        { new: true }
+        { new: true },
       );
       console.log("added new mech address is ", addedAddress);
       return addedAddress;
@@ -533,33 +576,33 @@ class MechRepository
   }
 
   async updateTempMechData(
-    data: IUpdateTempDataWithOTP
+    data: IUpdateTempDataWithOTP,
   ): Promise<ITempMech | null> {
     try {
       const { tempMechId, otp } = data;
       const result = await TempMech.findByIdAndUpdate(tempMechId, { otp: otp });
       console.log(
         "Updated tempMechData in the mechTempMechData in the mechRepository",
-        result
+        result,
       );
       return result;
     } catch (error) {
       console.log(
         "Error occured while udating the tempMechData while storing the new otp in the updateTempmechData , mechRepository",
-        error
+        error,
       );
       throw error;
     }
   }
   async handleRemoveMechAddress(
     mechId: string,
-    addressId: string
+    addressId: string,
   ): Promise<boolean> {
     try {
       console.log(
         "Entered in mechRepository for removing address",
         mechId,
-        addressId
+        addressId,
       );
 
       const mechanic = await MechModel.findById(mechId);
@@ -569,7 +612,7 @@ class MechRepository
       }
 
       const targetAddress = mechanic.address.find(
-        (addr: Address) => addr._id.toString() === addressId
+        (addr: Address) => addr._id.toString() === addressId,
       );
 
       if (!targetAddress) {
@@ -589,7 +632,7 @@ class MechRepository
   }
 
   async setDefaultAddress(
-    data: ISetMechDefaultAddress
+    data: ISetMechDefaultAddress,
   ): Promise<SetMechDefaultAddressResponse[] | null> {
     try {
       const { mechId, addressId } = data;
@@ -612,13 +655,13 @@ class MechRepository
             return { ...addr, isDefaultAddress: true };
           }
           return { ...addr, isDefaultAddress: false };
-        }
+        },
       );
 
       const updatedMechanic = await mechanic.save();
       console.log(
         "Updated default address successfully:",
-        updatedMechanic.address
+        updatedMechanic.address,
       );
       return updatedMechanic.address;
     } catch (error) {

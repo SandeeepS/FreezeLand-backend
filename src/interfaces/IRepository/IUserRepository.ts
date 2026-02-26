@@ -41,7 +41,7 @@ export interface IUserRepository {
     getUserCount(regex: RegExp): Promise<number>;
     getAllServices(data: IGetAllServices): Promise<GetAllServiceResponse[] | null>;
     getServiceCount(data: IGetServiceCount): Promise<number>;
-    getAllUserRegisteredServices(data: IGetAllUserRegisteredServices): Promise<GetAllUserRegisteredServicesResponse[] | null>;
+    getAllUserRegisteredServices(data: IGetAllUserRegisteredServices): Promise<GetAllUserRegisteredServicesResponse | null>;
     getUserRegisteredServiceDetailsById (id:string) :Promise<getUserRegisteredServiceDetailsByIdResponse[]>
     editUser(data: IEditUser): Promise<EditUserResponse | null>;
     registerService(data: IRegisterService):Promise<RegisterServiceResponse | null> ;
