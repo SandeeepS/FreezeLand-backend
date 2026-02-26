@@ -3,7 +3,6 @@ import { IAddMechAddressResponse, SetMechDefaultAddressResponse } from "../dataC
 import {
     EmailExistResponse,
     IEmailExitCheck,
-    getAllAcceptedServiceResponse,
     GetAllDevicesResponse,
     GetAllMechanicCompletedServicesResponse,
     GetAllMechanicResponse,
@@ -38,6 +37,7 @@ import {
     IGetMechanicAddress,
     IGetMechanicAddressResponse,
     ISetMechDefaultAddress,
+    GetAllAcceptedServiceResponse,
   } from "../dataContracts/Mech/IService.dto";
 import { ITempMech } from "../Model/IMech";
 
@@ -51,9 +51,9 @@ export interface IMechServices{
     getAllMechanics(data: IGetAllMechanics): Promise<GetAllMechanicResponse | null>;
     VerifyMechanic (values:IVerifyMechanic):Promise<unknown>
     updateNewPassword(data: IUpdateNewPassword):Promise<UpdateNewPasswordResponse | null>;
-    getAllUserRegisteredServices(page: number, limit: number, searchQuery: string,userId:string): Promise<unknown>;
+    getAllUserRegisteredServices(page: number, limit: number, search: string): Promise<unknown>;
     getComplaintDetails(id:string) :Promise<getComplaintDetailsResponse[] | null >
-    getAllAcceptedServices (mechanicId : string) : Promise<getAllAcceptedServiceResponse[]>
+    getAllAcceptedServices (page:number,limit:number,search:string,mechanicId : string) : Promise<GetAllAcceptedServiceResponse>
     updateWorkDetails(data : IUpdateWorkDetails ) :Promise<unknown>
     getDevcies(): Promise<GetAllDevicesResponse[]>
     getMechanicDetails(data: IGetMechanicDetails): Promise<getMechanicDetailsResponse | null> 

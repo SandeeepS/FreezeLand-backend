@@ -3,9 +3,7 @@ import {
     IAddService,
     EmailExistResponse,
     EmailExitCheck,
-    getAllAcceptedServiceResponse,
     GetAllDevicesResponse,
-   
     getComplaintDetailsResponse,
     IGetMechanicDetails,
     getMechanicDetailsResponse,
@@ -34,6 +32,8 @@ import {
     IGetMechanicAddressResponse,
     ISetMechDefaultAddress,
     SetMechDefaultAddressResponse,
+    IGetallAcceptedServicesData,
+    GetAllAcceptedServiceResponse,
   } from "../dataContracts/Mech/IRepository.dto";
 import { ITempMech } from "../Model/IMech";
 
@@ -50,7 +50,7 @@ export interface IMechRepository{
     getMechanicDetails (data:IGetMechanicDetails):Promise<getMechanicDetailsResponse|null> 
     getComplaintDetails (id:string) :Promise<getComplaintDetailsResponse[]> 
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string,roomId:string): Promise<getUpdatedWorkAssingnedResponse> 
-    getAllAcceptedServices (mechanicId:string):Promise <getAllAcceptedServiceResponse[]>
+    getAllAcceptedServices (data: IGetallAcceptedServicesData):Promise <GetAllAcceptedServiceResponse>
     updateComplaintStatus(complaintId:string,nextStatus:string):Promise<updateCompleteStatusResponse | null>
     createTempMechData(tempMechDetails: {otp: string;mechData: MechRegistrationData;}): Promise<ITempMech>
     getTempMechData(id:string):Promise<ITempMech | null>

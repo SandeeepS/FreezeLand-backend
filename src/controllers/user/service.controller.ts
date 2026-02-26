@@ -65,27 +65,27 @@ class ServiceController implements IServiceController {
     next: NextFunction,
   ) {
     try {
-      const { userId } = req.query;
+      const { userId, page, limit, search } = req.query;
       console.log(
         "userId in the userController in the getAllUserRegisteredService",
         userId,
+        page,
+        limit,
+        search,
       );
 
-      const page = 1;
-      const limit = 25;
-      const searchQuery = "";
       const allRegisteredUserServices =
         await this._userServices.getAllUserRegisteredServices(
-          page,
-          limit,
-          searchQuery,
+          parseInt(page as string) || 1,
+          parseInt(limit as string) || 5,
+          search as string,
           userId as string,
         );
       if (allRegisteredUserServices) {
         res.status(OK).json({
           success: true,
           message: "data fetched successfully",
-          allRegisteredUserServices: allRegisteredUserServices,
+          allRegisteredUserServices,
         });
       } else {
         res.status(NOT_FOUND).json({
