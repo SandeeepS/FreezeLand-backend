@@ -289,7 +289,7 @@ class ConcernRepository
       );
 
       const result = await concernModel.aggregate(pipeline);
-
+      console.log("Complaints registered by users are:",result);
       return {
         allRegisteredUserServices: result,
         pagination: {
