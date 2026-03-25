@@ -102,13 +102,19 @@ class ConcernService implements IConcernService {
 
   //function to get completed service/complait completed by mechanic
   async getAllCompletedServiceByMechanic(
-    mechanicId: string
-  ): Promise<GetAllMechanicCompletedServicesResponse[] | null> {
+    mechanicId: string,
+    page : number ,
+    limit : number ,
+    search : string
+  ): Promise<GetAllMechanicCompletedServicesResponse | null> {
     try {
       console.log("Entered in the concern Service", mechanicId);
       const result =
         await this._concernRepositroy.getAllCompletedServiceByMechanic(
-          mechanicId
+          mechanicId,
+          page, 
+          limit,
+          search
         );
       return result;
     } catch (error) {

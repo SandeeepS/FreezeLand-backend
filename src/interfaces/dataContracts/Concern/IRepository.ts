@@ -53,6 +53,15 @@ export interface GetAllUserRegisteredServicesData {
 }
 
 export interface GetAllMechanicCompletedServicesResponse {
+  completedServices: GetAllMechanicCompletedServicesData[];
+  pagination: {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    itemsPerPage: number;
+  };
+}
+export interface GetAllMechanicCompletedServicesData {
   _id: string;
   name: string;
   image: [];

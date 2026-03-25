@@ -62,7 +62,7 @@ class mechService implements IMechServices {
     private _roomRepository: IRoomRepository,
     private _createjwt: ICreateJWT,
     private _encrypt: compareInterface,
-    private _email: Iemail
+    private _email: Iemail,
   ) {
     this._mechRepository = _mechRepository;
     this._concernRepository = _concernRepository;
@@ -73,7 +73,7 @@ class mechService implements IMechServices {
   }
 
   async mechRegistration(
-    mechData: MechRegistrationData
+    mechData: MechRegistrationData,
   ): Promise<Partial<ITempMech>> {
     try {
       const { email, name, phone, password, cpassword } = mechData;
@@ -82,7 +82,7 @@ class mechService implements IMechServices {
         phone.toString(),
         email,
         password,
-        cpassword
+        cpassword,
       );
 
       if (!isValid) {
@@ -99,14 +99,13 @@ class mechService implements IMechServices {
         throw new Error("Failed to generate OTP");
       }
       const tempMechDetails = { otp, mechData };
-      const savedTempMech = await this._mechRepository.createTempMechData(
-        tempMechDetails
-      );
+      const savedTempMech =
+        await this._mechRepository.createTempMechData(tempMechDetails);
       return savedTempMech;
     } catch (error) {
       console.log(
         "Error occured in the mechRegistration in the mechService ",
-        error
+        error,
       );
       throw error;
     }
@@ -117,7 +116,7 @@ class mechService implements IMechServices {
       console.log(
         "enterd in the verify otp funciton in the mechServices ",
         id,
-        otp
+        otp,
       );
       const getTempMechData = await this._mechRepository.getTempMechData(id);
       if (!getTempMechData) {
@@ -137,7 +136,7 @@ class mechService implements IMechServices {
           const secret_key: string | undefined = process.env.CRYPTR_SECRET;
           if (!secret_key) {
             throw new Error(
-              "Encryption secret key is not defined in the environment"
+              "Encryption secret key is not defined in the environment",
             );
           }
 
@@ -161,10 +160,10 @@ class mechService implements IMechServices {
             const mechId = mech.id?.toString();
             const access_token = this._createjwt.generateAccessToken(
               mechId as string,
-              mech.role
+              mech.role,
             );
             const refresh_token = this._createjwt.generateRefreshToken(
-              mechId as string
+              mechId as string,
             );
             console.log("access token is", access_token);
             console.log("refreshtoken is", refresh_token);
@@ -203,7 +202,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured in the verifyOTP function in the mechServie",
-        error
+        error,
       );
       throw error;
     }
@@ -214,12 +213,11 @@ class mechService implements IMechServices {
     try {
       const { tempMechId } = data;
       console.log("TempMechId isssssssss", tempMechId);
-      const tempUserData = await this._mechRepository.getTempMechData(
-        tempMechId
-      );
+      const tempUserData =
+        await this._mechRepository.getTempMechData(tempMechId);
       console.log(
         "tempMechData in the resendOTP in the mechService",
-        tempUserData
+        tempUserData,
       );
       const userEmail = tempUserData?.mechData.email;
       const otp = await this._email.generateAndSendOTP(userEmail as string);
@@ -231,7 +229,7 @@ class mechService implements IMechServices {
         {
           tempMechId,
           otp,
-        }
+        },
       );
       return updatedTempUserData;
     } catch (error) {
@@ -247,7 +245,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured in the singup function in the mechService ",
-        error
+        error,
       );
       throw error;
     }
@@ -260,7 +258,7 @@ class mechService implements IMechServices {
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
       if (!secret_key) {
         throw new Error(
-          "Encrption secret key is not defined in the environment"
+          "Encrption secret key is not defined in the environment",
         );
       }
       const cryptr = new Cryptr(secret_key, {
@@ -318,7 +316,7 @@ class mechService implements IMechServices {
         const mech = await this._mechRepository.emailExistCheck({ email });
         console.log(
           "accessed mechanic details from the mechService, in the mechLogin function is ",
-          mech
+          mech,
         );
 
         if (mech?._id) {
@@ -335,7 +333,7 @@ class mechService implements IMechServices {
             if (mech.password && password) {
               const passwordMatch = await this._encrypt.compare(
                 password,
-                mech.password as string
+                mech.password as string,
               );
 
               if (passwordMatch) {
@@ -343,7 +341,7 @@ class mechService implements IMechServices {
                 const mechId = mech._id.toString();
                 const token = this._createjwt.generateAccessToken(
                   mechId,
-                  mech.role
+                  mech.role,
                 );
                 const refreshToken =
                   this._createjwt.generateRefreshToken(mechId);
@@ -413,7 +411,7 @@ class mechService implements IMechServices {
   }
 
   async getUserByEmail(
-    data: IEmailExitCheck
+    data: IEmailExitCheck,
   ): Promise<EmailExistResponse | null> {
     try {
       const { email } = data;
@@ -425,7 +423,7 @@ class mechService implements IMechServices {
   }
 
   async getAllMechanics(
-    data: IGetAllMechanics
+    data: IGetAllMechanics,
   ): Promise<GetAllMechanicResponse | null> {
     try {
       const { page, limit, searchQuery } = data;
@@ -447,7 +445,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured in the getAllmechanic in the mechServie",
-        error
+        error,
       );
       throw error;
     }
@@ -461,14 +459,14 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured in the verifyMechanci in the mechServie",
-        error
+        error,
       );
       throw error;
     }
   }
 
   async getS3SingUrlForMechCredinential(
-    data: IGetPreSignedUrl
+    data: IGetPreSignedUrl,
   ): Promise<GetPreSignedUrlResponse> {
     try {
       const { fileName, fileType, name } = data;
@@ -485,7 +483,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "error occured in the getS3SignURlforMechCredinentaial in the mechServie",
-        error
+        error,
       );
       throw error;
     }
@@ -494,19 +492,19 @@ class mechService implements IMechServices {
   //update the compliant Status
   async updateComplaintStatus(
     complaintId: string,
-    nextStatus: string
+    nextStatus: string,
   ): Promise<updateCompleteStatusResponse | null> {
     try {
       console.log("Entered in the updateComplaintStatus");
       const result = await this._mechRepository.updateComplaintStatus(
         complaintId,
-        nextStatus
+        nextStatus,
       );
       return result;
     } catch (error) {
       console.log(
         "Error occured in the mechService while updaing the complaint status",
-        error
+        error,
       );
       throw error;
     }
@@ -525,14 +523,14 @@ class mechService implements IMechServices {
   }
 
   async updateNewPassword(
-    data: IUpdateNewPassword
+    data: IUpdateNewPassword,
   ): Promise<UpdateNewPasswordResponse | null> {
     try {
       const { password, mechId } = data;
       const secret_key: string | undefined = process.env.CRYPTR_SECRET;
       if (!secret_key) {
         throw new Error(
-          "Encrption secret key is not defined in the environment"
+          "Encrption secret key is not defined in the environment",
         );
       }
       const cryptr = new Cryptr(secret_key, {
@@ -549,14 +547,14 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured in the updatePassword in the mechService",
-        error
+        error,
       );
       throw error;
     }
   }
 
   async getMechanicDetails(
-    data: IGetMechanicDetails
+    data: IGetMechanicDetails,
   ): Promise<getMechanicDetailsResponse | null> {
     try {
       const { id } = data;
@@ -566,7 +564,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured in the getMechanicDetails in the mechService",
-        error
+        error,
       );
       throw error;
     }
@@ -574,13 +572,13 @@ class mechService implements IMechServices {
 
   //function to get the mechanic address
   async getMechanicAddress(
-    data: IGetMechanicAddress
+    data: IGetMechanicAddress,
   ): Promise<IGetMechanicAddressResponse[] | null> {
     try {
       const { mechanicId } = data;
       console.log(
         "reached the mechController with id for accessing the mehchanic address",
-        mechanicId
+        mechanicId,
       );
       const result = await this._mechRepository.getMechanicAddress({
         mechanicId,
@@ -589,7 +587,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "error while accessing the mechanic address in the mech service ",
-        error
+        error,
       );
       throw error;
     }
@@ -598,7 +596,7 @@ class mechService implements IMechServices {
   async getAllUserRegisteredServices(
     page: number,
     limit: number,
-    search: string
+    search: string,
   ): Promise<GetAllUserRegisteredServicesResponse | null> {
     try {
       const data = await this._concernRepository.getAllUserRegisteredServices({
@@ -612,7 +610,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured while fetching the user registerd complaint in the mechService ",
-        error
+        error,
       );
       throw error;
     }
@@ -620,7 +618,7 @@ class mechService implements IMechServices {
 
   //function to getting the specified complinat using id
   async getComplaintDetails(
-    id: string
+    id: string,
   ): Promise<getComplaintDetailsResponse[] | null> {
     try {
       console.log("Enterdin the mechService");
@@ -629,7 +627,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured while getting the specified Complaint by id in the mechServices  ",
-        error
+        error,
       );
       throw error;
     }
@@ -640,7 +638,7 @@ class mechService implements IMechServices {
     complaintId: string,
     mechanicId: string,
     status: string,
-    roomId: string
+    roomId: string,
   ): Promise<getUpdatedWorkAssingnedResponse> {
     try {
       console.log("Entered the mechservice");
@@ -648,12 +646,12 @@ class mechService implements IMechServices {
         complaintId,
         mechanicId,
         status,
-        roomId
+        roomId,
       );
       return result;
     } catch (error) {
       console.log(
-        "Error occued while updating the compliant database while mechanic accepting the work"
+        "Error occued while updating the compliant database while mechanic accepting the work",
       );
       throw error;
     }
@@ -661,10 +659,10 @@ class mechService implements IMechServices {
 
   //function to get the all acccepted services by mechanic
   async getAllAcceptedServices(
-    page:number,
-    limit:number,
-    search:string,
-    mechanicId: string
+    page: number,
+    limit: number,
+    search: string,
+    mechanicId: string,
   ): Promise<GetAllAcceptedServiceResponse> {
     try {
       console.log("Enterd in the mechService");
@@ -672,13 +670,13 @@ class mechService implements IMechServices {
         page,
         limit,
         search,
-        mechanicId
-    });
+        mechanicId,
+      });
       return result;
     } catch (error) {
       console.log(
         "Error occured while getting the accepted complaint details in the mechService",
-        error
+        error,
       );
       throw error;
     }
@@ -703,7 +701,7 @@ class mechService implements IMechServices {
       console.log(
         "complaintId and wrokDetails in the mechService is ",
         complaintId,
-        workDetails
+        workDetails,
       );
       const result = await this._concernRepository.updateWorkDetails({
         complaintId,
@@ -712,7 +710,7 @@ class mechService implements IMechServices {
       return result;
     } catch (error) {
       console.log(
-        "error occured in the mechService while updating the work details while fixing  the complaint "
+        "error occured in the mechService while updating the work details while fixing  the complaint ",
       );
       throw error;
     }
@@ -720,21 +718,28 @@ class mechService implements IMechServices {
 
   //function to getAllCompleted complaint by mechanic
   async getAllCompletedServices(
-    mechanicId: string
-  ): Promise<GetAllMechanicCompletedServicesResponse[] | null> {
+    mechanicId: string,
+    page: number,
+    limit: number,
+    search: string,
+  ): Promise<GetAllMechanicCompletedServicesResponse | null> {
     try {
+      
       console.log(
-        "Entered in the getAllCompliantService funtion in the mechService"
+        "Entered in the getAllCompliantService funtion in the mechService",
       );
       const result =
         await this._concernRepository.getAllCompletedServiceByMechanic(
-          mechanicId
+          mechanicId,
+          page,
+          limit,
+          search
         );
       return result;
     } catch (error) {
       console.log(
         "error in getAllCompletedServices in the  mechService",
-        error
+        error,
       );
       throw error;
     }
@@ -742,13 +747,13 @@ class mechService implements IMechServices {
 
   //function to edit the mechanic profile
   async editMechanic(
-    mechaicDetails: IUpdatingMechanicDetails
+    mechaicDetails: IUpdatingMechanicDetails,
   ): Promise<IupdateingMechanicDetailsResponse | null> {
     try {
       const { mechId, values } = mechaicDetails;
       console.log(
         "Values reached in the mechService in the backend while eding the mechanic",
-        mechaicDetails
+        mechaicDetails,
       );
       const result = await this._mechRepository.editMechanic({
         mechId,
@@ -763,7 +768,7 @@ class mechService implements IMechServices {
 
   //function to add the address for the mechanic
   async AddMechAddress(
-    data: IAddMechAddress
+    data: IAddMechAddress,
   ): Promise<IAddMechAddressResponse | null> {
     try {
       const { values } = data;
@@ -798,30 +803,30 @@ class mechService implements IMechServices {
 
   async handleRemoveMechAddress(
     mechId: string,
-    addressId: string
+    addressId: string,
   ): Promise<boolean> {
     try {
       console.log(
         "Enterd in the handleRemoveMechAddress in the mechService",
         mechId,
-        addressId
+        addressId,
       );
       const result = await this._mechRepository.handleRemoveMechAddress(
         mechId,
-        addressId
+        addressId,
       );
       return result;
     } catch (error) {
       console.log(
         "Error occured in thehandleRemoveMechAddress function in mech service ",
-        error
+        error,
       );
       throw error;
     }
   }
 
   async setUserDefaultAddress(
-    data: ISetMechDefaultAddress
+    data: ISetMechDefaultAddress,
   ): Promise<SetMechDefaultAddressResponse[] | null> {
     try {
       const { mechId, addressId } = data;
@@ -832,7 +837,7 @@ class mechService implements IMechServices {
     } catch (error) {
       console.log(
         "Error occured in the setUserDefaultAddress in the mechService",
-        error
+        error,
       );
       throw error;
     }
