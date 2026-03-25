@@ -80,13 +80,13 @@ class ConcernService implements IConcernService {
   async getAllUserRegisteredServices(
     page: number,
     limit: number,
-    searchQuery: string
-  ): Promise<GetAllUserRegisteredServicesResponse[] | null> {
+    search: string
+  ): Promise<GetAllUserRegisteredServicesResponse | null> {
     try {
       const data = await this._concernRepositroy.getAllUserRegisteredServices({
         page,
         limit,
-        searchQuery,
+        search,
       });
       console.log("data in the mechService ", data);
 
