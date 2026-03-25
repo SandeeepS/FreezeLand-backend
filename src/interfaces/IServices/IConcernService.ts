@@ -6,7 +6,7 @@ export interface IConcernService {
      getComplaintById(complaintId: string): Promise<getComplaintDetailsResponse[]  | null>
      cancelComplaint(complaintId: string,userRole : string,reason:string) :Promise<unknown>
      getAllUserRegisteredServices(page: number,limit: number, searchQuery: string): Promise<GetAllUserRegisteredServicesResponse | null> 
-     getAllCompletedServiceByMechanic(mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null>
+     getAllCompletedServiceByMechanic(mechanicId: string,page : number ,limit : number ,search : string): Promise<GetAllMechanicCompletedServicesResponse | null>      
      updateConcernWithOrderId(complaintId:string, orderId:string):Promise<UpdatedcomplaintWithOrderIdResponse | null>
 }
 

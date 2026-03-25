@@ -180,10 +180,13 @@ class MechanicServiceController implements IMechanicServiceController {
   ) {
     try {
       console.log("Entered in the getAllCompleted Services");
-      const { mechanicId } = req.query;
+      const { mechanicId, page, limit, search } = req.query;
       console.log("mechanic id is", mechanicId);
       const result = await this._mechServices.getAllCompletedServices(
         mechanicId as string,
+        parseInt(page as string),
+        parseInt(limit as string),
+        search as string,
       );
       res.status(OK).json({ success: true, result });
     } catch (error) {

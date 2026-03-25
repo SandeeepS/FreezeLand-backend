@@ -137,7 +137,6 @@ class ConcernRepository
     }
   }
 
-
   //funciton to cancel complaints
   async cancelComplaint(
     complaintId: string,
@@ -337,13 +336,25 @@ class ConcernRepository
   //function for getting all the mechanic's completed service history
   async getAllCompletedServiceByMechanic(
     mechanicId: string,
-  ): Promise<GetAllMechanicCompletedServicesResponse[] | null> {
+    page: number,
+    limit: number,
+    search: string,
+  ): Promise<GetAllMechanicCompletedServicesResponse | null> {
     try {
-      // Convert mechanicId string to ObjectId for comparison
       const mechanicObjectId = new mongoose.Types.ObjectId(mechanicId);
 
-      // Use aggregation to get all completed services where mechanic was involved
-      const result = await concernModel.aggregate([
+      const searchMatch = search
+        ? {
+            $match: {
+              $or: [
+                { "serviceDetails.name": { $regex: search, $options: "i" } },
+                { "userDetails.name": { $regex: search, $options: "i" } },
+              ],
+            },
+          }
+        : null;
+
+      const basePipeline: PipelineStage[] = [
         {
           $match: {
             isDeleted: false,
@@ -388,17 +399,40 @@ class ConcernRepository
             },
           },
         },
+      ];
+
+      if (searchMatch) {
+        basePipeline.push(searchMatch);
+      }
+
+      const countPipeline = [...basePipeline, { $count: "total" }];
+      const countResult = await concernModel.aggregate(countPipeline);
+      const totalItems = countResult[0]?.total || 0;
+
+      const dataPipeline: PipelineStage[] = [
+        ...basePipeline,
         { $sort: { updatedAt: -1 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
         {
           $project: {
             "userDetails.password": 0,
             "currentMechanicDetails.password": 0,
           },
         },
-      ]);
+      ];
 
-      console.log("Mechanic completed service history:", result);
-      return result as GetAllMechanicCompletedServicesResponse[];
+      const result = await concernModel.aggregate(dataPipeline);
+
+      return {
+        completedServices: result,
+        pagination: {
+          totalItems,
+          totalPages: Math.ceil(totalItems / limit),
+          currentPage: page,
+          itemsPerPage: limit,
+        },
+      };
     } catch (error) {
       console.log(
         "Error occurred while fetching mechanic completed service history:",
