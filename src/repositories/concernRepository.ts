@@ -136,6 +136,7 @@ class ConcernRepository
       throw error;
     }
   }
+  
 
   //funciton to cancel complaints
   async cancelComplaint(
@@ -261,6 +262,26 @@ class ConcernRepository
             as: "serviceDetails",
           },
         },
+        {
+          $lookup: {
+            from: "addresses",
+            let: { addressId: "$address" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$_id", "$$addressId"] },
+                },
+              },
+              {
+                $project: {
+                  longitude: 1,
+                  latitude: 1,
+                },
+              },
+            ],
+            as: "addressOfUser",
+          },
+        },
         { $skip: (page - 1) * limit },
         { $limit: limit },
         { $project: { "userDetails.password": 0 } },
@@ -289,7 +310,10 @@ class ConcernRepository
       );
 
       const result = await concernModel.aggregate(pipeline);
-      console.log("Complaints registered by users are:",result);
+      console.log(
+        "Complaints registered by users are:",
+        result[0].addressOfUser,
+      );
       return {
         allRegisteredUserServices: result,
         pagination: {
