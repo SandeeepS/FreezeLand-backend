@@ -61,7 +61,7 @@ export interface IMechServices{
     updateWorkAssigned(complaintId: string,mechanicId: string,status: string,roomId: string): Promise<getUpdatedWorkAssingnedResponse> 
     updateComplaintStatus(complaintId: string, nextStatus: string):Promise<updateCompleteStatusResponse | null>   
     createRoom(data: ICreateRoomData): Promise<ICreateRoomResponse> 
-    getAllCompletedServices (mechanicId:string):Promise<GetAllMechanicCompletedServicesResponse[] | null>
+    getAllCompletedServices(mechanicId: string,page: number,limit: number,search: string): Promise<GetAllMechanicCompletedServicesResponse | null>    
     editMechanic(mechaicDetails:IUpdatingMechanicDetails) :Promise<IupdateingMechanicDetailsResponse | null> 
     AddMechAddress(data: IAddMechAddress): Promise<IAddMechAddressResponse | null> 
     editAddress(data: IEditAddress): Promise<IEditAddressResponse | null> 
