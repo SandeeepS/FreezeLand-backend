@@ -136,7 +136,7 @@ class ConcernRepository
       throw error;
     }
   }
-  
+
 
   //funciton to cancel complaints
   async cancelComplaint(
