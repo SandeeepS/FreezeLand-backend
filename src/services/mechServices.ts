@@ -724,7 +724,6 @@ class mechService implements IMechServices {
     search: string,
   ): Promise<GetAllMechanicCompletedServicesResponse | null> {
     try {
-      
       console.log(
         "Entered in the getAllCompliantService funtion in the mechService",
       );
@@ -733,8 +732,13 @@ class mechService implements IMechServices {
           mechanicId,
           page,
           limit,
-          search
+          search,
         );
+      console.log(
+        "result of completd services by mechnaic in the mechService , getAllComplted function",
+        result,
+      );
+
       return result;
     } catch (error) {
       console.log(
