@@ -54,7 +54,7 @@ userRouter.post('/verify-forgot-otp', async (req: Request, res: Response,next:Ne
 userRouter.post('/resend-otp',async(req:Request,res:Response,next:NextFunction) => await authController.resendOTP(req,res,next));
 userRouter.post('/handlePayment',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await controller.createStripeSession(req,res,next));
 userRouter.put('/update-newpassword',async(req: Request, res: Response,next:NextFunction) => await authController.updateNewPassword(req, res,next));
-userRouter.get('/profile',async (req: Request, res: Response,next:NextFunction) => await profileController.getProfile(req, res,next));
+userRouter.get('/profile',userAuth(["user"]),async (req: Request, res: Response,next:NextFunction) => await profileController.getProfile(req, res,next));
 userRouter.put('/editUser',userAuth(["user"]),async (req:Request,res:Response,next:NextFunction) => await profileController.editUser(req,res,next));
 userRouter.post('/addAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.addAddress(req,res,next));
 userRouter.put('/setDefaultAddress',userAuth(["user"]),async(req:Request,res:Response,next:NextFunction) => await addressController.setDefaultAddress(req,res,next));
