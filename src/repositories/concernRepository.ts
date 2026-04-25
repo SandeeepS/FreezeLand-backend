@@ -67,14 +67,11 @@ class ConcernRepository
           $unwind: "$userDetails",
         },
         {
-          $addFields: {
-            defaultAddressDetails: {
-              $filter: {
-                input: "$userDetails.address",
-                as: "addr",
-                cond: { $eq: ["$$addr._id", "$defaultAddress"] },
-              },
-            },
+          $lookup: {
+            from: "addresses",
+            localField: "address",
+            foreignField: "_id",
+            as: "userAddress",
           },
         },
         {
